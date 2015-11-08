@@ -58,11 +58,9 @@ This example uses the layout framework to read NAACCR files and translate them i
 ```java
 File dataFile = new File("my-data.txd.gz");
 Layout layout = LayoutFactory.getLayout(LayoutFactory.LAYOUT_ID_NAACCR_16_ABSTRACT);
-for (<Map<String, String> rec : (RecordLayout)layout.readAllRecords(new File("my_file.txt"))) {
-    Collection<RuleFailure> failures = ValidationEngine.validate(new SimpleNaaccrLinesValidatable(rec));
-    for (RuleFailure failure : failures)
+for (<Map<String, String> rec : ((NaaccrLayout)layout).readAllRecords(new File("my_file.txt")))
+    for (RuleFailure failure : ValidationEngine.validate(new SimpleNaaccrLinesValidatable(rec)))
         System.out.println(failure.getMessage());
-}
 ```
 
 ### Using the edits testing framework
