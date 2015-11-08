@@ -1,0 +1,228 @@
+Functions.GEN_RESET_LOCAL_CONTEXT(binding);
+// this is only required because this edit uses inner functions...
+def AJC6STGP_DBF_SIZE = AJC6STGP_DBF.size()
+def AJC6STGP_DBF_GRPSTAGE_SIZE = AJC6STGP_DBF_GRPSTAGE.size()
+def AJC6HIST_DBF_SIZE = AJC6HIST_DBF.size()
+def AJC6SIGP_DBF_SIZE = AJC6SIGP_DBF.size()
+def AJC6HIST_DBF_GRPHISTLOW_SIZE = AJC6HIST_DBF_GRPHISTLOW.size()
+def AJC6STGC_DBF_GRPSTAGE_SIZE = AJC6STGC_DBF_GRPSTAGE.size()
+def AJC6SIGP_DBF_SITELOW_SIZE = AJC6SIGP_DBF_SITELOW.size()
+def AJC6STGC_DBF_SIZE = AJC6STGC_DBF.size()
+
+/* Declare variables in table to be referenced in edit */
+SITELOW = new char[100]
+SITEHIGH = new char[100]
+GRP = new char[100]
+HISTLOW = new char[100]
+HISTHIGH = new char[100]
+GPCODE = new char[100]
+GRPSTAGE = new char[100]
+
+req_flag = 0
+permit_flag = 0
+dx_year = 0
+
+/* Declare concatenated Site Group/Stage variable */
+GrpStg = new char[11]
+
+SiteGrp = new char[5]
+Site = new char[5]
+
+/* Declare concatenated SiteGrp/Histology variable */
+GrpHist = new char[7]
+
+dx_year = Functions.GEN_DATE_YEAR_IOP(binding, untrimmedline.dateOfDiagnosis)
+
+if (dx_year == GEN_DT_EMPTY)
+    return true
+
+if (dx_year == GEN_DT_ERROR)
+    return Functions.GEN_ERROR_TEXT(binding, "Date of Diagnosis: %DC")
+
+if (dx_year < 2003 || dx_year > 2009)
+    return true
+
+if (!Functions.GEN_INLIST(untrimmedline.tnmEditionNumber, "06,88"))
+    return true
+
+if (Functions.GEN_EMPTY(untrimmedline.histologyIcdO3))
+    return true
+
+/* if behavior is benign or borderline - pass */
+if (Functions.GEN_INLIST(untrimmedline.behaviorIcdO3, "0,1"))
+    return true
+
+if (Functions.GEN_INLIST(untrimmedline.overRideSiteTnmStgGrp, "1")) {
+    if (Functions.GEN_VAL(untrimmedline.ageAtDx) > 24)
+        return Functions.GEN_ERROR_MSG(binding, 'Primary Site, AJCC Stage Group - Ed 6, ICDO3 (COC): Over-ride applies only to pediatric cases (ages less than 25)')
+}
+if (Functions.GEN_INLIST(untrimmedline.overRideSiteTnmStgGrp, "1")) {
+    if (dx_year < 2008) {
+        if (Functions.GEN_INLIST(untrimmedline.tnmEditionNumber, "88") && Functions.GEN_INLIST(untrimmedline.tnmClinStageGroup, "88") && Functions.GEN_INLIST(untrimmedline.tnmPathStageGroup, "88"))
+            return true
+        else
+            return Functions.GEN_ERROR_MSG(binding, 'Primary Site, AJCC Stage Group - Ed 6, ICDO3 (COC): TNM data items must be coded 88 if over-ride is set for pediatric case')
+    }
+    else {
+        if (Functions.GEN_INLIST(untrimmedline.tnmEditionNumber, "88") && Functions.GEN_INLIST(untrimmedline.tnmClinStageGroup, "88") && (Functions.GEN_INLIST(untrimmedline.tnmPathStageGroup, "88") || Functions.GEN_EMPTY(untrimmedline.tnmPathStageGroup)))
+            return true
+        else
+            return Functions.GEN_ERROR_MSG(binding, 'Primary Site, AJCC Stage Group - Ed 6, ICDO3 (COC): TNM data items must be coded 88 if over-ride is set for pediatric case')
+    }
+}
+
+Get_SiteGrp6()
+
+req_flag = 0
+Check_IfReq6()
+
+permit_flag = 0
+Check_IfPermit6()
+Functions.GEN_STRCPY(GrpStg, SiteGrp)
+
+if (req_flag == 0) {
+    if (permit_flag == 0) {
+        if (!Functions.GEN_INLIST(untrimmedline.tnmClinStageGroup, "88"))
+            Functions.GEN_SAVE_ERROR_TEXT(binding, 'Primary Site, AJCC Stage Group - Ed 6, ICDO3 (COC): AJCC Clin Stage Group should = "88"  for site/hist combination')
+    }
+    else {
+        if (!Functions.GEN_INLIST(untrimmedline.tnmClinStageGroup, "88"))
+            Validate_ClinStg6()
+    }
+}
+else {
+
+    Validate_ClinStg6()
+
+}
+if (dx_year > 2007) {
+    if (Functions.GEN_EMPTY(untrimmedline.tnmPathStageGroup))
+        return true
+}
+
+Functions.GEN_STRCPY(GrpStg, SiteGrp)
+
+if (req_flag == 0) {
+    if (permit_flag == 0) {
+        if (!Functions.GEN_INLIST(untrimmedline.tnmPathStageGroup, "88"))
+            Functions.GEN_SAVE_ERROR_TEXT(binding, 'Primary Site, AJCC Stage Group - Ed 6, ICDO3 (COC): AJCC Path Stage Group should = "88"  for site/hist combination')
+    }
+    else {
+        if (!Functions.GEN_INLIST(untrimmedline.tnmPathStageGroup, "88"))
+            Validate_PathStg6()
+    }
+}
+else
+    Validate_PathStg6()
+
+return true
+
+def Validate_PathStg6() {
+
+    Functions.GEN_STRCAT(GrpStg, untrimmedline.tnmPathStageGroup)
+
+    if (!Functions.GEN_LOOKUP(GrpStg, AJC6STGP_DBF, AJC6STGP_DBF_GRPSTAGE, [:]))
+        Functions.GEN_SAVE_ERROR_TEXT(binding, 'Primary Site, AJCC Stage Group - Ed 6, ICDO3 (COC): AJCC Path Stage Group is invalid for site/hist combination')
+}
+
+def Validate_ClinStg6() {
+
+    Functions.GEN_STRCAT(GrpStg, untrimmedline.tnmClinStageGroup)
+
+    if (!Functions.GEN_LOOKUP(GrpStg, AJC6STGC_DBF, AJC6STGC_DBF_GRPSTAGE, [:]))
+        Functions.GEN_SAVE_ERROR_TEXT(binding, 'Primary Site, AJCC Stage Group - Ed 6, ICDO3 (COC): AJCC Clin Stage Group is invalid for site/hist combination')
+}
+def Get_SiteGrp6() {
+
+    /* Lymphoid neoplasms */
+    if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "9590-9596,9650-9667,9670-9729"))
+        Functions.GEN_STRCPY(SiteGrp, "48")
+    else {
+        /* Prostate - transitional cell carcinoma - chg to site group 39 */
+        if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8120-8130"))
+            Functions.GEN_STRCPY(SiteGrp, "39")
+        else {
+            /* Melanoma of skin - set to site group 24 */
+            if (Functions.GEN_INLIST(untrimmedline.primarySite, "440-449,510-512,518,519,600-602,608,609,632", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8720-8722, 8742-8745, 8761, 8771, 8772, 8780"))
+                Functions.GEN_STRCPY(SiteGrp, "24")
+            else {
+                Functions.GEN_STRCPY(Site, untrimmedline.primarySite)
+
+                /* look up closest record <=  search key */
+                if (Functions.GEN_RLOOKUP(Site, AJC6SIGP_DBF, AJC6SIGP_DBF_SITELOW, [0:GPCODE, 2:SITELOW, 3:SITEHIGH, 4:HISTLOW, 5:HISTHIGH])) {
+                    if (Functions.GEN_STRCMP(untrimmedline.primarySite, SITELOW) >= 0 && Functions.GEN_STRCMP(untrimmedline.primarySite, SITEHIGH) <= 0)
+                        Functions.GEN_STRCPY(SiteGrp, GPCODE)
+                    else
+                        Functions.GEN_STRCPY(SiteGrp, "99")
+                }
+                else
+                    Functions.GEN_STRCPY(SiteGrp, "99")
+            }
+        }
+    }
+}
+
+def Check_IfReq6() {
+    /* for site groups, set req_flag to 1 if histology indicates that AJCC 
+   stage is required */
+
+    /* lymphoid */
+    if (Functions.GEN_INLIST(SiteGrp, "48"))
+        req_flag = 1
+    else {
+        if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8120,8130"))
+            req_flag = 1
+        else {
+            /* Concatenate SiteGroup, Histology */
+            Functions.GEN_STRCPY(GrpHist, SiteGrp)
+            Functions.GEN_STRCAT(GrpHist, untrimmedline.histologyIcdO3)
+
+            /* look up closest record >= impossible search key */
+            if (Functions.GEN_RLOOKUP(GrpHist, AJC6HIST_DBF, AJC6HIST_DBF_GRPHISTLOW, [0:GRP, 1:HISTLOW, 2:HISTHIGH])) {
+                /* If found, confirm it's the impossible case */
+                if (Functions.GEN_STRCMP(GRP, SiteGrp) == 0 && Functions.GEN_STRCMP(untrimmedline.histologyIcdO3, HISTLOW) >= 0 && Functions.GEN_STRCMP(untrimmedline.histologyIcdO3, HISTHIGH) <= 0)
+                    req_flag = 1
+            }
+
+        }
+    }
+
+}
+
+def Check_IfPermit6() {
+    /* Prostate - transitional cell carcinoma - site group 39 */
+    if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8120-8130"))
+        permit_flag = 1
+    else {
+        if (Functions.GEN_INLIST(SiteGrp, "03-19, 23, 25-31, 33, 34, 36-39")) {
+            if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000-8576, 8940-8950, 8980, 8981"))
+                permit_flag = 1
+        }
+        else {
+            if (Functions.GEN_INLIST(SiteGrp, "20,32")) {
+                if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000"))
+                    permit_flag = 1
+            }
+            else {
+                if (Functions.GEN_INLIST(SiteGrp, "21,22")) {
+                    if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000,8800-9582"))
+                        permit_flag = 1
+                }
+                else {
+                    if (Functions.GEN_INLIST(SiteGrp, "24")) {
+                        if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8742"))
+                            permit_flag = 1
+                    }
+                    else {
+                        if (Functions.GEN_INLIST(SiteGrp, "35")) {
+                            if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000-8576, 8940-8950, 8980, 8981,9060-9085"))
+                                permit_flag = 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+return true

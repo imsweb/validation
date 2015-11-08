@@ -1,0 +1,37 @@
+<validator name="Fake Validator No ID">
+
+    <!-- - - - - - - - - - - - - - - -->
+    <!--  START RULE SET DEFINITION  -->
+    <!-- - - - - - - - - - - - - - - -->
+
+    <conditions>
+
+        <condition id="fvni_CtcEdits" java-path="lines.line">
+            <description>Rules to be ran on a non-deleted CTC.</description>
+            <expression>
+                <![CDATA[
+            return !line.deleted
+        ]]>
+            </expression>
+        </condition>
+    </conditions>
+
+    <!-- - - - - - - - - - - - - - - - - -->
+    <!--  START REGISTRY SPECIFIC EDITS  -->
+    <!-- - - - - - - - - - - - - - - - - -->
+
+    <rules>
+
+        <rule id="FVNI-FAKE" java-path="lines.line" condition="fvni_CtcEdits">
+            <expression>
+                <![CDATA[
+              return false
+        ]]>
+            </expression>
+            <message>...</message>
+            <description />
+            <history />
+        </rule>
+    </rules>
+
+</validator>

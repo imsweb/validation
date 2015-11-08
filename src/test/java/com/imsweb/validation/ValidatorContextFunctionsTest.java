@@ -1,0 +1,278 @@
+/*
+ * Copyright (C) 2010 Information Management Services, Inc.
+ */
+package com.imsweb.validation;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import groovy.lang.Binding;
+
+import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
+import com.imsweb.validation.shared.ContextFunctionDocDto;
+
+public class ValidatorContextFunctionsTest {
+
+    private ValidatorContextFunctions _functions = new ValidatorContextFunctions();
+
+    @Before
+    public void setUp() throws Exception {
+        TestingUtils.init();
+    }
+
+    @Test
+    public void testDocumentation() {
+        List<ContextFunctionDocDto> list = ValidatorContextFunctions.getMethodsDocumentation();
+        Assert.assertFalse(list.isEmpty());
+        for (ContextFunctionDocDto dto : list) {
+            Assert.assertNotNull(dto.getMethodName());
+            Assert.assertNotNull(dto.getDescription());
+            Assert.assertFalse(dto.getDescription().trim().isEmpty());
+            Assert.assertNotNull(dto.getExample());
+            Assert.assertFalse(dto.getExample().trim().isEmpty());
+            Assert.assertEquals(dto.getParams().size(), dto.getParamNames().size());
+        }
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "AssertEqualsBetweenInconvertibleTypes"})
+    public void testForceFailureOnEntity() {
+        Binding binding = new Binding();
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
+        Map<String, String> entity = new HashMap<>();
+
+        // null binding
+        _functions.forceFailureOnEntity(null, entity);
+        Assert.assertNull(binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY));
+
+        // null entity
+        _functions.forceFailureOnEntity(binding, null);
+        Assert.assertNull(binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY));
+
+        // no properties
+        _functions.forceFailureOnEntity(binding, entity);
+        Assert.assertTrue(binding.getVariables().containsKey(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY));
+        Set<ExtraPropertyEntityHandlerDto> set = (Set<ExtraPropertyEntityHandlerDto>)binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
+        Assert.assertEquals(1, set.size());
+        Assert.assertEquals(entity, set.iterator().next().getEntity());
+        Assert.assertNull(set.iterator().next().getProperties());
+
+        // one property
+        _functions.forceFailureOnEntity(binding, entity, "prop1");
+        set = (Set<ExtraPropertyEntityHandlerDto>)binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
+        Assert.assertEquals(2, set.size());
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
+
+        // two properties
+        _functions.forceFailureOnEntity(binding, entity, "prop1", "prop2");
+        set = (Set<ExtraPropertyEntityHandlerDto>)binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
+        Assert.assertEquals(1, set.size());
+        Assert.assertEquals(entity, set.iterator().next().getEntity());
+        Assert.assertEquals(2, set.iterator().next().getProperties().size());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testForceFailureOnProperty() {
+        Binding binding = new Binding();
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
+
+        // null binding
+        _functions.forceFailureOnProperty(null);
+        Assert.assertNull(binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY));
+
+        // no properties
+        _functions.forceFailureOnProperty(binding);
+        Assert.assertNull(binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY));
+
+        // one property
+        _functions.forceFailureOnProperty(binding, "prop1");
+        Set<String> set = (Set<String>)binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY);
+        Assert.assertEquals(1, set.size());
+
+        // two properties
+        _functions.forceFailureOnProperty(binding, "prop1", "prop2");
+        set = (Set<String>)binding.getVariables().get(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY);
+        Assert.assertEquals(2, set.size());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testIgnoreFailureOnProperty() {
+        Binding binding = new Binding();
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
+
+        // null binding
+        _functions.ignoreFailureOnProperty(null);
+        Assert.assertNull(binding.getVariables().get(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY));
+
+        // no properties
+        _functions.ignoreFailureOnProperty(binding);
+        Assert.assertNull(binding.getVariables().get(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY));
+
+        // one property
+        _functions.ignoreFailureOnProperty(binding, "prop1");
+        Set<String> set = (Set<String>)binding.getVariables().get(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY);
+        Assert.assertEquals(1, set.size());
+
+        // two properties
+        _functions.ignoreFailureOnProperty(binding, "prop1", "prop2");
+        set = (Set<String>)binding.getVariables().get(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY);
+        Assert.assertEquals(2, set.size());
+    }
+
+    @Test
+    public void testGetContext() throws ValidationException {
+        TestingUtils.loadValidator("fake-validator");
+
+        // no validator ID
+        boolean exception = false;
+        try {
+            _functions.getContext(null, "FV_CONTEXT1");
+        }
+        catch (ValidationException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception!");
+        exception = false;
+
+        // no context key
+        try {
+            _functions.getContext("fake-validator", null);
+        }
+        catch (ValidationException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception!");
+        exception = false;
+
+        // bad validator ID
+        try {
+            _functions.getContext("?", "FV_CONTEXT1");
+        }
+        catch (ValidationException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception!");
+        exception = false;
+
+        // bad context key
+        try {
+            _functions.getContext("fake-validator", "?");
+        }
+        catch (ValidationException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception!");
+
+        // good validator ID and context key
+        Assert.assertNotNull(_functions.getContext("fake-validator", "FV_CONTEXT1"));
+
+        TestingUtils.unloadValidator("fake-validator");
+    }
+
+    @Test
+    public void testFetchLookup() throws ValidationException {
+
+        // null ID
+        boolean exception = false;
+        try {
+            _functions.fetchLookup(null);
+        }
+        catch (ValidationException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception!");
+        exception = false;
+
+        // non-null ID -> null (default implementation)
+        try {
+            _functions.fetchLookup("lkup_id");
+        }
+        catch (ValidationException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception!");
+    }
+
+    @Test
+    public void testFetchConfVariable() throws ValidationException {
+
+        // null ID        
+        boolean exception = false;
+        try {
+            _functions.fetchConfVariable(null);
+        }
+        catch (ValidationException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception!");
+
+        // non-null ID -> null (default implementation)
+        Assert.assertNull(_functions.fetchConfVariable("id"));
+    }
+
+    @Test
+    public void testAsInt() {
+        Assert.assertEquals(1, _functions.asInt(1).intValue());
+        Assert.assertEquals(-1, _functions.asInt(-1).intValue());
+        Assert.assertEquals(2, _functions.asInt("2").intValue());
+        Assert.assertNull(_functions.asInt(null));
+        Assert.assertNull(_functions.asInt(""));
+        Assert.assertNull(_functions.asInt("1A"));
+    }
+
+    @Test
+    public void testBetween() {
+        Assert.assertFalse(_functions.between(null, 1, 3));
+        Assert.assertFalse(_functions.between(2, null, 3));
+        Assert.assertFalse(_functions.between(2, 1, null));
+        Assert.assertTrue(_functions.between(2, 1, 3));
+        Assert.assertFalse(_functions.between(4, 1, 3));
+        Assert.assertTrue(_functions.between(1.5, 1.0, 2.0));
+        Assert.assertTrue(_functions.between("B", "A", "C"));
+        Assert.assertFalse(_functions.between("D", "A", "C"));
+        Assert.assertTrue(_functions.between("8002", "8000", "8004"));
+        Assert.assertFalse(_functions.between("9999", "8000", "8004"));
+        Assert.assertTrue(_functions.between("8002", 8000, 8004));
+        Assert.assertTrue(_functions.between((short)8002, 8000, 8004));
+        Assert.assertFalse(_functions.between("198", 1970, 1990));
+        Assert.assertFalse(_functions.between("198", "1970", "1990"));
+    }
+
+    @Test
+    public void testGetCurrentDay() {
+        Assert.assertNotNull(_functions.getCurrentDay());
+    }
+
+    @Test
+    public void testGetCurrentMonth() {
+        Assert.assertNotNull(_functions.getCurrentMonth());
+    }
+
+    @Test
+    public void testGetCurrentYear() {
+        Assert.assertNotNull(_functions.getCurrentYear());
+    }
+}

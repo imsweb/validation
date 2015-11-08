@@ -1,0 +1,14 @@
+<validator name="Fake Validator Exception" id="fake-validator-exception">
+
+    <conditions>
+        <condition id="fve-ruleset1" name="RuleSet 1" java-path="level1"/>
+    </conditions>
+
+    <rules>
+        <rule id="fve-rule1" name="Rule 1" java-path="level1" condition="fve-ruleset1">
+            <expression>if (level1.prop == true) throw new Exception(); return true</expression>
+            <message>message1</message>
+        </rule>
+    </rules>
+
+</validator>

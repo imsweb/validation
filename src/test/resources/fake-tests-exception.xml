@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tested-validator id="fake-validator-naaccr-lines">
+    <test test-id="fvnl-rule1">
+        <script><![CDATA[rec = [:]
+rec['primarySite'] = 'C000'
+Testing.assertPass(rec, somethingelse)]]></script>
+    </test>
+</tested-validator>

@@ -1,0 +1,17 @@
+for (i = 0; i < lines.size() - 1; i++)
+    for (j = i+1; j < lines.size(); j++) {
+        def dx1 = Functions.asInt(lines[i].dateOfDiagnosisYear)
+        def dx2 = Functions.asInt(lines[j].dateOfDiagnosisYear)
+        def hist1 = lines[i].histologyIcdO3 == null ? '' : lines[i].histologyIcdO3
+        def hist2 = lines[j].histologyIcdO3 == null ? '' : lines[j].histologyIcdO3
+        def beh1 = lines[i].behaviorIcdO3 == null ? '' : lines[i].behaviorIcdO3
+        def beh2 = lines[j].behaviorIcdO3 == null ? '' : lines[j].behaviorIcdO3
+        def icd1 = hist1 + '/' + beh1
+        def icd2 = hist2 + '/' + beh2
+        if ((dx1 >= 2010 || dx2 >= 2010) && hemato_same_primaries.containsKey(icd1) && hemato_same_primaries[icd1].contains(icd2)) {
+            Functions.forceFailureOnEntity(binding, lines[i])
+            Functions.forceFailureOnEntity(binding, lines[j])
+            return false
+        }
+    }
+return true

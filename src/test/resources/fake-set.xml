@@ -1,0 +1,6 @@
+<set id="test-set" name="Test Set" desc="Test Desc">
+    <validator id="id">
+        <include>Edit1,Edit2,Edit3</include>
+        <exclude>Edit2</exclude>
+    </validator>
+</set>

@@ -1,0 +1,31 @@
+
+// regular property access
+if (ctc.dateOfDiagnosisYyyy < 2001 || ctc.dateOfDiagnosisYyyy > 2003 || ctc.typeOfReportingSource == 7 || ctc.seerSummaryStage2000 != 1 || Functions.between(ctc.histologyICDO3, "9590", "9729"))
+    return true;
+
+// simple alias
+def fa = facilityAdmission;
+if (fa.prop1 == null)
+    return true
+
+// deep alias
+def reg = facilityAdmission.registryData;
+if (reg.prop2 == null)
+    return Functions.fetchLookup("lkup_1") != null;
+
+// for loop
+for (c in patient.ctcs) {
+    if (c.primarySite == null)
+        return Functions.fetchLookup('lkup_2').containLabel("value");
+}
+
+for (course in ctc.courses)
+   if (course.sequenceNumber == 1 && course.calculationMethod == 0)
+       return true                         
+
+
+// it
+if (patient.ctcs.any{it.histology > '8000'})
+    return false
+                
+return true;

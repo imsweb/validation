@@ -1,0 +1,21 @@
+<validator name="Fake Validator Release With No Date" id="fake-validator-release-no-date">
+
+    <releases>
+        <release version="TEST-002-01" />  <!-- no date... -->
+        <release version="TEST-001-02" date="2001-01-01" desc="Just for testing" />
+        <release version="TEST-001-01" date="2000-12-30" desc="" />
+    </releases>
+
+    <conditions>
+        <condition id="fv-ruleset1" name="RuleSet 1" java-path="level1"/>
+    </conditions>
+
+    <rules>
+        <rule id="fv-rule1" name="Rule 1" java-path="level1" condition="fv-ruleset1">
+            <expression>return true</expression>
+            <message>message1</message>
+            <description>description1</description>
+        </rule>
+    </rules>
+
+</validator>

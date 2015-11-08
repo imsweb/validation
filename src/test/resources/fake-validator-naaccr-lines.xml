@@ -1,0 +1,23 @@
+<validator name="Fake Validator Naaccr Lines" id="fake-validator-naaccr-lines">
+    <context>
+        <entry id="FVNL_CONTEXT1">return '1'</entry>
+    </context>
+    <conditions>
+        <condition id="fvnl-field" java-path="lines.line"/>
+        <condition id="fvnl-inter-record" java-path="lines"/>
+    </conditions>
+    <rules>
+        <rule id="fvnl-rule1" name="Rule 1" java-path="lines.line" condition="fvnl-field">
+            <expression><![CDATA[out << 'Testing redirecting the output!'; return line.primarySite == 'C000']]></expression>
+            <message>message1</message>
+        </rule>
+        <rule id="fvnl-rule2" name="Rule 2" java-path="lines" condition="fvnl-inter-record">
+            <expression>def var = Functions.asInt('123'); return lines.size() == 2</expression>
+            <message>message2</message>
+        </rule>
+        <rule id="fvnl-rule3" name="Rule 3" java-path="lines.line">
+            <expression>return line.prop3 != FVNL_CONTEXT1</expression>
+            <message>message3</message>
+        </rule>
+    </rules>
+</validator>

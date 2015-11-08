@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tested-validator id="fake-validator-naaccr-lines">
+    <test test-id="fvnl-rule1">
+        <script><![CDATA[rec = [:]
+rec['primarySite'] = 'C000'
+Testing.assertPass(rec)
+rec['primarySite'] = 'C001'
+Testing.assertFail(rec)
+// test a loop!
+values = ['C000', 'C000', 'C000']
+for (value in values) {
+    rec['primarySite'] = value
+    Testing.assertPass(rec)
+}
+// following test should fail (it should be an assertFail, not an assertPass)
+rec['primarySite'] = null
+Testing.assertPass(rec)]]></script>
+    </test>
+    <test test-id="fvnl-rule2">
+        <script><![CDATA[pat = []
+Testing.assertFail(pat)
+pat << [:]
+Testing.assertFail(pat)
+pat << [:]
+// test a for loop - edit passes if there are two lines
+for (int i = 0; i < 10; i++)
+    Testing.assertPass(pat)
+pat << [:]
+// test a closure
+(1..10).each {
+    Testing.assertFail(pat)
+}
+// test a while loop
+int i = 0;
+while (i < 10) {
+    Testing.assertFail(pat)
+    i++
+}
+]]></script>
+    </test>
+    <test test-id="fvnl-rule3">
+        <script><![CDATA[rec = [:]
+rec.prop3 = '1'
+Testing.assertFail(rec)
+rec.prop3 = '2'
+Testing.assertPass(rec)
+]]></script>
+    </test>
+</tested-validator>

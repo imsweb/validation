@@ -1,0 +1,43 @@
+<validator id="fake-validator" name="Fake Validator">
+    
+    <context>
+        <entry id="FV_CONTEXT1">return '1'</entry>
+    </context>
+    
+    <conditions>
+        <condition id="fv-ruleset1" java-path="level1">
+            <description>description1</description>
+            <expression>return true</expression>
+        </condition>
+        <condition id="fv-ruleset2" java-path="level1.level2">
+            <description>description2</description>
+            <expression>return true</expression>
+        </condition>
+        <condition id="fv-ruleset3" java-path="level1.level2.level3">
+            <description>description3</description>
+            <expression>return true</expression>
+        </condition>
+    </conditions>
+
+    <rules>
+        <rule id="fv-rule1" java-path="level1" condition="fv-ruleset1" severity="1">
+            <expression>this should be bad groovy, right?!?</expression>
+            <message>message1</message>
+            <description>description1</description>
+            <history>
+                <event user="test" date="2001-01-01">history</event>
+            </history>
+        </rule>
+        <rule id="fv-rule2" java-path="level1.level2" condition="fv-ruleset2" severity="2" depends="fv-rule1">
+            <expression>return level2.prop != Context.FV_CONTEXT1</expression>
+            <message>message2</message>
+            <description>description2</description>
+        </rule>
+        <rule id="fv-rule3" java-path="level1.level2.level3" condition="fv-ruleset3" severity="3" depends="fv-rule2">
+            <expression>return level3.prop != Context.FV_CONTEXT1</expression>
+            <message>message3</message>
+            <description>description3</description>
+        </rule>
+    </rules>
+
+</validator>

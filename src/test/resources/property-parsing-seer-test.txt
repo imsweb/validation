@@ -1,0 +1,23 @@
+// regular property
+            if (line.dateOfLastContactYear == '9999') 
+               return false
+
+// property that does not exists in SEER*DMS
+if (line.recordType != null)
+     return ( line.recordType ==~ /^[ICA]$/ )
+  
+
+// census 70/80/90 property
+          if ( line.censusTract708090 != null
+                && line.censusTract708090 != '000000'
+                && line.censusTract708090 != '999999'
+                && (     !(line.censusTract708090 ==~ /^[0-9]{6}$/)
+                       || (     !Functions.between(line.censusTract708090, "000100", "949999")
+                             && !Functions.between(line.censusTract708090, "950100", "998999")
+                          )
+                   )
+             )
+              return false
+              
+// census 2000 property
+return (line.censusTract2000 == null) || (line.censusTract2000 == '000000') || (line.censusTract2000 ==~ /^[0-9]{6}$/ && Functions.between(line.censusTract2000, '000100', '999999'))

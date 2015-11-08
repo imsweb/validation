@@ -1,0 +1,64 @@
+<validator name="Fake Validator" id="fake-validator" version="TEST-002-01" min-engine-version="4.0" translated-from="test">
+
+    <releases>
+        <release version="TEST-002-01" date="2000-01-01" />
+        <release version="TEST-001-02" date="2001-01-01" desc="Just for testing" />
+        <release version="TEST-001-01" date="2000-12-30" desc="" />
+    </releases>
+
+    <deleted-rules>
+        <deleted-rule id="OLD-ID" name="OLD-NAME" version="TEST-001-02" user="test" date="2000-01-15" ref="666">Edit was deleted.</deleted-rule>
+    </deleted-rules>
+
+    <context>
+        <entry id="FV_CONTEXT1">return '1'</entry>
+    </context>
+    
+    <categories>
+        <category id="fv-category" name="Category">
+            <description>description for the category</description>
+        </category>
+    </categories>
+
+    <conditions>
+        <condition id="fv-condition" name="Condition" java-path="level1.level2">
+            <description>description for the condition</description>
+            <expression>return level2.prop2 != 'IGNORED'</expression>
+        </condition>
+    </conditions>
+
+    <rules>
+        <rule id="fv-rule1" name="Rule 1" java-path="level1" category="fv-category" severity="1" agency="test">
+            <expression>return level1.prop != Context.FV_CONTEXT1</expression>
+            <message>message1</message>
+            <description>description1</description>
+            <history>
+                <event version="TEST-001-02" user="test" date="2001-01-15" ref="999999">history</event>
+            </history>
+        </rule>
+        <rule id="fv-rule2" name="Rule 2" java-path="level1.level2" condition="fv-condition" depends="fv-rule1">
+            <expression><![CDATA[
+                Functions.forceFailureOnProperty(binding, 'level2.otherProp')
+                Functions.ignoreFailureOnProperty(binding, 'level2.prop')
+                return level2.prop != Context.FV_CONTEXT1
+            ]]></expression>
+            <message>message2</message>
+            <description>description2</description>
+        </rule>
+        <rule id="fv-rule3" java-path="level1.level2.level3" depends="fv-rule2">
+            <expression>return level3.prop != Context.FV_CONTEXT1</expression>
+            <message>message3</message>
+            <description>description3</description>
+        </rule>
+    </rules>
+
+    <sets>
+        <set id="fv-set1" name="Set 1">
+            <description>description</description>
+            <include>fv-rule2</include>
+        </set>
+        <set id="fv-set2">
+            <exclude>fv-rule2</exclude>
+        </set>
+    </sets>
+</validator>

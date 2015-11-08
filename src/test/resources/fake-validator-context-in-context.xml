@@ -1,0 +1,20 @@
+<validator id="fake-validator-context-in-context" name="Fake Validator Context in Context">
+
+    <context>
+        <entry id="FVCC_GROOVY_1">return ['1', '2', '3']</entry>
+        <entry id="FVCC_GROOVY_2">return ['a', 'b', 'c']</entry>
+        <entry id="FVCC">[1 : Context.FVCC_GROOVY_1, 2 : Context.FVCC_GROOVY_1, 3 : Context.FVCC_GROOVY_2]</entry>
+    </context>
+
+    <conditions>
+        <condition id="fvcc-ruleset" name="RuleSet 1" java-path="level1"/>
+    </conditions>
+
+    <rules>
+        <rule id="fvcc-rule1" name="Rule 1" java-path="level1" condition="fvcc-ruleset">
+            <expression>return Context.FVCC.get(3).contains('b')</expression>
+            <message>message</message>
+        </rule>
+    </rules>
+
+</validator>

@@ -1,0 +1,19 @@
+<validator name="Fake Validator Parent Condition" id="fake-validator-parent-condition" min-engine-version="4.0">
+
+    <conditions>
+        <condition id="fvpc-condition1" java-path="level1">
+            <expression>return level1.prop != '1'</expression>
+        </condition>
+        <condition id="fvpc-condition2" java-path="level1">
+            <expression>return level1.prop != '2'</expression>
+        </condition>
+    </conditions>
+
+    <rules>
+        <rule id="fvpc-rule" java-path="level1.level2" >
+            <expression>return level2.prop != 'A'</expression>
+            <message>message</message>
+        </rule>
+    </rules>
+
+</validator>

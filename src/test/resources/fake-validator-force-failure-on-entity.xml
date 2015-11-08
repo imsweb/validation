@@ -1,0 +1,45 @@
+<validator id="fake-validator-force-failure-on-entity" name="Fake Validator For Testing Force Failure On Entity Mechanism">
+    
+    <context/>
+
+    <conditions>
+        <condition id="fv-unique-ruleset" java-path="level1"/>
+    </conditions>
+
+    <rules>
+        <rule id="fv-unique-rule-1" java-path="level1" condition="fv-unique-ruleset">
+            <expression><![CDATA[
+                // the goal here is to iterate over all the level2 entities and always fail the first one and the last one
+                if (level1.level2 != null && level1.level2.size() >= 2) {
+                    for (int i = 0; i < level1.level2.size(); i++) {
+                        def entity = level1.level2.get(i)
+                        if (entity.prop != null && (i == 0 || i == level1.level2.size() - 1))
+                            Functions.forceFailureOnEntity(binding, entity, 'level2.prop')
+                    }    
+                }
+                
+                // always fail the edit since the goal is to test the returned properties upon failure...
+                return false
+            ]]></expression>
+            <message>message1</message>
+        </rule>
+        
+        <rule id="fv-unique-rule-2" java-path="level1" condition="fv-unique-ruleset">
+            <expression><![CDATA[
+                // the goal here is to iterate over all the level2 entities and always fail the first one and the last one
+                if (level1.level2 != null && level1.level2.size() >= 2) {
+                    for (int i = 0; i < level1.level2.size(); i++) {
+                        def entity = level1.level2.get(i)
+                        if (entity.prop != null && (i == 0 || i == level1.level2.size() - 1))
+                            Functions.forceFailureOnEntity(binding, entity)
+                    }    
+                }
+                
+                // always fail the edit since the goal is to test the returned properties upon failure...
+                return false
+            ]]></expression>
+            <message>message1</message>
+        </rule>
+    </rules>
+
+</validator>
