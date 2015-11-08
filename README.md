@@ -1,108 +1,94 @@
-# Validation Framework
+# Java Validation Framework
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-[Version](VERSION) | 
-[Changelog](changelog.txt) | 
-[Snapshots](http://cilantro.imsweb.com:8080/nexus/content/repositories/snapshots/com/imsweb/validation/) | 
-[Releases](http://cilantro.imsweb.com:8080/nexus/content/repositories/releases/com/imsweb/validation/)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Group ID: ```com.imsweb```
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Artifact ID: ```validation```
+[![Build Status](https://travis-ci.org/imsweb/validation.svg?branch=master)](https://travis-ci.org/imsweb/validation)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation)
 
-This framework allows edits to be defined using the Groovy scripting language, and to execute them on all type of different data.
+This framework allows edits to be defined using the Groovy scripting language, and to execute them on different types data.
 
-The **XmlValidatorFactory** class can be used to read/write edits from/to XML data files.
- 
-The **ValidationEngine** is the main class of the framework and is used to execute edits. Here is an example of how the engine can be used:
+## Features
+
+* Edits are written in Groovy, a rich java-based scripting language.
+* Large tables can be provided to the edits as contexts and shared among several edits.
+* Edits can be loaded from an XML file, or defined programmatically.
+* Any type of data can be validated; it just needs to implement the *Validatable* interface.
+* The validation engine executing edits is thread safe.
+* Edits can be dynamically added, modified or removed in the engine.
+* The engine supports an edits testing framework with unit tests written in Groovy as well.
+
+## Download
+
+This library will be available in Maven Central soon.
+
+## Usage
+
+### Reading a file of edits
 
 ```java
-    public static void main(String[] args) throws Exception {
-
-        long start = System.currentTimeMillis();
-        System.out.println("Strarting to run Validation Engine Demo...");
-
-        // before using any of the methods from the validation module, we need to initialize the services and context methods;
-        // this simple example will use the default implementations, but those classes are designed to be extended to customize the services
-        // and add more application-specific context functions...
-        ValidatorServices.initialize(new ValidatorServices());
-        ValidatorContextFunctions.initialize(new ValidatorContextFunctions());
-        System.out.println("Initialized services...");
-
-        // create a rule (rules must be contained in a validator, so we have to create that too)
-        Rule r = new Rule();
-        r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence()); // this is an internal ID
-        r.setId("testing-rule");
-        r.setJavaPath("record");
-        r.setMessage("Just for testing...");
-        r.setExpression("return record.primarySite != 'C809'"); // this is Groovy code
-        Validator v = new Validator();
-        v.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence()); // this is an internal ID
-        v.setId("testing-validator");
-        v.setName("Test");
-        v.getRules().add(r);
-        r.setValidator(v);
-        ValidationEngine.initialize(v);
-        System.out.println("Initialized validation engine with " + v.getRules().size() + " edit...");
-
-        // let's create a fake record to be validated
-        System.out.println("Calling validate() method...");
-        Map<String, Object> record = new HashMap<String, Object>();
-        record.put("primarySite", "C809");
-        if (!ValidationEngine.validate(new SimpleMapValidatable("ID", "record", record)).isEmpty())
-            System.out.println("  > was expecting a failure for unknown site and got one  :-)");
-        else
-            System.err.println("  > was expecting a failure for unknown site but didn't get one  :-(");
-
-        // let's change the site and make sure there is no more failure
-        record.put("primarySite", "C123");
-        if (ValidationEngine.validate(new SimpleMapValidatable("ID", "record", record)).isEmpty())
-            System.out.println("  > was expecting no failure for known site and didn't get one  :-)");
-        else
-            System.err.println("  > was expecting no failure for known site but got one  :-(");
-
-        System.out.println("Demo ran in " + (SeerUtils.formatTime(System.currentTimeMillis() - start)) + "; good bye...");
-    }
+File file = new File("my-edits.xml")
+Validator v = XmlValidatorFactory.loadValidatorFromXml(file);
+ValidationEngine.initialize(v);
 ```
 
-Here is the result of running that code:
-```asciidoc
-Strarting to run Validation Engine Demo #1...
-Initialized services...
-Initialized validation engine with 1 edit...
-Calling validate() method...
-  > was expecting a failure for unknown site and got one  :-)
-  > was expecting no failure for known site and didn't get one  :-)
-Demo ran in 2 seconds; good bye...
+### Creating an edit programmatically
+
+```java
+// create the rule
+Rule r = new Rule();
+r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
+r.setId("my-rule");
+r.setJavaPath("record");
+r.setMessage("Primary Site cannot be C809.");
+r.setExpression("return record.primarySite != 'C809'");
+
+// create the validator (a wrapper for all the rules that belong together)
+Validator v = new Validator();
+v.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence())
+v.setId("my-rules");
+v.getRules().add(r);
+r.setValidator(v);
+
+// initialize the engine
+ValidationEngine.initialize(v);
 ```
 
-The framework makes no assumption on the format of the data; it just expects a **Validatable** object. It is the caller's responsibility 
-to wrap their own entities into a **Validatable**. For most purposes, the **SimpleMapValidatable** should be enough; there is also a 
-**SimpleNaaccrLinesValidatable** specifically designed to work with NAACCR data files...
+### Executing edits on a data file
 
-The framework also contains functionalities to load and execute edit tests. Here is an example of a multi-threaded unit test using the SEER edits:
+This example uses the layout framework to read NAACCR files and translate them into maps of properties.
+
+```java
+File dataFile = new File("my-data.txd.gz");
+Layout layout = LayoutFactory.getLayout(LayoutFactory.LAYOUT_ID_NAACCR_16_ABSTRACT);
+for (<Map<String, String> rec : (RecordLayout)layout.readAllRecords(new File("my_file.txt"))) {
+    Collection<RuleFailure> failures = ValidationEngine.validate(new SimpleNaaccrLinesValidatable(rec));
+    for (RuleFailure failure : failures)
+        System.out.println(failure.getMessage());
+}
+```
+
+### Using the edits testing framework
+
+This example shows how to write a multi-threaded unit test for some XML edits:
+
 ```java
     public void testSeerEdits() throws Exception {
-        
-        // load SEER edits
-        Validator validator = XmlValidatorFactory.loadValidatorFromXml(currentThread().getContextClassLoader().getResource("seer-edits.xml"));
-        ValidationEngine.addValidator(new EditableValidator(validator));
 
-        // laod and run the tests
+        // load and run the tests
         List<String> errors = Collections.synchronizedList(new ArrayList<String>());
         ExecutorService service = Executors.newFixedThreadPool(4);
         for (RuleTest test : XmlValidatorFactory.loadTestsFromXml(currentThread().getContextClassLoader().getResource("seer-edits-tests.xml")).getTests().values())
             service.submit(new EditTestExecutor(test, errors));
         service.shutdown();
+
+        // wait until all the threads are done
         service.awaitTermination(1, TimeUnit.MINUTES);
         if (!errors.isEmpty()) {
             StringBuilder failures = new StringBuilder();
             for (String error : errors)
                 failures.append(error);
             fail("\n\nDone running SEER edits tests; found following problems:\n\n" + failures);
-        }   
+        }
     }
-        
+
     // used to run a single edit test
     private static class EditTestExecutor implements Runnable {
 
