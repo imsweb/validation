@@ -162,9 +162,9 @@ public final class TestingUtils {
 
         @Override
         public String getJavaPathForAlias(String alias) {
-            for (String key : _EXTRA_ALIASES.keySet())
-                if (_EXTRA_ALIASES.get(key).equals(alias))
-                    return key;
+            for (Map.Entry<String, String> entry : _EXTRA_ALIASES.entrySet())
+                if (entry.getValue().equals(alias))
+                    return entry.getKey();
             return super.getJavaPathForAlias(alias);
         }
 

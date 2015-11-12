@@ -29,10 +29,18 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
  * The entity that needs to be validated needs to be provided to the constructor as an argument. Another important argument of the constructor
  * is the root prefix, it defines the alias to be used in the edits: if the root is "record", the edit will have to access the properties as
  * "record.property"; if the root is "tumor", the edit will have to access the properties as "tumor.property".
- * <p/>
+ * <br/><br/>
+ * In it's simplest form, this validatable can be used to wrap a data line represented as a map of properties where every value is the String read
+ * from the data line. In that case, the default prefix "record" will be used, and the wrapped entity shouldn't have any complex types nor collections.
+ * <br/><br/>
  * Created on Apr 17, 2010 by Fabian
  */
 public class SimpleMapValidatable implements Validatable {
+
+    /**
+     * The default root prefix for this validatable.
+     */
+    public static final String ROOT_PREFIX = "record";
 
     /**
      * Display ID for this validatable.
@@ -78,7 +86,17 @@ public class SimpleMapValidatable implements Validatable {
      * Constructor.
      * <p/>
      * Created on Apr 17, 2010 by Fabian
-     * @param rootPrefix the root prefix (first element of the java path provided in the rulesets)
+     * @param map map representing the object to be validated (map of lists of maps etc..)
+     */
+    public SimpleMapValidatable(Map<String, Object> map) {
+        this("?", ROOT_PREFIX, map, null);
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * Created on Apr 17, 2010 by Fabian
+     * @param rootPrefix the root prefix (first element of the java path provided in the edits)
      * @param map map representing the object to be validated (map of lists of maps etc..)
      */
     public SimpleMapValidatable(String rootPrefix, Map<String, Object> map) {
@@ -90,7 +108,7 @@ public class SimpleMapValidatable implements Validatable {
      * <p/>
      * Created on Apr 17, 2010 by Fabian
      * @param displayId display ID to return for this validatable (the display ID is used in some log messages)
-     * @param rootPrefix the root prefix (first element of the java path provided in the rulesets)
+     * @param rootPrefix the root prefix (first element of the java path provided in the edits)
      * @param map map representing the object to be validated (map of lists of maps etc..)
      */
     public SimpleMapValidatable(String displayId, String rootPrefix, Map<String, Object> map) {
@@ -102,7 +120,7 @@ public class SimpleMapValidatable implements Validatable {
      * <p/>
      * Created on Apr 17, 2010 by Fabian
      * @param displayId display ID to return for this validatable (the display ID is used in some log messages)
-     * @param rootPrefix the root prefix (first element of the java path provided in the rulesets)
+     * @param rootPrefix the root prefix (first element of the java path provided in the edits)
      * @param map map representing the object to be validated (map of lists of maps etc..)
      * @param context map of extra context to be provided to the edit
      */

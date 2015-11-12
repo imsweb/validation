@@ -26,19 +26,30 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
  * <br/><br/>
  * This class also supports the "untrimmed" notation used by the Genedits translated edits (by default edits are designed to run on trimmed values).
  * <br/><br/>
- * As a convenience, a property "_csSchemaName" will be automatically added to each data line and set to the CStage schema name based on the following properties:
+ * As a convenience, a property "_csSchemaName" will be automatically added to each data line if the context functions have been initialized with
+ * the CStage implementation. The variable and set to the CStage schema name based on the following properties:
  * <ul>
  * <li>primarySite</li>
  * <li>histologyIcdO3</li>
  * <li>csSiteSpecificFactor25</li>
  * </ul>
- * The property will be added if it's not there yet, or if either one of the site/hist properties exists. In orther words, if you want to
+ * The property will be added if it's not there yet, or if either one of the site/hist properties exists. In other words, if you want to
  * to populate the "_csSchemaName" yourself on the line (which can be useful for unit tests), make sure to not also provide a site/hist.
- * or the schema will be overrdden.
+ * or the schema will be overridden.
  * <br/><br/>
  * Created on Apr 17, 2010 by Fabian
  */
 public class SimpleNaaccrLinesValidatable implements Validatable {
+
+    /**
+     * The root prefix for NAACCR lines.
+     */
+    public static final String ROOT_PREFIX = "lines";
+
+    /**
+     * The root prefix for untrimmed NAACCR lines.
+     */
+    public static final String ROOT_PREFIX_UNTRIMMED = "untrimmedlines";
 
     /**
      * Used to keep track of the property paths (prefix) when an error is reported; this is the full path with the indexes
@@ -126,14 +137,14 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
      * <p/>
      * Created on Aug 7, 2011 by depryf
      * @param list wrapped entity (a list of map representing one or several NAACCR records for one patient set)
-     * @param context optional context to be provded to the executed rule
+     * @param context optional context to be provided to the executed rule
      * @param useUntrimmedNotation if true, the untrimmed notation will be used ('untrimmedline' instead of 'line'); defaults to false
      */
     public SimpleNaaccrLinesValidatable(List<Map<String, String>> list, Map<String, Object> context, boolean useUntrimmedNotation) {
         if (list == null)
             throw new RuntimeException("wrapped entity cannot be null");
 
-        String rootPrefix = useUntrimmedNotation ? "untrimmedlines" : "lines";
+        String rootPrefix = useUntrimmedNotation ? ROOT_PREFIX_UNTRIMMED : ROOT_PREFIX;
 
         _prefix = rootPrefix;
         _alias = rootPrefix;
@@ -150,7 +161,6 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     /**
      * Constructor used internally.
      * <p/>
-     * Created on Jun 7, 2011 by murphyr
      * @param parent parent validatable
      * @param prefix current path prefix
      * @param map current line

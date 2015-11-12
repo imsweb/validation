@@ -52,6 +52,12 @@ public class SimpleMapValidatableTest {
         Assert.assertEquals("level1", v.getRootLevel());
         Assert.assertEquals(1, ValidationEngine.validate(v).size());
 
+        // default root
+        v = new SimpleMapValidatable(entity);
+        Assert.assertEquals("?", v.getDisplayId());
+        Assert.assertNull(v.getCurrentTumorId());
+        Assert.assertEquals("record", v.getRootLevel());
+
         // add a second level
         entity.put("prop", "0"); // because of dependencies, we don't want level1 to fail anymore
         List<Map<String, Object>> secondLevel = new ArrayList<>();

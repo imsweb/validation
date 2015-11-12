@@ -27,6 +27,8 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 
+import com.imsweb.validation.entities.SimpleMapValidatable;
+import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.internal.EditCodeVisitorSupport;
 import com.imsweb.validation.internal.context.JavaContextParser;
@@ -95,36 +97,16 @@ public class ValidatorServices {
     private static final Map<String, String> _ALIASES = new HashMap<>();
 
     static {
-        // this is the alias for SEER*Abs
-        _ALIASES.put("rec", "rec");
+        // this alias is used to run edits using the SimpleMapValidatable wrapper
+        _ALIASES.put(SimpleMapValidatable.ROOT_PREFIX, "record");
 
-        // these are the aliases for SEER*DMS (Patient Sets)
-        _ALIASES.put("patient", "patient");
-        _ALIASES.put("patient.addresses", "patientAddress");
-        _ALIASES.put("patient.aliases", "patientAlias");
-        _ALIASES.put("patient.causesOfDeath", "patientCauseOfDeath");
-        _ALIASES.put("patient.comments", "patientComment");
-        _ALIASES.put("patient.informants", "patientInformant");
-        _ALIASES.put("patient.referenceIds", "patientReferenceId");
-        _ALIASES.put("patient.ctcs", "ctc");
-        _ALIASES.put("patient.ctcs.medPractCares", "ctcMedPractCare");
-        _ALIASES.put("patient.ctcs.referenceIds", "ctcReferenceId");
-        _ALIASES.put("patient.ctcs.facilityAdmissions", "facilityAdmission");
-        _ALIASES.put("patient.ctcs.courses", "course");
-        _ALIASES.put("patient.ctcs.courses.treatmentProcedures", "treatmentProcedure");
-        _ALIASES.put("patient.ctcs.courses.treatmentProcedures.imageEvaluations", "imageEvaluation");
-        _ALIASES.put("patient.ctcs.courses.treatmentProcedures.specimenEvaluations", "specimenEvaluation");
-        _ALIASES.put("patient.specialStudyInclusions", "patientSpecialStudyInclusion");
+        // these aliases are used to run edits against NAACCR lines
+        _ALIASES.put(SimpleNaaccrLinesValidatable.ROOT_PREFIX, "lines");
+        _ALIASES.put(SimpleNaaccrLinesValidatable.ROOT_PREFIX + ".line", "line");
 
-        // this is the alias for SEER*DMS (Records)
-        _ALIASES.put("record", "record");
-        _ALIASES.put("record.specialStudyInclusions", "recordSpecialStudyInclusion");
-
-        // these are the aliases for SEER*Edits (also called "NAACCR notation")
-        _ALIASES.put("lines", "lines");
-        _ALIASES.put("lines.line", "line");
-        _ALIASES.put("untrimmedlines", "untrimmedlines");
-        _ALIASES.put("untrimmedlines.untrimmedline", "untrimmedline");
+        // these aliases are used to run edits against untrimmed NAACCR lines
+        _ALIASES.put(SimpleNaaccrLinesValidatable.ROOT_PREFIX_UNTRIMMED, "untrimmedlines");
+        _ALIASES.put(SimpleNaaccrLinesValidatable.ROOT_PREFIX_UNTRIMMED + ".untrimmedline", "untrimmedline");
     }
 
     /**

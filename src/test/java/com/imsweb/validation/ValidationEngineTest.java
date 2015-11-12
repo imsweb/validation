@@ -29,10 +29,6 @@ import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.internal.ValidatingContext;
 
-/**
- * Created on Jun 29, 2011 by depryf
- * @author depryf
- */
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ValidationEngineTest {
 
@@ -40,10 +36,7 @@ public class ValidationEngineTest {
     public void setUp() throws Exception {
         TestingUtils.init();
     }
-    
-    /**
-     * Created on Apr 15, 2010 by Fabian
-     */
+
     @Test
     public void testInitialize() throws Exception {
 
@@ -130,9 +123,6 @@ public class ValidationEngineTest {
         ValidationEngine.enableMultiThreadedCompilation(1);
     }
 
-    /**
-     * Created on Jul 7, 2011 by depryf
-     */
     @Test
     public void testGetters() {
         TestingUtils.loadValidator("fake-validator");
@@ -180,9 +170,6 @@ public class ValidationEngineTest {
         Assert.assertNull(ValidationEngine.getRule("fv-rule1", "?"));
     }
 
-    /**
-     * Created on Jul 7, 2011 by depryf
-     */
     @Test
     @SuppressWarnings("unchecked")
     public void testValidate() throws Exception {
@@ -323,9 +310,10 @@ public class ValidationEngineTest {
         ValidationEngine.turnStatisticsOff();
     }
 
-    // this test uses one validator with two validatable roots; DMS actually uses different validators, but the idea is the same...
     @Test
     public void testCrossRootValidation() throws Exception {
+
+        // this test uses one validator with two validatable roots; DMS actually uses different validators, but the idea is the same...
 
         EditableValidator v = new EditableValidator();
         v.setId("fvcr");
@@ -430,9 +418,6 @@ public class ValidationEngineTest {
         TestingUtils.unloadValidator("fake-validator-exception");
     }
 
-    /**
-     * Created on Jul 7, 2011 by depryf
-     */
     @Test
     public void testModifyRule() throws Exception {
         TestingUtils.loadValidator("fake-validator");
@@ -706,10 +691,6 @@ public class ValidationEngineTest {
         TestingUtils.unloadValidator("fake-validator");
     }
 
-    /**
-     * Created on Mar 26, 2012 by depryf
-     * @throws Exception
-     */
     @Test
     public void testSeerdmsUsage() throws Exception {
         Validator v = TestingUtils.loadValidator("fake-validator");
@@ -771,9 +752,6 @@ public class ValidationEngineTest {
         TestingUtils.unloadValidator("fake-validator");
     }
 
-    /**
-     * Created on Jul 7, 2011 by depryf
-     */
     @Test
     public void testModifyCondition() throws Exception {
         TestingUtils.loadValidator("fake-validator");
@@ -937,7 +915,7 @@ public class ValidationEngineTest {
         exception = false;
         e4.setJavaPath("level1.level2.level3");
 
-        // successul addition
+        // successful addition
         ValidationEngine.addCondition(e4);
         Assert.assertNotNull(ValidationEngine.getCondition("fv-ruleset4"));
 
@@ -958,9 +936,6 @@ public class ValidationEngineTest {
         TestingUtils.unloadValidator("fake-validator");
     }
 
-    /**
-     * Created on Jul 7, 2011 by depryf
-     */
     @Test
     public void testModifyValidator() throws Exception {
 
@@ -996,9 +971,6 @@ public class ValidationEngineTest {
         TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fv-rule3");
     }
 
-    /**
-     * Created on Jul 7, 2011 by depryf
-     */
     @Test
     public void testModifyContext() throws Exception {
 
@@ -1118,7 +1090,7 @@ public class ValidationEngineTest {
         TestingUtils.loadValidator("fake-validator-context-in-context-old-syntax");
         try {
             Assert.assertEquals(3, ValidationEngine.getValidator("fake-validator-context-in-context-old-syntax").getRawContext().size());
-            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<String, Object>());
+            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<>());
             TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvcc-rule1");
         }
         finally {
@@ -1129,7 +1101,7 @@ public class ValidationEngineTest {
         TestingUtils.loadValidator("fake-validator-context-in-context");
         try {
             Assert.assertEquals(3, ValidationEngine.getValidator("fake-validator-context-in-context").getRawContext().size());
-            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<String, Object>());
+            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<>());
             TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvcc-rule1");
         }
         finally {
@@ -1137,9 +1109,6 @@ public class ValidationEngineTest {
         }
     }
 
-    /**
-     * Created on Oct 6, 2011 by depryf
-     */
     @Test
     public void testMassUpdateIgnoreFlags() throws Exception {
         TestingUtils.loadValidator("fake-validator");
@@ -1206,24 +1175,25 @@ public class ValidationEngineTest {
         TestingUtils.unloadValidator("fake-validator");
     }
 
-    // forced rules are also tested in the testValidate() method, this is testing a more specific case...
     @Test
     public void testForcedRule() throws Exception {
+
+        // forced rules are also tested in the testValidate() method, this is testing a more specific case...
 
         // we want to test a fake edit with alias (and root) "level" when no other edits exist for that level...
         Rule r = new Rule();
         r.setId("tmp");
         r.setJavaPath("level");
         r.setExpression("return false");
-        TestingUtils.assertEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<String, Object>()), r), "tmp");
+        TestingUtils.assertEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<>()), r), "tmp");
 
         // if the validatable uses a wrong path, that's fine
-        TestingUtils.assertNoEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "whatever", new HashMap<String, Object>()), r), "tmp");
+        TestingUtils.assertNoEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "whatever", new HashMap<>()), r), "tmp");
 
         // but the forced rule must have a valid java path!
         try {
             r.setJavaPath("whatever");
-            ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<String, Object>()), r);
+            ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<>()), r);
         }
         catch (ValidationException e) {
             return;
