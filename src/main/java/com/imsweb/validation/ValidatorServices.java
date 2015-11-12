@@ -187,9 +187,9 @@ public class ValidatorServices {
      * @return the java-path corresponding to the passed alias
      */
     public String getJavaPathForAlias(String alias) {
-        for (String key : _ALIASES.keySet())
-            if (_ALIASES.get(key).equals(alias))
-                return key;
+        for (Map.Entry<String, String> entry : _ALIASES.entrySet())
+            if (entry.getValue().equals(alias))
+                return entry.getKey();
         return null;
     }
 
