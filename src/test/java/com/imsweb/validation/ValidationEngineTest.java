@@ -1090,7 +1090,7 @@ public class ValidationEngineTest {
         TestingUtils.loadValidator("fake-validator-context-in-context-old-syntax");
         try {
             Assert.assertEquals(3, ValidationEngine.getValidator("fake-validator-context-in-context-old-syntax").getRawContext().size());
-            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<>());
+            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<String, Object>());
             TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvcc-rule1");
         }
         finally {
@@ -1101,7 +1101,7 @@ public class ValidationEngineTest {
         TestingUtils.loadValidator("fake-validator-context-in-context");
         try {
             Assert.assertEquals(3, ValidationEngine.getValidator("fake-validator-context-in-context").getRawContext().size());
-            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<>());
+            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<String, Object>());
             TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvcc-rule1");
         }
         finally {
@@ -1185,15 +1185,15 @@ public class ValidationEngineTest {
         r.setId("tmp");
         r.setJavaPath("level");
         r.setExpression("return false");
-        TestingUtils.assertEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<>()), r), "tmp");
+        TestingUtils.assertEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<String, Object>()), r), "tmp");
 
         // if the validatable uses a wrong path, that's fine
-        TestingUtils.assertNoEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "whatever", new HashMap<>()), r), "tmp");
+        TestingUtils.assertNoEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "whatever", new HashMap<String, Object>()), r), "tmp");
 
         // but the forced rule must have a valid java path!
         try {
             r.setJavaPath("whatever");
-            ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<>()), r);
+            ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<String, Object>()), r);
         }
         catch (ValidationException e) {
             return;
