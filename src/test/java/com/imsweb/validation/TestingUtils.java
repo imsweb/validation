@@ -151,6 +151,12 @@ public final class TestingUtils {
 
             _EXTRA_ALIASES.put("root", "root");
             _EXTRA_ALIASES.put("root.repeatedObjects", "repeatedObject");
+
+            _EXTRA_ALIASES.put("patient", "patient");
+            _EXTRA_ALIASES.put("patient.ctcs", "ctc");
+            _EXTRA_ALIASES.put("patient.ctcs.facilityAdmissions", "facilityAdmission");
+            _EXTRA_ALIASES.put("patient.ctcs.courses", "course");
+            _EXTRA_ALIASES.put("patient.ctcs.courses.treatmentProcedures", "treatmentProcedure");
         }
 
         @Override
