@@ -21,6 +21,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import groovy.lang.Binding;
 
+import com.imsweb.staging.Staging;
 import com.imsweb.validation.ValidationEngine;
 
 /**
@@ -87,7 +88,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
     // Pre-compiled regex and formatters...
     private static final Pattern _GEN_VAL_P1 = Pattern.compile("(\\-?\\d+)(.*)");
-    private static final Pattern GEN_VALID_DATE_IOP_P1 = Pattern.compile("(\\d{8}|\\d{6}\\s{2}|\\d{4}\\s{4})");
+    private static final Pattern _GEN_VALID_DATE_IOP_P1 = Pattern.compile("(\\d{8}|\\d{6}\\s{2}|\\d{4}\\s{4})");
     private static final DateTimeFormatter _GEN_DATECMP_IOP_FORMAT = DateTimeFormat.forPattern("yyyyMMdd");
     private static final Pattern _GEN_TRIM_P1 = Pattern.compile("^\\s+");
     private static final Pattern _GEN_TRIM_P2 = Pattern.compile("\\s+$");
@@ -96,8 +97,23 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     private static final Pattern _GEN_MATCH_P2 = Pattern.compile("(\\\\s)+");
     private static final Pattern _GEN_MATCH_P3 = Pattern.compile("((\\\\s)+)\\)$");
     private static final Pattern _GEN_MATCH_P4 = Pattern.compile("((\\\\s)+)$");
-    public static final Pattern _GEN_FMTSTR_P1 = Pattern.compile("%(.*)ld");
+    private static final Pattern _GEN_FMTSTR_P1 = Pattern.compile("%(.*)ld");
     private static final Pattern _GEN_INLIST_P1 = Pattern.compile("(\\d+)\\D*.*");
+
+    /**
+     * Default constructor.
+     */
+    public MetafileContextFunctions() {
+        super();
+    }
+
+    /**
+     * Constructor.
+     * @param csStaging <code>Staging</code> instance to use for Collaboriative-Stage-related operations.
+     */
+    public MetafileContextFunctions(Staging csStaging) {
+        super(csStaging);
+    }
 
     /**
      * Special genedit method. Internal use only.
@@ -167,7 +183,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return false;
         }
 
-        if (!GEN_VALID_DATE_IOP_P1.matcher(val).matches()) {
+        if (!_GEN_VALID_DATE_IOP_P1.matcher(val).matches()) {
             binding.setVariable(BINDING_KEY_DATE_COMPONENT, "date format must be CCYYMMDD");
             return false;
         }

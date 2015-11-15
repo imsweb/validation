@@ -150,7 +150,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     public static final String CSTAGE_TAG_UNDEFINED_SSF = "UNDEFINED_SSF";
 
     // the staging instance to use for all cstage-related logic
-    protected Staging _staging;
+    protected Staging _csStaging;
 
     // Cached schema ID per schema number
     protected Map<Integer, String> _schemaIdByNumber = new HashMap<>();
@@ -164,14 +164,14 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
 
     /**
      * Constructor.
-     * @param staging a Staging instance responsible for all CStage-related logic
+     * @param csStaging a Staging instance responsible for all CStage-related logic
      */
-    public StagingContextFunctions(Staging staging) {
-        _staging = staging;
+    public StagingContextFunctions(Staging csStaging) {
+        _csStaging = csStaging;
 
-        if (_staging != null) {
-            for (String schemaId : _staging.getSchemaIds()) {
-                StagingSchema schema = _staging.getSchema(schemaId);
+        if (_csStaging != null) {
+            for (String schemaId : _csStaging.getSchemaIds()) {
+                StagingSchema schema = _csStaging.getSchema(schemaId);
                 if (schema.getSchemaNum() != null)
                     _schemaIdByNumber.put(schema.getSchemaNum(), schemaId);
             }
@@ -186,10 +186,10 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      */
     @ContextFunctionDocAnnotation(desc = "Returns the CS version as provided by the CS library.", example = "def csVersion = Functions.getCsVersion()")
     public String getCsVersion() {
-        if (_staging == null)
+        if (_csStaging == null)
             return null;
 
-        return _staging.getVersion().replace(".", "");
+        return _csStaging.getVersion().replace(".", "");
     }
 
     /**
@@ -212,7 +212,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns the CS schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getCsSchemaName(inputs)")
     public String getCsSchemaName(Map<String, String> input) {
-        if (_staging == null)
+        if (_csStaging == null)
             return null;
 
         StagingSchema schema = getStagingSchema(input);
@@ -239,11 +239,11 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns true if the provided value is valid for the CS schema corresponding to the inputs and the CS field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAcceptableCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public boolean isAcceptableCsCode(Map<String, String> input, String field, String valueToCheck) {
-        if (_staging == null || input == null || field == null || valueToCheck == null)
+        if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
-        return schema != null && _staging.isCodeValid(schema.getId(), CSTAGE_FIELDS.get(field), valueToCheck);
+        return schema != null && _csStaging.isCodeValid(schema.getId(), CSTAGE_FIELDS.get(field), valueToCheck);
 
     }
 
@@ -267,7 +267,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns true if the provided value is obsolete for the CS schema corresponding to the inputs and the CS field, false otherwise. The value is obsolete if its description in the CS table starts with OBSOLETE. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isObsoleteCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public boolean isObsoleteCsCode(Map<String, String> input, String field, String valueToCheck) {
-        if (_staging == null || input == null || field == null || valueToCheck == null)
+        if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
 
         String description = getDescriptionForCode(input, CSTAGE_FIELDS.get(field), valueToCheck);
@@ -295,7 +295,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns the reason why a particular code is obsolete.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.getCsObsoleteReason(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public String getCsObsoleteReason(Map<String, String> input, String field, String valueToCheck) {
-        if (_staging == null || input == null || field == null || valueToCheck == null)
+        if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return null;
 
         String description = getDescriptionForCode(input, CSTAGE_FIELDS.get(field), valueToCheck);
@@ -333,7 +333,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                     + "false otherwise. Required means either 'already-collected', 'needed-for-staging' or 'clinically significant'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredCsCode(inputs, 1)")
     public boolean isRequiredCsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -366,7 +366,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                     + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isNeededForStagingCsCode(inputs, 1)")
     public boolean isNeededForStagingCsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -400,7 +400,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                     + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAlreadyCollectedCsCode(inputs, 1)")
     public boolean isAlreadyCollectedCsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -432,7 +432,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                     + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isClinicallySignificantCsCode(inputs, 1)")
     public boolean isClinicallySignificantCsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -466,7 +466,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                     + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredPre2010CsCode(inputs, 1)")
     public boolean isRequiredPre2010CsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -500,7 +500,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                     + "false otherwise. Required means either 'already-collected', 'needed-for-staging' or 'clinically significant'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredCsCode(inputs, 1)")
     public boolean isCocRequiredCsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -532,7 +532,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns true if the passed Site Specific Factor index is required (already-collected) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAlreadyCollectedCsCode(inputs, 1)")
     public boolean isCocAlreadyCollectedCsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -585,7 +585,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns true if the passed Site Specific Factor index is required (clinically-significant) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isClinicallySignificantCsCode(inputs, 1)")
     public boolean isCocClinicallySignificantCsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -618,7 +618,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns true if the passed Site Specific Factor index is required (pre-2010) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredPre2010CsCode(inputs, 1)")
     public boolean isCocRequiredPre2010CsCode(Map<String, String> input, Integer ssfIndex) {
-        if (_staging == null || input == null || ssfIndex == null)
+        if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
         StagingSchema schema = getStagingSchema(input);
@@ -638,16 +638,16 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      * @return corresponding schema, maybe null
      */
     public StagingSchema getStagingSchema(Map<String, String> input) {
-        if (_staging == null || input == null)
+        if (_csStaging == null || input == null)
             return null;
 
         String site = input.get(CSTAGE_INPUT_PROP_SITE);
         String hist = input.get(CSTAGE_INPUT_PROP_HIST);
         String ssf25 = input.get(CSTAGE_INPUT_PROP_DISC);
 
-        List<StagingSchema> schemas = _staging.lookupSchema(new CsSchemaLookup(site, hist, ssf25));
+        List<StagingSchema> schemas = _csStaging.lookupSchema(new CsSchemaLookup(site, hist, ssf25));
         if (schemas.size() == 1)
-            return _staging.getSchema(schemas.get(0).getId());
+            return _csStaging.getSchema(schemas.get(0).getId());
 
         return null;
     }
@@ -659,10 +659,10 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      * @return corresponding schema, maybe null
      */
     private StagingSchema getStagingSchema(int schemaNumber) {
-        if (_staging == null || schemaNumber == -1)
+        if (_csStaging == null || schemaNumber == -1)
             return null;
 
-        return _staging.getSchema(_schemaIdByNumber.get(schemaNumber));
+        return _csStaging.getSchema(_schemaIdByNumber.get(schemaNumber));
     }
 
     /**
@@ -674,7 +674,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      * @return corresponding description, maybe null
      */
     private String getDescriptionForCode(Map<String, String> input, String cstageField, String code) {
-        if (_staging == null || input == null || code == null)
+        if (_csStaging == null || input == null || code == null)
             return null;
 
         StagingSchema schema = getStagingSchema(input);
@@ -685,7 +685,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (schemaInput == null)
             return null;
 
-        StagingTable table = _staging.getTable(schemaInput.getTable());
+        StagingTable table = _csStaging.getTable(schemaInput.getTable());
         if (table == null)
             return null;
 
@@ -699,7 +699,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (colIndex == -1)
             return null;
 
-        Integer rowIndex = _staging.findMatchingTableRow(table.getId(), cstageField, code);
+        Integer rowIndex = _csStaging.findMatchingTableRow(table.getId(), cstageField, code);
         if (rowIndex == null)
             return null;
 
@@ -707,14 +707,14 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     protected int getCsNumSchemas() {
-        if (_staging == null)
+        if (_csStaging == null)
             return -1;
 
-        return _staging.getSchemaIds().size();
+        return _csStaging.getSchemaIds().size();
     }
 
     protected int getCsSchemaNumber(Map<String, String> input) {
-        if (_staging == null)
+        if (_csStaging == null)
             return -1;
 
         StagingSchema schema = getStagingSchema(input);
@@ -722,7 +722,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     protected String getCsSchemaName(int schemaNum) {
-        if (_staging == null)
+        if (_csStaging == null)
             return null;
 
         StagingSchema schema = getStagingSchema(schemaNum);
@@ -730,11 +730,11 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     protected boolean isAcceptableCsCode(int schemaNumber, int tableNumber, String valueToCheck) {
-        if (_staging == null)
+        if (_csStaging == null)
             return false;
 
         StagingSchema schema = getStagingSchema(schemaNumber);
-        return schema != null && _staging.isCodeValid(schema.getId(), CSTAGE_TABLE_NUMBERS.get(tableNumber), valueToCheck);
+        return schema != null && _csStaging.isCodeValid(schema.getId(), CSTAGE_TABLE_NUMBERS.get(tableNumber), valueToCheck);
     }
 
     /**
