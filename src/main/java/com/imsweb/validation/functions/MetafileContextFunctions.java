@@ -878,11 +878,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         // looks like Genedits considers a regex for a single space to match an empty string...
         if (val.isEmpty()) {
             String tmp = _GEN_MATCH_P2.matcher(reg).replaceAll("\\\\s"); // let's deal only with single spaces, since they seem to do the same in the Genedits language
-
-            if (tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s") || tmp.contains("|\\s|"))
-                return true;
-
-            if (tmp.equals("(\\s)") || tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)") || tmp.contains("|(\\s)|"))
+            if (tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s") || tmp.equals("(\\s)") || tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)"))
                 return true;
         }
 
