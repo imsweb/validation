@@ -19,6 +19,31 @@ This framework allows edits to be defined using the Groovy scripting language, a
 
 This library will be available in Maven Central soon.
 
+## Core concepts
+
+**ValidationEngine**: this is the class responsible for executing the edits. It needs to be initialized before that can happen.
+
+**XmlValidatorFactory**: provides utility methods for reading/writing edits XML files.
+
+**Validator**: a logic grouping of edits (for example, the SEER edits, or the NAACCR edits). This is the entities used to
+initialize the validation engine.
+
+**Rule**: edits are called rules in this framework.
+
+**Context**: validators can also contain contexts; those are usually large data structures (list, maps, etc...) that are accessed by more than one edit.
+Edits can reference contexts using the prefix *"Context."*.
+
+**Validatable**: an interface used to tell the engine how to execute the edits on specific data types. This allows very different types
+(like a NAACCR line, a Java tumor object or a record from a data entry form) to be wrapped into a validatable and handled by the framework.
+
+**ValidatorServices**: some services are made available to the edits (like accessing a lookup, or a configuration variable); different applications
+provide those features differently, therefore the services need to be overridden if the default behavior is not the one needed.
+
+**ValidatorContextFunctions**: the methods from this class are made available to the edits; they can be called using the prefix *"Function."*.
+The default implementation provides very basic methods but it can be initialized with a more complex implementation if needed.
+If the edits need to access staging information, the StagingContextFunctions class should be used for initialization.
+If the edits have been translated from a Genedits metafile, the MetafileContextFunctions class should be used instead.
+
 ## Usage
 
 ### Reading a file of edits
@@ -46,7 +71,7 @@ ValidationEngine.initialize(v);
 
 ### Creating an edit programmatically
 
-This example shows how to initialize the validation engine from edits created within the code:
+This example shows how to initialize the validation engine from edits created within the code.
 
 ```java
 // create the rule
@@ -70,7 +95,8 @@ ValidationEngine.initialize(v);
 
 ### Executing edits on a data file
 
-This example uses the layout framework to read NAACCR files and translate them into maps of fields:
+This example shows how to validate a data file and print the edit failures; it uses the [layout](https://github.com/imsweb/layout)
+framework to read a NAACCR file and translate it into a map of properties that the validation engine can handle.
 
 ```java
 File dataFile = new File("my-data.txd.gz");
