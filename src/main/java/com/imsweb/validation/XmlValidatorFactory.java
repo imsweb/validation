@@ -53,7 +53,7 @@ import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.io.xml.Xpp3Driver;
 
 import com.imsweb.validation.entities.Category;
 import com.imsweb.validation.entities.Condition;
@@ -127,7 +127,7 @@ public final class XmlValidatorFactory {
      * @return an instance of XStream, never null
      */
     private static XStream createValidatorXStream() {
-        XStream xstream = new XStream(new StaxDriver() {
+        XStream xstream = new XStream(new Xpp3Driver() {
             @Override
             public HierarchicalStreamWriter createWriter(Writer out) {
                 return new PrettyPrintWriter(out, "    ") {
@@ -950,7 +950,7 @@ public final class XmlValidatorFactory {
      * @return an instance of XStream, never null
      */
     private static XStream createStandaloneSetXStream() {
-        XStream xstream = new XStream(new StaxDriver() {
+        XStream xstream = new XStream(new Xpp3Driver() {
             @Override
             public HierarchicalStreamWriter createWriter(Writer out) {
                 return new PrettyPrintWriter(out, "    ");
@@ -1191,7 +1191,7 @@ public final class XmlValidatorFactory {
      * @return an instance of XStream, never null
      */
     private static XStream createTestsXStream() {
-        XStream xstream = new XStream(new StaxDriver() {
+        XStream xstream = new XStream(new Xpp3Driver() {
             @Override
             public HierarchicalStreamWriter createWriter(Writer out) {
                 return new PrettyPrintWriter(out, "    ") {
