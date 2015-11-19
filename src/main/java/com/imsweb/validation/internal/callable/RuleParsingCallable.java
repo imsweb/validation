@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import org.apache.commons.lang3.StringUtils;
 
 import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.XmlValidatorFactory;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.RuleHistory;
 import com.imsweb.validation.entities.Validator;
@@ -109,7 +110,7 @@ public class RuleParsingCallable implements Callable<Void> {
 
         if (_xmlRule.getMessage() == null)
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no message provided");
-        rule.setMessage(_xmlRule.getMessage());
+        rule.setMessage(XmlValidatorFactory.trimEmptyLines(_xmlRule.getMessage(), true));
 
         if (_xmlRule.getDepends() != null && !_xmlRule.getDepends().isEmpty()) {
             Set<String> dependencies = new HashSet<>();
@@ -141,7 +142,7 @@ public class RuleParsingCallable implements Callable<Void> {
                     rh.setReference(event.getRef());
                     if (event.getValue() == null)
                         throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no content provided in history entry");
-                    rh.setMessage(event.getValue());
+                    rh.setMessage(XmlValidatorFactory.trimEmptyLines(event.getValue(), true));
                     history.add(rh);
                 }
             }

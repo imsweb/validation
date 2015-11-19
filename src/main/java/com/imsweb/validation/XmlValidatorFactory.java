@@ -412,7 +412,7 @@ public final class XmlValidatorFactory {
                     throw new IOException("Deleted rule date is required");
                 rh.setDate(event.getDate());
                 rh.setReference(event.getRef());
-                rh.setMessage(event.getValue());
+                rh.setMessage(XmlValidatorFactory.trimEmptyLines(event.getValue(), true));
                 histories.add(rh);
             }
         }
@@ -435,7 +435,7 @@ public final class XmlValidatorFactory {
                 if (!"groovy".equals(contextType) && !"java".equals(contextType))
                     throw new IOException("Unable to load context '" + entryType.getId() + "' in " + validator.getId() + "; type must be 'groovy' or 'java'");
                 entry.setType(contextType);
-                entry.setExpression(entryType.getValue());
+                entry.setExpression(reAlign(entryType.getValue()));
                 rawContext.add(entry);
             }
         }
@@ -471,7 +471,7 @@ public final class XmlValidatorFactory {
                 if (type.getName() != null)
                     category.setName(type.getName().trim());
                 if (type.getDescription() != null)
-                    category.setDescription(type.getDescription());
+                    category.setDescription(reAlign(type.getDescription()));
 
                 categories.add(category);
             }
@@ -509,13 +509,13 @@ public final class XmlValidatorFactory {
                     condition.setName(type.getName().trim());
                 condition.setJavaPath(type.getJavaPath().trim());
                 try {
-                    condition.setExpression(type.getExpression());
+                    condition.setExpression(reAlign(type.getExpression()));
                 }
                 catch (ConstructionException e) {
                     throw new IOException("Unable to load condition '" + condition.getId() + "'; it contain an invalid expression", e);
                 }
                 if (type.getDescription() != null)
-                    condition.setDescription(type.getDescription());
+                    condition.setDescription(reAlign(type.getDescription()));
 
                 conditions.add(condition);
             }
@@ -605,7 +605,7 @@ public final class XmlValidatorFactory {
                 if (type.getName() != null)
                     set.setName(type.getName().trim());
                 if (type.getDescription() != null)
-                    set.setDescription(type.getDescription());
+                    set.setDescription(reAlign(type.getDescription()));
 
                 String include = type.getInclude();
                 Set<String> inclusions = new HashSet<>();
@@ -769,7 +769,7 @@ public final class XmlValidatorFactory {
             conditionType.setId(condition.getId());
             conditionType.setName(condition.getName());
             conditionType.setJavaPath(condition.getJavaPath());
-            conditionType.setExpression(condition.getExpression());
+            conditionType.setExpression(reAlign(condition.getExpression()));
             conditionType.setDescription(condition.getDescription());
             conditionsType.add(conditionType);
         }
@@ -837,7 +837,7 @@ public final class XmlValidatorFactory {
                 ruleType.setDepends(buf.toString());
             }
             ruleType.setDescription(rule.getDescription());
-            ruleType.setExpression(rule.getExpression());
+            ruleType.setExpression(reAlign(rule.getExpression()));
             ruleType.setId(rule.getId());
             ruleType.setMessage(rule.getMessage());
             ruleType.setName(rule.getName());
@@ -1045,7 +1045,7 @@ public final class XmlValidatorFactory {
                 throw new IOException("Set ID is required");
             set.setId(setType.getId());
             set.setName(setType.getName());
-            set.setDescription(setType.getDesc());
+            set.setDescription(reAlign(setType.getDesc()));
 
             for (StandaloneSetValidatorXmlDto validatorType : setType.getValidators()) {
 
@@ -1307,7 +1307,7 @@ public final class XmlValidatorFactory {
             for (TestXmlDto testType : validatorTestsType.getTest()) {
                 RuleTest test = new RuleTest();
                 test.setTestedRuleId(testType.getTestId());
-                test.setScriptText(testType.getScript());
+                test.setScriptText(reAlign(testType.getScript()));
                 tests.put(test.getTestedRuleId(), test);
             }
             validatorTests.setTests(tests);
