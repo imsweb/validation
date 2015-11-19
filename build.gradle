@@ -9,7 +9,7 @@ plugins {
 
 group = 'com.imsweb'
 version = file('VERSION').text
-description = 'Validation framework, allows to define edits in Groovy and use them to validate data files.'
+description = 'This framework allows edits to be defined in Groovy and to be executed on various data types.'
 
 println "Starting build using ${Jvm.current()}"
 
@@ -80,7 +80,7 @@ task generateJavaContextParser << {
 modifyPom {
     project {
         name 'Validation Framework'
-        description 'Validation framework, allows to define edits in Groovy and use them to validate data files.'
+        description 'This framework allows edits to be defined in Groovy and to be executed on various data types.'
         url 'https://github.com/imsweb/validation'
         inceptionYear '2015'
 
