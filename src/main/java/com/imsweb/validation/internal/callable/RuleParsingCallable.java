@@ -102,7 +102,7 @@ public class RuleParsingCallable implements Callable<Void> {
         if (_xmlRule.getExpression() == null)
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no expression provided");
         try {
-            rule.setExpression(_xmlRule.getExpression());
+            rule.setExpression(XmlValidatorFactory.reAlign(_xmlRule.getExpression()));
         }
         catch (ConstructionException e) {
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; it contain an invalid expression", e);
@@ -120,7 +120,7 @@ public class RuleParsingCallable implements Callable<Void> {
             rule.setDependencies(dependencies);
         }
         if (_xmlRule.getDescription() != null)
-            rule.setDescription(_xmlRule.getDescription());
+            rule.setDescription(XmlValidatorFactory.reAlign(_xmlRule.getDescription()));
         if (_xmlRule.getHistoryEvents() != null && !_xmlRule.getHistoryEvents().isEmpty()) {
             Set<RuleHistory> history = new HashSet<>();
             for (HistoryEventXmlDto event : _xmlRule.getHistoryEvents()) {
