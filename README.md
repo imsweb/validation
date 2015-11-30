@@ -17,7 +17,9 @@ This framework allows edits to be defined in [Groovy](http://www.groovy-lang.org
 
 ## Download
 
-This library will be available in Maven Central soon.
+The library is available on [Maven Central](http://search.maven.org/); type `g:"com.imsweb" AND a:"validation"` in the search to find it.
+
+You can check out the [release page](https://github.com/imsweb/validation/releases) for a list of the releases and their changes.
 
 ## Core concepts
 
