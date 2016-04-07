@@ -266,6 +266,129 @@ public class StagingContextFunctionsTest {
     }
 
     @Test
+    public void testGetTnmVersion() {
+        Assert.assertNotNull(_functions.getTnmVersion());
+    }
+
+    @Test
+    public void testGetTnmSchema() {
+        Map<String, String> input = new HashMap<>();
+        Assert.assertNull(_functions.getTnmStagingSchema(null));
+        Assert.assertNull(_functions.getTnmStagingSchema(input));
+
+        input.put("primarySite", "C481");
+        input.put("histologyIcdO3", "8000");
+        input.put("csSiteSpecificFactor25", null);
+        Assert.assertNull(_functions.getTnmStagingSchema(input));
+
+        input.put("sex", "1");
+        Assert.assertNotNull(_functions.getTnmStagingSchema(input));
+
+        input.put("csSiteSpecificFactor25", "010");
+        Assert.assertNotNull(_functions.getTnmStagingSchema(input));
+
+        input.put("primarySite", "C111");
+        Assert.assertNotNull(_functions.getTnmStagingSchema(input));
+
+        input.put("csSiteSpecificFactor25", null);
+        Assert.assertNull(_functions.getTnmStagingSchema(input));
+    }
+
+    @Test
+    public void testGetTnmSchemaName() {
+        Map<String, String> input = new HashMap<>();
+        Assert.assertNull(_functions.getTnmSchemaName(null));
+        Assert.assertNull(_functions.getTnmSchemaName(input));
+
+        input.put("primarySite", "C004");
+        input.put("histologyIcdO3", "8750");
+        input.put("csSiteSpecificFactor25", "30");
+        Assert.assertEquals("Melanoma Lip Lower", _functions.getTnmSchemaName(input));
+        input.put("primarySite", "C003");
+        Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
+        input.put("csSiteSpecificFactor25", null);
+        Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
+        input.put("histologyIcdO3", "8720");
+        Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
+        input.put("histologyIcdO3", "8790");
+        Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
+        input.put("histologyIcdO3", "8719");
+        Assert.assertNull(_functions.getTnmSchemaName(input));
+        input.put("histologyIcdO3", "8791");
+        Assert.assertNull(_functions.getTnmSchemaName(input));
+    }
+
+    @Test
+    public void testIsAcceptableTnmCode() {
+
+        // C447/8000 and tnmClinT, expecting [88, c0, c1, c2, c3, c4, cX, pIS, blank]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C447");
+        input.put("histologyIcdO3", "8000");
+        input.put("csSiteSpecificFactor25", null);
+
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "csTumorSize", "000"));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", "88"));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", "c0"));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", "c4"));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", "cX"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", "c5"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", null));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", ""));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", "xyz"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", "-5"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", "99999"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, null, "000"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "", "000"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "zyz", "000"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(null, "tnmClinT", "000"));
+    }
+
+    @Test
+    public void testIsRequiredTnmCode() {
+
+        // C619/8000 -> Prostate [1,8,10,2,7,9,12,13]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C619");
+        input.put("histologyIcdO3", "8000");
+        input.put("csSiteSpecificFactor25", null);
+
+        Assert.assertTrue(_functions.isRequiredTnmCode(input, 1));
+        Assert.assertTrue(_functions.isRequiredTnmCode(input, 2));
+        Assert.assertFalse(_functions.isRequiredTnmCode(input, 23));
+    }
+
+    @Test
+    public void testIsNeededForStagingTnmCode() {
+
+        // C619/8000 -> Prostate [1,8,10]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C619");
+        input.put("histologyIcdO3", "8000");
+        input.put("csSiteSpecificFactor25", null);
+
+        Assert.assertTrue(_functions.isNeededForStagingTnmCode(input, 1));
+        Assert.assertFalse(_functions.isNeededForStagingTnmCode(input, 2));
+        Assert.assertTrue(_functions.isNeededForStagingTnmCode(input, 8));
+        Assert.assertFalse(_functions.isNeededForStagingTnmCode(input, 23));
+    }
+
+    @Test
+    public void testIsCocRequiredTnmCode() {
+
+        // C619/8000 -> Prostate [1,2,7,8,9,10,11,12,13]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C619");
+        input.put("histologyIcdO3", "8000");
+        input.put("csSiteSpecificFactor25", null);
+
+        Assert.assertFalse(_functions.isCocRequiredTnmCode(input, 3));
+        Assert.assertTrue(_functions.isCocRequiredTnmCode(input, 2));
+        Assert.assertTrue(_functions.isCocRequiredTnmCode(input, 12));
+        Assert.assertFalse(_functions.isCocRequiredTnmCode(input, 23));
+    }
+    
+    @Test
     public void testExpandKeys() {
         Assert.assertNotNull(_functions.expandKeys(Collections.singletonMap((Object)"1-9", (Object)"A")));
     }

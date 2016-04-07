@@ -18,6 +18,9 @@ import com.imsweb.staging.cs.CsSchemaLookup;
 import com.imsweb.staging.entities.StagingSchema;
 import com.imsweb.staging.entities.StagingSchemaInput;
 import com.imsweb.staging.entities.StagingTable;
+import com.imsweb.staging.tnm.TnmDataProvider;
+import com.imsweb.staging.tnm.TnmSchemaLookup;
+import com.imsweb.staging.tnm.TnmStagingData;
 import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
@@ -149,8 +152,65 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     public static final String CSTAGE_TAG_REQUIRED_PRE_2010_COC = "COC_REQUIRED_PRE_2010";
     public static final String CSTAGE_TAG_UNDEFINED_SSF = "UNDEFINED_SSF";
 
-    // the staging instance to use for all cstage-related logic
+    // the standard NAACCR properties used when getting a TNM schema
+    public static final String TNM_INPUT_PROP_SITE = "primarySite";
+    public static final String TNM_INPUT_PROP_HIST = "histologyIcdO3";
+    public static final String TNM_INPUT_PROP_SSF25 = "csSiteSpecificFactor25";
+    public static final String TNM_INPUT_PROP_SEX = "sex";
+
+    // TNM metadata tags
+    public static final String TNM_TAG_SEER_REQUIRED = "SEER_REQUIRED";
+    public static final String TNM_TAG_COC_REQUIRED = "COC_REQUIRED";
+    public static final String TNM_TAG_NPCR_REQUIRED = "NPCR_REQUIRED";
+    public static final String TNM_TAG_CCCR_REQUIRED = "CCCR_REQUIRED";
+
+    // this maps the TNM fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
+    public static final Map<String, String> TNM_FIELDS = new HashMap<>();
+
+    static {
+        TNM_FIELDS.put("seerPrimaryTumor", "seer_primary_tumor");
+        TNM_FIELDS.put("seerRegionalNodes", "seer_nodes");
+        TNM_FIELDS.put("seerMets", "seer_mets");
+        TNM_FIELDS.put("tnmClinStageGroup", "clin_stage_group_direct");
+        TNM_FIELDS.put("tnmPathStageGroup", "path_stage_group_direct");
+        TNM_FIELDS.put("rxSummSystemicSurgSeq", "systemic_surg_seq");
+        TNM_FIELDS.put("rxSummSurgRadSeq", "radiation_surg_seq");
+        TNM_FIELDS.put("tnmClinT", "clin_t");
+        TNM_FIELDS.put("tnmClinN", "clin_n");
+        TNM_FIELDS.put("tnmClinM", "clin_m");
+        TNM_FIELDS.put("tnmPathT", "path_t");
+        TNM_FIELDS.put("tnmPathN", "path_n");
+        TNM_FIELDS.put("tnmPathM", "path_m");
+        TNM_FIELDS.put("csSiteSpecFact1", "ssf1");
+        TNM_FIELDS.put("csSiteSpecFact2", "ssf2");
+        TNM_FIELDS.put("csSiteSpecFact3", "ssf3");
+        TNM_FIELDS.put("csSiteSpecFact4", "ssf4");
+        TNM_FIELDS.put("csSiteSpecFact5", "ssf5");
+        TNM_FIELDS.put("csSiteSpecFact6", "ssf6");
+        TNM_FIELDS.put("csSiteSpecFact7", "ssf7");
+        TNM_FIELDS.put("csSiteSpecFact8", "ssf8");
+        TNM_FIELDS.put("csSiteSpecFact9", "ssf9");
+        TNM_FIELDS.put("csSiteSpecFact10", "ssf10");
+        TNM_FIELDS.put("csSiteSpecFact11", "ssf11");
+        TNM_FIELDS.put("csSiteSpecFact12", "ssf12");
+        TNM_FIELDS.put("csSiteSpecFact13", "ssf13");
+        TNM_FIELDS.put("csSiteSpecFact14", "ssf14");
+        TNM_FIELDS.put("csSiteSpecFact15", "ssf15");
+        TNM_FIELDS.put("csSiteSpecFact16", "ssf16");
+        TNM_FIELDS.put("csSiteSpecFact17", "ssf17");
+        TNM_FIELDS.put("csSiteSpecFact18", "ssf18");
+        TNM_FIELDS.put("csSiteSpecFact19", "ssf19");
+        TNM_FIELDS.put("csSiteSpecFact20", "ssf20");
+        TNM_FIELDS.put("csSiteSpecFact21", "ssf21");
+        TNM_FIELDS.put("csSiteSpecFact22", "ssf22");
+        TNM_FIELDS.put("csSiteSpecFact23", "ssf23");
+        TNM_FIELDS.put("csSiteSpecFact24", "ssf24");
+        TNM_FIELDS.put("csSiteSpecFact25", "ssf25");
+    }
+
+    // the staging instances to use for cstage- and tnm-related logic
     protected Staging _csStaging;
+    protected Staging _tnmStaging;
 
     // Cached schema ID per schema number
     protected Map<Integer, String> _schemaIdByNumber = new HashMap<>();
@@ -159,15 +219,17 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      * Default constructor
      */
     public StagingContextFunctions() {
-        this(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)));
+        this(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)), Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST)));
     }
 
     /**
      * Constructor.
      * @param csStaging a Staging instance responsible for all CStage-related logic
+     * @param tnmStaging a Staging instance responsible for all TNM-related logic
      */
-    public StagingContextFunctions(Staging csStaging) {
+    public StagingContextFunctions(Staging csStaging, Staging tnmStaging) {
         _csStaging = csStaging;
+        _tnmStaging = tnmStaging;
 
         if (_csStaging != null) {
             for (String schemaId : _csStaging.getSchemaIds()) {
@@ -215,7 +277,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null)
             return null;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         return schema == null ? null : schema.getName();
     }
 
@@ -242,7 +304,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         return schema != null && _csStaging.isCodeValid(schema.getId(), CSTAGE_FIELDS.get(field), valueToCheck);
 
     }
@@ -336,7 +398,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -369,7 +431,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -403,7 +465,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -435,7 +497,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -469,7 +531,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -503,7 +565,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -535,7 +597,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -588,7 +650,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -621,7 +683,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
@@ -631,13 +693,175 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     /**
+     * Returns the TNM library version.
+     * <p/>
+     * Created on Feb 4, 2011 by depryf
+     * @return the TNM library version
+     */
+    @ContextFunctionDocAnnotation(desc = "Returns the TNM version as provided by the TNM library.", example = "def tnmVersion = Functions.getTnmVersion()")
+    public String getTnmVersion() {
+        if (_tnmStaging == null)
+            return null;
+
+        return _tnmStaging.getVersion();
+    }
+
+    /**
+     * Returns the TNM schema name for the given input, null if there is no schema
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>csSiteSpecificFactor25</li>
+     * <li>sex</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @return the corresponding TNM schema name; null if not found
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
+            desc = "Returns the TNM schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getTnmSchemaName(inputs)")
+    public String getTnmSchemaName(Map<String, String> input) {
+        if (_tnmStaging == null)
+            return null;
+
+        StagingSchema schema = getTnmStagingSchema(input);
+        return schema == null ? null : schema.getName();
+    }
+
+    /**
+     * Returns true if the given value is valid for the given field with the schema corresponding to the passed input
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>csSiteSpecificFactor25</li>
+     * <li>sex</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param field requested TNM field
+     * @param valueToCheck value to check
+     * @return true if the value is acceptable, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "TNM field name", paramName3 = "valueToCheck", param3 = "value to validate",
+            desc = "Returns true if the provided value is valid for the TNM schema corresponding to the inputs and the TNM field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' and 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAcceptableTnmCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+    public boolean isAcceptableTnmCode(Map<String, String> input, String field, String valueToCheck) {
+        if (_tnmStaging == null || input == null || field == null || valueToCheck == null)
+            return false;
+
+        StagingSchema schema = getTnmStagingSchema(input);
+        return schema != null && _tnmStaging.isCodeValid(schema.getId(), TNM_FIELDS.get(field), valueToCheck);
+    }
+
+    /**
+     * Returns true if the passed SSF index is required for SEER for the schema corresponding to the passed input.
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>csSiteSpecificFactor25</li>
+     * <li>sex</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param ssfIndex requested SSF index
+     * @return true if the index is required for SEER, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
+            desc = "Returns true if the passed Site Specific Factor index is required for SEER for the schema corresponding to the passed input, "
+                    + "false otherwise. Required means either 'seer-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredTnmCode(inputs, 1)")
+    public boolean isRequiredTnmCode(Map<String, String> input, Integer ssfIndex) {
+        if (_tnmStaging == null || input == null || ssfIndex == null)
+            return false;
+
+        StagingSchema schema = getTnmStagingSchema(input);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_SEER_REQUIRED)));
+    }
+
+    /**
+     * Returns true if the passed SSF index is required (needed-for-staging) for SEER for the schema corresponding to the passed input.
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>csSiteSpecificFactor25</li>
+     * <li>sex</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param ssfIndex requested SSF index
+     * @return true if the index is needed for staging, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
+            desc = "Returns true if the passed Site Specific Factor index is required (needed-for-staging) for SEER for the schema corresponding to the passed input, "
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isNeededForStagingTnmCode(inputs, 1)")
+    public boolean isNeededForStagingTnmCode(Map<String, String> input, Integer ssfIndex) {
+        if (_tnmStaging == null || input == null || ssfIndex == null)
+            return false;
+
+        StagingSchema schema = getTnmStagingSchema(input);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        if (schemaInput == null)
+            return false;
+
+        return schemaInput.getUsedForStaging();
+    }
+
+    /**
+     * Returns true if the passed SSF index is required for CoC for the schema corresponding to the passed input.
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>csSiteSpecificFactor25</li>
+     * <li>sex</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param ssfIndex requested SSF index
+     * @return true if the index is required for COC, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
+            desc = "Returns true if the passed Site Specific Factor index is required for COC for the schema corresponding to the passed input, "
+                    + "false otherwise. Required means either 'coc-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isCocRequiredTnmCode(inputs, 1)")
+    public boolean isCocRequiredTnmCode(Map<String, String> input, Integer ssfIndex) {
+        if (_tnmStaging == null || input == null || ssfIndex == null)
+            return false;
+
+        StagingSchema schema = getTnmStagingSchema(input);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_COC_REQUIRED)));
+    }
+
+    /**
      * Helper method to get the schema from an input line (using standard NAACCR properties).
      * <br/>
      * I am making this method public because it's useful in many other places in the code...
      * @param input input fields (standard NAACCR properties)
      * @return corresponding schema, maybe null
      */
-    public StagingSchema getStagingSchema(Map<String, String> input) {
+    public StagingSchema getCsStagingSchema(Map<String, String> input) {
         if (_csStaging == null || input == null)
             return null;
 
@@ -653,12 +877,39 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     /**
+     * Helper method to get the TNM schema from an input line (using standard NAACCR properties).
+     * <br/>
+     * I am making this method public because it's useful in many other places in the code...
+     * @param input input fields (standard NAACCR properties)
+     * @return corresponding schema, maybe null
+     */
+    public StagingSchema getTnmStagingSchema(Map<String, String> input) {
+        if (_tnmStaging == null || input == null)
+            return null;
+
+        String site = input.get(TNM_INPUT_PROP_SITE);
+        String hist = input.get(TNM_INPUT_PROP_HIST);
+        String ssf25 = input.get(TNM_INPUT_PROP_SSF25);
+        String sex = input.get(TNM_INPUT_PROP_SEX);
+
+        TnmSchemaLookup lkup = new TnmSchemaLookup(site, hist);
+        lkup.setInput(TnmStagingData.SSF25_KEY, ssf25);
+        lkup.setInput(TnmStagingData.SEX_KEY, sex);
+
+        List<StagingSchema> schemas = _tnmStaging.lookupSchema(lkup);
+        if (schemas.size() == 1)
+            return _tnmStaging.getSchema(schemas.get(0).getId());
+
+        return null;
+    }
+
+    /**
      * Helper method to get the schema from a schema number (as used in the old cstage DLL).
      * <br/>
      * @param schemaNumber schema number
      * @return corresponding schema, maybe null
      */
-    private StagingSchema getStagingSchema(int schemaNumber) {
+    private StagingSchema getCsStagingSchema(int schemaNumber) {
         if (_csStaging == null || schemaNumber == -1)
             return null;
 
@@ -677,7 +928,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || input == null || code == null)
             return null;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         if (schema == null)
             return null;
 
@@ -717,7 +968,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null)
             return -1;
 
-        StagingSchema schema = getStagingSchema(input);
+        StagingSchema schema = getCsStagingSchema(input);
         return schema == null || schema.getSchemaNum() == null ? -1 : schema.getSchemaNum();
     }
 
@@ -725,7 +976,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null)
             return null;
 
-        StagingSchema schema = getStagingSchema(schemaNum);
+        StagingSchema schema = getCsStagingSchema(schemaNum);
         return schema == null ? null : schema.getName();
     }
 
@@ -733,7 +984,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null)
             return false;
 
-        StagingSchema schema = getStagingSchema(schemaNumber);
+        StagingSchema schema = getCsStagingSchema(schemaNumber);
         return schema != null && _csStaging.isCodeValid(schema.getId(), CSTAGE_TABLE_NUMBERS.get(tableNumber), valueToCheck);
     }
 

@@ -183,11 +183,16 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
         // this used to be in a protected method, but we are in a private constructor; pointless really, might as well put the code here!
         if (ValidatorContextFunctions.isInitialized() && ValidatorContextFunctions.getInstance() instanceof StagingContextFunctions) {
             boolean hasCsSchema = _currentLine.containsKey(Validatable.KEY_CS_SCHEMA_NAME);
+            boolean hasTnmSchema = _currentLine.containsKey(Validatable.KEY_TNM_SCHEMA_NAME);
             boolean hasSite = _currentLine.containsKey(StagingContextFunctions.CSTAGE_INPUT_PROP_SITE);
             boolean hasHist = _currentLine.containsKey(StagingContextFunctions.CSTAGE_INPUT_PROP_HIST);
             if (!hasCsSchema || hasSite || hasHist) {
-                StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getStagingSchema(_currentLine);
+                StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_CS_SCHEMA_NAME, schema != null ? schema.getName() : null);
+            }
+            if (!hasTnmSchema || hasSite || hasHist) {
+                StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getTnmStagingSchema(_currentLine);
+                _currentLine.put(Validatable.KEY_TNM_SCHEMA_NAME, schema != null ? schema.getName() : null);
             }
         }
     }
