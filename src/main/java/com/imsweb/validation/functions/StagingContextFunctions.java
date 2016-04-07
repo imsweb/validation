@@ -212,8 +212,8 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     protected Staging _csStaging;
     protected Staging _tnmStaging;
 
-    // Cached schema ID per schema number
-    protected Map<Integer, String> _schemaIdByNumber = new HashMap<>();
+    // Cached schema ID per schema number for CS
+    protected Map<Integer, String> _csSchemaIdByNumber = new HashMap<>();
 
     /**
      * Default constructor
@@ -235,7 +235,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             for (String schemaId : _csStaging.getSchemaIds()) {
                 StagingSchema schema = _csStaging.getSchema(schemaId);
                 if (schema.getSchemaNum() != null)
-                    _schemaIdByNumber.put(schema.getSchemaNum(), schemaId);
+                    _csSchemaIdByNumber.put(schema.getSchemaNum(), schemaId);
             }
         }
     }
@@ -913,7 +913,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         if (_csStaging == null || schemaNumber == -1)
             return null;
 
-        return _csStaging.getSchema(_schemaIdByNumber.get(schemaNumber));
+        return _csStaging.getSchema(_csSchemaIdByNumber.get(schemaNumber));
     }
 
     /**
