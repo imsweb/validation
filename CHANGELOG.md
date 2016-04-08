@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.5.1**
+
+- Added support for TNM staging in the context methods and the simple NAACCR line validatable; using TNM 1.1 algorithm.
+
 **Version 1.5**
 
 - Increased the engine version to 5.2.
