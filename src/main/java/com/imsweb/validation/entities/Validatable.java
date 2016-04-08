@@ -23,10 +23,11 @@ public interface Validatable {
     String KEY_APPLICATION_REGISTRY = "applicationRegistryId";
 
     /**
-     * Key for the cached Collaborative Stage schema name - based on site, hist and ssf25 (but actual property names will vary
+     * Key for the cached Staging schema names, CS based on site, hist and ssf25 and TNM based on site, hist, ssf25 and sex (but actual property names will vary
      * by wrapped object).
      */
     String KEY_CS_SCHEMA_NAME = "_csSchemaName";
+    String KEY_TNM_SCHEMA_NAME = "_tnmSchemaName";
 
     /**
      * Returns the root level of this validatable. This corresponds to the first property in the full java-path of any rulesets.
