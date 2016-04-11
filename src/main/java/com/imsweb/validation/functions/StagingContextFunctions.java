@@ -751,7 +751,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             desc = "Returns true if the provided value is valid for the TNM schema corresponding to the inputs and the TNM field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' and 'sex'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAcceptableTnmCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public boolean isAcceptableTnmCode(Map<String, String> input, String field, String valueToCheck) {
-        if (_tnmStaging == null || input == null || field == null || valueToCheck == null)
+        if (_tnmStaging == null || input == null || field == null)
             return false;
 
         StagingSchema schema = getTnmStagingSchema(input);
