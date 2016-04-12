@@ -333,7 +333,7 @@ public class StagingContextFunctionsTest {
         Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", "c4"));
         Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", "cX"));
         Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", "c5"));
-        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", null));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", null));
         Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinT", ""));
         Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", "xyz"));
         Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinT", "-5"));
@@ -342,6 +342,15 @@ public class StagingContextFunctionsTest {
         Assert.assertFalse(_functions.isAcceptableTnmCode(input, "", "000"));
         Assert.assertFalse(_functions.isAcceptableTnmCode(input, "zyz", "000"));
         Assert.assertFalse(_functions.isAcceptableTnmCode(null, "tnmClinT", "000"));
+
+        // C447/8000 and clinStageGroup, expecting [0, 1, 2, 3, 4, 99, 88]
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinStageGroup", "88"));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinStageGroup", "0"));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinStageGroup", "4"));
+        Assert.assertTrue(_functions.isAcceptableTnmCode(input, "tnmClinStageGroup", "99"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinStageGroup", "c5"));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinStageGroup", null));
+        Assert.assertFalse(_functions.isAcceptableTnmCode(input, "tnmClinStageGroup", ""));
     }
 
     @Test
