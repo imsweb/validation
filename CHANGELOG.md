@@ -2,6 +2,7 @@
 
 **Version 1.5.3**
 
+- Increased the engine version to 5.3 (version 5.3 is needed for edits using new TNM context methods).
 - Updated staging client from version 2.1 to version 2.1.1.
 - Updated Groovy library from version 2.4.4 (indy) to version 2.4.6 (indy).
 - Updated Joda library (for date utilities) from version 2.8.1 to version 2.9.3.
