@@ -25,7 +25,8 @@ import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
 /**
- * Staging-related helper methods made available to the edits.
+ * Staging-related helper methods made available to the edits. If you want to execute edits that call some staging utility methods, you need to initialize
+ * the context functions with an instance of this class. Otherwise you should just use the ValidatorContextFunctions one.
  */
 public class StagingContextFunctions extends ValidatorContextFunctions {
 

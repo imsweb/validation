@@ -25,9 +25,13 @@ import com.imsweb.staging.Staging;
 import com.imsweb.validation.ValidationEngine;
 
 /**
- * Metafile-related helper methods made available to the edits.
+ * Metafile-related helper methods made available to the edits. If you want to execute translated edits in your project, you need to initialize
+ * the context functions with an instance of this class.
  * <br/><br/>
  * None of these methods should be called from regular (non-translated) edits.
+ * <br/><br/>
+ * As of version 5.3 of the engine, it is now possible to treat WARNINGS in translated edits as a failing state. To do that, just call
+ * the setFailWarnings() method with an argument of "true" after instanciating this class.
  */
 @SuppressWarnings("ALL")
 public class MetafileContextFunctions extends StagingContextFunctions {
@@ -100,6 +104,9 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     private static final Pattern _GEN_FMTSTR_P1 = Pattern.compile("%(.*)ld");
     private static final Pattern _GEN_INLIST_P1 = Pattern.compile("(\\d+)\\D*.*");
 
+    // I don't love giving a state to this class, but I am not sure how else to do it since we already have multiple flavors for the constructor...
+    private boolean _failWarnings = false;
+
     /**
      * Default constructor.
      */
@@ -114,6 +121,20 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      */
     public MetafileContextFunctions(Staging csStaging, Staging tnmStaging) {
         super(csStaging, tnmStaging);
+    }
+
+    /**
+     * If set to true, then warnings in translated edits will make the edit fail.
+     */
+    public void setFailWarnings(boolean failWarnings) {
+        _failWarnings = failWarnings;
+    }
+
+    /**
+     * @return whether warnings in translated edits are considered as failures.
+     */
+    public boolean isFailWarnings() {
+        return _failWarnings;
     }
 
     /**
@@ -1624,7 +1645,9 @@ public class MetafileContextFunctions extends StagingContextFunctions {
          * Warnings reported by SAVE_WARNING_TEXT are in addition to any reported by ERROR_MSG or other returns from the edit.
          */
 
-        // we don't support the concept of warnings...
+
+        if (_failWarnings)
+            return GEN_SAVE_WARNING_TEXT(binding, texts);
 
         return true;
     }
@@ -1644,7 +1667,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
          * Warnings reported by SET_WARNING are in addition to any reported by ERROR_MSG or other returns from the edit.
          */
 
-        // we don't support the concept of warnings...
+        if (_failWarnings)
+            return GEN_SET_ERROR(binding, texts);
 
         return true;
     }
@@ -1897,5 +1921,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             end--;
 
         return value.substring(0, end);
+    }
+
+    public boolean GEN_WARNING_RESULT() {
+        // if _failWarnings is true, then the warnings should be considered as errors and this method should return false (to fail the edit)
+        // if _failWarnings is false, then the warnings should be ignored, the edits shouldn't fail and this method should return true
+        return !_failWarnings;
     }
 }
