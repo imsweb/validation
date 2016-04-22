@@ -1,8 +1,16 @@
 ## Validation Framework Version History
 
+**Version 1.5.3**
+
+- Updated staging client from version 2.1 to version 2.1.1.
+- Updated Groovy library from version 2.4.4 (indy) to version 2.4.6 (indy).
+- Updated Joda library (for date utilities) from version 2.8.1 to version 2.9.3.
+- Updated XStreams library (for XML utilities) from version 1.4.7 to version 1.4.9.
+- Updated Apache commons-lang library from version 3.3.2 to version 3.4.
+
 **Version 1.5.2**
 
-- Changed staging context method isAcceptableTnmCode() to not always return false for a null value
+- Changed staging context method isAcceptableTnmCode() to not always return false for a null value.
 
 **Version 1.5.1**
 
