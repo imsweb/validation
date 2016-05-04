@@ -2,6 +2,7 @@
 
 **Version 1.5.4**
 
+- Increased the engine version to 5.4 (version 5.4 is needed for edits using staging schema ID instead of name).
 - Deprecated the constants related to staging schema name in Validatable; those have been replaced by staging ID constants.
 
 **Version 1.5.3**
