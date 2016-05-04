@@ -182,17 +182,30 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
 
         // this used to be in a protected method, but we are in a private constructor; pointless really, might as well put the code here!
         if (ValidatorContextFunctions.isInitialized() && ValidatorContextFunctions.getInstance() instanceof StagingContextFunctions) {
-            boolean hasCsSchema = _currentLine.containsKey(Validatable.KEY_CS_SCHEMA_NAME);
-            boolean hasTnmSchema = _currentLine.containsKey(Validatable.KEY_TNM_SCHEMA_NAME);
+            boolean hasCsSchemaName = _currentLine.containsKey(Validatable.KEY_CS_SCHEMA_NAME);
+            boolean hasTnmSchemaName = _currentLine.containsKey(Validatable.KEY_TNM_SCHEMA_NAME);
+            boolean hasCsSchemaId = _currentLine.containsKey(Validatable.KEY_CS_SCHEMA_ID);
+            boolean hasTnmSchemaId = _currentLine.containsKey(Validatable.KEY_TNM_SCHEMA_ID);
             boolean hasSite = _currentLine.containsKey(StagingContextFunctions.CSTAGE_INPUT_PROP_SITE);
             boolean hasHist = _currentLine.containsKey(StagingContextFunctions.CSTAGE_INPUT_PROP_HIST);
-            if (!hasCsSchema || hasSite || hasHist) {
+
+            // this block of code will be removed in a future version; edits should not reference staging schemas by name, but by ID instead...
+            if (!hasCsSchemaName || hasSite || hasHist) {
                 StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_CS_SCHEMA_NAME, schema != null ? schema.getName() : null);
             }
-            if (!hasTnmSchema || hasSite || hasHist) {
+            if (!hasTnmSchemaName || hasSite || hasHist) {
                 StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getTnmStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_TNM_SCHEMA_NAME, schema != null ? schema.getName() : null);
+            }
+
+            if (!hasCsSchemaId || hasSite || hasHist) {
+                StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
+                _currentLine.put(Validatable.KEY_CS_SCHEMA_ID, schema != null ? schema.getId() : null);
+            }
+            if (!hasTnmSchemaId || hasSite || hasHist) {
+                StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getTnmStagingSchema(_currentLine);
+                _currentLine.put(Validatable.KEY_TNM_SCHEMA_ID, schema != null ? schema.getId() : null);
             }
         }
     }

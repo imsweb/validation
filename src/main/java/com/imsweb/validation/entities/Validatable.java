@@ -17,17 +17,38 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 public interface Validatable {
 
     /**
-     * Key for the special application registry extra context entry - that is not the registry defined by the validated data,
-     * it is the registry in which the application running the validation engine is.
+     * Key for the special application registry extra context entry.
+     * <br/>
+     * Deprecated as of version 1.5.4; this constant is not reference in this library and will be removed in a future version.
      */
+    @Deprecated
     String KEY_APPLICATION_REGISTRY = "applicationRegistryId";
 
     /**
-     * Key for the cached Staging schema names, CS based on site, hist and ssf25 and TNM based on site, hist, ssf25 and sex (but actual property names will vary
-     * by wrapped object).
+     * Key for the calculated CS staging schema name that some validatable implementations put in the context of the executed edits.
+     * <br/>
+     * Deprecated as of version 1.5.4; use the schema ID instead.
      */
+    @Deprecated
     String KEY_CS_SCHEMA_NAME = "_csSchemaName";
+
+    /**
+     * Key for the calculated TNM staging schema name that some validatable implementations put in the context of the executed edits.
+     * <br/>
+     * Deprecated as of version 1.5.4; use the schema ID instead.
+     */
+    @Deprecated
     String KEY_TNM_SCHEMA_NAME = "_tnmSchemaName";
+
+    /**
+     * Key for the calculated CS staging schema ID that some validatable implementations put in the context of the executed edits.
+     */
+    String KEY_CS_SCHEMA_ID = "_csSchemaId";
+
+    /**
+     * Key for the calculated TNM staging schema ID that some validatable implementations put in the context of the executed edits.
+     */
+    String KEY_TNM_SCHEMA_ID = "_tnmSchemaId";
 
     /**
      * Returns the root level of this validatable. This corresponds to the first property in the full java-path of any rulesets.

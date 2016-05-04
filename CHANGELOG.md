@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.5.4**
+
+- Deprecated the constants related to staging schema name in Validatable; those have been replaced by staging ID constants.
+
 **Version 1.5.3**
 
 - Increased the engine version to 5.3 (version 5.3 is needed for edits using new TNM context methods).
