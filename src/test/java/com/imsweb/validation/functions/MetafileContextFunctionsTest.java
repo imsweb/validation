@@ -76,13 +76,25 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_INLIST("    101", "100-150,225-229", "\\d\\d\\d"));
         Assert.assertFalse(_functions.GEN_INLIST("    101    ", "100-150,225-229", "\\d\\d\\d"));
 
-        // value is only right-trim when a regex is provided
-        Assert.assertTrue(_functions.GEN_INLIST("C101", "100-150,225-229", "C\\d\\d\\d", 2, 3));
-        Assert.assertTrue(_functions.GEN_INLIST("C101   ", "100-150,225-229", "C\\d\\d\\d", 2, 3));
-        Assert.assertFalse(_functions.GEN_INLIST("    C101", "100-150,225-229", "C\\d\\d\\d", 2, 3));
-        Assert.assertFalse(_functions.GEN_INLIST("    C101    ", "100-150,225-229", "C\\d\\d\\d", 2, 3));
-        Assert.assertFalse(_functions.GEN_INLIST("C10", "100-150,225-229", "C\\d\\d\\s", 2, 3));
-        Assert.assertFalse(_functions.GEN_INLIST("C10 ", "100-150,225-229", "C\\d\\d\\s", 2, 3));
+        // following block has been tested with Genedits
+        Assert.assertFalse(_functions.GEN_INLIST("C101", "100-150", "C\\d\\d\\d", 2, 2));
+        Assert.assertTrue(_functions.GEN_INLIST("C101", "100-150", "C\\d\\d\\d", 2, 3));
+        Assert.assertTrue(_functions.GEN_INLIST("C101", "100-150", "C\\d\\d\\d", 2, 4));
+        Assert.assertTrue(_functions.GEN_INLIST("C10", "10-15", "C\\d\\d", 2, 2));
+        Assert.assertTrue(_functions.GEN_INLIST("C10", "10-15", "C\\d\\d", 2, 3));
+        Assert.assertTrue(_functions.GEN_INLIST("C10", "10-15", "C\\d\\d", 2, 4));
+        Assert.assertTrue(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 2));
+        Assert.assertTrue(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 3));
+        Assert.assertTrue(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 4));
+        Assert.assertTrue(_functions.GEN_INLIST("C10 ", "10-15", "C\\d\\d\\s", 2, 2));
+        Assert.assertTrue(_functions.GEN_INLIST("C10 ", "10-15", "C\\d\\d\\s", 2, 3));
+        Assert.assertTrue(_functions.GEN_INLIST("C10 ", "10-15", "C\\d\\d\\s", 2, 4));
+        Assert.assertFalse(_functions.GEN_INLIST(" 101", "100-150", "\\s\\d\\d\\d", 2, 2));
+        Assert.assertTrue(_functions.GEN_INLIST(" 101", "100-150", "\\s\\d\\d\\d", 2, 3));
+        Assert.assertTrue(_functions.GEN_INLIST(" 101", "100-150", "\\s\\d\\d\\d", 2, 4));
+        Assert.assertFalse(_functions.GEN_INLIST(" 01 ", "100-150", "\\s\\d\\d\\s", 2, 2));
+        Assert.assertFalse(_functions.GEN_INLIST(" 01 ", "100-150", "\\s\\d\\d\\s", 2, 2));
+        Assert.assertFalse(_functions.GEN_INLIST(" 01 ", "100-150", "\\s\\d\\d\\s", 2, 4));
 
         // I just don't understand how that function works!!!  All the following cases have been tested using genedits...
         Assert.assertFalse(_functions.GEN_INLIST("", "")); // this one is not a valid syntax in genedits

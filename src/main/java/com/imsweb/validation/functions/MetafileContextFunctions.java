@@ -868,18 +868,19 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         if (!GEN_MATCH(value, regex))
             return false;
-
-        String val = GEN_TO_STRING(value);
-        if (val.trim().isEmpty() || val.length() < startPos - 1 + length)
-            return false;
-
-        val = val.substring(startPos - 1, startPos - 1 + length);
-
+        
         // apparently Genedits right-trim the incoming value in their MATCH method, in C++ the value is a pointer, so it is trimmed in INLIST as a side effect!
-        val = trimRight(val);
+        String val = trimRight(GEN_TO_STRING(value));
 
         if (val.isEmpty())
             return true;
+        
+        if (val.trim().isEmpty() || startPos >= val.length())
+            return false;
+
+
+        // Genedits uses 1-based index; it also allows the length to go past the end of the string, so let's adjust it here
+        val = val.substring(startPos - 1, Math.min(startPos - 1 + length, val.length()));
 
         return isValInList(val, l);
     }

@@ -1,8 +1,12 @@
 ## Validation Framework Version History
 
+**Version 1.5.6**
+
+- Fixed a bug in the GenEDITS INLIST function implementation resulting in some edits failing when they should pass.
+
 **Version 1.5.5**
 
-- Fixed a bug in the GenEDITS IN_LIST function implementation resulting in a out-of-bound exception.
+- Fixed a bug in the GenEDITS INLIST function implementation resulting in a out-of-bound exception.
 - Removed the deprecated staging schema name constants from the Validatable class.
 
 **Version 1.5.4**
