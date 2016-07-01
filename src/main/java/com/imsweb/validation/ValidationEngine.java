@@ -85,7 +85,7 @@ public final class ValidationEngine {
     /**
      * Engine version (used to check compatibility with the edits)
      */
-    private static final String _ENGINE_VERSION = "5.4";
+    private static final String _ENGINE_VERSION = "5.5";
 
     /**
      * Context key for the helper functions - Functions.

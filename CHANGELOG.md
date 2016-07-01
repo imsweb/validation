@@ -2,6 +2,7 @@
 
 **Version 1.5.6**
 
+- Increased the engine version to 5.5 (version 5.5 is needed for ensuring correct results when running translated metafile edits).
 - Fixed a bug in the GenEDITS INLIST function implementation resulting in some edits failing when they should pass.
 
 **Version 1.5.5**
