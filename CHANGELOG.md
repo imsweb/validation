@@ -2,6 +2,7 @@
 
 **Version 1.5.5**
 
+- Fixed a bug in the GenEDITS IN_LIST function implementation resulting in a out-of-bound exception.
 - Removed the deprecated staging schema name constants from the Validatable class.
 
 **Version 1.5.4**

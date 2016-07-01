@@ -873,13 +873,13 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         if (val.trim().isEmpty() || val.length() < startPos - 1 + length)
             return false;
 
+        val = val.substring(startPos - 1, startPos - 1 + length);
+
         // apparently Genedits right-trim the incoming value in their MATCH method, in C++ the value is a pointer, so it is trimmed in INLIST as a side effect!
         val = trimRight(val);
 
         if (val.isEmpty())
             return true;
-
-        val = val.substring(startPos - 1, startPos - 1 + length);
 
         return isValInList(val, l);
     }

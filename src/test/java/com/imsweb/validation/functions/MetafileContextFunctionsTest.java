@@ -81,6 +81,8 @@ public class MetafileContextFunctionsTest {
         Assert.assertTrue(_functions.GEN_INLIST("C101   ", "100-150,225-229", "C\\d\\d\\d", 2, 3));
         Assert.assertFalse(_functions.GEN_INLIST("    C101", "100-150,225-229", "C\\d\\d\\d", 2, 3));
         Assert.assertFalse(_functions.GEN_INLIST("    C101    ", "100-150,225-229", "C\\d\\d\\d", 2, 3));
+        Assert.assertFalse(_functions.GEN_INLIST("C10", "100-150,225-229", "C\\d\\d\\s", 2, 3));
+        Assert.assertFalse(_functions.GEN_INLIST("C10 ", "100-150,225-229", "C\\d\\d\\s", 2, 3));
 
         // I just don't understand how that function works!!!  All the following cases have been tested using genedits...
         Assert.assertFalse(_functions.GEN_INLIST("", "")); // this one is not a valid syntax in genedits
