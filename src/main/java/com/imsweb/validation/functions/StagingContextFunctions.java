@@ -272,7 +272,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      * @return the corresponding CS schema name; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the CS schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
+            desc = "Returns the CS schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getCsSchemaName(inputs)")
     public String getCsSchemaName(Map<String, String> input) {
         if (_csStaging == null)
@@ -280,6 +280,33 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
 
         StagingSchema schema = getCsStagingSchema(input);
         return schema == null ? null : schema.getName();
+    }
+
+    /**
+     * Returns the CS schema ID for the passed input fields.
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>csSiteSpecificFactor25</li>
+     * </ul>
+     * <p/>
+     * The site and the histology cannot be null (or the resulting schema will be null); the SSF25 can be null or missing.
+     * <p/>
+     * Created on Jan 19, 2010 by depryf
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @return the corresponding CS schema ID; null if not found
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
+            desc = "Returns the CS schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaId = Functions.getCsSchemaId(inputs)")
+    public String getCsSchemaId(Map<String, String> input) {
+        if (_csStaging == null)
+            return null;
+
+        StagingSchema schema = getCsStagingSchema(input);
+        return schema == null ? null : schema.getId();
     }
 
     /**
@@ -722,7 +749,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      * @return the corresponding TNM schema name; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the TNM schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
+            desc = "Returns the TNM schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getTnmSchemaName(inputs)")
     public String getTnmSchemaName(Map<String, String> input) {
         if (_tnmStaging == null)
@@ -732,6 +759,31 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         return schema == null ? null : schema.getName();
     }
 
+    /**
+     * Returns the TNM schema ID for the given input, null if there is no schema
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>csSiteSpecificFactor25</li>
+     * <li>sex</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @return the corresponding TNM schema ID; null if not found
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
+            desc = "Returns the TNM schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaId = Functions.getTnmSchemaId(inputs)")
+    public String getTnmSchemaId(Map<String, String> input) {
+        if (_tnmStaging == null)
+            return null;
+
+        StagingSchema schema = getTnmStagingSchema(input);
+        return schema == null ? null : schema.getId();
+    }
+    
     /**
      * Returns true if the given value is valid for the given field with the schema corresponding to the passed input
      * <p/>
