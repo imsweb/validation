@@ -55,6 +55,33 @@ public class StagingContextFunctionsTest {
     }
 
     @Test
+    public void testGetCsSchemaId() {
+
+        // the input is what will test the function's behavior
+        Map<String, String> input = new HashMap<>();
+
+        Assert.assertNull(_functions.getCsSchemaId(null));
+        Assert.assertNull(_functions.getCsSchemaId(null));
+        Assert.assertNull(_functions.getCsSchemaId(input));
+        input.put("primarySite", "C004");
+        input.put("histologyIcdO3", "8750");
+        input.put("csSiteSpecificFactor25", "30");
+        Assert.assertEquals("melanoma_lip_lower", _functions.getCsSchemaId(input));
+        input.put("primarySite", "C003");
+        Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
+        input.put("csSiteSpecificFactor25", null);
+        Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
+        input.put("histologyIcdO3", "8720");
+        Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
+        input.put("histologyIcdO3", "8790");
+        Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
+        input.put("histologyIcdO3", "8719");
+        Assert.assertNull(_functions.getCsSchemaId(input));
+        input.put("histologyIcdO3", "8791");
+        Assert.assertNull(_functions.getCsSchemaId(input));
+    }
+
+    @Test
     public void testIsAcceptableCsCode() {
 
         // C447/8000 and csTumorSize, expecting [989, 994, 995, 001-988, 992, 993, 990, 991, 000, 999]
@@ -316,6 +343,37 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getTnmSchemaName(input));
         input.put("histologyIcdO3", "8791");
         Assert.assertNull(_functions.getTnmSchemaName(input));
+    }
+
+    @Test
+    public void testGetTnmSchemaId() {
+        Map<String, String> input = new HashMap<>();
+        Assert.assertNull(_functions.getTnmSchemaId(null));
+        Assert.assertNull(_functions.getTnmSchemaId(input));
+
+        input.put("primarySite", "C004");
+        input.put("histologyIcdO3", "8750");
+        input.put("csSiteSpecificFactor25", "30");
+        Assert.assertEquals("melanoma_lip_lower", _functions.getTnmSchemaId(input));
+        input.put("primarySite", "C003");
+        Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
+        input.put("csSiteSpecificFactor25", null);
+        Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
+        input.put("histologyIcdO3", "8720");
+        Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
+        input.put("histologyIcdO3", "8790");
+        Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
+        input.put("histologyIcdO3", "8719");
+        Assert.assertNull(_functions.getTnmSchemaId(input));
+        input.put("histologyIcdO3", "8791");
+        Assert.assertNull(_functions.getTnmSchemaId(input));
+        input.put("primarySite", "C481");
+        input.put("histologyIcdO3", "8000");
+        input.put("csSiteSpecificFactor25", null);
+        input.put("sex", "2");
+        Assert.assertEquals("peritoneum_female_gen", _functions.getTnmSchemaId(input));
+        input.put("sex", null);
+        Assert.assertNull(_functions.getTnmSchemaId(input));
     }
 
     @Test

@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.5.7**
+
+- Added staging context methods getCsSchemaId() and getTnmSchemaId() that return a schema ID given a map of inputs.
+
 **Version 1.5.6**
 
 - Increased the engine version to 5.5 (version 5.5 is needed for ensuring correct results when running translated metafile edits).
