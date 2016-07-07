@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 1.5.8**
+
+- Increased the engine version to 5.6 (version 5.6 is needed for ensuring correct results when running translated metafile edits).
+- Fixed another bug in the GenEDITS INLIST function implementation resulting in some edits failing when they should pass.
+
 **Version 1.5.7**
 
 - Added staging context methods getCsSchemaId() and getTnmSchemaId() that return a schema ID given a map of inputs.
