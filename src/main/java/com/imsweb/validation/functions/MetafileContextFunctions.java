@@ -868,21 +868,20 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         if (!GEN_MATCH(value, regex))
             return false;
-        
+
         // apparently Genedits right-trim the incoming value in their MATCH method, in C++ the value is a pointer, so it is trimmed in INLIST as a side effect!
         String val = trimRight(GEN_TO_STRING(value));
 
         if (val.isEmpty())
             return true;
-        
-        if (val.trim().isEmpty() || startPos >= val.length())
+
+        int start = startPos - 1; // Genedits uses 1-based index...
+        int end = Math.min(startPos - 1 + length, val.length()); // Gendits allows a length going past the end of the string...
+
+        if (val.trim().isEmpty() || start >= end)
             return false;
 
-
-        // Genedits uses 1-based index; it also allows the length to go past the end of the string, so let's adjust it here
-        val = val.substring(startPos - 1, Math.min(startPos - 1 + length, val.length()));
-
-        return isValInList(val, l);
+        return isValInList(val.substring(start, end), l);
     }
 
     public boolean GEN_MATCH(Object value, Object regex) {
@@ -1645,7 +1644,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
          * It can be used to return multiple warning or error messages from the same edit, unlike ERROR_MSG, which changes the default error message only.
          * Warnings reported by SAVE_WARNING_TEXT are in addition to any reported by ERROR_MSG or other returns from the edit.
          */
-
 
         if (_failWarnings)
             return GEN_SAVE_WARNING_TEXT(binding, texts);

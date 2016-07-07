@@ -95,6 +95,13 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_INLIST(" 01 ", "100-150", "\\s\\d\\d\\s", 2, 2));
         Assert.assertFalse(_functions.GEN_INLIST(" 01 ", "100-150", "\\s\\d\\d\\s", 2, 2));
         Assert.assertFalse(_functions.GEN_INLIST(" 01 ", "100-150", "\\s\\d\\d\\s", 2, 4));
+        Assert.assertTrue(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 4));
+        Assert.assertFalse(_functions.GEN_INLIST("cXxx", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 4));
+        Assert.assertFalse(_functions.GEN_INLIST("c   ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 4));
+        Assert.assertFalse(_functions.GEN_INLIST("    ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 4));
+        Assert.assertTrue(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 10));
+        Assert.assertFalse(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 4, 4));
+        Assert.assertFalse(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 10, 4));
 
         // I just don't understand how that function works!!!  All the following cases have been tested using genedits...
         Assert.assertFalse(_functions.GEN_INLIST("", "")); // this one is not a valid syntax in genedits
