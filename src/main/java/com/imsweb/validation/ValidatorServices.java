@@ -213,8 +213,8 @@ public class ValidatorServices {
      * Created on Feb 25, 2008 by depryf
      * @return next sequence to use
      */
-    public long getNextRuleSequence() {
-        return _RULE_SEQ.incrementAndGet();
+    public Long getNextRuleSequence() {
+        return (long)_RULE_SEQ.incrementAndGet();
     }
 
     /**
@@ -223,8 +223,8 @@ public class ValidatorServices {
      * Created on Feb 25, 2008 by depryf
      * @return next sequence to use
      */
-    public long getNextCategorySequence() {
-        return _CATEGORY_SEQ.incrementAndGet();
+    public Long getNextCategorySequence() {
+        return (long)_CATEGORY_SEQ.incrementAndGet();
     }
 
     /**
@@ -233,8 +233,8 @@ public class ValidatorServices {
      * Created on Feb 25, 2008 by depryf
      * @return next sequence to use
      */
-    public long getNextConditionSequence() {
-        return _CONDITION_SEQ.incrementAndGet();
+    public Long getNextConditionSequence() {
+        return (long)_CONDITION_SEQ.incrementAndGet();
     }
 
     /**
@@ -243,8 +243,8 @@ public class ValidatorServices {
      * Created on Feb 25, 2008 by depryf
      * @return next sequence to use
      */
-    public long getNextValidatorSequence() {
-        return _VALIDATOR_SEQ.incrementAndGet();
+    public Long getNextValidatorSequence() {
+        return (long)_VALIDATOR_SEQ.incrementAndGet();
     }
 
     /**
@@ -253,8 +253,8 @@ public class ValidatorServices {
      * Created on Feb 25, 2008 by depryf
      * @return next sequence to use
      */
-    public long getNextContextEntrySequence() {
-        return _CONTEXT_ENTRY_SEQ.incrementAndGet();
+    public Long getNextContextEntrySequence() {
+        return (long)_CONTEXT_ENTRY_SEQ.incrementAndGet();
     }
 
     /**
@@ -263,8 +263,8 @@ public class ValidatorServices {
      * Created on Feb 25, 2008 by depryf
      * @return next sequence to use
      */
-    public long getNextSetSequence() {
-        return _SET_SEQ.incrementAndGet();
+    public Long getNextSetSequence() {
+        return (long)_SET_SEQ.incrementAndGet();
     }
 
     /**
