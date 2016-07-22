@@ -4,7 +4,9 @@
 package com.imsweb.validation.entities;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -21,6 +23,8 @@ import com.imsweb.validation.ValidatorServices;
  * Created on Nov 9, 2007 by depryf
  */
 public class Rule {
+
+    private static final Pattern _MESSAGE_PATTERN = Pattern.compile("\r?\n");
 
     /**
      * DB ID for this rule
@@ -53,7 +57,7 @@ public class Rule {
     protected String _message;
 
     /**
-     * Expression to evalutate for this rule
+     * Expression to evaluate for this rule
      */
     protected String _expression;
 
@@ -83,7 +87,7 @@ public class Rule {
     protected Set<String> _conditions;
 
     /**
-     * Opearator (AND or OR) to use for the set of conditions.
+     * Operator (AND or OR) to use for the set of conditions.
      */
     protected Boolean _useAndForConditions;
 
@@ -108,13 +112,13 @@ public class Rule {
     protected Set<String> _usedLookupIds;
 
     /**
-     * Set of potiential context entries (they are potential because they might not all be context entries;
+     * Set of potential context entries (they are potential because they might not all be context entries;
      * but if a context entry is used, it will be in this list...
      */
     protected Set<String> _potentialContextEntries;
 
     /**
-     * If set to true, the rule won't be executed when validating a validatasble, unless the rule is explicitly forced (default to false, should never be null)
+     * If set to true, the rule won't be executed when validating a validatable, unless the rule is explicitly forced (default to false, should never be null)
      */
     protected Boolean _ignored;
 
@@ -229,7 +233,7 @@ public class Rule {
     }
 
     /**
-     * Getter for the severity (the meaning of the severity is application-dependend; the severity is not used by the validation engine).
+     * Getter for the severity (the meaning of the severity is application-dependent; the severity is not used by the validation engine).
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the rule severity
@@ -239,7 +243,7 @@ public class Rule {
     }
 
     /**
-     * Setter for the severity (the meaning of the severity is application-dependend; the severity is not used by the validation engine).
+     * Setter for the severity (the meaning of the severity is application-dependent; the severity is not used by the validation engine).
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @param severity the rule severity
@@ -265,12 +269,8 @@ public class Rule {
      * @param message the rule failure message
      */
     public void setMessage(String message) {
-        if (message != null) {
-            message = message.replaceAll("\r\n", " ");
-            message = message.replaceAll("\n", " ");
-            message = message.trim();
-        }
-
+        if (message != null)
+            message = _MESSAGE_PATTERN.matcher(message).replaceAll(" ").trim();
         _message = message;
     }
 
@@ -291,20 +291,20 @@ public class Rule {
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @param expression the rule expression
-     * @throws ConstructionException if the exression is not valid Groovy
+     * @throws ConstructionException if the expression is not valid Groovy
      */
     public void setExpression(String expression) throws ConstructionException {
-        _expression = expression;
-
-        synchronized (this) {
-            try {
-                _rawProperties.clear();
-                _potentialContextEntries.clear();
-                _usedLookupIds.clear();
-                ValidatorServices.getInstance().parseExpression("rule", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
-            }
-            catch (CompilationFailedException e) {
-                throw new ConstructionException("Unable to parse rule " + getId(), e);
+        if (!Objects.equals(expression, _expression)) {
+            synchronized (this) {
+                try {
+                    _rawProperties.clear();
+                    _potentialContextEntries.clear();
+                    _usedLookupIds.clear();
+                    ValidatorServices.getInstance().parseExpression("rule", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
+                }
+                catch (CompilationFailedException e) {
+                    throw new ConstructionException("Unable to parse rule " + getId(), e);
+                }
             }
         }
     }
@@ -516,7 +516,6 @@ public class Rule {
     public Set<String> getPotentialContextEntries() {
         return _potentialContextEntries;
     }
-
 
     /**
      * Getter
