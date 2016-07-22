@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 1.5.9**
+
+- The used properties won't be recalculated if the assigned expression is the same as the previous value.
+- The returned sequences from the validator services are now Long instead of native long.
+
 **Version 1.5.8**
 
 - Increased the engine version to 5.6 (version 5.6 is needed for ensuring correct results when running translated metafile edits).
