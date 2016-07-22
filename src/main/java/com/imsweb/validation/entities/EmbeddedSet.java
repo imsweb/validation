@@ -6,6 +6,9 @@ package com.imsweb.validation.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * An embedded set is a ... set of edits provided within a given validator; edit IDs to reference the edits.
  * <p/>
@@ -279,28 +282,26 @@ public class EmbeddedSet {
     }
 
     @Override
-    public int hashCode() {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + ((_id == null) ? 0 : _id.hashCode());
-        return result;
+    public String toString() {
+        return getId();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
+    public boolean equals(Object other) {
+        if (!(other instanceof EmbeddedSet))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        EmbeddedSet other = (EmbeddedSet)obj;
-        if (_id == null) {
-            if (other._id != null)
-                return false;
-        }
-        else if (!_id.equals(other._id))
-            return false;
-        return true;
+        EmbeddedSet castOther = (EmbeddedSet)other;
+        if (getSetId() != null)
+            return new EqualsBuilder().append(getSetId(), castOther.getSetId()).isEquals();
+        else
+            return new EqualsBuilder().append(getId(), castOther.getId()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        if (getSetId() != null)
+            return new HashCodeBuilder().append(getSetId()).toHashCode();
+        else
+            return new HashCodeBuilder().append(getId()).toHashCode();
     }
 }

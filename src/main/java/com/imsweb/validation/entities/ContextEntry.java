@@ -3,6 +3,9 @@
  */
 package com.imsweb.validation.entities;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * A context entry is one context variable in a {@link Validator} object.
  * <p/>
@@ -10,19 +13,29 @@ package com.imsweb.validation.entities;
  */
 public class ContextEntry {
 
-    /** DB ID for this context entry */
+    /**
+     * DB ID for this context entry
+     */
     protected Long _contextEntryId;
 
-    /** Context key (must be unique in the entire validation engine) */
+    /**
+     * Context key (must be unique in the entire validation engine)
+     */
     protected String _key;
 
-    /** Context expression */
+    /**
+     * Context expression
+     */
     protected String _expression;
 
-    /** Parent <code>Validator</code> */
+    /**
+     * Parent <code>Validator</code>
+     */
     protected Validator _validator;
 
-    /** Context type ("java" or "groovy") */
+    /**
+     * Context type ("java" or "groovy")
+     */
     protected String _type;
 
     /**
@@ -133,50 +146,28 @@ public class ContextEntry {
         this._type = type;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 4, 2011 by depryf
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "ContextEntry [" + _key + " in " + _validator.getId() + "]";
+        return _key;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 8, 2011 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
+    public boolean equals(Object other) {
+        if (!(other instanceof ContextEntry))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ContextEntry other = (ContextEntry)obj;
-        if (_contextEntryId == null) {
-            if (other._contextEntryId != null)
-                return false;
-        }
-        else if (!_contextEntryId.equals(other._contextEntryId))
-            return false;
-        return true;
+        ContextEntry castOther = (ContextEntry)other;
+        if (getContextEntryId() != null)
+            return new EqualsBuilder().append(getContextEntryId(), castOther.getContextEntryId()).isEquals();
+        else
+            return new EqualsBuilder().append(getKey(), castOther.getKey()).isEquals();
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 8, 2011 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + ((_contextEntryId == null) ? 0 : _contextEntryId.hashCode());
-        return result;
+        if (getContextEntryId() != null)
+            return new HashCodeBuilder().append(getContextEntryId()).toHashCode();
+        else
+            return new HashCodeBuilder().append(getKey()).toHashCode();
     }
 
 }

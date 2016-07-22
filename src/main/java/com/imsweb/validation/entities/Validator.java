@@ -473,37 +473,28 @@ public class Validator {
         return null;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 9, 2011 by depryf
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return getId();
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof Validator))
             return false;
         Validator castOther = (Validator)other;
-        return new EqualsBuilder().append(getValidatorId(), castOther.getValidatorId()).isEquals();
+        if (getValidatorId() != null)
+            return new EqualsBuilder().append(getValidatorId(), castOther.getValidatorId()).isEquals();
+        else
+            return new EqualsBuilder().append(getId(), castOther.getId()).isEquals();
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getValidatorId()).toHashCode();
+        if (getValidatorId() != null)
+            return new HashCodeBuilder().append(getValidatorId()).toHashCode();
+        else
+            return new HashCodeBuilder().append(getId()).toHashCode();
     }
 
 }

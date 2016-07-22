@@ -550,17 +550,15 @@ public class Rule {
         Rule castOther = (Rule)other;
         if (getRuleId() != null)
             return new EqualsBuilder().append(getRuleId(), castOther.getRuleId()).isEquals();
-        else {
+        else
             return new EqualsBuilder().append(getId(), castOther.getId()).isEquals();
-        }
     }
 
     @Override
     public int hashCode() {
         if (getRuleId() != null)
             return new HashCodeBuilder().append(getRuleId()).toHashCode();
-        else {
+        else
             return new HashCodeBuilder().append(getId()).toHashCode();
-        }
     }
 }
