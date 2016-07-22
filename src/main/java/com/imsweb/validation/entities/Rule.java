@@ -295,6 +295,7 @@ public class Rule {
      */
     public void setExpression(String expression) throws ConstructionException {
         if (!Objects.equals(expression, _expression)) {
+            _expression = expression;
             synchronized (this) {
                 try {
                     _rawProperties.clear();
