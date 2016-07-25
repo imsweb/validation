@@ -1787,16 +1787,19 @@ public final class ValidationEngine {
             validator.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence());
         if (validator.getValidatorId() == null)
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
-        
+
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_NUM_COMPILER_THREADS);
         List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
-        for (Rule r : validator.getRules()) {
-            if (r.getRuleId() == null)
-                r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
-            if (r.getRuleId() == null)
-                throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
-            results.add(service.submit(new RuleCompilingCallable(r, rules)));
+        if (validator.getRules() != null) {
+            for (Rule r : validator.getRules()) {
+                if (r.getRuleId() == null)
+                    r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
+                if (r.getRuleId() == null)
+                    throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
+                results.add(service.submit(new RuleCompilingCallable(r, rules)));
+            }
+            validator.setRules(new HashSet<>(validator.getRules())); // since internal IDs might have changed
         }
 
         // internalize the conditions
@@ -1808,30 +1811,46 @@ public final class ValidationEngine {
                     throw new ConstructionException("Conditions must have a non-null internal ID to be registered in the engine");
                 conditions.put(c.getConditionId(), new ExecutableCondition(c));
             }
+            validator.setConditions(new HashSet<>(validator.getConditions())); // since internal IDs might have changed
         }
 
         // we don't internalize the categories because they are not used at runtime, but let's still assign a unique ID to them...
-        if (validator.getCategories() != null)
+        if (validator.getCategories() != null) {
             for (Category c : validator.getCategories())
                 if (c.getCategoryId() == null)
                     c.setCategoryId(ValidatorServices.getInstance().getNextCategorySequence());
+            validator.setCategories(new HashSet<>(validator.getCategories())); // since internal IDs might have changed
+        }
 
         // for any context entry that threw an exception, re-try it a second time, hopefully the dependency exception will be resolved...
-        Set<ContextEntry> reRun = new HashSet<>();
-        for (ContextEntry entry : validator.getRawContext()) {
-            try {
-                // this is really not great, a better way would be to fully parse the context expressions, but that will do for now...
-                if (entry.getExpression().contains(VALIDATOR_CONTEXT_KEY + "."))
+        if (validator.getRawContext() != null) {
+            Set<ContextEntry> reRun = new HashSet<>();
+            for (ContextEntry entry : validator.getRawContext()) {
+                if (entry.getContextEntryId() == null)
+                    entry.setContextEntryId(ValidatorServices.getInstance().getNextContextEntrySequence());
+                try {
+                    // this is really not great, a better way would be to fully parse the context expressions, but that will do for now...
+                    if (entry.getExpression().contains(VALIDATOR_CONTEXT_KEY + "."))
+                        reRun.add(entry);
+                    else
+                        ValidatorServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+                }
+                catch (ConstructionException e) {
                     reRun.add(entry);
-                else
-                    ValidatorServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+                }
             }
-            catch (ConstructionException e) {
-                reRun.add(entry);
-            }
+            for (ContextEntry entry : reRun)
+                ValidatorServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+            validator.setRawContext(new HashSet<>(validator.getRawContext())); // since internal IDs might have changed
         }
-        for (ContextEntry entry : reRun)
-            ValidatorServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+
+        // we don't internalize the sets because they are not used at runtime, but let's still assign a unique ID to them...
+        if (validator.getSets() != null) {
+            for (EmbeddedSet s : validator.getSets())
+                if (s.getSetId() == null)
+                    s.setSetId(ValidatorServices.getInstance().getNextSetSequence());
+            validator.setSets(new HashSet<>(validator.getSets())); // since internal IDs might have changed
+        }
 
         // we won't be submitting new work anymore
         service.shutdown();
