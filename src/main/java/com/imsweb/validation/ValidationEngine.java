@@ -1159,7 +1159,7 @@ public final class ValidationEngine {
             if (editableCondition.getConditionId() == null)
                 throw new ConstructionException("An internal ID is required when modifying a condition");
             if (editableCondition.getId() == null)
-                throw new ConstructionException("A cateogry ID is required when modifying a condition");
+                throw new ConstructionException("A category ID is required when modifying a condition");
             if (editableCondition.getValidatorId() == null)
                 throw new ConstructionException("A group is required when modifying a condition");
             if (editableCondition.getJavaPath() == null)
@@ -1783,12 +1783,19 @@ public final class ValidationEngine {
 
     private static void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts) throws ConstructionException {
 
+        if (validator.getValidatorId() == null)
+            validator.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence());
+        if (validator.getValidatorId() == null)
+            throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
+        
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_NUM_COMPILER_THREADS);
         List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
         for (Rule r : validator.getRules()) {
             if (r.getRuleId() == null)
                 r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
+            if (r.getRuleId() == null)
+                throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
             results.add(service.submit(new RuleCompilingCallable(r, rules)));
         }
 
@@ -1797,6 +1804,8 @@ public final class ValidationEngine {
             for (Condition c : validator.getConditions()) {
                 if (c.getConditionId() == null)
                     c.setConditionId(ValidatorServices.getInstance().getNextConditionSequence());
+                if (c.getConditionId() == null)
+                    throw new ConstructionException("Conditions must have a non-null internal ID to be registered in the engine");
                 conditions.put(c.getConditionId(), new ExecutableCondition(c));
             }
         }
