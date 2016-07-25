@@ -957,10 +957,11 @@ public class ValidationEngineTest {
         // by default the level3 rule should fail
         TestingUtils.assertEditFailure(ValidationEngine.validate(validatable), "fv-rule3");
 
-        v.setName("OTHER");
-        v.setHash("123");
-        v.setId("fake-validator-changed");
-        ValidationEngine.updateValidator(new EditableValidator(v));
+        EditableValidator editableValidator = new EditableValidator(v);
+        editableValidator.setName("OTHER");
+        editableValidator.setHash("123");
+        editableValidator.setId("fake-validator-changed");
+        ValidationEngine.updateValidator(editableValidator);
         Assert.assertNull(ValidationEngine.getValidator("fake-validator"));
         Assert.assertNotNull(ValidationEngine.getValidator("fake-validator-changed"));
         Assert.assertEquals("OTHER", ValidationEngine.getValidator("fake-validator-changed").getName());

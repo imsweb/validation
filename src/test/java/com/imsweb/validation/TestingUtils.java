@@ -42,8 +42,7 @@ public final class TestingUtils {
 
         if (v == null) {
             try {
-                v = XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"));
-                ValidationEngine.addValidator(new EditableValidator(v));
+                v = ValidationEngine.addValidator(new EditableValidator(XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
             }
             catch (Exception e) {
                 throw new RuntimeException("Unable to load '" + id + "'", e);
