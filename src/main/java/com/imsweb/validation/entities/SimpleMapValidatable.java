@@ -3,7 +3,6 @@
  */
 package com.imsweb.validation.entities;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -240,21 +239,7 @@ public class SimpleMapValidatable implements Validatable {
                     int colPos = javaPath == null ? -1 : javaPath.lastIndexOf(".");
                     if (javaPath != null && colPos >= 0) {
                         String collectionName = javaPath.substring(colPos + 1);
-
-                        Object collection;
-                        if (_current instanceof Map)
-                            collection = ((Map)_current).get(collectionName);
-                        else {
-                            try {
-                                Field field = _current.getClass().getDeclaredField(collectionName);
-                                field.setAccessible(true);
-                                collection = field.get(_current);
-                            }
-                            catch (IllegalAccessException | NoSuchFieldException e) {
-                                throw new IllegalAccessException("Unable to access " + collectionName + " on object of type + " + _current.getClass().getName());
-                            }
-                        }
-
+                        Object collection = _current.get(collectionName);
                         if (collection != null) {
                             int index = -1;
                             if (collection instanceof List)
