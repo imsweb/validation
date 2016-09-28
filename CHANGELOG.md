@@ -1,10 +1,11 @@
 ## Validation Framework Version History
 
-**Version 1.5.10**
+**Version 1.6**
 
 - Updated staging client from version 2.1.1 to version 2.3.
 - Updated Groovy library from version 2.4.6 (indy) to version 2.4.7 (indy).
 - Updated BeanUtils library from version 1.9.2 to version 1.9.3.
+- This library now requires Java 8 at minimum.
 
 **Version 1.5.9**
 
@@ -62,9 +63,9 @@
 - Removed deprecated CStage context methods from the ValidatorContextFunctions class.
 - Split context functions, this change requires doing the initialization a bit differently: to run translated and/or SEER edits, use the MetafileContextFunctions; to use only SEER edits, use the StagingContextFunctions.
 - Replaced JAXB by XStream for all XML operations.
-- Updated Groovy library from 2.4.3 to 2.4.4; now using "indy" version of the library.
-- Updated Staging client library from 1.4.2 to 1.4.6.
-- The library now requires Java 7.
+- Updated Groovy library from version 2.4.3 to version 2.4.4; now using "indy" version of the library.
+- Updated Staging client library from version 1.4.2 to version 1.4.6.
+- This library now requires Java 7 at minimum.
 
 **Version 1.4.1**
 
