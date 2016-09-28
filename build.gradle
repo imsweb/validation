@@ -19,11 +19,11 @@ repositories {
 }
 
 dependencies {
-    compile 'com.imsweb:staging-client-java:2.1.1'
-    compile 'org.codehaus.groovy:groovy:2.4.6:indy'
+    compile 'com.imsweb:staging-client-java:2.3'
+    compile 'org.codehaus.groovy:groovy:2.4.7:indy'
     compile 'commons-codec:commons-codec:1.10'
     compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'commons-beanutils:commons-beanutils:1.9.2'
+    compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile 'joda-time:joda-time:2.9.3'
     compile 'com.thoughtworks.xstream:xstream:1.4.9'
     testCompile 'junit:junit:4.12'

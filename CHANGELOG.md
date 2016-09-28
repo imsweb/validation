@@ -1,5 +1,11 @@
 ## Validation Framework Version History
 
+**Version 1.5.10**
+
+- Updated staging client from version 2.1.1 to version 2.3.
+- Updated Groovy library from version 2.4.6 (indy) to version 2.4.7 (indy).
+- Updated BeanUtils library from version 1.9.2 to version 1.9.3.
+
 **Version 1.5.9**
 
 - The used properties won't be recalculated if the assigned expression is the same as the previous value.
