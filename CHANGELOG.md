@@ -2,6 +2,7 @@
 
 **Version 1.6**
 
+- Added new method in XmlValidatorFactory to extract all attributes from main Validator tag.
 - Removed Joda library dependency, replaced by new Java 8 date framework.
 - Updated staging client from version 2.1.1 to version 2.3.
 - Updated Groovy library from version 2.4.6 (indy) to version 2.4.7 (indy).

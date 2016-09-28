@@ -3,7 +3,6 @@
  */
 package com.imsweb.validation;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,6 +87,15 @@ import com.imsweb.validation.internal.callable.RuleParsingCallable;
  * Created on Apr 26, 2011 by depryf
  */
 public final class XmlValidatorFactory {
+
+    /**
+     * The attributes of the root tag
+     */
+    public static final String ROOT_ATTR_ID = "id";
+    public static final String ROOT_ATTR_NAME = "name";
+    public static final String ROOT_ATTR_VERSION = "version";
+    public static final String ROOT_ATTR_MIN_ENGINE_VERSION = "min-engine-version";
+    public static final String ROOT_ATTR_TRANSLATED_FROM = "translated-from";
 
     /**
      * Compiled <code>Pattern</code> for tab characters
@@ -237,7 +244,9 @@ public final class XmlValidatorFactory {
         if (is == null)
             throw new IOException("Unable to load validator, target input stream is null");
 
-        return loadValidatorFromXml(new InputStreamReader(is, StandardCharsets.UTF_8));
+        try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            return loadValidatorFromXml(reader);
+        }
     }
 
     /**
@@ -326,7 +335,10 @@ public final class XmlValidatorFactory {
     public static void writeValidatorToXml(Validator validator, OutputStream os) throws IOException {
         if (os == null)
             throw new IOException("Unable to write validator '" + validator.getId() + "', target output stream is null");
-        writeValidatorToXml(validator, new OutputStreamWriter(os, StandardCharsets.UTF_8));
+
+        try (OutputStreamWriter writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)) {
+            writeValidatorToXml(validator, writer);
+        }
     }
 
     /**
@@ -642,16 +654,13 @@ public final class XmlValidatorFactory {
         }
 
         // sort the releases so the most recent is always first in the file...
-        Collections.sort(releases, new Comparator<ReleaseXmlDto>() {
-            @Override
-            public int compare(ReleaseXmlDto o1, ReleaseXmlDto o2) {
-                if (o1.getDate() == null)
-                    return -1;
-                else if (o2.getDate() == null)
-                    return 1;
-                else
-                    return -1 * o1.getDate().compareTo(o2.getDate());
-            }
+        Collections.sort(releases, (o1, o2) -> {
+            if (o1.getDate() == null)
+                return -1;
+            else if (o2.getDate() == null)
+                return 1;
+            else
+                return -1 * o1.getDate().compareTo(o2.getDate());
         });
 
         return releases;
@@ -677,20 +686,17 @@ public final class XmlValidatorFactory {
         }
 
         // sort the event by date/ref/id
-        Collections.sort(deletedRules, new Comparator<DeletedRuleXmlDto>() {
-            @Override
-            public int compare(DeletedRuleXmlDto o1, DeletedRuleXmlDto o2) {
-                Calendar c1 = Calendar.getInstance();
-                c1.setTime(o1.getDate());
-                Calendar c2 = Calendar.getInstance();
-                c2.setTime(o2.getDate());
-                if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) && c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH)) {
-                    if (o1.getRef() != null && o2.getRef() != null && !o1.getRef().equals(o2.getRef()))
-                        return o1.getRef().compareTo(o2.getRef());
-                    return o1.getId().compareTo(o2.getId());
-                }
-                return o1.getDate().compareTo(o2.getDate());
+        Collections.sort(deletedRules, (o1, o2) -> {
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(o1.getDate());
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(o2.getDate());
+            if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) && c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH)) {
+                if (o1.getRef() != null && o2.getRef() != null && !o1.getRef().equals(o2.getRef()))
+                    return o1.getRef().compareTo(o2.getRef());
+                return o1.getId().compareTo(o2.getId());
             }
+            return o1.getDate().compareTo(o2.getDate());
         });
 
         return deletedRules;
@@ -702,12 +708,7 @@ public final class XmlValidatorFactory {
 
         // sort the context entries by their key
         List<ContextEntry> list = new ArrayList<>(validator.getRawContext());
-        Collections.sort(list, new Comparator<ContextEntry>() {
-            @Override
-            public int compare(ContextEntry o1, ContextEntry o2) {
-                return o1.getKey().compareToIgnoreCase(o2.getKey());
-            }
-        });
+        Collections.sort(list, (o1, o2) -> o1.getKey().compareToIgnoreCase(o2.getKey()));
 
         List<ContextEntryXmlDto> contextEntries = new ArrayList<>();
         for (ContextEntry contextEntry : list) {
@@ -729,12 +730,7 @@ public final class XmlValidatorFactory {
         List<Category> list = new ArrayList<>();
         if (validator.getCategories() != null)
             list.addAll(validator.getCategories());
-        Collections.sort(list, new Comparator<Category>() {
-            @Override
-            public int compare(Category o1, Category o2) {
-                return o1.getId().compareToIgnoreCase(o2.getId());
-            }
-        });
+        Collections.sort(list, (o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
 
         List<CategoryXmlDto> categoriesType = new ArrayList<>();
         for (Category category : list) {
@@ -756,12 +752,7 @@ public final class XmlValidatorFactory {
         List<Condition> list = new ArrayList<>();
         if (validator.getConditions() != null)
             list.addAll(validator.getConditions());
-        Collections.sort(list, new Comparator<Condition>() {
-            @Override
-            public int compare(Condition o1, Condition o2) {
-                return o1.getId().compareToIgnoreCase(o2.getId());
-            }
-        });
+        Collections.sort(list, (o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
 
         List<ConditionXmlDto> conditionsType = new ArrayList<>();
         for (Condition condition : list) {
@@ -783,45 +774,42 @@ public final class XmlValidatorFactory {
 
         // sort the rules by they ID (try to be smart about the IF edits)
         List<Rule> list = new ArrayList<>(validator.getRules());
-        Collections.sort(list, new Comparator<Rule>() {
-            @Override
-            public int compare(Rule o1, Rule o2) {
-                String id1 = o1.getId();
-                String id2 = o2.getId();
+        Collections.sort(list, (o1, o2) -> {
+            String id1 = o1.getId();
+            String id2 = o2.getId();
 
-                Matcher m1 = _PATTERN_RULE_ID.matcher(id1);
-                Matcher m2 = _PATTERN_RULE_ID.matcher(id2);
+            Matcher m1 = _PATTERN_RULE_ID.matcher(id1);
+            Matcher m2 = _PATTERN_RULE_ID.matcher(id2);
 
-                if (m1.matches() && m2.matches()) {
-                    String prefix1 = m1.group(1);
-                    String prefix2 = m2.group(1);
-                    String integerPart1 = m1.group(2);
-                    String integerPart2 = m2.group(2);
-                    String suffix1 = m1.group(3);
-                    String suffix2 = m2.group(3);
+            if (m1.matches() && m2.matches()) {
+                String prefix1 = m1.group(1);
+                String prefix2 = m2.group(1);
+                String integerPart1 = m1.group(2);
+                String integerPart2 = m2.group(2);
+                String suffix1 = m1.group(3);
+                String suffix2 = m2.group(3);
 
-                    int result = prefix1.compareToIgnoreCase(prefix2);
+                int result = prefix1.compareToIgnoreCase(prefix2);
+                if (result == 0) {
+                    Integer i1 = Integer.valueOf(integerPart1);
+                    Integer i2 = Integer.valueOf(integerPart2);
+                    result = i1.compareTo(i2);
                     if (result == 0) {
-                        Integer i1 = Integer.valueOf(integerPart1);
-                        Integer i2 = Integer.valueOf(integerPart2);
-                        result = i1.compareTo(i2);
-                        if (result == 0) {
-                            if (suffix1 == null)
-                                return -1;
-                            else if (suffix2 == null)
-                                return 1;
-                            else
-                                return suffix1.compareToIgnoreCase(suffix2);
-                        }
+                        if (suffix1 == null)
+                            return -1;
+                        else if (suffix2 == null)
+                            return 1;
                         else
-                            return result;
+                            return suffix1.compareToIgnoreCase(suffix2);
                     }
                     else
                         return result;
                 }
                 else
-                    return id1.toUpperCase().compareTo(id2.toUpperCase());
+                    return result;
             }
+            else
+                return id1.toUpperCase().compareTo(id2.toUpperCase());
         });
 
         List<RuleXmlDto> rulesType = new ArrayList<>();
@@ -869,20 +857,17 @@ public final class XmlValidatorFactory {
                     sortedEvents.add(eventType);
                 }
                 // sort the event by date, from older to newer
-                Collections.sort(sortedEvents, new Comparator<HistoryEventXmlDto>() {
-                    @Override
-                    public int compare(HistoryEventXmlDto o1, HistoryEventXmlDto o2) {
-                        Calendar c1 = Calendar.getInstance();
-                        c1.setTime(o1.getDate());
-                        Calendar c2 = Calendar.getInstance();
-                        c2.setTime(o2.getDate());
-                        if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) && c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH)) {
-                            if (o1.getRef() != null && o2.getRef() != null)
-                                return o1.getRef().compareTo(o2.getRef());
-                            return o1.getUser().compareTo(o2.getUser());
-                        }
-                        return o1.getDate().compareTo(o2.getDate());
+                Collections.sort(sortedEvents, (o1, o2) -> {
+                    Calendar c1 = Calendar.getInstance();
+                    c1.setTime(o1.getDate());
+                    Calendar c2 = Calendar.getInstance();
+                    c2.setTime(o2.getDate());
+                    if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) && c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH)) {
+                        if (o1.getRef() != null && o2.getRef() != null)
+                            return o1.getRef().compareTo(o2.getRef());
+                        return o1.getUser().compareTo(o2.getUser());
                     }
+                    return o1.getDate().compareTo(o2.getDate());
                 });
                 ruleType.setHistoryEvents(sortedEvents);
             }
@@ -901,12 +886,7 @@ public final class XmlValidatorFactory {
         List<EmbeddedSet> list = new ArrayList<>();
         if (validator.getSets() != null)
             list.addAll(validator.getSets());
-        Collections.sort(list, new Comparator<EmbeddedSet>() {
-            @Override
-            public int compare(EmbeddedSet o1, EmbeddedSet o2) {
-                return o1.getId().compareToIgnoreCase(o2.getId());
-            }
-        });
+        Collections.sort(list, (o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
 
         List<SetXmlDto> setsType = new ArrayList<>();
         for (EmbeddedSet set : list) {
@@ -915,7 +895,7 @@ public final class XmlValidatorFactory {
             setType.setName(set.getName());
             setType.setDescription(set.getDescription());
 
-            List<String> inclusions = set.getInclusions() == null ? Collections.<String>emptyList() : new ArrayList<>(set.getInclusions());
+            List<String> inclusions = set.getInclusions() == null ? Collections.emptyList() : new ArrayList<>(set.getInclusions());
             Collections.sort(inclusions);
             if (!inclusions.isEmpty()) {
                 StringBuilder buf = new StringBuilder();
@@ -925,7 +905,7 @@ public final class XmlValidatorFactory {
                 setType.setInclude(buf.toString());
             }
 
-            List<String> exclusions = set.getExclusions() == null ? Collections.<String>emptyList() : new ArrayList<>(set.getExclusions());
+            List<String> exclusions = set.getExclusions() == null ? Collections.emptyList() : new ArrayList<>(set.getExclusions());
             Collections.sort(exclusions);
             if (!exclusions.isEmpty()) {
                 StringBuilder buf = new StringBuilder();
@@ -1020,7 +1000,9 @@ public final class XmlValidatorFactory {
         if (is == null)
             throw new IOException("Unable to load standalone set, target input stream is null");
 
-        return loadStandaloneSetFromXml(new InputStreamReader(is, StandardCharsets.UTF_8));
+        try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            return loadStandaloneSetFromXml(reader);
+        }
     }
 
     /**
@@ -1114,7 +1096,10 @@ public final class XmlValidatorFactory {
     public static void writeStandaloneSetToXml(StandaloneSet set, OutputStream os) throws IOException {
         if (os == null)
             throw new IOException("Unable to write set '" + set.getId() + "', target output stream is null");
-        writeStandaloneSetToXml(set, new OutputStreamWriter(os, StandardCharsets.UTF_8));
+
+        try (OutputStreamWriter writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)) {
+            writeStandaloneSetToXml(set, writer);
+        }
     }
 
     /**
@@ -1280,7 +1265,9 @@ public final class XmlValidatorFactory {
         if (is == null)
             throw new IOException("Unable to load tests suite, target input stream is null");
 
-        return loadTestsFromXml(new InputStreamReader(is, StandardCharsets.UTF_8));
+        try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            return loadTestsFromXml(reader);
+        }
     }
 
     /**
@@ -1349,7 +1336,10 @@ public final class XmlValidatorFactory {
     public static void writeTestsToXml(ValidatorTests tests, OutputStream os) throws IOException {
         if (os == null)
             throw new IOException("Unable to write tests suite for '" + tests.getTestedValidatorId() + "', target output stream is null");
-        writeTestsToXml(tests, new OutputStreamWriter(os, StandardCharsets.UTF_8));
+
+        try (OutputStreamWriter writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)) {
+            writeTestsToXml(tests, writer);
+        }
     }
 
     /**
@@ -1376,45 +1366,42 @@ public final class XmlValidatorFactory {
                 List<RuleTest> sortedTests = new ArrayList<>(tests.getTests().values());
 
                 // sort the tests by they ID (try to be smart about the IF edits)
-                Collections.sort(sortedTests, new Comparator<RuleTest>() {
-                    @Override
-                    public int compare(RuleTest o1, RuleTest o2) {
-                        String id1 = o1.getTestedRuleId();
-                        String id2 = o2.getTestedRuleId();
+                Collections.sort(sortedTests, (o1, o2) -> {
+                    String id1 = o1.getTestedRuleId();
+                    String id2 = o2.getTestedRuleId();
 
-                        Matcher m1 = _PATTERN_RULE_ID.matcher(id1);
-                        Matcher m2 = _PATTERN_RULE_ID.matcher(id2);
+                    Matcher m1 = _PATTERN_RULE_ID.matcher(id1);
+                    Matcher m2 = _PATTERN_RULE_ID.matcher(id2);
 
-                        if (m1.matches() && m2.matches()) {
-                            String prefix1 = m1.group(1);
-                            String prefix2 = m2.group(1);
-                            String integerPart1 = m1.group(2);
-                            String integerPart2 = m2.group(2);
-                            String suffix1 = m1.group(3);
-                            String suffix2 = m2.group(3);
+                    if (m1.matches() && m2.matches()) {
+                        String prefix1 = m1.group(1);
+                        String prefix2 = m2.group(1);
+                        String integerPart1 = m1.group(2);
+                        String integerPart2 = m2.group(2);
+                        String suffix1 = m1.group(3);
+                        String suffix2 = m2.group(3);
 
-                            int result = prefix1.compareToIgnoreCase(prefix2);
+                        int result = prefix1.compareToIgnoreCase(prefix2);
+                        if (result == 0) {
+                            Integer i1 = Integer.valueOf(integerPart1);
+                            Integer i2 = Integer.valueOf(integerPart2);
+                            result = i1.compareTo(i2);
                             if (result == 0) {
-                                Integer i1 = Integer.valueOf(integerPart1);
-                                Integer i2 = Integer.valueOf(integerPart2);
-                                result = i1.compareTo(i2);
-                                if (result == 0) {
-                                    if (suffix1 == null)
-                                        return -1;
-                                    else if (suffix2 == null)
-                                        return 1;
-                                    else
-                                        return suffix1.compareToIgnoreCase(suffix2);
-                                }
+                                if (suffix1 == null)
+                                    return -1;
+                                else if (suffix2 == null)
+                                    return 1;
                                 else
-                                    return result;
+                                    return suffix1.compareToIgnoreCase(suffix2);
                             }
                             else
                                 return result;
                         }
                         else
-                            return id1.toUpperCase().compareTo(id2.toUpperCase());
+                            return result;
                     }
+                    else
+                        return id1.toUpperCase().compareTo(id2.toUpperCase());
                 });
 
                 List<TestXmlDto> testList = new ArrayList<>();
@@ -1485,6 +1472,43 @@ public final class XmlValidatorFactory {
     }
 
     /**
+     * Returns the main attributes of the validator corresponding to the passed <code>URL</code>, null if none are found.
+     * <br/><br/>
+     * This method supports a gzipped compressed resource (if the URL path ends with gz or gzip); otherwise
+     * it assumes the resource is not compressed.
+     * <p/>
+     * Created on Nov 13, 2008 by depryf
+     * @param url target <code>URL</code>
+     * @return corresponding attributes, maybe empty but never null
+     */
+    public static Map<String, String> getXmlValidatorRootAttributes(URL url) {
+        Map<String, String> result = new HashMap<>();
+        if (url == null)
+            return result;
+
+        Pattern regex1 = Pattern.compile("<validator\\s+([^>]+?)>", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern regex2 = Pattern.compile("\\s*(id|name|version|min-engine-version|translated-from)\\s*=\\s*['\"](.+?)['\"]", Pattern.MULTILINE | Pattern.DOTALL);
+
+        boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
+        try (InputStream is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream()) {
+
+            byte[] bytes = new byte[1024];
+            int n = is.read(bytes);
+            Matcher m1 = regex1.matcher(new String(bytes, 0, n, StandardCharsets.UTF_8));
+            if (m1.find()) {
+                Matcher m2 = regex2.matcher(m1.group(1).replaceAll("\r?\n", ""));
+                while (m2.find())
+                    result.put(m2.group(1), m2.group(2));
+            }
+        }
+        catch (IOException e) {
+            /* do nothing */
+        }
+
+        return result;
+    }
+
+    /**
      * Returns the hash code corresponding to the passed <code>URL</code>, null if it cannot be computed.
      * <br/><br/>
      * This method uses the SHA-1 algorithm to compute the code.
@@ -1534,45 +1558,7 @@ public final class XmlValidatorFactory {
      * @return corresponding validator ID, maybe null
      */
     public static String getXmlValidatorId(URL url) {
-        if (url == null)
-            return null;
-
-        String result = null;
-
-        Pattern regex = Pattern.compile("^<validator.+id=\"(.+?)\".+");
-        BufferedReader buf = null;
-        InputStream is = null;
-        try {
-            boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
-            is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream();
-            buf = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            String line = buf.readLine();
-            while (line != null) {
-                Matcher m = regex.matcher(line.trim());
-                if (m.matches()) {
-                    result = m.group(1);
-                    break;
-                }
-
-                line = buf.readLine();
-            }
-        }
-        catch (IOException e) {
-            /* do nothing */
-        }
-        finally {
-            try {
-                if (is != null)
-                    is.close();
-                if (buf != null)
-                    buf.close();
-            }
-            catch (Exception e) {
-                /* do nothing */
-            }
-        }
-
-        return result;
+        return getXmlValidatorRootAttributes(url).get(ROOT_ATTR_ID);
     }
 
     /**
@@ -1586,45 +1572,7 @@ public final class XmlValidatorFactory {
      * @return validator name, null if it can't be found
      */
     public static String getXmlValidatorName(URL url) {
-        if (url == null)
-            return null;
-
-        String result = null;
-
-        Pattern regex = Pattern.compile("^<validator.+name=\"(.+?)\".+");
-        BufferedReader buf = null;
-        InputStream is = null;
-        try {
-            boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
-            is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream();
-            buf = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            String line = buf.readLine();
-            while (line != null) {
-                Matcher m = regex.matcher(line.trim());
-                if (m.matches()) {
-                    result = m.group(1);
-                    break;
-                }
-
-                line = buf.readLine();
-            }
-        }
-        catch (IOException e) {
-            /* do nothing */
-        }
-        finally {
-            try {
-                if (is != null)
-                    is.close();
-                if (buf != null)
-                    buf.close();
-            }
-            catch (Exception e) {
-                /* do nothing */
-            }
-        }
-
-        return result;
+        return getXmlValidatorRootAttributes(url).get(ROOT_ATTR_NAME);
     }
 
     /**
@@ -1638,45 +1586,7 @@ public final class XmlValidatorFactory {
      * @return validator version, null if it can't be found
      */
     public static String getXmlValidatorVersion(URL url) {
-        if (url == null)
-            return null;
-
-        String result = null;
-
-        Pattern regex = Pattern.compile("^<validator.* version=\"(.+?)\".+");
-        BufferedReader buf = null;
-        InputStream is = null;
-        try {
-            boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
-            is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream();
-            buf = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            String line = buf.readLine();
-            while (line != null) {
-                Matcher m = regex.matcher(line.trim());
-                if (m.matches()) {
-                    result = m.group(1);
-                    break;
-                }
-
-                line = buf.readLine();
-            }
-        }
-        catch (IOException e) {
-            /* do nothing */
-        }
-        finally {
-            try {
-                if (is != null)
-                    is.close();
-                if (buf != null)
-                    buf.close();
-            }
-            catch (Exception e) {
-                /* do nothing */
-            }
-        }
-
-        return result;
+        return getXmlValidatorRootAttributes(url).get(ROOT_ATTR_VERSION);
     }
 
     /**

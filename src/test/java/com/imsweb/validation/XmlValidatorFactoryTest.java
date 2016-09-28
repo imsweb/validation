@@ -626,6 +626,26 @@ public class XmlValidatorFactoryTest {
     }
 
     @Test
+    public void testGetXmlValidatorRootAttributes() {
+        Map<String, String> expected = new HashMap<>();
+        expected.put(XmlValidatorFactory.ROOT_ATTR_ID, "fake-validator");
+        expected.put(XmlValidatorFactory.ROOT_ATTR_NAME, "Fake Validator");
+        expected.put(XmlValidatorFactory.ROOT_ATTR_VERSION, "TEST-002-01");
+        expected.put(XmlValidatorFactory.ROOT_ATTR_MIN_ENGINE_VERSION, "4.0");
+        expected.put(XmlValidatorFactory.ROOT_ATTR_TRANSLATED_FROM, "test");
+        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml")));
+        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz")));
+        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-multi-line.xml")));
+        
+        expected.clear();
+        expected.put(XmlValidatorFactory.ROOT_ATTR_NAME, "Fake Validator No ID");
+        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml")));
+        
+        expected.clear();
+        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("property-parsing-test.txt")));
+    }
+    
+    @Test
     public void testGetXmlValidatorId() {
         Assert.assertNull(XmlValidatorFactory.getXmlValidatorId(null));
         Assert.assertNull(XmlValidatorFactory.getXmlValidatorId(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml")));

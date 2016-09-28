@@ -1,0 +1,7 @@
+<validator 
+        name="Fake Validator" 
+        id="fake-validator" 
+        version="TEST-002-01" 
+        min-engine-version="4.0" 
+        translated-from="test">
+</validator>
