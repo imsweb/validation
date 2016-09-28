@@ -4,6 +4,7 @@
 package com.imsweb.validation;
 
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,7 +13,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.joda.time.LocalDate;
 
 import groovy.lang.Binding;
 
@@ -50,7 +50,7 @@ public class ValidatorContextFunctions {
      * @param instance a <code>ValidatorContextFunctions</code> instance
      */
     public static synchronized void initialize(ValidatorContextFunctions instance) {
-            _INSTANCE = instance;
+        _INSTANCE = instance;
     }
 
     /**
@@ -386,7 +386,7 @@ public class ValidatorContextFunctions {
      */
     @ContextFunctionDocAnnotation(desc = "Returns the current month as an integer.", example = "Functions.getCurrentMonth()")
     public int getCurrentMonth() {
-        return LocalDate.now().getMonthOfYear();
+        return LocalDate.now().getMonthValue();
     }
 
     /**

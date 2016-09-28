@@ -3,6 +3,8 @@
  */
 package com.imsweb.validation.functions;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -605,11 +606,13 @@ public class MetafileContextFunctionsTest {
 
     @Test
     public void testGEN_VALID_DATE_IOP() {
-        //get todays date
+        //get today's date
         LocalDate today = LocalDate.now();
         LocalDate tomorrow = today.plusDays(1);
         LocalDate nextMonth = today.plusMonths(1);
         LocalDate nextYear = today.plusYears(1);
+
+        DateTimeFormatter yearMonthDayFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
         Binding binding = new Binding();
         _functions.GEN_RESET_LOCAL_CONTEXT(binding);
@@ -628,41 +631,41 @@ public class MetafileContextFunctionsTest {
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20120229"));
 
         //today
-        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, today.toString("yyyyMMdd")));
+        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, today.format(yearMonthDayFormatter)));
         //next month
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextMonth.toString("yyyyMMdd")));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextMonth.format(yearMonthDayFormatter)));
         //tomorrow
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.toString("yyyyMMdd")));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.format(yearMonthDayFormatter)));
         //next year
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.toString("yyyyMMdd")));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.format(yearMonthDayFormatter)));
 
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "201310  "));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.toString("yyyy") + "11  "));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.format(yearMonthDayFormatter).substring(0, 4) + "11  "));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "2013  01"));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "2013    "));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.toString("yyyy") + "    "));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.format(yearMonthDayFormatter).substring(0, 4) + "    "));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "201010AA"));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "201010-1"));
 
         _functions.GEN_ALLOW_FUTURE_DATE_IOP(binding, 0);
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.toString("yyyy") + "    "));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.toString("yyyyMMdd")));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.format(yearMonthDayFormatter).substring(0, 4) + "    "));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.format(yearMonthDayFormatter)));
 
         _functions.GEN_ALLOW_FUTURE_DATE_IOP(binding, 1);
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20120202"));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20200202"));
-        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, nextYear.toString("yyyyMMdd")));
-        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.toString("yyyyMMdd")));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusDays(1).toString("yyyyMMdd")));
+        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, nextYear.format(yearMonthDayFormatter)));
+        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.format(yearMonthDayFormatter)));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusDays(1).format(yearMonthDayFormatter)));
 
         _functions.GEN_ALLOW_FUTURE_DATE_IOP(binding, 2);
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20120202"));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20130202"));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20200202"));
-        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.toString("yyyyMMdd")));
-        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(1).toString("yyyyMMdd")));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(2).toString("yyyyMMdd")));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(1).plusDays(1).toString("yyyyMMdd")));
+        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.format(yearMonthDayFormatter)));
+        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(1).format(yearMonthDayFormatter)));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(2).format(yearMonthDayFormatter)));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(1).plusDays(1).format(yearMonthDayFormatter)));
     }
 
     @Test
@@ -1350,10 +1353,10 @@ public class MetafileContextFunctionsTest {
 
         // test a map where we request tablevars
         List<List<Object>> table3 = new ArrayList<>();
-        table3.add(Arrays.asList((Object)"INDEX", "SITE", "HIST"));
-        table3.add(Arrays.asList((Object)"1", "C400", "8000"));
-        table3.add(Arrays.asList((Object)"2", "C420", "8000"));
-        table3.add(Arrays.asList((Object)"3", "C440", "8005"));
+        table3.add(Arrays.asList("INDEX", "SITE", "HIST"));
+        table3.add(Arrays.asList("1", "C400", "8000"));
+        table3.add(Arrays.asList("2", "C420", "8000"));
+        table3.add(Arrays.asList("3", "C440", "8005"));
         Map<Integer, char[]> tableVars3 = new HashMap<>();
         tableVars3.put(1, new char[5]);
         tableVars3.put(2, new char[5]);

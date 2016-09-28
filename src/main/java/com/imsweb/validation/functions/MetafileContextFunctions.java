@@ -3,6 +3,11 @@
  */
 package com.imsweb.validation.functions;
 
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +18,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.Days;
-import org.joda.time.IllegalFieldValueException;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import groovy.lang.Binding;
 
@@ -93,7 +93,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     // Pre-compiled regex and formatters...
     private static final Pattern _GEN_VAL_P1 = Pattern.compile("(\\-?\\d+)(.*)");
     private static final Pattern _GEN_VALID_DATE_IOP_P1 = Pattern.compile("(\\d{8}|\\d{6}\\s{2}|\\d{4}\\s{4})");
-    private static final DateTimeFormatter _GEN_DATECMP_IOP_FORMAT = DateTimeFormat.forPattern("yyyyMMdd");
+    private static final DateTimeFormatter _GEN_DATECMP_IOP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final Pattern _GEN_TRIM_P1 = Pattern.compile("^\\s+");
     private static final Pattern _GEN_TRIM_P2 = Pattern.compile("\\s+$");
     private static final Pattern _GEN_TRIM_P3 = Pattern.compile("(^\\s+|\\s+$)");
@@ -232,8 +232,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         try {
             int day = val.trim().length() == 8 ? Integer.valueOf(val.substring(6, 8)) : 1;
-            LocalDate toCheck = new LocalDate(year, month, day);
-            int actualMaxDay = toCheck.dayOfMonth().getMaximumValue();
+            LocalDate toCheck = LocalDate.of(year, month, day);
+            int actualMaxDay = YearMonth.of(year, month).lengthOfMonth();
             if (day <= 0 || day > actualMaxDay) {
                 binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to day");
                 return false;
@@ -246,7 +246,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 return false;
             }
         }
-        catch (IllegalFieldValueException e) {
+        catch (DateTimeException e) {
             return false; // Invalid date.  Like Feb 29th 2010.
         }
 
@@ -450,7 +450,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         LocalDate date1 = LocalDate.parse(buf1.toString(), _GEN_DATECMP_IOP_FORMAT);
         LocalDate date2 = LocalDate.parse(buf2.toString(), _GEN_DATECMP_IOP_FORMAT);
 
-        return Days.daysBetween(date1, date2).getDays();
+        return (int)ChronoUnit.DAYS.between(date1, date2);
     }
 
     /**
@@ -557,8 +557,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
         date2Buf.append(pad(String.valueOf(safeEndMonth), 2, "0", true));
 
-        int numDaysInBeginningMonth = new LocalDate(y1, safeBeginningMonth, 1).dayOfMonth().getMaximumValue();
-        int numDaysInEndMonth = new LocalDate(y2, safeEndMonth, 1).dayOfMonth().getMaximumValue();
+        int numDaysInBeginningMonth = YearMonth.of(y1, safeBeginningMonth).lengthOfMonth();
+        int numDaysInEndMonth = YearMonth.of(y2, safeEndMonth).lengthOfMonth();
 
         // handle day of first value
         int safeBeginningDay = d1;
@@ -654,8 +654,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
         date2Buf.append(pad(String.valueOf(safeEndMonth), 2, "0", true));
 
-        int numDaysInBeginningMonth = new LocalDate(y1, safeBeginningMonth, 1).dayOfMonth().getMaximumValue();
-        int numDaysInEndMonth = new LocalDate(y2, safeEndMonth, 1).dayOfMonth().getMaximumValue();
+        int numDaysInBeginningMonth = YearMonth.of(y1, safeBeginningMonth).lengthOfMonth();
+        int numDaysInEndMonth = YearMonth.of(y2, safeEndMonth).lengthOfMonth();
 
         // handle day of first value
         int safeBeginningDay = d1;
@@ -1891,7 +1891,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         // create a string with today's date, format is "YYYYmmDD"
         LocalDate now = LocalDate.now();
         buf.append(now.getYear());
-        buf.append(pad(String.valueOf(now.getMonthOfYear()), 2, "0", true));
+        buf.append(pad(String.valueOf(now.getMonthValue()), 2, "0", true));
         buf.append(pad(String.valueOf(now.getDayOfMonth()), 2, "0", true));
 
         return buf.toString();

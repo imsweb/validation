@@ -24,7 +24,6 @@ dependencies {
     compile 'commons-codec:commons-codec:1.10'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'commons-beanutils:commons-beanutils:1.9.3'
-    compile 'joda-time:joda-time:2.9.3'
     compile 'com.thoughtworks.xstream:xstream:1.4.9'
     testCompile 'junit:junit:4.12'
 }
