@@ -242,8 +242,8 @@ public class SimpleMapValidatable implements Validatable {
                         String collectionName = javaPath.substring(colPos + 1);
 
                         Object collection;
-                        if (_current instanceof Map<?, ?>)
-                            collection = ((Map<?, ?>)_current).get(collectionName);
+                        if (_current instanceof Map)
+                            collection = ((Map)_current).get(collectionName);
                         else {
                             try {
                                 Field field = _current.getClass().getDeclaredField(collectionName);

@@ -449,8 +449,8 @@ public class ValidatorServices {
                 Object replacement = null;
 
                 Object obj = validatable.getScope().get(prefix);
-                if (obj instanceof Map<?, ?>)
-                    replacement = ((Map<?, ?>)obj).get(propertyName);
+                if (obj instanceof Map)
+                    replacement = ((Map)obj).get(propertyName);
                 else {
                     try {
                         Field field = obj.getClass().getDeclaredField(propertyName);
