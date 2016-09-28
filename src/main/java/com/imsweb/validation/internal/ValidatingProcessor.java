@@ -17,8 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import groovy.lang.Binding;
 
@@ -39,9 +37,6 @@ import com.imsweb.validation.entities.Validatable;
  */
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ValidatingProcessor implements Processor {
-
-    // log for this class
-    private static final Log _LOG = LogFactory.getLog(ValidatingProcessor.class);
 
     // map of stats object to keep track of how long each polisher takes to run
     private static final Map<String, ValidationEngineStats> _STATS = new HashMap<>();
@@ -133,16 +128,12 @@ public class ValidatingProcessor implements Processor {
 
                     // *** rule could be ignored because the caller requested to dynamically ignore it
                     if ((vContext.getToExecute() != null && !vContext.getToExecute().contains(id)) || (vContext.getToIgnore() != null && vContext.getToIgnore().contains(id))) {
-                        if (_LOG.isDebugEnabled())
-                            _LOG.debug("Ignored " + id + " on " + validatable.getDisplayId() + " because caller requested to dynamically ignore it");
                         currentRuleFailures.add(id); // do not run any rules depending on a rule that is being ignored
                         continue;
                     }
 
                     // *** rule could be ignored because it has been flagged as being ignored
                     if (rule.getIgnored() != null && rule.getIgnored()) {
-                        if (_LOG.isDebugEnabled())
-                            _LOG.debug("Ignored " + id + " on " + validatable.getDisplayId() + " because its ignore flag is true");
                         currentRuleFailures.add(id); // do not run any rules depending on a rule that is being ignored
                         continue;
                     }
@@ -166,8 +157,6 @@ public class ValidatingProcessor implements Processor {
                             }
                         }
                         if (conditionFailed) {
-                            if (_LOG.isDebugEnabled())
-                                _LOG.debug("Ignored " + id + " on " + validatable.getDisplayId() + " because condition failed");
                             currentRuleFailures.add(id); // do not run any rules depending on a rule that failed because of its condition
                             continue;
                         }
@@ -175,8 +164,6 @@ public class ValidatingProcessor implements Processor {
 
                     // *** rule could be ignored because one of its parent rule failed (or was ignored)
                     if (vContext.atLeastOneDependencyFailed(validatablePaths, rule.getDependencies())) {
-                        if (_LOG.isDebugEnabled())
-                            _LOG.debug("Ignored " + id + " on " + validatable.getDisplayId() + " because at least one dependency failed or was ignored");
                         currentRuleFailures.add(id); // do not run any rules depending on a rule that failed because of its dependencies
                         continue;
                     }
@@ -213,28 +200,12 @@ public class ValidatingProcessor implements Processor {
                         failure.setOriginalResult((Boolean)binding.getVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT));
                         results.add(failure);
                         currentRuleFailures.add(id);
-
-                        if (_LOG.isDebugEnabled()) {
-                            if (failure.getGroovyException() != null)
-                                _LOG.debug("Executed " + rule.getId() + " on " + validatable.getDisplayId() + ": exception");
-                            else
-                                _LOG.debug("Executed " + rule.getId() + " on " + validatable.getDisplayId() + ": failure");
-                        }
                     }
-                    else if (_LOG.isDebugEnabled())
-                        _LOG.debug("Executed " + rule.getId() + " on " + validatable.getDisplayId() + ": success");
                 }
                 catch (ValidationException e) {
                     results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause()));
                 }
                 catch (Exception e) {
-                    // this one is actually not expected at all, so we need to log something...
-                    StringBuilder buf = new StringBuilder();
-                    buf.append("Unexpected exception executing edit ").append(id);
-                    String validated = validatable.getDisplayId();
-                    if (validated != null)
-                        buf.append(" on ").append(validatable.getDisplayId());
-                    _LOG.warn(buf.toString(), e);
                     results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, null));
                 }
                 finally {

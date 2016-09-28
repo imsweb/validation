@@ -3,7 +3,7 @@
  */
 package com.imsweb.validation;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.ast.MethodNode;
 import org.codehaus.groovy.ast.ModuleNode;
@@ -192,6 +191,7 @@ public class ValidatorServices {
      * @param id ID of the lookup to fetch
      * @return corresponding <code>Lookup</code> or null if we didn't find it
      */
+    @SuppressWarnings("UnusedParameters")
     public ValidatorLookup getLookupById(String id) {
         return null;
     }
@@ -203,6 +203,7 @@ public class ValidatorServices {
      * @param id ID of the configuration variable to fetch
      * @return corresponding value, possibly null
      */
+    @SuppressWarnings("UnusedParameters")
     public Object getConfVariable(String id) {
         return null;
     }
@@ -452,9 +453,11 @@ public class ValidatorServices {
                     replacement = ((Map<?, ?>)obj).get(propertyName);
                 else {
                     try {
-                        replacement = PropertyUtils.getSimpleProperty(obj, propertyName);
+                        Field field = obj.getClass().getDeclaredField(propertyName);
+                        field.setAccessible(true);
+                        replacement = field.get(obj);
                     }
-                    catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    catch (IllegalAccessException | NoSuchFieldException e) {
                         error = true;
                     }
                 }

@@ -4,9 +4,9 @@
 
 - Added new method in XmlValidatorFactory to extract all attributes from main Validator tag.
 - Removed Joda library dependency, replaced by new Java 8 date framework.
+- Removed BeanUtils library dependency.
 - Updated staging client from version 2.1.1 to version 2.3.
 - Updated Groovy library from version 2.4.6 (indy) to version 2.4.7 (indy).
-- Updated BeanUtils library from version 1.9.2 to version 1.9.3.
 - This library now requires Java 8 at minimum.
 
 **Version 1.5.9**

@@ -22,8 +22,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.imsweb.validation.entities.Category;
 import com.imsweb.validation.entities.Condition;
@@ -76,11 +74,6 @@ import com.imsweb.validation.internal.callable.RuleCompilingCallable;
  * Created on Apr 26, 2008 by Fabian Depry
  */
 public final class ValidationEngine {
-
-    /**
-     * Log for this class
-     */
-    private static final Log _LOG = LogFactory.getLog(ValidationEngine.class);
 
     /**
      * Engine version (used to check compatibility with the edits)
@@ -1917,21 +1910,13 @@ public final class ValidationEngine {
     private static Collection<RuleFailure> internalValidate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
 
         // pre-condition: engine must be initialized
-        if (_STATUS == ValidationEngineStatus.NOT_INITIALIZED) {
-            if (_LOG.isDebugEnabled())
-                _LOG.debug("Validation engine cannot be used before being initialized; returning empty results for " + validatable.getDisplayId());
+        if (_STATUS == ValidationEngineStatus.NOT_INITIALIZED)
             return new HashSet<>();
-        }
 
         // pre-condition: there must be a root processor for this validatable
         Processor processor = _PROCESSORS.get(validatable.getRootLevel());
-        if (processor == null) {
-            if (_STATUS == ValidationEngineStatus.INITIALIZING)
-                _LOG.warn("Validation engine is being re-initialized; returning empty results for " + validatable.getDisplayId());
-            else if (_LOG.isDebugEnabled())
-                _LOG.debug("Unable to find a processor for root level '" + validatable.getRootLevel() + "'; returning empty results for " + validatable.getDisplayId());
+        if (processor == null)
             return new HashSet<>();
-        }
 
         // pre-condition: if a forced rule is provided, it must have a known java path
         if (vContext.getToForce() != null && !ValidatorServices.getInstance().getAllJavaPaths().containsKey(vContext.getToForce().getJavaPath()))
@@ -2002,7 +1987,7 @@ public final class ValidationEngine {
 
         // update all the processors
         for (ValidatingProcessor p : _PROCESSORS.values())
-            p.setRules(rules.containsKey(p.getJavaPath()) ? rules.get(p.getJavaPath()) : Collections.<ExecutableRule>emptyList());
+            p.setRules(rules.containsKey(p.getJavaPath()) ? rules.get(p.getJavaPath()) : Collections.emptyList());
     }
 
     private static void updateProcessorsConditions(Collection<ExecutableCondition> allConditions) {
@@ -2020,12 +2005,12 @@ public final class ValidationEngine {
 
         // update all the processors
         for (ValidatingProcessor p : _PROCESSORS.values())
-            p.setConditions(conditions.containsKey(p.getJavaPath()) ? conditions.get(p.getJavaPath()) : Collections.<ExecutableCondition>emptyList());
+            p.setConditions(conditions.containsKey(p.getJavaPath()) ? conditions.get(p.getJavaPath()) : Collections.emptyList());
     }
 
     private static void updateProcessorsContexts(Map<Long, Map<String, Object>> allContexts) {
 
-        // this code used to be smart about which validator was used at which java-path, and provide only the conexts for that particular
+        // this code used to be smart about which validator was used at which java-path, and provide only the contexts for that particular
         // java-path to the processor; but that doesn't work in SEER*DMS where some edits are persisted but not registered to the engine!
         for (ValidatingProcessor p : _PROCESSORS.values())
             p.setContexts(allContexts);
@@ -2096,10 +2081,10 @@ public final class ValidationEngine {
                 String rulePath = rule.getJavaPath();
                 String dependPath = pathCache.get(id);
                 if (rulePath == null)
-                    _LOG.warn("Got a null java-path for edit " + rule.getId() + ", this should never happen!");
-                else if (dependPath == null)
-                    _LOG.warn("Got a null java-path for edit " + id + " (on which " + rule.getId() + " depends), this should never happen!");
-                else if (!rulePath.startsWith(dependPath) || rulePath.length() < dependPath.length())
+                    throw new ConstructionException("Got a null java-path for edit " + rule.getId());
+                if (dependPath == null)
+                    throw new ConstructionException("Got a null java-path for edit " + id + " (on which " + rule.getId() + " depends)");
+                if (!rulePath.startsWith(dependPath) || rulePath.length() < dependPath.length())
                     throw new ConstructionException(rule.getId() + " includes a dependency for an edit lower in the data structure tree.");
 
                 // check that dependencies do not cross validators                    
