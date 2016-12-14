@@ -66,16 +66,16 @@ findbugs {
 }
 
 // use this task to generate the regex parser
-task generateJavaContextParser << {
-
-    // create lexer
-    javaexec {
-        main = '-jar'
-        args = ['config/jflex-1.4.2/lib/JFlex.jar',
-                '--nobak',
-                '-d',
-                'src/main/java/com/imsweb/validation/internal/context/',
-                'config/java-context.flex']
+task generateJavaContextParser {
+    doLast {
+        javaexec {
+            main = '-jar'
+            args = ['config/jflex-1.4.2/lib/JFlex.jar',
+                    '--nobak',
+                    '-d',
+                    'src/main/java/com/imsweb/validation/internal/context/',
+                    'config/java-context.flex']
+        }
     }
 }
 
@@ -113,7 +113,7 @@ modifyPom {
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+    gradleVersion = '3.2.1'
 }
 
 
