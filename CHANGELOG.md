@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.6.1**
+
+- Fixed a bug that prevented the root attributes to be found if the file contained large text before the root tag.
+
 **Version 1.6**
 
 - Added new method in XmlValidatorFactory to extract all attributes from main Validator tag.

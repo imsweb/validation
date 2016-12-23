@@ -1491,14 +1491,33 @@ public final class XmlValidatorFactory {
 
         boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
         try (InputStream is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream()) {
-
             byte[] bytes = new byte[1024];
             int n = is.read(bytes);
-            Matcher m1 = regex1.matcher(new String(bytes, 0, n, StandardCharsets.UTF_8));
-            if (m1.find()) {
-                Matcher m2 = regex2.matcher(m1.group(1).replaceAll("\r?\n", ""));
-                while (m2.find())
-                    result.put(m2.group(1), m2.group(2));
+            while (n > 0) {
+                String line = new String(bytes, 0, n, StandardCharsets.UTF_8);
+                if (StringUtils.contains(line, "<validator")) { // hopefully this check is cheaper that using the regex
+
+                    Matcher m1 = regex1.matcher(line);
+                    if (m1.find()) {
+                        Matcher m2 = regex2.matcher(m1.group(1).replaceAll("\r?\n", ""));
+                        while (m2.find())
+                            result.put(m2.group(1), m2.group(2));
+                    }
+                    else {
+                        // we have the tag but not the regex, it probably indicates that we are in between; let's get the next line...
+                        n = is.read(bytes);
+                        m1 = regex1.matcher(line + new String(bytes, 0, n, StandardCharsets.UTF_8));
+                        if (m1.find()) {
+                            Matcher m2 = regex2.matcher(m1.group(1).replaceAll("\r?\n", ""));
+                            while (m2.find())
+                                result.put(m2.group(1), m2.group(2));
+                        }
+                    }
+
+                    // regardless of whether we found the attributes or not, we did find the (supposedly unique) validator tag, so we can stop looking
+                    break;
+                }
+                n = is.read(bytes);
             }
         }
         catch (IOException e) {
