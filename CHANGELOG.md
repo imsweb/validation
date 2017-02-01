@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.6.2**
+
+- Updated staging client from version 2.3 to version 2.4; this contains the new TNM 1.3 algorithm.
+
 **Version 1.6.1**
 
 - Fixed a bug that prevented the root attributes to be found if the file contained large text before the root tag.
