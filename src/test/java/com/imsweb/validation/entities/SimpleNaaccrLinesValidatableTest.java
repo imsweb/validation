@@ -99,10 +99,13 @@ public class SimpleNaaccrLinesValidatableTest {
         TestingUtils.unloadValidator("fake-validator-naaccr-lines");
     }
     
-    @SuppressWarnings("unchecked")
+    
     @Test
+    @SuppressWarnings("unchecked")
     public void testGetCsSchemaId() throws IllegalAccessException {
+        // This test needs StagingContextFunctions instead of TestingValidatorContextFunctions
         ValidatorContextFunctions.initialize(new StagingContextFunctions());
+        
         Map<String, String> record = new HashMap<>();
         SimpleNaaccrLinesValidatable v = new SimpleNaaccrLinesValidatable(record);
         List<Validatable> validatables = v.followCollection("line");
@@ -144,5 +147,8 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertEquals("001", line.get("csSiteSpecificFactor25"));
         Assert.assertEquals("peritoneum", line.get("_tnmSchemaId"));
         Assert.assertEquals("peritoneum", line.get("_csSchemaId"));
+
+        //Uniniitalize the StagingContextFunctions
+        ValidatorContextFunctions.initialize(null);
     }
 }
