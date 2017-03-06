@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.6.3**
+
+- SimpleNaaccrValidatable will convert the sex value to SSF25 when the SSF25 discriminator is missing for Peritoneum and Peritoneum Female Gen so that the CS schema will be found.
+
 **Version 1.6.2**
 
 - Updated staging client from version 2.3 to version 2.4; this contains the new TNM 1.3 algorithm.

@@ -464,4 +464,19 @@ public class StagingContextFunctionsTest {
     public void testExpandList() {
         Assert.assertNotNull(_functions.expandList(Collections.singletonList((Object)"1-9")));
     }
+
+    @Test
+    public void testGetSsf25FromSex() {
+        Assert.assertEquals("001", _functions.getSsf25FromSex("1"));
+        Assert.assertEquals("002", _functions.getSsf25FromSex("2"));
+        Assert.assertEquals("003", _functions.getSsf25FromSex("3"));
+        Assert.assertEquals("004", _functions.getSsf25FromSex("4"));
+        Assert.assertEquals("004", _functions.getSsf25FromSex("5"));
+        Assert.assertEquals("002", _functions.getSsf25FromSex("6"));
+        Assert.assertEquals("009", _functions.getSsf25FromSex("9"));
+
+        Assert.assertNull(_functions.getSsf25FromSex(null));
+        Assert.assertNull(_functions.getSsf25FromSex(""));
+        Assert.assertNull(_functions.getSsf25FromSex("7"));
+    }
 }
