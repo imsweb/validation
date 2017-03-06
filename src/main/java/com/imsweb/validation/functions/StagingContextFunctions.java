@@ -1137,7 +1137,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     /**
-     * Returns the corresponding SSF25 value for the given sex value
+     * Returns the corresponding SSF25 value for the given sex value 
      */
     public String getSsf25FromSex(String sex) {
         if (sex == null)
