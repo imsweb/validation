@@ -18,6 +18,8 @@ import org.junit.Test;
 
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidatorContextFunctions;
+import com.imsweb.validation.functions.StagingContextFunctions;
 
 public class SimpleNaaccrLinesValidatableTest {
 
@@ -95,5 +97,58 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertEquals("lines.line[0]", v.followCollection("line").get(0).getCurrentLevel());
 
         TestingUtils.unloadValidator("fake-validator-naaccr-lines");
+    }
+    
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGetCsSchemaId() throws IllegalAccessException {
+        // This test needs StagingContextFunctions instead of TestingValidatorContextFunctions
+        ValidatorContextFunctions.initialize(new StagingContextFunctions());
+        
+        Map<String, String> record = new HashMap<>();
+        SimpleNaaccrLinesValidatable v = new SimpleNaaccrLinesValidatable(record);
+        List<Validatable> validatables = v.followCollection("line");
+        Map<String, String> line = (Map<String, String>)validatables.get(0).getScope().get("line");
+        Assert.assertNull(line.get("csSiteSpecificFactor25"));
+        Assert.assertNull(line.get("_tnmSchemaId"));
+        Assert.assertNull(line.get("_csSchemaId"));
+
+        record.put("primarySite", "C111");
+        record.put("histologyIcdO3", "8000");
+        v = new SimpleNaaccrLinesValidatable(record);
+        validatables = v.followCollection("line");
+        line = (Map<String, String>)validatables.get(0).getScope().get("line");
+        Assert.assertNull(line.get("csSiteSpecificFactor25"));
+        Assert.assertNull(line.get("_tnmSchemaId"));
+        Assert.assertNull(line.get("_csSchemaId"));
+
+        record.put("csSiteSpecificFactor25", "010");
+        v = new SimpleNaaccrLinesValidatable(record);
+        validatables = v.followCollection("line");
+        line = (Map<String, String>)validatables.get(0).getScope().get("line");
+        Assert.assertEquals("010", line.get("csSiteSpecificFactor25"));
+        Assert.assertEquals("nasopharynx", line.get("_tnmSchemaId"));
+        Assert.assertEquals("nasopharynx", line.get("_csSchemaId"));
+
+        record.put("primarySite", "C481");
+        record.put("csSiteSpecificFactor25", null);
+        record.put("sex", "1");
+        v = new SimpleNaaccrLinesValidatable(record);
+        validatables = v.followCollection("line");
+        line = (Map<String, String>)validatables.get(0).getScope().get("line");
+        Assert.assertEquals("001", line.get("csSiteSpecificFactor25"));
+        Assert.assertEquals("peritoneum", line.get("_tnmSchemaId"));
+        Assert.assertEquals("peritoneum", line.get("_csSchemaId"));
+
+        v = new SimpleNaaccrLinesValidatable(Collections.singletonList(record), null, true);
+        validatables = v.followCollection("untrimmedline");
+        line = (Map<String, String>)validatables.get(0).getScope().get("untrimmedline");
+        Assert.assertEquals("001", line.get("csSiteSpecificFactor25"));
+        Assert.assertEquals("peritoneum", line.get("_tnmSchemaId"));
+        Assert.assertEquals("peritoneum", line.get("_csSchemaId"));
+
+        //Uniniitalize the StagingContextFunctions
+        ValidatorContextFunctions.initialize(null);
     }
 }
