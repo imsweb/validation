@@ -34,6 +34,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     public static final String CSTAGE_INPUT_PROP_SITE = "primarySite";
     public static final String CSTAGE_INPUT_PROP_HIST = "histologyIcdO3";
     public static final String CSTAGE_INPUT_PROP_DISC = "csSiteSpecificFactor25";
+    public static final String CSTAGE_PROP_DX_YEAR = "dateOfDiagnosisYear";
 
     // this maps the CS fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
     public static final Map<String, String> CSTAGE_FIELDS = new HashMap<>();
@@ -1139,25 +1140,33 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     /**
      * Returns the corresponding SSF25 value for the given sex value 
      */
-    public String getSsf25FromSex(String sex) {
-        if (sex == null)
-            return null;
+    public String getSsf25FromSex(String ssf25, String sex, String hist, String dxYear, String schemaId) {
+        boolean isPeritoneum = "peritoneum".equals(schemaId) || "peritoneum_female_gen".equals(schemaId);
+        boolean isMissingSsf25 = !("001".equals(ssf25) || "002".equals(ssf25) || "003".equals(ssf25) || "004".equals(ssf25) || "009".equals(ssf25) || "981".equals(ssf25));
+        if (isPeritoneum && isMissingSsf25 && ("2016".equals(dxYear) || "2017".equals(dxYear))) {
+            Integer histInt = hist != null ? Integer.valueOf(hist) : null;
+            if (hist == null || !((8000 <= histInt && histInt <= 8576) || (8590 <= histInt && histInt <= 8671) || (8930 <= histInt && histInt <= 8934) || (8940 <= histInt && histInt <= 9110)))
+                return "981";
 
-        switch (sex) {
-            case "2":
-            case "6":
-                return "002";
-            case "1":
-                return "001";
-            case "3":
-                return "003";
-            case "4":
-            case "5":
-                return "004";
-            case "9":
+            if (sex == null)
                 return "009";
-            default:
-                return null;
+
+            switch (sex) {
+                case "2":
+                case "6":
+                    return "002";
+                case "1":
+                case "5":
+                    return "001";
+                case "3":
+                    return "003";
+                case "4":
+                    return "004";
+                default:
+                    return "009";
+            }
         }
+
+        return ssf25;
     }
 }

@@ -467,16 +467,33 @@ public class StagingContextFunctionsTest {
 
     @Test
     public void testGetSsf25FromSex() {
-        Assert.assertEquals("001", _functions.getSsf25FromSex("1"));
-        Assert.assertEquals("002", _functions.getSsf25FromSex("2"));
-        Assert.assertEquals("003", _functions.getSsf25FromSex("3"));
-        Assert.assertEquals("004", _functions.getSsf25FromSex("4"));
-        Assert.assertEquals("004", _functions.getSsf25FromSex("5"));
-        Assert.assertEquals("002", _functions.getSsf25FromSex("6"));
-        Assert.assertEquals("009", _functions.getSsf25FromSex("9"));
+        // test sex conditions
+        Assert.assertEquals("001", _functions.getSsf25FromSex(null, "1", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("002", _functions.getSsf25FromSex(null, "2", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("003", _functions.getSsf25FromSex(null, "3", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("004", _functions.getSsf25FromSex(null, "4", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("001", _functions.getSsf25FromSex(null, "5", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("002", _functions.getSsf25FromSex(null, "6", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("009", _functions.getSsf25FromSex(null, "9", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("009", _functions.getSsf25FromSex(null, null, "8000", "2016", "peritoneum"));
+        Assert.assertEquals("009", _functions.getSsf25FromSex(null, "", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("009", _functions.getSsf25FromSex(null, "7", "8000", "2016", "peritoneum"));
 
-        Assert.assertNull(_functions.getSsf25FromSex(null));
-        Assert.assertNull(_functions.getSsf25FromSex(""));
-        Assert.assertNull(_functions.getSsf25FromSex("7"));
+        // test hist, schema, and dx year conditions
+        Assert.assertEquals("001", _functions.getSsf25FromSex(null, "1", "8000", "2016", "peritoneum_female_gen"));
+        Assert.assertEquals("001", _functions.getSsf25FromSex(null, "1", "8000", "2017", "peritoneum"));
+        Assert.assertNull(_functions.getSsf25FromSex(null, "1", "8000", "2016", "larynx_other"));
+        Assert.assertNull(_functions.getSsf25FromSex(null, "1", "8000", "2015", "peritoneum"));
+        Assert.assertEquals("981", _functions.getSsf25FromSex(null, "1", "8577", "2016", "peritoneum"));
+
+        // test ssf25 condition
+        Assert.assertEquals("001", _functions.getSsf25FromSex("001", null, "8000", "2016", "peritoneum"));
+        Assert.assertEquals("001", _functions.getSsf25FromSex("001", "2", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("002", _functions.getSsf25FromSex("988", "2", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("002", _functions.getSsf25FromSex("   ", "2", "8000", "2016", "peritoneum"));
+        Assert.assertEquals("002", _functions.getSsf25FromSex("   ", "2", "8000", "2016", "peritoneum"));
+
+        Assert.assertNull(_functions.getSsf25FromSex(null, null, null, null, null));
+        Assert.assertEquals("981", _functions.getSsf25FromSex(null, null, null, "2016", "peritoneum"));
     }
 }
