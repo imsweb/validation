@@ -114,6 +114,7 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertNull(line.get("_tnmSchemaId"));
         Assert.assertNull(line.get("_csSchemaId"));
 
+        record.put("dateOfDiagnosisYear", "2016");
         record.put("primarySite", "C111");
         record.put("histologyIcdO3", "8000");
         v = new SimpleNaaccrLinesValidatable(record);

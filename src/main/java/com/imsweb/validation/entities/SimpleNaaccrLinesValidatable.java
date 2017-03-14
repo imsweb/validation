@@ -190,11 +190,14 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
             if (!hasTnmSchemaId || hasSite || hasHist) {
                 StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getTnmStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_TNM_SCHEMA_ID, schema != null ? schema.getId() : null);
-                String ssf25 = _currentLine.get(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC);
-                String sex = _currentLine.get(StagingContextFunctions.TNM_INPUT_PROP_SEX);
-                boolean ssf25IsMissing = (_useUntrimmedNotation ? "   ".equals(ssf25) : ssf25 == null) || "988".equals(ssf25);
-                if (schema != null && ssf25IsMissing && (schema.getId().equals("peritoneum") || schema.getId().equals("peritoneum_female_gen")))
-                    _currentLine.put(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC, ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getSsf25FromSex(sex));
+                if (schema != null) {
+                    String ssf25 = _currentLine.get(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC);
+                    String sex = _currentLine.get(StagingContextFunctions.TNM_INPUT_PROP_SEX);
+                    String hist = _currentLine.get(StagingContextFunctions.CSTAGE_INPUT_PROP_HIST);
+                    String dxYear = _currentLine.get(StagingContextFunctions.CSTAGE_PROP_DX_YEAR);
+                    String newSsf25Value = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getSsf25FromSex(ssf25, sex, hist, dxYear, schema.getId());
+                    _currentLine.put(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC, newSsf25Value);
+                }
             }
             if (!hasCsSchemaId || hasSite || hasHist) {
                 StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
