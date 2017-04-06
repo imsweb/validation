@@ -3,9 +3,6 @@
 **Version 1.6.3**
 
 - Updated staging client from version 2.4 to version 2.5; this contains the new TNM 1.4 algorithm. 
-
-**Version 1.6.3**
-
 - SimpleNaaccrLinesValidatable will convert the sex value to SSF25 when the SSF25 discriminator is missing for Peritoneum and Peritoneum Female Gen so that the CS schema will be found.
 
 **Version 1.6.2**
