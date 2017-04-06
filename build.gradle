@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.imsweb:staging-client-java:2.4'
+    compile 'com.imsweb:staging-client-java:2.5'
     compile 'org.codehaus.groovy:groovy:2.4.7:indy'
     compile 'commons-codec:commons-codec:1.10'
     compile 'org.apache.commons:commons-lang3:3.4'
