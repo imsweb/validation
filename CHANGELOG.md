@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 1.7**
+
+- Increased the engine version to 5.7
+- Added support for timing out execution of edits (disabled by default).
+
 **Version 1.6.3**
 
 - Updated staging client from version 2.4 to version 2.5; this contains the new TNM 1.4 algorithm. 

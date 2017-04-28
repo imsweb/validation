@@ -184,7 +184,7 @@ public class ExecutableRule {
     public void setInternalValidatorId(Long internalValidatorId) {
         this._internalValidatorId = internalValidatorId;
     }
-    
+
     /**
      * @return Returns the id.
      */
@@ -432,7 +432,7 @@ public class ExecutableRule {
         if (_script == null)
             return true;
 
-        boolean success = false;
+        boolean success;
 
         try {
             // clean up any leftover binding properties

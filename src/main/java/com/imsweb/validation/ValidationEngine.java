@@ -78,7 +78,7 @@ public final class ValidationEngine {
     /**
      * Engine version (used to check compatibility with the edits)
      */
-    private static final String _ENGINE_VERSION = "5.6";
+    private static final String _ENGINE_VERSION = "5.7";
 
     /**
      * Context key for the helper functions - Functions.
@@ -138,7 +138,17 @@ public final class ValidationEngine {
     /**
      * Message used when an exception happened while executing a rule.
      */
-    public static final String EXCEPTION_MSG = "Rule failed with exception";
+    public static final String EXCEPTION_MSG = "Edit failed with exception.";
+
+    /**
+     * Message used when a timeout happened while executing a rule.
+     */
+    public static final String TIMEOUT_MSG = "Edit execution took too long.";
+
+    /**
+     * Message used when a timeout happened while executing a rule.
+     */
+    public static final String INTERRUPTED_MSG = "Edit execution was interrupted.";
 
     /**
      * Map of <code>Validator</code>s, keyed by validator ID
@@ -197,6 +207,11 @@ public final class ValidationEngine {
      * The number of threads to use to compile the rules (see enableMultiThreadedCompilation() method)
      */
     private static int _NUM_COMPILER_THREADS = 1;
+
+    /**
+     * The timeout (in seconds) for running edits (or conditions); if an edit runs for longer than the value, it will automatically be killed and fail. Use 0 for no timeout (the default).
+     */
+    private static int _EDIT_EXECUTION_TIMEOUT = 0;
 
     /**
      * Private lock controlling access to the state of the engine; all methods using the state of the engine (including the validate methods) need to acquire a read lock;
@@ -915,7 +930,7 @@ public final class ValidationEngine {
             execRule.setMessage(editableRule.getMessage());
             execRule.setIgnored(editableRule.getIgnored() == null ? Boolean.FALSE : editableRule.getIgnored());
             if (dependenciesUpdated)
-                execRule.setDependencies(editableRule.getDependencies() == null ? Collections.<String>emptySet() : editableRule.getDependencies());
+                execRule.setDependencies(editableRule.getDependencies() == null ? Collections.emptySet() : editableRule.getDependencies());
             execRule.setConditions(editableRule.getConditions());
             execRule.setUseAndForConditions(editableRule.getUseAndForConditions());
             execRule.setJavaPath(editableRule.getJavaPath());
@@ -1761,13 +1776,25 @@ public final class ValidationEngine {
     }
 
     /**
-     * Enable multi-threaded compilation of the rules, using the provided number of threads (by default only one thread is used).
+     * Enables multi-threaded compilation of the rules, using the provided number of threads (by default only one thread is used).
      * @param numThreads number of threads to use, must be between 1 and 32
      */
     public static void enableMultiThreadedCompilation(int numThreads) {
         if (numThreads < 1 || numThreads > 32)
             throw new RuntimeException("Number of threads must be between 1 and 32!");
         _NUM_COMPILER_THREADS = numThreads;
+    }
+
+    /**
+     * Enables edit (and condition) execution timeout.
+     * <br/><br/>
+     * If set to a strictly positive value, and edit that runs for more than the value (in seconds) will be killed and will be seen as a failure.
+     * @param timeoutInSeconds timeout value in seconds, use 0 for no timeout (the default)
+     */
+    public static void enableEditExecutionTimeout(int timeoutInSeconds) {
+        if (timeoutInSeconds < 0)
+            throw new RuntimeException("Timeout in seconds must be 0 (to disable the timeout) or positive.");
+        _EDIT_EXECUTION_TIMEOUT = timeoutInSeconds;
     }
 
     // ********************************************************************************
@@ -1872,7 +1899,7 @@ public final class ValidationEngine {
         }
     }
 
-    private static Set<String> checkValidatorConstraints(List<Validator> validators) throws ConstructionException {
+    private static void checkValidatorConstraints(List<Validator> validators) throws ConstructionException {
         Set<String> validatorIds = new HashSet<>(), conditionIds = new HashSet<>(), categoryIds = new HashSet<>(), ruleIds = new HashSet<>();
         for (Validator v : validators) {
             if (validatorIds.contains(v.getId()))
@@ -1903,8 +1930,6 @@ public final class ValidationEngine {
                 ruleIds.add(r.getId());
             }
         }
-
-        return ruleIds;
     }
 
     private static Collection<RuleFailure> internalValidate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
@@ -1941,21 +1966,14 @@ public final class ValidationEngine {
             // keep track of the current partial path
             StringBuilder partialPath = new StringBuilder(parts[0]);
 
-            // first part correspond to a validating processor
-            ValidatingProcessor validatingProcessor = _PROCESSORS.get(partialPath.toString());
-            if (validatingProcessor == null) {
-                validatingProcessor = new ValidatingProcessor(partialPath.toString());
-                _PROCESSORS.put(partialPath.toString(), validatingProcessor);
-            }
-
-            // the rest of the parts correspond to iterative processors...
-            ValidatingProcessor current = validatingProcessor;
+            // first part correspond to a validating processor, the rest of the parts correspond to iterative processors...
+            ValidatingProcessor current = _PROCESSORS.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _EDIT_EXECUTION_TIMEOUT));
             for (int i = 1; i < parts.length; i++) {
                 partialPath.append(".").append(parts[i]);
 
                 ValidatingProcessor vProcessor = _PROCESSORS.get(partialPath.toString());
                 if (vProcessor == null) {
-                    vProcessor = new ValidatingProcessor(partialPath.toString());
+                    vProcessor = new ValidatingProcessor(partialPath.toString(), _EDIT_EXECUTION_TIMEOUT);
                     IterativeProcessor iProcessor = new IterativeProcessor(vProcessor, parts[i]);
                     _PROCESSORS.put(partialPath.toString(), vProcessor);
                     current.addNested(iProcessor);
@@ -1976,14 +1994,8 @@ public final class ValidationEngine {
 
         // get the sorted rules by java-path
         Map<String, List<ExecutableRule>> rules = new HashMap<>();
-        for (ExecutableRule rule : sortedRules) {
-            List<ExecutableRule> list = rules.get(rule.getJavaPath());
-            if (list == null) {
-                list = new ArrayList<>();
-                rules.put(rule.getJavaPath(), list);
-            }
-            list.add(rule);
-        }
+        for (ExecutableRule rule : sortedRules)
+            rules.computeIfAbsent(rule.getJavaPath(), k -> new ArrayList<>()).add(rule);
 
         // update all the processors
         for (ValidatingProcessor p : _PROCESSORS.values())
@@ -1994,14 +2006,8 @@ public final class ValidationEngine {
 
         // get the conditions by java-path (there is no order needed for conditions)
         Map<String, List<ExecutableCondition>> conditions = new HashMap<>();
-        for (ExecutableCondition condition : allConditions) {
-            List<ExecutableCondition> list = conditions.get(condition.getJavaPath());
-            if (list == null) {
-                list = new ArrayList<>();
-                conditions.put(condition.getJavaPath(), list);
-            }
-            list.add(condition);
-        }
+        for (ExecutableCondition condition : allConditions)
+            conditions.computeIfAbsent(condition.getJavaPath(), k -> new ArrayList<>()).add(condition);
 
         // update all the processors
         for (ValidatingProcessor p : _PROCESSORS.values())

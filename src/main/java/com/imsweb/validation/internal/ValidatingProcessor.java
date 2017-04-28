@@ -13,8 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -62,14 +69,24 @@ public class ValidatingProcessor implements Processor {
     // whether or not stats should be recorded
     private boolean _recordStats = false;
 
+    // time out in seconds when executing an edit or a condition
+    private int _timeout;
+
+    // thread executor to be able to time out an edit
+    private ExecutorService _executor;
+
     /**
      * Constructor.
      * <p/>
      * Created on Aug 15, 2011 by depryf
      * @param javaPath current java path for this validating processor
+     * @param editExecutionTimeout timeout for edits (0 or negative means no timeout)
      */
-    public ValidatingProcessor(String javaPath) {
+    public ValidatingProcessor(String javaPath, int editExecutionTimeout) {
         _currentJavaPath = javaPath;
+        _timeout = editExecutionTimeout;
+        if (editExecutionTimeout > 0)
+            _executor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -100,9 +117,33 @@ public class ValidatingProcessor implements Processor {
             binding = buildBinding(validatable);
             Set<String> currentConditionFailures = new HashSet<>();
             vContext.getFailedConditionIds().put(validatable.getCurrentLevel(), currentConditionFailures);
-            for (ExecutableCondition condition : _conditions)
-                if (!condition.check(validatable, binding))
+            for (ExecutableCondition condition : _conditions) {
+
+                boolean success;
+                if (_timeout > 0) {
+                    Future<Boolean> future = _executor.submit(new ExecutorCallable(condition, validatable, binding));
+                    try {
+                        success = future.get(_timeout, TimeUnit.SECONDS);
+                    }
+                    catch (InterruptedException e) {
+                        throw new ValidationException(condition.getId() + ": " + ValidationEngine.INTERRUPTED_MSG);
+                    }
+                    catch (TimeoutException e) {
+                        throw new ValidationException(condition.getId() + ": " + ValidationEngine.TIMEOUT_MSG);
+                    }
+                    catch (ExecutionException e) {
+                        if (e.getCause() instanceof ValidationException)
+                            throw (ValidationException)e.getCause();
+                        throw new ValidationException(condition.getId() + ": " + ValidationEngine.EXCEPTION_MSG);
+                    }
+                }
+                else
+                    success = condition.check(validatable, binding);
+
+                if (!success) {
                     currentConditionFailures.add(condition.getId());
+                }
+            }
         }
 
         // if this processor contains no rule, and there isn't one to be forced, we are done!
@@ -169,9 +210,16 @@ public class ValidatingProcessor implements Processor {
                     }
                 }
 
+                Future<Boolean> future = null;
                 try {
                     long startTime = System.currentTimeMillis();
-                    boolean success = rule.validate(validatable, binding);
+                    boolean success;
+                    if (_timeout > 0) {
+                        future = _executor.submit(new ExecutorCallable(rule, validatable, binding));
+                        success = future.get(_timeout, TimeUnit.SECONDS);
+                    }
+                    else
+                        success = rule.validate(validatable, binding);
                     long endTime = System.currentTimeMillis();
 
                     // keep track of the stats...
@@ -202,6 +250,18 @@ public class ValidatingProcessor implements Processor {
                         currentRuleFailures.add(id);
                     }
                 }
+                catch (TimeoutException e) {
+                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.TIMEOUT_MSG, validatable, null));
+                }
+                catch (InterruptedException e) {
+                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.INTERRUPTED_MSG, validatable, null));
+                }
+                catch (ExecutionException e) {
+                    if (e.getCause() instanceof ValidationException)
+                        results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause().getCause()));
+                    else
+                        results.add(new RuleFailure(rule.getRule(), "Edit generated an unexpected error: " + e.getCause().getMessage(), validatable, null));
+                }
                 catch (ValidationException e) {
                     results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause()));
                 }
@@ -210,6 +270,8 @@ public class ValidatingProcessor implements Processor {
                 }
                 finally {
                     validatable.clearPropertiesWithError();
+                    if (future != null)
+                        future.cancel(true);
                 }
             }
         }
@@ -386,4 +448,31 @@ public class ValidatingProcessor implements Processor {
         }
     }
 
+    /**
+     * Simple class to wrap an edit/condition execution into a thread so it can be timed out.
+     */
+    private static class ExecutorCallable implements Callable<Boolean> {
+
+        private ExecutableRule _rule;
+        private ExecutableCondition _condition;
+        private Validatable _validatable;
+        private Binding _binding;
+
+        public ExecutorCallable(ExecutableRule rule, Validatable validatable, Binding binding) {
+            _rule = rule;
+            _validatable = validatable;
+            _binding = binding;
+        }
+
+        public ExecutorCallable(ExecutableCondition condition, Validatable validatable, Binding binding) {
+            _condition = condition;
+            _validatable = validatable;
+            _binding = binding;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+            return _rule != null ? _rule.validate(_validatable, _binding) : _condition.check(_validatable, _binding);
+        }
+    }
 }

@@ -60,7 +60,7 @@ public class ValidationEngineTest {
         Assert.assertFalse(ValidationEngine.isInitialized());
 
         // initialize with an empty list
-        ValidationEngine.initialize(Collections.<Validator>emptyList());
+        ValidationEngine.initialize(Collections.emptyList());
         Assert.assertTrue(ValidationEngine.isInitialized());
         Assert.assertTrue(ValidationEngine.getValidators().isEmpty());
         ValidationEngine.uninitialize();
@@ -208,9 +208,9 @@ public class ValidationEngineTest {
         TestingUtils.assertEditFailure(ValidationEngine.validate(validatable, tmpRule), "JUST_TESTING");
 
         // test ignoring the rules
-        TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable, Collections.<String>emptyList()), "fv-rule1");
-        TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable, Collections.<String>emptyList()), "fv-rule2");
-        TestingUtils.assertEditFailure(ValidationEngine.validate(validatable, Collections.<String>emptyList()), "fv-rule3");
+        TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable, Collections.emptyList()), "fv-rule1");
+        TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable, Collections.emptyList()), "fv-rule2");
+        TestingUtils.assertEditFailure(ValidationEngine.validate(validatable, Collections.emptyList()), "fv-rule3");
         // rule3 depends on rule2 which depends on rule1, so ignore either 1 or 2 should disable 3
         TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable, Collections.singletonList("fv-rule1")), "fv-rule3");
         TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable, Collections.singletonList("fv-rule2")), "fv-rule3");
@@ -256,14 +256,23 @@ public class ValidationEngineTest {
         TestingUtils.unloadValidator("fake-validator");
 
         // test an exception in the Groovy expression
-        TestingUtils.loadValidator("fake-validator-groovy-exception");
+        TestingUtils.loadValidator("fake-validator-exception-groovy");
         entity.clear();
         entity.put("prop", "1");
         RuleFailure rf = ValidationEngine.validate(new SimpleMapValidatable("ID", "level1", entity)).iterator().next();
         Assert.assertEquals(ValidationEngine.EXCEPTION_MSG, rf.getMessage());
         Assert.assertNotNull(rf.getGroovyException());
         Assert.assertEquals("TEST", rf.getGroovyException().getMessage());
-        TestingUtils.unloadValidator("fake-validator-groovy-exception");
+        TestingUtils.unloadValidator("fake-validator-exception-groovy");
+
+        // test a timeout
+        TestingUtils.loadValidator("fake-validator-exception-timeout");
+        entity.clear();
+        entity.put("prop", "1");
+        rf = ValidationEngine.validate(new SimpleMapValidatable("ID", "level1", entity)).iterator().next();
+        Assert.assertEquals(ValidationEngine.TIMEOUT_MSG, rf.getMessage());
+        Assert.assertNull(rf.getGroovyException());
+        TestingUtils.unloadValidator("fake-validator-exception-timeout");
 
         // test a rule based on a condition defined on a higher level (rule on 'level1.level2' depends on a condition defined on 'level1')
         TestingUtils.loadValidator("fake-validator-parent-condition");
@@ -1091,7 +1100,7 @@ public class ValidationEngineTest {
         TestingUtils.loadValidator("fake-validator-context-in-context-old-syntax");
         try {
             Assert.assertEquals(3, ValidationEngine.getValidator("fake-validator-context-in-context-old-syntax").getRawContext().size());
-            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<String, Object>());
+            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<>());
             TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvcc-rule1");
         }
         finally {
@@ -1102,7 +1111,7 @@ public class ValidationEngineTest {
         TestingUtils.loadValidator("fake-validator-context-in-context");
         try {
             Assert.assertEquals(3, ValidationEngine.getValidator("fake-validator-context-in-context").getRawContext().size());
-            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<String, Object>());
+            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<>());
             TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvcc-rule1");
         }
         finally {
@@ -1186,15 +1195,15 @@ public class ValidationEngineTest {
         r.setId("tmp");
         r.setJavaPath("level");
         r.setExpression("return false");
-        TestingUtils.assertEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<String, Object>()), r), "tmp");
+        TestingUtils.assertEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<>()), r), "tmp");
 
         // if the validatable uses a wrong path, that's fine
-        TestingUtils.assertNoEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "whatever", new HashMap<String, Object>()), r), "tmp");
+        TestingUtils.assertNoEditFailure(ValidationEngine.validate(new SimpleMapValidatable("ID", "whatever", new HashMap<>()), r), "tmp");
 
         // but the forced rule must have a valid java path!
         try {
             r.setJavaPath("whatever");
-            ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<String, Object>()), r);
+            ValidationEngine.validate(new SimpleMapValidatable("ID", "level", new HashMap<>()), r);
         }
         catch (ValidationException e) {
             return;

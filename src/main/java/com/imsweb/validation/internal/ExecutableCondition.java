@@ -246,7 +246,7 @@ public class ExecutableCondition {
         if (_script == null)
             return true;
 
-        boolean success = false;
+        boolean success;
 
         try {
             _script.setBinding(binding);

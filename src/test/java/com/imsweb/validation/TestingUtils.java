@@ -35,6 +35,9 @@ public final class TestingUtils {
         // initialize engine
         if (!ValidationEngine.isInitialized())
             ValidationEngine.initialize();
+        
+        // no edits should take more than one second (except the one tha tests the timeout)
+        ValidationEngine.enableEditExecutionTimeout(1);
     }
 
     public static Validator loadValidator(String id) {

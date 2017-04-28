@@ -1,0 +1,10 @@
+<validator name="Fake Validator Exception Timeout" id="fake-validator-exception-timeout">
+
+    <rules>
+        <rule id="fve-rule1" name="Rule 1" java-path="level1">
+            <expression>Thread.sleep(5000); return true</expression>
+            <message>message1</message>
+        </rule>
+    </rules>
+
+</validator>

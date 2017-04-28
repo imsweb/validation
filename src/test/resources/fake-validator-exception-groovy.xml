@@ -1,4 +1,4 @@
-<validator name="Fake Validator Groovy Exception" id="fake-validator-groovy-exception">
+<validator name="Fake Validator Exception Groovy" id="fake-validator-exception-groovy">
 
     <conditions>
         <condition id="fve-ruleset1" name="RuleSet 1" java-path="level1"/>
