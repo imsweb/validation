@@ -298,6 +298,42 @@ public class ValidatorContextFunctions {
     }
 
     /**
+     * Logs the message
+     * <p/>
+     * Created on Dec 20, 2007 by depryf
+     * @param message Message to log
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "message", param1 = "Message", desc = "Logs the given message.",
+            example = "Functions.log('message')")
+    public void log(String message) {
+        ValidatorServices.getInstance().log(message);
+    }
+
+    /**
+     * Logs the message as a warning
+     * <p/>
+     * Created on Dec 20, 2007 by depryf
+     * @param message Message to log
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "message", param1 = "Message", desc = "Logs the given message as a warning.",
+            example = "Functions.logWarning('warning message')")
+    public void logWarning(String message) {
+        ValidatorServices.getInstance().logWarning(message);
+    }
+
+    /**
+     * Logs the message as an error
+     * <p/>
+     * Created on Dec 20, 2007 by depryf
+     * @param message Message to log
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "message", param1 = "Message", desc = "Logs the given message as a error.",
+            example = "Functions.logError('error message')")
+    public void logError(String message) {
+        ValidatorServices.getInstance().logError(message);
+    }
+
+    /**
      * Utility method that attempts to convert the supplied object to an Integer.
      * <p/>
      * Created on Dec 27, 2007 by depryf

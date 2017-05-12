@@ -209,6 +209,27 @@ public class ValidatorServices {
     }
 
     /**
+     * Logs the given message
+     * @param message
+     */
+    @SuppressWarnings("UnusedParameters")
+    public void log(String message) {}
+
+    /**
+     * Logs the message as a warning
+     * @param message
+     */
+    @SuppressWarnings("UnusedParameters")
+    public void logWarning(String message) {}
+
+    /**
+     * Logs the message as an error
+     * @param message
+     */
+    @SuppressWarnings("UnusedParameters")
+    public void logError(String message) {}
+
+    /**
      * Returns the next rule ID to use.
      * <p/>
      * Created on Feb 25, 2008 by depryf
