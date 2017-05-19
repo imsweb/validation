@@ -232,6 +232,16 @@ public class ValidatorContextFunctionsTest {
         // non-null ID -> null (default implementation)
         Assert.assertNull(_functions.fetchConfVariable("id"));
     }
+    
+    @Test
+    public void testLog() {
+        _functions.log("info!");
+        _functions.logWarning("warning!");
+        _functions.logError("error!");
+        TestingUtils.assertLogMessage("info!");
+        TestingUtils.assertLogMessage("warning!");
+        TestingUtils.assertLogMessage("error!");
+    }
 
     @Test
     public void testAsInt() {
