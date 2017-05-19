@@ -3,6 +3,7 @@
 **Version 1.7**
 
 - Increased the engine version to 5.7
+- Added new log methods in context functions, a framework can provide a log implementation in the services.
 - Added support for edit/set tags (used in the Genedits framework).
 - Added support for timing out execution of edits (disabled by default).
 
