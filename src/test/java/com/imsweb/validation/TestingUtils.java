@@ -4,8 +4,10 @@
 package com.imsweb.validation;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -121,6 +123,11 @@ public final class TestingUtils {
         if (results.isEmpty())
             Assert.fail("\nWas expecting at least one failure but got none");
     }
+    
+    public static void assertLogMessage(String x) {
+       Assert.assertTrue(((TestingValidatorServices)ValidatorServices.getInstance()).getLogMessages().contains(x));
+    }
+    
 
     private static class TestingValidatorContextFunctions extends ValidatorContextFunctions {
 
@@ -143,6 +150,8 @@ public final class TestingUtils {
          * Map of java-path -> alias to use in the edits
          */
         private static final Map<String, String> _EXTRA_ALIASES = new HashMap<>();
+        
+        private List<String> _logMessages = new ArrayList<>();
 
         static {
             _EXTRA_ALIASES.put("level1", "level1");
@@ -184,6 +193,25 @@ public final class TestingUtils {
             result.putAll(_EXTRA_ALIASES);
 
             return result;
+        }
+        
+        @Override
+        public void log(String message) {
+            _logMessages.add(message);
+        }
+
+        @Override
+        public void logWarning(String message) {
+            _logMessages.add(message);
+        }
+
+        @Override
+        public void logError(String message) {
+            _logMessages.add(message);
+        }
+        
+        public List<String> getLogMessages() {
+            return _logMessages;
         }
     }
 
