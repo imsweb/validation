@@ -78,6 +78,7 @@ public class RuleParsingCallable implements Callable<Void> {
         rule.setId(_xmlRule.getId().trim());
         if (_xmlRule.getName() != null)
             rule.setName(_xmlRule.getName().trim());
+        rule.setTag(_xmlRule.getTag());
         if (_xmlRule.getJavaPath() == null)
             throw new IOException("Unable to load " + _xmlRule.getId() + " in " + _validator.getId() + "; java-path is missing");
         rule.setJavaPath(_xmlRule.getJavaPath());
@@ -96,7 +97,7 @@ public class RuleParsingCallable implements Callable<Void> {
             rule.setUseAndForConditions(useAnds);
 
         }
-        rule.setSeverity(_xmlRule.getSeverity() == null ? null : _xmlRule.getSeverity());
+        rule.setSeverity(_xmlRule.getSeverity());
         rule.setAgency(_xmlRule.getAgency());
 
         if (_xmlRule.getExpression() == null)

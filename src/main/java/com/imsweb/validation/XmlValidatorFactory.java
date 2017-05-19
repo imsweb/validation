@@ -195,7 +195,7 @@ public final class XmlValidatorFactory {
      * Created on Feb 5, 2008 by depryf
      * @param file <code>File</code> to XML file to load (cannot be null, must exist)
      * @return a new <code>Validator</code>
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(File file) throws IOException {
         if (file == null)
@@ -217,7 +217,7 @@ public final class XmlValidatorFactory {
      * Created on Feb 5, 2008 by depryf
      * @param url <code>URL</code> to XML file to load (if null or if a stream cannot be opened from it, an exception will be raised)
      * @return a new <code>Validator</code>
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(URL url) throws IOException {
         if (url == null)
@@ -238,7 +238,7 @@ public final class XmlValidatorFactory {
      * Created on Feb 5, 2008 by depryf
      * @param is <code>InputStream</code> to validator file to load (if null an exception will be raised)
      * @return a new <code>Validator</code>
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(InputStream is) throws IOException {
         if (is == null)
@@ -257,7 +257,7 @@ public final class XmlValidatorFactory {
      * Created on Feb 5, 2008 by depryf
      * @param reader <code>Reader</code> to XML (if null an exception will be raised)
      * @return a new <code>Validator</code>
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(Reader reader) throws IOException {
         if (reader == null)
@@ -286,14 +286,8 @@ public final class XmlValidatorFactory {
             // and finally calculate the inverted dependencies - this requires two passes over the edits; maybe somebody smarter will make it faster ;-)
             Map<String, Set<String>> invertedDependencies = new HashMap<>();
             for (Rule r : validator.getRules()) {
-                for (String id : r.getDependencies()) {
-                    Set<String> s = invertedDependencies.get(id);
-                    if (s == null) {
-                        s = new HashSet<>();
-                        invertedDependencies.put(id, s);
-                    }
-                    s.add(r.getId());
-                }
+                for (String id : r.getDependencies())
+                    invertedDependencies.computeIfAbsent(id, k -> new HashSet<>()).add(r.getId());
             }
             for (Rule r : validator.getRules())
                 r.setInvertedDependencies(invertedDependencies.get(r.getId()));
@@ -311,7 +305,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 29, 2009 by depryf
      * @param validator validator to write
      * @param file <code>File</code> where the validator will be written (parent folder must exists)
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeValidatorToXml(Validator validator, File file) throws IOException {
         if (file == null)
@@ -330,7 +324,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 29, 2009 by depryf
      * @param validator validator to write
      * @param os <code>OutputStream</code> to XML (if null an exception will be raised)
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeValidatorToXml(Validator validator, OutputStream os) throws IOException {
         if (os == null)
@@ -349,7 +343,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 29, 2009 by depryf
      * @param validator validator to write
      * @param writer <code>Writer</code> to XML (if null an exception will be raised)
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeValidatorToXml(Validator validator, Writer writer) throws IOException {
         if (validator == null)
@@ -616,6 +610,7 @@ public final class XmlValidatorFactory {
                 set.setValidator(validator);
                 if (type.getName() != null)
                     set.setName(type.getName().trim());
+                set.setTag(type.getTag());
                 if (type.getDescription() != null)
                     set.setDescription(reAlign(type.getDescription()));
 
@@ -654,7 +649,7 @@ public final class XmlValidatorFactory {
         }
 
         // sort the releases so the most recent is always first in the file...
-        Collections.sort(releases, (o1, o2) -> {
+        releases.sort((o1, o2) -> {
             if (o1.getDate() == null)
                 return -1;
             else if (o2.getDate() == null)
@@ -686,7 +681,7 @@ public final class XmlValidatorFactory {
         }
 
         // sort the event by date/ref/id
-        Collections.sort(deletedRules, (o1, o2) -> {
+        deletedRules.sort((o1, o2) -> {
             Calendar c1 = Calendar.getInstance();
             c1.setTime(o1.getDate());
             Calendar c2 = Calendar.getInstance();
@@ -708,7 +703,7 @@ public final class XmlValidatorFactory {
 
         // sort the context entries by their key
         List<ContextEntry> list = new ArrayList<>(validator.getRawContext());
-        Collections.sort(list, (o1, o2) -> o1.getKey().compareToIgnoreCase(o2.getKey()));
+        list.sort((o1, o2) -> o1.getKey().compareToIgnoreCase(o2.getKey()));
 
         List<ContextEntryXmlDto> contextEntries = new ArrayList<>();
         for (ContextEntry contextEntry : list) {
@@ -730,7 +725,7 @@ public final class XmlValidatorFactory {
         List<Category> list = new ArrayList<>();
         if (validator.getCategories() != null)
             list.addAll(validator.getCategories());
-        Collections.sort(list, (o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
+        list.sort((o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
 
         List<CategoryXmlDto> categoriesType = new ArrayList<>();
         for (Category category : list) {
@@ -752,7 +747,7 @@ public final class XmlValidatorFactory {
         List<Condition> list = new ArrayList<>();
         if (validator.getConditions() != null)
             list.addAll(validator.getConditions());
-        Collections.sort(list, (o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
+        list.sort((o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
 
         List<ConditionXmlDto> conditionsType = new ArrayList<>();
         for (Condition condition : list) {
@@ -774,7 +769,7 @@ public final class XmlValidatorFactory {
 
         // sort the rules by they ID (try to be smart about the IF edits)
         List<Rule> list = new ArrayList<>(validator.getRules());
-        Collections.sort(list, (o1, o2) -> {
+        list.sort((o1, o2) -> {
             String id1 = o1.getId();
             String id2 = o2.getId();
 
@@ -829,6 +824,7 @@ public final class XmlValidatorFactory {
             ruleType.setId(rule.getId());
             ruleType.setMessage(rule.getMessage());
             ruleType.setName(rule.getName());
+            ruleType.setTag(rule.getTag());
             ruleType.setJavaPath(rule.getJavaPath());
             ruleType.setCategory(rule.getCategory());
             if (rule.getConditions() != null && !rule.getConditions().isEmpty()) {
@@ -857,7 +853,7 @@ public final class XmlValidatorFactory {
                     sortedEvents.add(eventType);
                 }
                 // sort the event by date, from older to newer
-                Collections.sort(sortedEvents, (o1, o2) -> {
+                sortedEvents.sort((o1, o2) -> {
                     Calendar c1 = Calendar.getInstance();
                     c1.setTime(o1.getDate());
                     Calendar c2 = Calendar.getInstance();
@@ -886,13 +882,14 @@ public final class XmlValidatorFactory {
         List<EmbeddedSet> list = new ArrayList<>();
         if (validator.getSets() != null)
             list.addAll(validator.getSets());
-        Collections.sort(list, (o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
+        list.sort((o1, o2) -> o1.getId().compareToIgnoreCase(o2.getId()));
 
         List<SetXmlDto> setsType = new ArrayList<>();
         for (EmbeddedSet set : list) {
             SetXmlDto setType = new SetXmlDto();
             setType.setId(set.getId());
             setType.setName(set.getName());
+            setType.setTag(set.getTag());
             setType.setDescription(set.getDescription());
 
             List<String> inclusions = set.getInclusions() == null ? Collections.emptyList() : new ArrayList<>(set.getInclusions());
@@ -951,7 +948,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param file <code>File</code>, cannot be null, must exist.
      * @return a <code>StandaloneSet</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static StandaloneSet loadStandaloneSetFromXml(File file) throws IOException {
         if (file == null)
@@ -973,7 +970,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param url <code>URL</code>, cannot be null.
      * @return a <code>StandaloneSet</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static StandaloneSet loadStandaloneSetFromXml(URL url) throws IOException {
         if (url == null)
@@ -994,7 +991,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param is <code>InputStream</code>, cannot be null
      * @return a <code>StandaloneSet</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static StandaloneSet loadStandaloneSetFromXml(InputStream is) throws IOException {
         if (is == null)
@@ -1013,7 +1010,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param reader <code>Reader</code>, cannot be null
      * @return a <code>StandaloneSet</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static StandaloneSet loadStandaloneSetFromXml(Reader reader) throws IOException {
         if (reader == null)
@@ -1072,7 +1069,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param set <code>StandaloneSet</code> to write, cannot be null
      * @param file <code>targetFile</code>, cannot be null, parent directory must exist
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeStandaloneSetToXml(StandaloneSet set, File file) throws IOException {
         if (file == null)
@@ -1091,7 +1088,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param set <code>StandaloneSet</code> to write, cannot be null
      * @param os <code>OutputStream</code>, cannot be null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeStandaloneSetToXml(StandaloneSet set, OutputStream os) throws IOException {
         if (os == null)
@@ -1110,7 +1107,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param set <code>StandaloneSet</code> to write, cannot be null
      * @param writer <code>Writer</code>, cannot be null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeStandaloneSetToXml(StandaloneSet set, Writer writer) throws IOException {
         if (set == null)
@@ -1216,7 +1213,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param file <code>File</code>, cannot be null, must exist.
      * @return a <code>ValidatorTests</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static ValidatorTests loadTestsFromXml(File file) throws IOException {
         if (file == null)
@@ -1238,7 +1235,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param url <code>URL</code>, cannot be null.
      * @return a <code>ValidatorTests</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static ValidatorTests loadTestsFromXml(URL url) throws IOException {
         if (url == null)
@@ -1259,7 +1256,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param is <code>InputStream</code>, cannot be null
      * @return a <code>ValidatorTests</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static ValidatorTests loadTestsFromXml(InputStream is) throws IOException {
         if (is == null)
@@ -1278,7 +1275,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param reader <code>Reader</code>, cannot be null
      * @return a <code>ValidatorTests</code>, never null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static ValidatorTests loadTestsFromXml(Reader reader) throws IOException {
         if (reader == null)
@@ -1312,7 +1309,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param tests <code>ValidatorTests</code> to write, cannot be null
      * @param file <code>targetFile</code>, cannot be null, parent directory must exist
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeTestsToXml(ValidatorTests tests, File file) throws IOException {
         if (file == null)
@@ -1331,7 +1328,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param tests <code>ValidatorTests</code> to write, cannot be null
      * @param os <code>OutputStream</code>, cannot be null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeTestsToXml(ValidatorTests tests, OutputStream os) throws IOException {
         if (os == null)
@@ -1350,7 +1347,7 @@ public final class XmlValidatorFactory {
      * Created on Nov 24, 2010 by Fabian
      * @param tests <code>ValidatorTests</code> to write, cannot be null
      * @param writer <code>Writer</code>, cannot be null
-     * @throws IOException
+     * @throws IOException if unable to properly read/write the entity
      */
     public static void writeTestsToXml(ValidatorTests tests, Writer writer) throws IOException {
         if (tests == null)
@@ -1366,7 +1363,7 @@ public final class XmlValidatorFactory {
                 List<RuleTest> sortedTests = new ArrayList<>(tests.getTests().values());
 
                 // sort the tests by they ID (try to be smart about the IF edits)
-                Collections.sort(sortedTests, (o1, o2) -> {
+                sortedTests.sort((o1, o2) -> {
                     String id1 = o1.getTestedRuleId();
                     String id2 = o2.getTestedRuleId();
 
@@ -1543,7 +1540,7 @@ public final class XmlValidatorFactory {
         if (url == null)
             return null;
 
-        String result = null;
+        String result;
         InputStream is = null;
         try {
             boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");

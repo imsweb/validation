@@ -3,6 +3,7 @@
 **Version 1.7**
 
 - Increased the engine version to 5.7
+- Added support for edit/set tags (used in the Genedits framework).
 - Added support for timing out execution of edits (disabled by default).
 
 **Version 1.6.3**

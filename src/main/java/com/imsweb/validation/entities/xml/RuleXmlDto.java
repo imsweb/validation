@@ -16,6 +16,9 @@ public class RuleXmlDto {
     private String name;
 
     @XStreamAsAttribute
+    private String tag;
+
+    @XStreamAsAttribute
     @XStreamAlias("java-path")
     private String javaPath;
 
@@ -57,6 +60,14 @@ public class RuleXmlDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public String getJavaPath() {

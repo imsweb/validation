@@ -266,6 +266,7 @@ public class XmlValidatorFactoryTest {
         Rule r1 = v.getRule("fv-rule1");
         Assert.assertEquals("fv-rule1", r1.getId());
         Assert.assertEquals("Rule 1", r1.getName());
+        Assert.assertEquals("tag1", r1.getTag());
         Assert.assertTrue(r1.getDependencies().isEmpty());
         Assert.assertEquals(1, r1.getSeverity().intValue());
         Assert.assertEquals("test", r1.getAgency());
@@ -296,6 +297,7 @@ public class XmlValidatorFactoryTest {
         EmbeddedSet s1 = v.getSet("fv-set1");
         Assert.assertEquals("fv-set1", s1.getId());
         Assert.assertEquals("Set 1", s1.getName());
+        Assert.assertEquals("tag1", s1.getTag());
         Assert.assertEquals("description", s1.getDescription());
         Assert.assertFalse(s1.needToInclude("fv-rule1"));
         Assert.assertTrue(s1.needToInclude("fv-rule2"));

@@ -34,6 +34,11 @@ public class EmbeddedSet {
     protected String _name;
 
     /**
+     * Set tag
+     */
+    protected String _tag;
+
+    /**
      * Validator under which this set is registered
      */
     protected Validator _validator;
@@ -137,6 +142,26 @@ public class EmbeddedSet {
      */
     public void setName(String name) {
         this._name = name;
+    }
+
+    /**
+     * Getter for the set tag.
+     * <p/>
+     * Created on May 19, 2017 by depryf
+     * @return set tag
+     */
+    public String getTag() {
+        return _tag;
+    }
+
+    /**
+     * Setter for the set tag.
+     * <p/>
+     * Created on May 19, 2017 by depryf
+     * @param tag set tag
+     */
+    public void setTag(String tag) {
+        _tag = tag;
     }
 
     /**

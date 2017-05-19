@@ -42,6 +42,11 @@ public class Rule {
     protected String _name;
 
     /**
+     * tag for this rule (tags are used in the Genedits framework)
+     */
+    protected String _tag;
+
+    /**
      * Java path for this rule
      */
     protected String _javaPath;
@@ -210,6 +215,26 @@ public class Rule {
      */
     public void setName(String name) {
         _name = name;
+    }
+
+    /**
+     * Getter for the tag.
+     * <p/>
+     * Created on May 19, 2017 by depryf
+     * @return the rule tag
+     */
+    public String getTag() {
+        return _tag;
+    }
+
+    /**
+     * Setter for the tag.
+     * <p/>
+     * Created on May 19, 2017 by depryf
+     * @param tag the rule tag
+     */
+    public void setTag(String tag) {
+        _tag = tag;
     }
 
     /**

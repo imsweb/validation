@@ -28,7 +28,7 @@
     </conditions>
 
     <rules>
-        <rule id="fv-rule1" name="Rule 1" java-path="level1" category="fv-category" severity="1" agency="test">
+        <rule id="fv-rule1" name="Rule 1" tag="tag1" java-path="level1" category="fv-category" severity="1" agency="test">
             <expression>return level1.prop != Context.FV_CONTEXT1</expression>
             <message>message1</message>
             <description>description1</description>
@@ -53,7 +53,7 @@
     </rules>
 
     <sets>
-        <set id="fv-set1" name="Set 1">
+        <set id="fv-set1" name="Set 1" tag="tag1">
             <description>description</description>
             <include>fv-rule2</include>
         </set>

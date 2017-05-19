@@ -13,6 +13,9 @@ public class SetXmlDto {
     @XStreamAsAttribute
     private String name;
 
+    @XStreamAsAttribute
+    private String tag;
+
     private String description;
 
     private String include;
@@ -33,6 +36,14 @@ public class SetXmlDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public String getDescription() {
