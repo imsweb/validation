@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -971,6 +972,34 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             throw new RuntimeException("Unsupported index type: " + index.getClass().getSimpleName());
 
         return found;
+    }
+
+    public boolean GEN_SQLLOOKUP(List<List<Object>> table, List<Object> columnNames, Object value) {
+        String val = GEN_TO_STRING(value);
+
+        int[] colNumbers = new int[columnNames.size()];
+        for (int i = 0; i < colNumbers.length; i++) {
+            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
+            if (colNumbers[i] == -1)
+                return false;
+        }
+
+        for (int r = 1; r < table.size(); r++) {
+            int index = 0;
+            boolean match = false;
+            for (int c : colNumbers) {
+                String entry = GEN_TO_STRING(table.get(r).get(c));
+                if (!StringUtils.startsWith(val.substring(index), entry)) {
+                    match = false;
+                    break;
+                }
+                match = true;
+                index += entry.length();
+            }
+            if (match && index == val.length())
+                return true;
+        }
+        return false;
     }
 
     /**

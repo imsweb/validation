@@ -1165,8 +1165,66 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_ILOOKUP(null, index4));
     }
 
+
+
     @Test
-    public void testGEN_LOOKUP() {
+    public void testGEN_SQLLOOKUP() {
+
+        // define the table we are going to use (notice how the table is not sorted according to the GPCODE, but the index is sorted accoding to the SITELOW)
+        List<List<Object>> table = new ArrayList<>();
+        List<Object> row0 = new ArrayList<>();
+        row0.add("GPCODE");
+        row0.add("GPNAME");
+        row0.add("SITELOW");
+        row0.add("SITEHIGH");
+        table.add(row0);
+        List<Object> row1 = new ArrayList<>();
+        row1.add("15");
+        row1.add("Bones");
+        row1.add("C420");
+        row1.add("C429");
+        table.add(row1);
+        List<Object> row2 = new ArrayList<>();
+        row2.add("17");
+        row2.add("Skin");
+        row2.add("C440");
+        row2.add("C449");
+        table.add(row2);
+        List<Object> row3 = new ArrayList<>();
+        row3.add("18");
+        row3.add("Another Bones");
+        row3.add("C400");
+        row3.add("C409");
+        table.add(row3);
+
+        List<Object> columns = new ArrayList<>();
+        columns.add("GPNAME");
+        columns.add("SITELOW");
+
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "BonesC420"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "SkinC440"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "Another BonesC400"));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC450"));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "C420Bones"));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "Bones C420"));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, " BonesC420"));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC420 "));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, ""));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "C440C449"));
+
+        columns.add("GPCODE");
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "BonesC42015"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "SkinC44017"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "Another BonesC40018"));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC420"));
+
+        columns.add("BadColumn");
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC42015"));
+
+    }
+
+        @Test
+        public void testGEN_LOOKUP() {
 
         // define the table we are going to use (notice how the table is not sorted according to the GPCODE, but the index is sorted accoding to the SITELOW)
         List<List<Object>> table = new ArrayList<>();
