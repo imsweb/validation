@@ -1300,6 +1300,13 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get(1)));
         Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get(2)));
         Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get(3)));
+
+        // The EDITS50 engine does not change the TABLEVARs if the edit does not pass
+        _functions.GEN_SQLRANGELOOKUP(table, columns, "C10", tablevars);
+        Assert.assertEquals("15", _functions.GEN_TO_STRING(tablevars.get(0)));
+        Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get(1)));
+        Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get(2)));
+        Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get(3)));
     }
 
     /**

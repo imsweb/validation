@@ -1038,8 +1038,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
 
         // side effect, fill in any requested tableVar
-        if (tableVars != null && table != null) {
-            List<Object> row = indexOfLargest > -1 ? table.get(indexOfLargest) : null;
+        if (indexOfLargest > -1 && tableVars != null && table != null) {
+            List<Object> row = table.get(indexOfLargest);
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
