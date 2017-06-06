@@ -973,6 +973,9 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return found;
     }
 
+    /**
+     * Special genedit method. Internal use only.
+     */
     public boolean GEN_SQLLOOKUP(List<List<Object>> table, List<Object> columnNames, Object value) {
         if (columnNames.isEmpty())
             return true;
@@ -999,7 +1002,13 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return false;
     }
 
+    /**
+     * Special genedit method. Internal use only.
+     */
     public boolean GEN_SQLRANGELOOKUP(List<List<Object>> table, List<Object> columnNames, Object value, Map<Integer, char[]> tableVars) {
+        if (columnNames.isEmpty())
+            return true;
+
         String val = GEN_TO_STRING(value);
 
         int[] colNumbers = new int[columnNames.size()];
@@ -1015,7 +1024,14 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             StringBuilder rowVal = new StringBuilder("");
             for (int c : colNumbers)
                 rowVal.append(GEN_TO_STRING(table.get(r).get(c)));
-            if (rowVal.toString().compareTo(val) <= 0 && rowVal.toString().compareTo(largest) > 0) {
+            if (StringUtils.isNumeric(val) && StringUtils.isNumeric(rowVal)) {
+                Double rowInt = Double.parseDouble(rowVal.toString());
+                if (rowInt <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowInt > Double.parseDouble(largest))) {
+                    indexOfLargest = r;
+                    largest = rowVal.toString();
+                }
+            }
+            else if (rowVal.toString().compareTo(val) <= 0 && rowVal.toString().compareTo(largest) > 0) {
                 indexOfLargest = r;
                 largest = rowVal.toString();
             }
