@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -975,6 +974,32 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     public boolean GEN_SQLLOOKUP(List<List<Object>> table, List<Object> columnNames, Object value) {
+        if (columnNames.isEmpty())
+            return true;
+
+        String val = GEN_TO_STRING(value);
+
+        int[] colNumbers = new int[columnNames.size()];
+        for (int i = 0; i < colNumbers.length; i++) {
+            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
+            if (colNumbers[i] == -1)
+                return true;
+        }
+
+        for (int r = 1; r < table.size(); r++) {
+            int index = 0;
+            boolean match = false;
+            StringBuilder rowVal = new StringBuilder("");
+            for (int c : colNumbers)
+                rowVal.append(GEN_TO_STRING(table.get(r).get(c)));
+
+            if (val.equals(rowVal.toString()))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean GEN_SQLRANGELOOKUP(List<List<Object>> table, List<Object> columnNames, Object value, Map<Integer, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
 
         int[] colNumbers = new int[columnNames.size()];
@@ -984,22 +1009,34 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 return false;
         }
 
+        int indexOfLargest = -1;
+        String largest = "";
         for (int r = 1; r < table.size(); r++) {
-            int index = 0;
-            boolean match = false;
-            for (int c : colNumbers) {
-                String entry = GEN_TO_STRING(table.get(r).get(c));
-                if (!StringUtils.startsWith(val.substring(index), entry)) {
-                    match = false;
-                    break;
-                }
-                match = true;
-                index += entry.length();
+            StringBuilder rowVal = new StringBuilder("");
+            for (int c : colNumbers)
+                rowVal.append(GEN_TO_STRING(table.get(r).get(c)));
+            if (rowVal.toString().compareTo(val) <= 0 && rowVal.toString().compareTo(largest) > 0) {
+                indexOfLargest = r;
+                largest = rowVal.toString();
             }
-            if (match && index == val.length())
-                return true;
         }
-        return false;
+
+        // side effect, fill in any requested tableVar
+        if (tableVars != null && table != null) {
+            List<Object> row = indexOfLargest > -1 ? table.get(indexOfLargest) : null;
+            for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
+                if (row == null)
+                    GEN_STRCPY(entry.getValue(), "");
+                else {
+                    int colIdx = entry.getKey();
+                    if (colIdx >= 0 && colIdx < row.size()) {
+                        Object obj = row.get(colIdx);
+                        GEN_STRCPY(entry.getValue(), trimRight(obj == null ? "" : obj.toString()));
+                    }
+                }
+            }
+        }
+        return indexOfLargest > -1;
     }
 
     /**
