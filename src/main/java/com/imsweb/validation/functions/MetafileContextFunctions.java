@@ -1025,8 +1025,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             for (int c : colNumbers)
                 rowVal.append(GEN_TO_STRING(table.get(r).get(c)));
             if (StringUtils.isNumeric(val) && StringUtils.isNumeric(rowVal)) {
-                Double rowInt = Double.parseDouble(rowVal.toString());
-                if (rowInt <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowInt > Double.parseDouble(largest))) {
+                Double rowNum = Double.parseDouble(rowVal.toString());
+                if (rowNum <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowNum > Double.parseDouble(largest))) {
                     indexOfLargest = r;
                     largest = rowVal.toString();
                 }
