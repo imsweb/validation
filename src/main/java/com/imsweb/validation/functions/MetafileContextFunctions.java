@@ -990,11 +990,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
 
         for (int r = 1; r < table.size(); r++) {
-            int index = 0;
-            boolean match = false;
+            List<Object> row = table.get(r);
             StringBuilder rowVal = new StringBuilder("");
             for (int c : colNumbers)
-                rowVal.append(GEN_TO_STRING(table.get(r).get(c)));
+                rowVal.append(GEN_TO_STRING(row.get(c)));
 
             if (val.equals(rowVal.toString()))
                 return true;
@@ -1021,9 +1020,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         int indexOfLargest = -1;
         String largest = "";
         for (int r = 1; r < table.size(); r++) {
+            List<Object> row = table.get(r);
             StringBuilder rowVal = new StringBuilder("");
             for (int c : colNumbers)
-                rowVal.append(GEN_TO_STRING(table.get(r).get(c)));
+                rowVal.append(GEN_TO_STRING(row.get(c)));
             if (StringUtils.isNumeric(val) && StringUtils.isNumeric(rowVal)) {
                 Double rowNum = Double.parseDouble(rowVal.toString());
                 if (rowNum <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowNum > Double.parseDouble(largest))) {
@@ -1038,7 +1038,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
 
         // side effect, fill in any requested tableVar
-        if (indexOfLargest > -1 && tableVars != null && table != null) {
+        if (indexOfLargest > -1 && tableVars != null) {
             List<Object> row = table.get(indexOfLargest);
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
