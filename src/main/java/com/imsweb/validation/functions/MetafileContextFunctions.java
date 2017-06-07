@@ -975,6 +975,88 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
     /**
      * Special genedit method. Internal use only.
+     */
+    public boolean GEN_SQLLOOKUP(List<List<Object>> table, List<Object> columnNames, Object value) {
+        if (columnNames.isEmpty())
+            return true;
+
+        String val = GEN_TO_STRING(value);
+
+        int[] colNumbers = new int[columnNames.size()];
+        for (int i = 0; i < colNumbers.length; i++) {
+            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
+            if (colNumbers[i] == -1)
+                return true;
+        }
+
+        for (int r = 1; r < table.size(); r++) {
+            List<Object> row = table.get(r);
+            StringBuilder rowVal = new StringBuilder("");
+            for (int c : colNumbers)
+                rowVal.append(GEN_TO_STRING(row.get(c)));
+
+            if (val.equals(rowVal.toString()))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Special genedit method. Internal use only.
+     */
+    public boolean GEN_SQLRANGELOOKUP(List<List<Object>> table, List<Object> columnNames, Object value, Map<Integer, char[]> tableVars) {
+        if (columnNames.isEmpty())
+            return true;
+
+        String val = GEN_TO_STRING(value);
+
+        int[] colNumbers = new int[columnNames.size()];
+        for (int i = 0; i < colNumbers.length; i++) {
+            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
+            if (colNumbers[i] == -1)
+                return false;
+        }
+
+        int indexOfLargest = -1;
+        String largest = "";
+        for (int r = 1; r < table.size(); r++) {
+            List<Object> row = table.get(r);
+            StringBuilder rowVal = new StringBuilder("");
+            for (int c : colNumbers)
+                rowVal.append(GEN_TO_STRING(row.get(c)));
+            if (StringUtils.isNumeric(val) && StringUtils.isNumeric(rowVal)) {
+                Double rowNum = Double.parseDouble(rowVal.toString());
+                if (rowNum <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowNum > Double.parseDouble(largest))) {
+                    indexOfLargest = r;
+                    largest = rowVal.toString();
+                }
+            }
+            else if (rowVal.toString().compareTo(val) <= 0 && rowVal.toString().compareTo(largest) > 0) {
+                indexOfLargest = r;
+                largest = rowVal.toString();
+            }
+        }
+
+        // side effect, fill in any requested tableVar
+        if (indexOfLargest > -1 && tableVars != null) {
+            List<Object> row = table.get(indexOfLargest);
+            for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
+                if (row == null)
+                    GEN_STRCPY(entry.getValue(), "");
+                else {
+                    int colIdx = entry.getKey();
+                    if (colIdx >= 0 && colIdx < row.size()) {
+                        Object obj = row.get(colIdx);
+                        GEN_STRCPY(entry.getValue(), trimRight(obj == null ? "" : obj.toString()));
+                    }
+                }
+            }
+        }
+        return indexOfLargest > -1;
+    }
+
+    /**
+     * Special genedit method. Internal use only.
      * <p/>
      * Created on Apr 5, 2011 by depryf
      * @param value
