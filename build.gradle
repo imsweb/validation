@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.imsweb'
-version = file('VERSION').text
+version = file('VERSION').text.trim()
 description = 'This framework allows edits to be defined in Groovy and to be executed on various data types.'
 
 println "Starting build using ${Jvm.current()}"
