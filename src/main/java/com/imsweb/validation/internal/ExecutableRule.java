@@ -3,8 +3,14 @@
  */
 package com.imsweb.validation.internal;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
@@ -95,6 +101,10 @@ public class ExecutableRule {
      */
     private Script _script;
 
+    private Object _clazz;
+
+    private Method _method;
+
     /**
      * Constructor.
      * <p/>
@@ -115,15 +125,42 @@ public class ExecutableRule {
         _rawProperties = rule.getRawProperties();
         _potentialContextEntries = rule.getPotentialContextEntries();
 
+        try {
+            Class<?> clazz = Class.forName("com.imsweb.validation.validators.Validator_test");
+            String[] parts = StringUtils.split(rule.getId(), "-");
+            StringBuilder buf = new StringBuilder(parts[0]);
+            for (int i = 1; i < parts.length; i++)
+                buf.append(StringUtils.capitalize(parts[i]));
+            parts = StringUtils.split(rule.getJavaPath(), ".");
+            List<Class<?>> params = new ArrayList<>();
+            params.add(Binding.class);
+            for (int i = 0; i < parts.length; i++)
+                params.add(Map.class);
+            _method = clazz.getMethod(buf.toString(), params.toArray(new Class[0]));
+
+            _clazz = clazz.newInstance();
+        }
+        catch (ClassNotFoundException | NoSuchMethodException e) {
+            // ignored
+        }
+        catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+
         synchronized (this) {
             _id = rule.getId();
 
-            try {
-                _script = ValidatorServices.getInstance().compileExpression(rule.getExpression());
-            }
-            catch (CompilationFailedException e) {
-                _script = null;
-                throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);
+            if (_method == null) {
+                try {
+                    _script = ValidatorServices.getInstance().compileExpression(rule.getExpression());
+                }
+                catch (CompilationFailedException e) {
+                    _script = null;
+                    throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);
+                }
             }
 
             if (rule.getExpression() != null)
@@ -429,6 +466,28 @@ public class ExecutableRule {
      */
     @SuppressWarnings("unchecked")
     private synchronized boolean validateForGroovy(Validatable validatable, Binding binding, ExtraPropertyHandlerDto extra) throws ValidationException {
+
+        if (_method != null) {
+            System.out.println("Using method for " + _id);
+
+            List<Object> params = new ArrayList<>();
+            params.add(binding);
+            String[] parts = StringUtils.split(_javaPath);
+            for (int i = 0; i < parts.length; i++)
+                params.add(binding.getVariable(parts[i]));
+
+            try {
+                return (Boolean)_method.invoke(_clazz, params.toArray(new Object[0]));
+            }
+            catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+                return false;
+            }
+
+        }
+
+
+
         if (_script == null)
             return true;
 
