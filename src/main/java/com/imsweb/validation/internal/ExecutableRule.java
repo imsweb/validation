@@ -19,10 +19,10 @@ import groovy.lang.Script;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
+import com.imsweb.validation.functions.MetafileContextFunctions;
 
 /**
  * Created on Jun 28, 2011 by depryf
@@ -139,16 +139,18 @@ public class ExecutableRule {
             List<Class<?>> params = new ArrayList<>();
             params.add(Binding.class);
             params.add(Map.class);
-            params.add(ValidatorContextFunctions.class);
-            for (int i = 0; i < parts.length; i++)
-                params.add(Map.class);
+            params.add(MetafileContextFunctions.class);
+            //for (int i = 0; i < parts.length; i++)
+            //    params.add(Map.class);
+            params.add(List.class);
+            params.add(Map.class);
             _method = clazz.getMethod(buf.toString(), params.toArray(new Class[0]));
             System.out.println("Found method '" + _method.getName() + " for edit " + rule.getId());
 
             _clazz = clazz.newInstance();
         }
         catch (ClassNotFoundException | NoSuchMethodException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         catch (IllegalAccessException e) {
             e.printStackTrace();
