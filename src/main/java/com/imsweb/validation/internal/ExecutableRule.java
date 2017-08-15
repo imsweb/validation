@@ -19,6 +19,7 @@ import groovy.lang.Script;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
@@ -126,22 +127,28 @@ public class ExecutableRule {
         _potentialContextEntries = rule.getPotentialContextEntries();
 
         try {
-            Class<?> clazz = Class.forName("com.imsweb.validation.validators.Validator_test");
+            //Class<?> clazz = Class.forName("com.imsweb.validation.validators.Validator_test");
+            //Class<?> clazz = Class.forName("Validator_test_groovy");
+            Class<?> clazz = Class.forName("NaaccrTranslatedEdits");
             String[] parts = StringUtils.split(rule.getId(), "-");
-            StringBuilder buf = new StringBuilder(parts[0]);
-            for (int i = 1; i < parts.length; i++)
-                buf.append(StringUtils.capitalize(parts[i]));
+//            StringBuilder buf = new StringBuilder(parts[0]);
+//            for (int i = 1; i < parts.length; i++)
+//                buf.append(StringUtils.capitalize(parts[i]));
+            StringBuilder buf = new StringBuilder(rule.getId().replace("-", "_"));
             parts = StringUtils.split(rule.getJavaPath(), ".");
             List<Class<?>> params = new ArrayList<>();
             params.add(Binding.class);
+            params.add(Map.class);
+            params.add(ValidatorContextFunctions.class);
             for (int i = 0; i < parts.length; i++)
                 params.add(Map.class);
             _method = clazz.getMethod(buf.toString(), params.toArray(new Class[0]));
+            System.out.println("Found method '" + _method.getName() + " for edit " + rule.getId());
 
             _clazz = clazz.newInstance();
         }
         catch (ClassNotFoundException | NoSuchMethodException e) {
-            // ignored
+            //e.printStackTrace();
         }
         catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -466,27 +473,56 @@ public class ExecutableRule {
      */
     @SuppressWarnings("unchecked")
     private synchronized boolean validateForGroovy(Validatable validatable, Binding binding, ExtraPropertyHandlerDto extra) throws ValidationException {
-
         if (_method != null) {
-            System.out.println("Using method for " + _id);
+            boolean result;
+
+            // http://www.tothenew.com/blog/compiling-groovy-code-statically/
+
+            //System.out.println("Using method for " + _id);
+
+            // clean up any leftover binding properties
+            binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
+            binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
+            binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
+            binding.setVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE, null);
+            binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, null);
+            binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, null);
+            binding.setVariable(ValidationEngine.VALIDATOR_FAILING_FLAG, null);
+            binding.setVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT, null);
 
             List<Object> params = new ArrayList<>();
             params.add(binding);
-            String[] parts = StringUtils.split(_javaPath);
+            params.add(binding.getVariable("Context"));
+            params.add(binding.getVariable("Functions"));
+            String[] parts = StringUtils.split(_javaPath, ".");
+            //System.out.println(binding.getVariables().keySet());
             for (int i = 0; i < parts.length; i++)
                 params.add(binding.getVariable(parts[i]));
 
             try {
-                return (Boolean)_method.invoke(_clazz, params.toArray(new Object[0]));
+                //System.out.println("Trying to invoke " + _method.getName() + " with params " + params);
+                result = (Boolean)_method.invoke(_clazz, params.toArray(new Object[0]));
+
+                // read back the forced/ignored entities/properties if there are any
+                if (_checkForcedEntities) {
+                    Object forcedEntities = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
+                    if (forcedEntities != null)
+                        extra.setForcedEntities((Set<ExtraPropertyEntityHandlerDto>)forcedEntities);
+                    Object forcedProperties = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY);
+                    if (forcedProperties != null)
+                        extra.setForcedProperties((Set<String>)forcedProperties);
+                    Object ignoredProperties = binding.getVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY);
+                    if (ignoredProperties != null)
+                        extra.setIgnoredProperties((Set<String>)ignoredProperties);
+                }
             }
             catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 return false;
             }
 
+            return result;
         }
-
-
 
         if (_script == null)
             return true;
