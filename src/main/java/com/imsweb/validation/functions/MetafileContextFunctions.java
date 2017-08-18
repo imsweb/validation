@@ -334,9 +334,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param minMaxFlag
      * @return - internal use only -
      */
-    public int GEN_DATECMP_IOP(Binding binding, Object value1, Object value2, int minMaxFlag) {
+    public int GEN_DATECMP_IOP(Binding binding, String value1, String value2, Object minMaxFlagObj) {
         StringBuilder buf1 = new StringBuilder();
         StringBuilder buf2 = new StringBuilder();
+
+        int minMaxFlag = (Integer)minMaxFlagObj;
 
         if (minMaxFlag == DT_MIN && !runMinFlagLogic(binding, value1, value2, minMaxFlag, value1, value2))
             return 0;
@@ -439,9 +441,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param minMaxFlag
      * @return - internal use only -
      */
-    public int GEN_DAYDIFF_IOP(Binding binding, String value1, String value2, int minMaxFlag) {
+    public int GEN_DAYDIFF_IOP(Binding binding, String value1, String value2, Object minMaxFlagObj) {
         StringBuilder buf1 = new StringBuilder();
         StringBuilder buf2 = new StringBuilder();
+
+        int minMaxFlag = (Integer)minMaxFlagObj;
 
         int result = applyMinMaxDayDiffFlag(binding, value1, value2, minMaxFlag, buf1, buf2);
         if (result != 0)
@@ -696,14 +700,14 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param type
      * @return - internal use only -
      */
-    public String GEN_TRIM(Object value, int type) {
+    public String GEN_TRIM(Object value, Object type) {
         String val = GEN_TO_STRING(value);
 
         if (val == null || val.isEmpty())
             return val;
 
         String result;
-        switch (type) {
+        switch ((Integer)type) {
             case TRIM_LEFT:
                 result = _GEN_TRIM_P1.matcher(val).replaceAll("");
                 break;
@@ -1055,6 +1059,14 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return indexOfLargest > -1;
     }
 
+    public boolean GEN_LOOKUP_TYPED(char[] value, Object table, Object index, Map<Integer, char[]> tableVars) {
+        return GEN_LOOKUP(value, table, index, tableVars);
+    }
+
+    public boolean GEN_LOOKUP_TYPED(String value, Object table, Object index, Map<Integer, char[]> tableVars) {
+        return GEN_LOOKUP(value, table, index, tableVars);
+    }
+
     /**
      * Special genedit method. Internal use only.
      * <p/>
@@ -1066,7 +1078,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
-    public boolean GEN_LOOKUP(Object value, List<List<Object>> table, Object index, Map<Integer, char[]> tableVars) {
+    public boolean GEN_LOOKUP(Object value, Object table, Object index, Map<Integer, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
 
         if (val == null || (table == null && index == null))
@@ -1127,9 +1139,9 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 throw new RuntimeException("Unsupported index type: " + index.getClass().getSimpleName());
         }
         else { // otherwise go over the entire table (ignore header)
-            for (int i = 1; i < table.size(); i++) {
+            for (int i = 1; i < ((List<List<Object>>)table).size(); i++) {
                 StringBuilder buf = new StringBuilder();
-                for (Object cell : table.get(i))
+                for (Object cell : ((List<List<Object>>)table).get(i))
                     buf.append(cell);
                 if (trimmedVal.equals(trimRight(buf.toString()))) {
                     found = true;
@@ -1141,7 +1153,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         // side effect, fill in any requested tableVar
         if (tableVars != null && table != null) {
-            List<Object> row = found && valIndex != null ? table.get(valIndex) : null;
+            List<Object> row = found && valIndex != null ? ((List<List<Object>>)table).get(valIndex) : null;
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
@@ -1158,6 +1170,14 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return found;
     }
 
+    public boolean GEN_RLOOKUP_TYPED(char[] value, Object table, Object index, Map<Integer, char[]> tableVars) {
+        return GEN_RLOOKUP(value, table, index, tableVars);
+    }
+
+    public boolean GEN_RLOOKUP_TYPED(String value, Object table, Object index, Map<Integer, char[]> tableVars) {
+        return GEN_RLOOKUP(value, table, index, tableVars);
+    }
+
     /**
      * Special genedit method. Internal use only.
      * <p/>
@@ -1169,7 +1189,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
-    public boolean GEN_RLOOKUP(Object value, List<List<String>> table, Object index, Map<Integer, char[]> tableVars) {
+    public boolean GEN_RLOOKUP(Object value, Object table, Object index, Map<Integer, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
 
         // it makes no sense to use RLOOKUP without an index!
@@ -1232,7 +1252,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         // side effect, fill in any requested tableVar
         if (tableVars != null && table != null) {
-            List<String> row = found && valIndex != null ? table.get(valIndex) : null;
+            List<String> row = found && valIndex != null ? ((List<List<String>>)table).get(valIndex) : null;
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
@@ -1520,8 +1540,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param justified
      * @return - internal use only -
      */
-    public boolean GEN_JUSTIFIED(Object value, int justified) {
+    public boolean GEN_JUSTIFIED(String value, Object justifiedObj) {
         String val = GEN_TO_STRING(value);
+
+        int justified = (Integer)justifiedObj;
 
         if (justified == JUSTIFIED_LEFT)
             return val != null && val.length() > 0 && val.charAt(0) != ' ';
@@ -1877,17 +1899,24 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         throw new RuntimeException("GEN_NAMEEXPR method is currently not supported!"); // coudn't find a single edit using this method
     }
 
-    /**
-     * Special genedit method. Internal use only.
-     * <p/>
-     * Created on Apr 5, 2011 by depryf
-     * @param dll
-     * @param method
-     * @param param
-     * @return - internal use only -
-     */
-    public int GEN_EXTERNALDLL(String dll, String method, Object param) {
-        return GEN_EXTERNALDLL(dll, method, new Object[] {param});
+    public int GEN_EXTERNALDLL(String dll, String method) {
+        return GEN_EXTERNALDLL(dll, method, null, null, null, null, null);
+    }
+
+    public int GEN_EXTERNALDLL(String dll, String method, Object param1) {
+        return GEN_EXTERNALDLL(dll, method, param1, null, null, null, null);
+    }
+
+    public int GEN_EXTERNALDLL(String dll, String method, Object param1, Object param2) {
+        return GEN_EXTERNALDLL(dll, method, param1, param2, null, null, null);
+    }
+
+    public int GEN_EXTERNALDLL(String dll, String method, Object param1, Object param2, Object param3) {
+        return GEN_EXTERNALDLL(dll, method, param1, param2, param3, null, null);
+    }
+
+    public int GEN_EXTERNALDLL(String dll, String method, Object param1, Object param2, Object param3, Object param4) {
+        return GEN_EXTERNALDLL(dll, method, param1, param2, param3, param4, null);
     }
 
     /**
@@ -1899,33 +1928,33 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param param
      * @return - internal use only -
      */
-    public int GEN_EXTERNALDLL(String dll, String method, Object... param) {
+    public int GEN_EXTERNALDLL(String dll, String method, Object param1, Object param2, Object param3, Object param4, Object param5) {
         if (!"Cstage.dll".equalsIgnoreCase(dll) && !"Cstage0205.dll".equalsIgnoreCase(dll))
             throw new RuntimeException("Only cstage.dll and cstage0205.dll are currently supported!");
 
         if ("CStage_get_version".equalsIgnoreCase(method)) {
-            GEN_STRCPY((char[])param[0], getCsVersion());
+            GEN_STRCPY((char[])param1, getCsVersion());
         }
         else if ("CStage_get_number_of_schemas".equalsIgnoreCase(method))
             return getCsNumSchemas();
         else if ("CStage_get_schema_number".equalsIgnoreCase(method)) {
-            String site = GEN_TO_STRING(param[0]);
-            String hist = GEN_TO_STRING(param[1]);
+            String site = GEN_TO_STRING(param1);
+            String hist = GEN_TO_STRING(param2);
             if (site == null || site.trim().isEmpty() || hist == null || hist.trim().isEmpty())
                 return -1;
             Map<String, String> input = new HashMap<String, String>();
             input.put("primarySite", site);
             input.put("histologyIcdO3", hist);
-            input.put("csSiteSpecificFactor25", GEN_TO_STRING(param[2]));
+            input.put("csSiteSpecificFactor25", GEN_TO_STRING(param3));
             return getCsSchemaNumber(input);
         }
         else if ("CStage_get_schema_name".equalsIgnoreCase(method))
-            GEN_STRCPY((char[])param[1], GEN_TRIM(getCsSchemaName((Integer)param[0]), TRIM_RIGHT));
+            GEN_STRCPY((char[])param2, GEN_TRIM(getCsSchemaName((Integer)param1), TRIM_RIGHT));
         else if ("CStage_code_is_valid".equalsIgnoreCase(method)) {
-            Integer schemaNumber = (Integer)param[0];
-            Integer tableNumber = (Integer)param[1];
+            Integer schemaNumber = (Integer)param1;
+            Integer tableNumber = (Integer)param2;
             // field index (param[2]) should always be 1 according to the DLL documentation, so it's not used
-            String valueToCheck = GEN_TO_STRING(param[3]);
+            String valueToCheck = GEN_TO_STRING(param4);
             return isAcceptableCsCode(schemaNumber, tableNumber, valueToCheck) ? 1 : 0;
         }
         else

@@ -145,18 +145,18 @@ public class ExecutableRule {
             params.add(List.class);
             params.add(Map.class);
             _method = clazz.getMethod(buf.toString(), params.toArray(new Class[0]));
-            System.out.println("Found method '" + _method.getName() + " for edit " + rule.getId());
+            //System.out.println("Found method '" + _method.getName() + " for edit " + rule.getId());
 
             _clazz = clazz.newInstance();
         }
         catch (ClassNotFoundException | NoSuchMethodException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         catch (IllegalAccessException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         catch (InstantiationException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         synchronized (this) {
@@ -544,6 +544,7 @@ public class ExecutableRule {
 
             _script.setBinding(binding);
 
+            //System.out.println(_rule.getId());
             Object result = _script.run();
             if (result instanceof Boolean)
                 success = (Boolean)result;
