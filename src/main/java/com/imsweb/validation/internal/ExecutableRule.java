@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
@@ -21,6 +20,7 @@ import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationEngineInitializationStats;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.ValidatorUtils;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.functions.MetafileContextFunctions;
@@ -138,37 +138,29 @@ public class ExecutableRule {
         _rawProperties = rule.getRawProperties();
         _potentialContextEntries = rule.getPotentialContextEntries();
 
-        try {
-            //Class<?> clazz = Class.forName("com.imsweb.validation.validators.Validator_test");
-            //Class<?> clazz = Class.forName("Validator_test_groovy");
-            Class<?> clazz = Class.forName("NaaccrTranslatedEdits");
-            String[] parts = StringUtils.split(rule.getId(), "-");
-            //            StringBuilder buf = new StringBuilder(parts[0]);
-            //            for (int i = 1; i < parts.length; i++)
-            //                buf.append(StringUtils.capitalize(parts[i]));
-            StringBuilder buf = new StringBuilder(rule.getId().replace("-", "_"));
-            parts = StringUtils.split(rule.getJavaPath(), ".");
-            List<Class<?>> params = new ArrayList<>();
-            params.add(Binding.class);
-            params.add(Map.class);
-            params.add(MetafileContextFunctions.class);
-            //for (int i = 0; i < parts.length; i++)
-            //    params.add(Map.class);
-            params.add(List.class);
-            params.add(Map.class);
-            _method = clazz.getMethod(buf.toString(), params.toArray(new Class[0]));
-            //System.out.println("Found method '" + _method.getName() + " for edit " + rule.getId());
+        // TODO clean this up
 
-            _clazz = clazz.newInstance();
-        }
-        catch (ClassNotFoundException | NoSuchMethodException e) {
-            //e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
-            //e.printStackTrace();
-        }
-        catch (InstantiationException e) {
-            //e.printStackTrace();
+        if (rule.getValidator() != null && rule.getValidator().getId() != null && rule.getId() != null) {
+            try {
+                // TODO it's not efficient to do this lookup over and over again; it should be attempted only once and cached somewhere
+                Class<?> clazz = Class.forName("com.imsweb.validation.runtime." + ValidatorUtils.createClassNameFromValidatorId(rule.getValidator().getId()));
+
+                List<Class<?>> params = new ArrayList<>();
+                params.add(Binding.class);
+                params.add(Map.class);
+                params.add(MetafileContextFunctions.class);
+
+                // TODO I am hard-coding these for now; they should come from the JAR
+                params.add(List.class);
+                params.add(Map.class);
+
+                _method = clazz.getMethod(ValidatorUtils.createMethodNameFromRuleid(rule.getId()), params.toArray(new Class[0]));
+
+                _clazz = clazz.newInstance();
+            }
+            catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
+                // ignored, default to use the script...
+            }
         }
 
         synchronized (this) {
@@ -495,12 +487,10 @@ public class ExecutableRule {
      */
     @SuppressWarnings("unchecked")
     private synchronized boolean validateForGroovy(Validatable validatable, Binding binding, ExtraPropertyHandlerDto extra) throws ValidationException {
+
+        // if a method is available, invoke it, otherwise execute the script
         if (_method != null) {
             boolean result;
-
-            // http://www.tothenew.com/blog/compiling-groovy-code-statically/
-
-            //System.out.println("Using method for " + _id);
 
             // clean up any leftover binding properties
             binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
@@ -516,13 +506,12 @@ public class ExecutableRule {
             params.add(binding);
             params.add(binding.getVariable("Context"));
             params.add(binding.getVariable("Functions"));
-            String[] parts = StringUtils.split(_javaPath, ".");
-            //System.out.println(binding.getVariables().keySet());
-            for (int i = 0; i < parts.length; i++)
-                params.add(binding.getVariable(parts[i]));
+
+            // TODO I am hard-coding these for now; they should come from the JAR
+            params.add(binding.getVariable("untrimmedlines"));
+            params.add(binding.getVariable("untrimmedline"));
 
             try {
-                //System.out.println("Trying to invoke " + _method.getName() + " with params " + params);
                 result = (Boolean)_method.invoke(_clazz, params.toArray(new Object[0]));
 
                 // read back the forced/ignored entities/properties if there are any
@@ -539,8 +528,7 @@ public class ExecutableRule {
                 }
             }
             catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-                return false;
+                throw new ValidationException("Exception invoking method for edit " + _rule.getId(), e);
             }
 
             return result;
