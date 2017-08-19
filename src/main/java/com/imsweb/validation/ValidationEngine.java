@@ -245,10 +245,11 @@ public final class ValidationEngine {
      * Initializes this validation engine.
      * <p/>
      * Created on Mar 6, 2008 by depryf
+     * @return initialization statistics
      */
-    public static void initialize() {
+    public static ValidationEngineInitializationStats initialize() {
         try {
-            initialize((List<Validator>)null);
+            return initialize((List<Validator>)null);
         }
         catch (ConstructionException e) {
             throw new RuntimeException(e); // should never happen since we are not really initializing anything...
@@ -260,10 +261,11 @@ public final class ValidationEngine {
      * <p/>
      * Created on Mar 6, 2008 by depryf
      * @param validator <code>Validator</code> to load
-     * @throws ConstructionException
+     * @return initialization statistics
+     * @throws ConstructionException if a ... construction exception happens...
      */
-    public static void initialize(Validator validator) throws ConstructionException {
-        initialize(validator == null ? null : Collections.singletonList(validator));
+    public static ValidationEngineInitializationStats initialize(Validator validator) throws ConstructionException {
+        return initialize(validator == null ? null : Collections.singletonList(validator));
     }
 
     /**
@@ -271,10 +273,14 @@ public final class ValidationEngine {
      * <p/>
      * Created on Mar 6, 2008 by depryf
      * @param validators list of <code>Validator</code> to load
-     * @throws ConstructionException
+     * @return initialization statistics
+     * @throws ConstructionException if a ... construction exception happens...
      */
-    public static void initialize(List<Validator> validators) throws ConstructionException {
+    public static ValidationEngineInitializationStats initialize(List<Validator> validators) throws ConstructionException {
         _STATUS = ValidationEngineStatus.INITIALIZING;
+
+        ValidationEngineInitializationStats stats = new ValidationEngineInitializationStats();
+        long start = System.currentTimeMillis();
 
         _LOCK.writeLock().lock();
         try {
@@ -289,7 +295,7 @@ public final class ValidationEngine {
                 // internalize the validators (that will compile any Groovy, which could through a construction exception)
                 for (Validator v : validators) {
                     Map<String, Object> contexts = new HashMap<>();
-                    internalizeValidator(v, conditions, rules, contexts);
+                    internalizeValidator(v, conditions, rules, contexts, stats);
                     allContexts.put(v.getValidatorId(), contexts);
                 }
 
@@ -314,6 +320,10 @@ public final class ValidationEngine {
         }
 
         _STATUS = ValidationEngineStatus.INITIALIZED;
+
+        stats.setInitializationDuration(System.currentTimeMillis() - start);
+
+        return stats;
     }
 
     /**
@@ -1323,7 +1333,7 @@ public final class ValidationEngine {
             Map<Long, ExecutableCondition> conditions = new ConcurrentHashMap<>();
             Map<Long, ExecutableRule> rules = new ConcurrentHashMap<>();
             Map<String, Object> contexts = new ConcurrentHashMap<>();
-            internalizeValidator(v, conditions, rules, contexts);
+            internalizeValidator(v, conditions, rules, contexts, null);
 
             // add the existing rules and conditions
             conditions.putAll(_EXECUTABLE_CONDITIONS);
@@ -1801,7 +1811,7 @@ public final class ValidationEngine {
     //                  INTERNAL METHODS (no lock required)
     // ********************************************************************************
 
-    private static void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts) throws ConstructionException {
+    private static void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, ValidationEngineInitializationStats stats) throws ConstructionException {
 
         if (validator.getValidatorId() == null)
             validator.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence());
@@ -1817,7 +1827,7 @@ public final class ValidationEngine {
                     r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
                 if (r.getRuleId() == null)
                     throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
-                results.add(service.submit(new RuleCompilingCallable(r, rules)));
+                results.add(service.submit(new RuleCompilingCallable(r, rules, stats)));
             }
             validator.setRules(new HashSet<>(validator.getRules())); // since internal IDs might have changed
         }

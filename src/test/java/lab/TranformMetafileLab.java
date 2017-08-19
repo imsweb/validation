@@ -23,6 +23,7 @@ import com.imsweb.datagenerator.naaccr.NaaccrDataGenerator;
 import com.imsweb.layout.LayoutFactory;
 import com.imsweb.layout.record.fixed.naaccr.NaaccrLayout;
 import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidationEngineInitializationStats;
 import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.XmlValidatorFactory;
@@ -32,19 +33,20 @@ import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.functions.MetafileContextFunctions;
 
+/**
+ * TODO fix in translation: boolean in NAACCR-00789; had to fix in both framework; what broke it was changing the translation to use typed variables...
+ * TODO in meta context functions, I fixed some int into Object; but I should be consistent and fix all of them
+ * TODO half of the time of loading is parsing the properties, context and lookups. This can be highly optimized
+ */
 public class TranformMetafileLab {
 
-    public static final File MAIN_FOLDER = new File("C:\\dev\\");
+    //public static final File MAIN_FOLDER = new File("C:\\dev\\");
+    public static final File MAIN_FOLDER = new File("D:\\Users\\depryf\\dev\\");
 
     public static void main(String[] args) throws Exception {
-        File metafile = new File(MAIN_FOLDER, "naaccr-translated-edits.xml.gz");
+        File metafile = new File(MAIN_FOLDER, "naaccr-translated-edits.xml");
 
-        ValidatorServices.initialize(new ValidatorServices() {
-            @Override
-            public void log(String message) {
-                System.out.println(message);
-            }
-        });
+        ValidatorServices.initialize(new ValidatorServices());
         ValidatorContextFunctions.initialize(new MetafileContextFunctions());
 
         System.out.println("Loading XML file...");
@@ -56,7 +58,7 @@ public class TranformMetafileLab {
         //translate(v);
         //createFakeFile(MAIN_FOLDER, "naaccr-16-10-rec.txt.gz", 10);
         //runEdits3(v, new File(MAIN_FOLDER, "naaccr-16-large-file.txt.gz"), 4);
-        runEdits3(v, new File(MAIN_FOLDER, "naaccr-16-10-rec.txt.gz"), 2);
+        runEdits3(v, new File(MAIN_FOLDER, "naaccr-16-large-file.txt.gz"), 4);
     }
 
     private static void createFakeFile(File parentFolder, String filename, int numLines) throws Exception {
@@ -65,7 +67,7 @@ public class TranformMetafileLab {
 
     private static void runEdits1(Validator v) throws Exception {
         System.out.println("Adding XML file...");
-        ValidationEngine.initialize(v);
+        printStats(ValidationEngine.initialize(v));
 
         System.out.println("Running XML file...");
         Map<String, String> entity = new HashMap<>();
@@ -80,9 +82,7 @@ public class TranformMetafileLab {
     private static void runEdits2(Validator v, File file) throws Exception {
 
         System.out.println("Adding XML file...");
-        long startInit = System.currentTimeMillis();
-        ValidationEngine.initialize(v);
-        System.out.println("   > done initialization in " + (System.currentTimeMillis() - startInit) + "ms");
+        printStats(ValidationEngine.initialize(v));
 
         NaaccrLayout layout = (NaaccrLayout)LayoutFactory.getLayout(LayoutFactory.LAYOUT_ID_NAACCR_16);
 
@@ -103,9 +103,7 @@ public class TranformMetafileLab {
     private static void runEdits3(Validator v, File file, int numThreads) throws Exception {
 
         System.out.println("Adding XML file...");
-        long startInit = System.currentTimeMillis();
-        ValidationEngine.initialize(v);
-        System.out.println("   > done initialization in " + (System.currentTimeMillis() - startInit) + "ms");
+        printStats(ValidationEngine.initialize(v));
 
         NaaccrLayout layout = (NaaccrLayout)LayoutFactory.getLayout(LayoutFactory.LAYOUT_ID_NAACCR_16);
 
@@ -123,6 +121,11 @@ public class TranformMetafileLab {
         executor.shutdown();
         executor.awaitTermination(5, TimeUnit.MINUTES);
         System.out.println(" > done in " + (System.currentTimeMillis() - start) + "ms; found " + count.get() + " failures...");
+    }
+
+    private static void printStats(ValidationEngineInitializationStats stats) {
+        System.out.println("   > done initialization in " + stats.getInitializationDuration() + " ms; num edits compiled: " + stats.getNumEditsCompiled() + "; num edits found on classpath: " + stats
+                .getNumEditsFoundOnClassPath());
     }
 
     private static void translate(Validator v) throws Exception {
@@ -143,9 +146,7 @@ public class TranformMetafileLab {
                     writer.write(") throws Exception {\n");
                     writer.write(r.getExpression()
                             .replace("Functions.", "functions.")
-                            .replace("Context.", "context.")
-                            .replace("GEN_LOOKUP", "GEN_LOOKUP_TYPED")
-                            .replace("GEN_RLOOKUP", "GEN_RLOOIUP_TYPED"));
+                            .replace("Context.", "context."));
                     writer.write("\n}\n\n");
                 }
             }
@@ -189,7 +190,7 @@ public class TranformMetafileLab {
                 Collection<RuleFailure> failures = ValidationEngine.validate(e);
                 _count.addAndGet(failures.size());
                 for (RuleFailure failure : failures) {
-                    System.out.println(failure.getRule().getId() + ": " + failure.getMessage());
+                    //System.out.println(failure.getRule().getId() + ": " + failure.getMessage());
                     if (failure.getGroovyException() != null)
                         System.out.println("!!! " + failure.getGroovyException().getMessage());
                 }

@@ -18,6 +18,7 @@ import groovy.lang.Script;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidationEngineInitializationStats;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.Rule;
@@ -56,7 +57,7 @@ public class ExecutableRule {
     private Set<String> _conditions;
 
     /**
-     * Opearator (AND or OR) to use for the set of conditions.
+     * Operator (AND or OR) to use for the set of conditions.
      */
     private Boolean _useAndForConditions;
 
@@ -86,7 +87,7 @@ public class ExecutableRule {
     private Set<String> _rawProperties;
 
     /**
-     * Set of potiental context entries (they are potential because they might not all be context entries;
+     * Set of potential context entries (they are potential because they might not all be context entries;
      * but if a context entry is used, it will be in this list...
      */
     private Set<String> _potentialContextEntries;
@@ -114,6 +115,17 @@ public class ExecutableRule {
      * @throws ConstructionException
      */
     public ExecutableRule(Rule rule) throws ConstructionException {
+        this(rule, null);
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * Created on Jun 28, 2011 by depryf
+     * @param rule parent rule
+     * @throws ConstructionException
+     */
+    public ExecutableRule(Rule rule, ValidationEngineInitializationStats stats) throws ConstructionException {
         _rule = rule;
         _internalId = rule.getRuleId();
         _internalValidatorId = rule.getValidator() != null ? rule.getValidator().getValidatorId() : null;
@@ -131,9 +143,9 @@ public class ExecutableRule {
             //Class<?> clazz = Class.forName("Validator_test_groovy");
             Class<?> clazz = Class.forName("NaaccrTranslatedEdits");
             String[] parts = StringUtils.split(rule.getId(), "-");
-//            StringBuilder buf = new StringBuilder(parts[0]);
-//            for (int i = 1; i < parts.length; i++)
-//                buf.append(StringUtils.capitalize(parts[i]));
+            //            StringBuilder buf = new StringBuilder(parts[0]);
+            //            for (int i = 1; i < parts.length; i++)
+            //                buf.append(StringUtils.capitalize(parts[i]));
             StringBuilder buf = new StringBuilder(rule.getId().replace("-", "_"));
             parts = StringUtils.split(rule.getJavaPath(), ".");
             List<Class<?>> params = new ArrayList<>();
@@ -175,6 +187,14 @@ public class ExecutableRule {
             if (rule.getExpression() != null)
                 _checkForcedEntities = rule.getExpression().contains("forceFailureOnEntity") || rule.getExpression().contains("forceFailureOnProperty") || rule.getExpression().contains(
                         "ignoreFailureOnProperty");
+        }
+
+        if (stats != null) {
+            stats.incrementNumEditsLoaded();
+            if (_method != null)
+                stats.incrementNumEditsFoundOnClassPath();
+            else if (_script != null)
+                stats.incrementNumEditsCompiled();
         }
     }
 

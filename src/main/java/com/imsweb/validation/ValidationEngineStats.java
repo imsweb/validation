@@ -10,19 +10,29 @@ package com.imsweb.validation;
  */
 public class ValidationEngineStats {
 
-    /** ID for this DTO (can represent anything - polisher ID, registry coding task ID, auto-cons rule ID, etc...) */
+    /**
+     * ID for this DTO (can represent anything - polisher ID, registry coding task ID, auto-cons rule ID, etc...)
+     */
     private String _id;
 
-    /** Number of run */
+    /**
+     * Number of run
+     */
     private Long _numRun = 1L;
 
-    /** Total time */
+    /**
+     * Total time
+     */
     private Long _totalTime = 0L;
 
-    /** Longest run time */
+    /**
+     * Longest run time
+     */
     private Long _longestTime = null;
 
-    /** Shortest run time */
+    /**
+     * Shortest run time
+     */
     private Long _shortestTime = null;
 
     /**

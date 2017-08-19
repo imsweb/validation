@@ -334,7 +334,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param minMaxFlag
      * @return - internal use only -
      */
-    public int GEN_DATECMP_IOP(Binding binding, String value1, String value2, Object minMaxFlagObj) {
+    public int GEN_DATECMP_IOP(Binding binding, Object value1, Object value2, Object minMaxFlagObj) {
         StringBuilder buf1 = new StringBuilder();
         StringBuilder buf2 = new StringBuilder();
 
@@ -700,14 +700,16 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param type
      * @return - internal use only -
      */
-    public String GEN_TRIM(Object value, Object type) {
+    public String GEN_TRIM(Object value, Object typeObj) {
         String val = GEN_TO_STRING(value);
 
         if (val == null || val.isEmpty())
             return val;
 
+        int type = (Integer)typeObj;
+
         String result;
-        switch ((Integer)type) {
+        switch (type) {
             case TRIM_LEFT:
                 result = _GEN_TRIM_P1.matcher(val).replaceAll("");
                 break;
@@ -926,26 +928,26 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
-    public boolean GEN_ILOOKUP(Object value, Object index) {
+    public boolean GEN_ILOOKUP(Object value, Object indexObj) {
         String val = GEN_TO_STRING(value);
 
-        if (val == null || index == null)
+        if (val == null || indexObj == null)
             return false;
 
         // index values are trimmed, so the incoming one also need to be trimmed...
         String trimmedVal = trimRight(val);
 
         boolean found = false;
-        if (index instanceof List) {
-            for (Object elem : (List<Object>)index) {
+        if (indexObj instanceof List) {
+            for (Object elem : (List<Object>)indexObj) {
                 if (elem instanceof List) {
                     List<Object> indexAndRecNum = (List<Object>)elem;
                     if (indexAndRecNum.size() != 2)
                         throw new RuntimeException("List elements of indexes must be of size 2 (index value and row number)");
-                    Object indexObj = indexAndRecNum.get(0);
-                    if (!(indexObj instanceof String))
-                        throw new RuntimeException("Index values must be Strings; got " + indexObj.getClass().getSimpleName());
-                    int comp = trimmedVal.compareTo((String)indexObj);
+                    Object indexStr = indexAndRecNum.get(0);
+                    if (!(indexStr instanceof String))
+                        throw new RuntimeException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
+                    int comp = trimmedVal.compareTo((String)indexStr);
                     if (comp == 0) {
                         found = true;
                         break;
@@ -961,18 +963,18 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                         break;
                     }
                     else if (comp < 0)
-                        break; // values in the index are sorted, so we can stop the iteration sooner... 
+                        break; // values in the index are sorted, so we can stop the iteration sooner...
                 }
                 else
                     throw new RuntimeException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
             }
         }
-        else if (index instanceof Map)
-            found = ((Map<Object, Object>)index).containsKey(trimmedVal);
-        else if (index instanceof Set)
-            found = ((Set<Object>)index).contains(trimmedVal);
+        else if (indexObj instanceof Map)
+            found = ((Map<Object, Object>)indexObj).containsKey(trimmedVal);
+        else if (indexObj instanceof Set)
+            found = ((Set<Object>)indexObj).contains(trimmedVal);
         else
-            throw new RuntimeException("Unsupported index type: " + index.getClass().getSimpleName());
+            throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
 
         return found;
     }
@@ -1059,14 +1061,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return indexOfLargest > -1;
     }
 
-    public boolean GEN_LOOKUP_TYPED(char[] value, Object table, Object index, Map<Integer, char[]> tableVars) {
-        return GEN_LOOKUP(value, table, index, tableVars);
-    }
-
-    public boolean GEN_LOOKUP_TYPED(String value, Object table, Object index, Map<Integer, char[]> tableVars) {
-        return GEN_LOOKUP(value, table, index, tableVars);
-    }
-
     /**
      * Special genedit method. Internal use only.
      * <p/>
@@ -1078,29 +1072,31 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
-    public boolean GEN_LOOKUP(Object value, Object table, Object index, Map<Integer, char[]> tableVars) {
+    public boolean GEN_LOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
 
-        if (val == null || (table == null && index == null))
+        if (val == null || (tableObj == null && indexObj == null))
             return false;
 
         // index values are trimmed, so the incoming one also need to be trimmed...
         String trimmedVal = trimRight(val);
 
+        List<List<Object>> table = (List<List<Object>>)tableObj;
+
         // if an index exists, use it!
         boolean found = false;
         Integer valIndex = null;
-        if (index != null) {
-            if (index instanceof List) {
-                for (Object elem : (List<Object>)index) {
+        if (indexObj != null) {
+            if (indexObj instanceof List) {
+                for (Object elem : (List<Object>)indexObj) {
                     if (elem instanceof List) {
                         List<Object> indexAndRecNum = (List<Object>)elem;
                         if (indexAndRecNum.size() != 2)
                             throw new RuntimeException("List elements of indexes must be of size 2 (index value and row number)");
-                        Object indexObj = indexAndRecNum.get(0);
-                        if (!(indexObj instanceof String))
-                            throw new RuntimeException("Index values must be Strings; got " + indexObj.getClass().getSimpleName());
-                        int comp = trimmedVal.compareTo((String)indexObj);
+                        Object indexStr = indexAndRecNum.get(0);
+                        if (!(indexStr instanceof String))
+                            throw new RuntimeException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
+                        int comp = trimmedVal.compareTo((String)indexStr);
                         if (comp == 0) {
                             found = true;
                             valIndex = (Integer)indexAndRecNum.get(1);
@@ -1117,14 +1113,14 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                             break;
                         }
                         else if (comp < 0)
-                            break; // values in the index are sorted, so we can stop the iteration sooner... 
+                            break; // values in the index are sorted, so we can stop the iteration sooner...
                     }
                     else
                         throw new RuntimeException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
                 }
             }
-            else if (index instanceof Map) {
-                Object rowNumObject = ((Map<Object, Object>)index).get(trimmedVal);
+            else if (indexObj instanceof Map) {
+                Object rowNumObject = ((Map<Object, Object>)indexObj).get(trimmedVal);
                 if (rowNumObject != null) {
                     found = true;
                     if (rowNumObject instanceof Integer)
@@ -1133,15 +1129,15 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                         throw new RuntimeException("Row numbers in indexes have to be Integers, got " + rowNumObject.getClass().getSimpleName());
                 }
             }
-            else if (index instanceof Set)
-                found = ((Set<Object>)index).contains(trimmedVal);
+            else if (indexObj instanceof Set)
+                found = ((Set<Object>)indexObj).contains(trimmedVal);
             else
-                throw new RuntimeException("Unsupported index type: " + index.getClass().getSimpleName());
+                throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
         }
         else { // otherwise go over the entire table (ignore header)
-            for (int i = 1; i < ((List<List<Object>>)table).size(); i++) {
+            for (int i = 1; i < table.size(); i++) {
                 StringBuilder buf = new StringBuilder();
-                for (Object cell : ((List<List<Object>>)table).get(i))
+                for (Object cell : table.get(i))
                     buf.append(cell);
                 if (trimmedVal.equals(trimRight(buf.toString()))) {
                     found = true;
@@ -1153,7 +1149,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         // side effect, fill in any requested tableVar
         if (tableVars != null && table != null) {
-            List<Object> row = found && valIndex != null ? ((List<List<Object>>)table).get(valIndex) : null;
+            List<Object> row = found && valIndex != null ? table.get(valIndex) : null;
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
@@ -1170,14 +1166,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return found;
     }
 
-    public boolean GEN_RLOOKUP_TYPED(char[] value, Object table, Object index, Map<Integer, char[]> tableVars) {
-        return GEN_RLOOKUP(value, table, index, tableVars);
-    }
-
-    public boolean GEN_RLOOKUP_TYPED(String value, Object table, Object index, Map<Integer, char[]> tableVars) {
-        return GEN_RLOOKUP(value, table, index, tableVars);
-    }
-
     /**
      * Special genedit method. Internal use only.
      * <p/>
@@ -1189,17 +1177,19 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
-    public boolean GEN_RLOOKUP(Object value, Object table, Object index, Map<Integer, char[]> tableVars) {
+    public boolean GEN_RLOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
 
         // it makes no sense to use RLOOKUP without an index!
-        if (val == null || index == null)
+        if (val == null || indexObj == null)
             return false;
+
+        List<List<String>> table = (List<List<String>>)tableObj;
 
         Integer valIndex = null;
 
-        if (index instanceof List) {
-            List<List<Object>> indexList = (List<List<Object>>)index;
+        if (indexObj instanceof List) {
+            List<List<Object>> indexList = (List<List<Object>>)indexObj;
 
             // for RLOOKUP, if a value is smaller than the smallest index value, return value not found
             List<Object> firstIndexAndRecNum = indexList.get(0);
@@ -1229,8 +1219,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 }
             }
         }
-        else if (index instanceof TreeMap) {
-            TreeMap<String, Integer> indexTree = (TreeMap<String, Integer>)index;
+        else if (indexObj instanceof TreeMap) {
+            TreeMap<String, Integer> indexTree = (TreeMap<String, Integer>)indexObj;
 
             // for RLOOKUP, if a value is smaller than the smallest index value, return value not found
             if (val.compareTo(indexTree.firstKey()) >= 0) {
@@ -1246,13 +1236,13 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             }
         }
         else
-            throw new RuntimeException("Unsupported index type: " + index.getClass().getSimpleName());
+            throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
 
         boolean found = valIndex != null && valIndex.intValue() >= 0;
 
         // side effect, fill in any requested tableVar
         if (tableVars != null && table != null) {
-            List<String> row = found && valIndex != null ? ((List<List<String>>)table).get(valIndex) : null;
+            List<String> row = found && valIndex != null ? table.get(valIndex) : null;
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
@@ -1540,7 +1530,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param justified
      * @return - internal use only -
      */
-    public boolean GEN_JUSTIFIED(String value, Object justifiedObj) {
+    public boolean GEN_JUSTIFIED(Object value, Object justifiedObj) {
         String val = GEN_TO_STRING(value);
 
         int justified = (Integer)justifiedObj;
@@ -1899,6 +1889,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         throw new RuntimeException("GEN_NAMEEXPR method is currently not supported!"); // coudn't find a single edit using this method
     }
 
+
     public int GEN_EXTERNALDLL(String dll, String method) {
         return GEN_EXTERNALDLL(dll, method, null, null, null, null, null);
     }
@@ -1919,15 +1910,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return GEN_EXTERNALDLL(dll, method, param1, param2, param3, param4, null);
     }
 
-    /**
-     * Special genedit method. Internal use only.
-     * <p/>
-     * Created on Apr 5, 2011 by depryf
-     * @param dll
-     * @param method
-     * @param param
-     * @return - internal use only -
-     */
     public int GEN_EXTERNALDLL(String dll, String method, Object param1, Object param2, Object param3, Object param4, Object param5) {
         if (!"Cstage.dll".equalsIgnoreCase(dll) && !"Cstage0205.dll".equalsIgnoreCase(dll))
             throw new RuntimeException("Only cstage.dll and cstage0205.dll are currently supported!");
