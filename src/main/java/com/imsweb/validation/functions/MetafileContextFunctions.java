@@ -331,7 +331,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param binding
      * @param value1
      * @param value2
-     * @param minMaxFlag
+     * @param minMaxFlagObj
      * @return - internal use only -
      */
     public int GEN_DATECMP_IOP(Binding binding, Object value1, Object value2, Object minMaxFlagObj) {
@@ -438,7 +438,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param binding
      * @param value1
      * @param value2
-     * @param minMaxFlag
+     * @param minMaxFlagObj
      * @return - internal use only -
      */
     public int GEN_DAYDIFF_IOP(Binding binding, String value1, String value2, Object minMaxFlagObj) {
@@ -697,7 +697,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * <p/>
      * Created on Apr 5, 2011 by depryf
      * @param value
-     * @param type
+     * @param typeObj
      * @return - internal use only -
      */
     public String GEN_TRIM(Object value, Object typeObj) {
@@ -924,7 +924,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * <p/>
      * Created on Apr 5, 2011 by depryf
      * @param value
-     * @param index
+     * @param indexObj
      * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
@@ -1066,8 +1066,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * <p/>
      * Created on Apr 5, 2011 by depryf
      * @param value
-     * @param table
-     * @param index
+     * @param tableObj
+     * @param indexObj
      * @param tableVars
      * @return - internal use only -
      */
@@ -1171,8 +1171,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * <p/>
      * Created on Apr 5, 2011 by depryf
      * @param value
-     * @param table
-     * @param index
+     * @param tableObj
+     * @param indexObj
      * @param tableVars
      * @return - internal use only -
      */
@@ -1527,7 +1527,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * <p/>
      * Created on Apr 5, 2011 by depryf
      * @param value
-     * @param justified
+     * @param justifiedObj
      * @return - internal use only -
      */
     public boolean GEN_JUSTIFIED(Object value, Object justifiedObj) {
