@@ -14,6 +14,10 @@ import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.runtime.ParsedContexts;
+import com.imsweb.validation.runtime.ParsedLookups;
+import com.imsweb.validation.runtime.ParsedProperties;
+import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
  * A <code>Rule</code> is the smallest entity in the validation engine. It defines
@@ -333,6 +337,24 @@ public class Rule {
                 }
             }
         }
+    }
+
+    /**
+     * Setter for the expression taking pre-parsed objects for optimization.
+     */
+    public void setExpression(String expression, ParsedProperties parsedProperties, ParsedContexts parsedContexts, ParsedLookups parsedLookups) throws ConstructionException {
+        // we are going to use the pre-parsed stuff only if they are all available, otherwise we don't use any of them...
+        Set<String> properties = RuntimeUtils.getParsedProperties(parsedProperties, _id);
+        Set<String> contexts = RuntimeUtils.getParsedContexts(parsedContexts, _id);
+        Set<String> lookups = RuntimeUtils.getParsedLookups(parsedLookups, _id);
+        if (properties != null && contexts != null && lookups != null) {
+            _expression = expression;
+            _rawProperties = properties;
+            _potentialContextEntries = contexts;
+            _usedLookupIds = lookups;
+        }
+        else
+            setExpression(expression);
     }
 
     /**

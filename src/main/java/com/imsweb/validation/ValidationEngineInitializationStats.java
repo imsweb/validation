@@ -11,15 +11,15 @@ public class ValidationEngineInitializationStats {
 
     private AtomicInteger _numEditsLoaded;
 
-    private AtomicInteger _numEditsCompiled;
+    private AtomicInteger _numEditsDynamicallyCompiled;
 
-    private AtomicInteger _numEditsFoundOnClassPath;
+    private AtomicInteger _numEditsStaticallyCompiled;
 
     public ValidationEngineInitializationStats() {
         _initializationDuration = 0L;
         _numEditsLoaded = new AtomicInteger();
-        _numEditsCompiled = new AtomicInteger();
-        _numEditsFoundOnClassPath = new AtomicInteger();
+        _numEditsDynamicallyCompiled = new AtomicInteger();
+        _numEditsStaticallyCompiled = new AtomicInteger();
     }
 
     public long getInitializationDuration() {
@@ -38,19 +38,19 @@ public class ValidationEngineInitializationStats {
         _numEditsLoaded.getAndIncrement();
     }
 
-    public int getNumEditsCompiled() {
-        return _numEditsCompiled.get();
+    public int getNumEditsDynamicallyCompiled() {
+        return _numEditsDynamicallyCompiled.get();
     }
 
     public void incrementNumEditsCompiled() {
-        _numEditsCompiled.getAndIncrement();
+        _numEditsDynamicallyCompiled.getAndIncrement();
     }
 
-    public int getNumEditsFoundOnClassPath() {
-        return _numEditsFoundOnClassPath.get();
+    public int getNumEditsStaticallyCompiled() {
+        return _numEditsStaticallyCompiled.get();
     }
 
     public void incrementNumEditsFoundOnClassPath() {
-        _numEditsFoundOnClassPath.getAndIncrement();
+        _numEditsStaticallyCompiled.getAndIncrement();
     }
 }

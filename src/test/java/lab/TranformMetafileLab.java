@@ -124,8 +124,8 @@ public class TranformMetafileLab {
     }
 
     private static void printStats(ValidationEngineInitializationStats stats) {
-        System.out.println("   > done initialization in " + stats.getInitializationDuration() + " ms; num edits compiled: " + stats.getNumEditsCompiled() + "; num edits found on classpath: " + stats
-                .getNumEditsFoundOnClassPath());
+        System.out.println("   > done initialization in " + stats.getInitializationDuration() + " ms; num edits compiled: " + stats.getNumEditsDynamicallyCompiled() + "; num edits found on classpath: " + stats
+                .getNumEditsStaticallyCompiled());
     }
 
     private static void translate(Validator v) throws Exception {

@@ -80,6 +80,10 @@ import com.imsweb.validation.entities.xml.TestXmlDto;
 import com.imsweb.validation.entities.xml.TestedValidatorXmlDto;
 import com.imsweb.validation.entities.xml.ValidatorXmlDto;
 import com.imsweb.validation.internal.callable.RuleParsingCallable;
+import com.imsweb.validation.runtime.ParsedContexts;
+import com.imsweb.validation.runtime.ParsedLookups;
+import com.imsweb.validation.runtime.ParsedProperties;
+import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
  * This class is responsible for reading and writing XML files containing edits definitions.
@@ -116,6 +120,11 @@ public final class XmlValidatorFactory {
      * The number of threads to use to parse the rules (see enableMultiThreadedParsing() method)
      */
     private static int _NUM_PARSER_THREADS = 1;
+
+    /**
+     * Whether or not the pre-parsing mechanism should be used (enabled by default).
+     */
+    private static boolean _PRE_PARSED_LOOKUP_ENABLED = true;
 
     /**
      * Private constructor, no instanciation.
@@ -541,6 +550,11 @@ public final class XmlValidatorFactory {
                 for (ValidatorRelease release : validator.getReleases())
                     versions.put(release.getVersion().getRawString(), release.getVersion());
 
+            // try to find pre-parsed information on the classpath
+            ParsedProperties props = _PRE_PARSED_LOOKUP_ENABLED ? RuntimeUtils.findParsedProperties(validator.getId()) : null;
+            ParsedContexts contexts = _PRE_PARSED_LOOKUP_ENABLED ? RuntimeUtils.findParsedContexts(validator.getId()) : null;
+            ParsedLookups lookups = _PRE_PARSED_LOOKUP_ENABLED ? RuntimeUtils.findParsedLookups(validator.getId()) : null;
+
             // go through each rule (we multi-thread this part since it can be a bit slow
             ExecutorService service = Executors.newFixedThreadPool(_NUM_PARSER_THREADS);
             List<Future<Void>> results = new ArrayList<>(rulesType.size());
@@ -550,7 +564,7 @@ public final class XmlValidatorFactory {
                 if (rules.containsKey(type.getId()))
                     throw new IOException("Edit '" + type.getId() + "' defined more than once in group " + validator.getId());
 
-                results.add(service.submit(new RuleParsingCallable(type, ValidatorServices.getInstance().getNextRuleSequence(), validator, versions, rules)));
+                results.add(service.submit(new RuleParsingCallable(type, ValidatorServices.getInstance().getNextRuleSequence(), validator, versions, rules, props, contexts, lookups)));
             }
 
             // we won't be submitting new work anymore
@@ -1425,13 +1439,20 @@ public final class XmlValidatorFactory {
     // ****************************************************************************************************
 
     /**
-     * Enable multi-threaded parsing of the rules, using the provided number of threads (by default only one thread is used)
+     * Enables multi-threaded parsing of the rules, using the provided number of threads (by default only one thread is used)
      * @param numThreads number of threads to use, must be between 1 and 32
      */
     public static void enableMultiThreadedParsing(int numThreads) {
         if (numThreads < 1 || numThreads > 32)
             throw new RuntimeException("Number of threads must be between 1 and 32!");
         _NUM_PARSER_THREADS = numThreads;
+    }
+
+    /**
+     * Disables the pre-parsing mechanism, which is on by default.  That mechanism tries to find a class of pre-parsed properties, lookups, etc... on the class path.
+     */
+    public static void disablePreParseLookup() {
+        _PRE_PARSED_LOOKUP_ENABLED = false;
     }
 
     /**

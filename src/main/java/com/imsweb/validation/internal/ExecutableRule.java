@@ -6,6 +6,7 @@ package com.imsweb.validation.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,10 +21,11 @@ import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationEngineInitializationStats;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidatorServices;
-import com.imsweb.validation.ValidatorUtils;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.functions.MetafileContextFunctions;
+import com.imsweb.validation.runtime.CompiledRules;
+import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
  * Created on Jun 28, 2011 by depryf
@@ -103,19 +105,24 @@ public class ExecutableRule {
      */
     private Script _script;
 
-    private Object _clazz;
+    /**
+     * Pre-compiled rules; if those are available and a method corresponding to this rule is found in that class, then the Groovy script won't be compiled.
+     */
+    private CompiledRules _compiledRules;
 
-    private Method _method;
+    /**
+     * The pre-compiled rule (as a Groovy method instead of a dynamically compiled Groovy script).
+     */
+    private Method _compiledRule;
 
     /**
      * Constructor.
      * <p/>
      * Created on Jun 28, 2011 by depryf
      * @param rule parent rule
-     * @throws ConstructionException
      */
     public ExecutableRule(Rule rule) throws ConstructionException {
-        this(rule, null);
+        this(rule, null, null);
     }
 
     /**
@@ -123,9 +130,10 @@ public class ExecutableRule {
      * <p/>
      * Created on Jun 28, 2011 by depryf
      * @param rule parent rule
-     * @throws ConstructionException
+     * @param compiledRules pre-compiled rules (can be null in which case a Groovy Script will be compiled)
+     * @param stats initialization stats (can be null)
      */
-    public ExecutableRule(Rule rule, ValidationEngineInitializationStats stats) throws ConstructionException {
+    public ExecutableRule(Rule rule, CompiledRules compiledRules, ValidationEngineInitializationStats stats) throws ConstructionException {
         _rule = rule;
         _internalId = rule.getRuleId();
         _internalValidatorId = rule.getValidator() != null ? rule.getValidator().getValidatorId() : null;
@@ -138,52 +146,33 @@ public class ExecutableRule {
         _rawProperties = rule.getRawProperties();
         _potentialContextEntries = rule.getPotentialContextEntries();
 
-        // TODO clean this up
+        // TODO I am hard-coding these for now; they should come from the JAR somehow
 
-        if (rule.getValidator() != null && rule.getValidator().getId() != null && rule.getId() != null) {
-            try {
-                // TODO it's not efficient to do this lookup over and over again; it should be attempted only once and cached somewhere
-                Class<?> clazz = Class.forName("com.imsweb.validation.runtime." + ValidatorUtils.createClassNameFromValidatorId(rule.getValidator().getId()));
-
-                List<Class<?>> params = new ArrayList<>();
-                params.add(Binding.class);
-                params.add(Map.class);
-                params.add(MetafileContextFunctions.class);
-
-                // TODO I am hard-coding these for now; they should come from the JAR
-                params.add(List.class);
-                params.add(Map.class);
-
-                _method = clazz.getMethod(ValidatorUtils.createMethodNameFromRuleid(rule.getId()), params.toArray(new Class[0]));
-
-                _clazz = clazz.newInstance();
-            }
-            catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
-                // ignored, default to use the script...
-            }
-        }
+        _compiledRules = compiledRules;
+        if (compiledRules != null)
+            _compiledRule = RuntimeUtils.findCompiledMethod(compiledRules, rule.getId(), Arrays.asList(Binding.class, Map.class, MetafileContextFunctions.class, List.class, Map.class));
 
         synchronized (this) {
             _id = rule.getId();
 
-            if (_method == null) {
+            // only compile Groovy script if no re-compiled Groovy method was available...
+            if (_compiledRule == null) {
                 try {
                     _script = ValidatorServices.getInstance().compileExpression(rule.getExpression());
                 }
                 catch (CompilationFailedException e) {
-                    _script = null;
                     throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);
                 }
             }
 
-            if (rule.getExpression() != null)
-                _checkForcedEntities = rule.getExpression().contains("forceFailureOnEntity") || rule.getExpression().contains("forceFailureOnProperty") || rule.getExpression().contains(
-                        "ignoreFailureOnProperty");
+            String exp = rule.getExpression();
+            if (exp != null)
+                _checkForcedEntities = exp.contains("forceFailureOnEntity") || exp.contains("forceFailureOnProperty") || exp.contains("ignoreFailureOnProperty");
         }
 
         if (stats != null) {
             stats.incrementNumEditsLoaded();
-            if (_method != null)
+            if (_compiledRule != null)
                 stats.incrementNumEditsFoundOnClassPath();
             else if (_script != null)
                 stats.incrementNumEditsCompiled();
@@ -381,9 +370,12 @@ public class ExecutableRule {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param expression expression
-     * @throws ConstructionException
      */
     public void setExpression(String expression) throws ConstructionException {
+
+        // can't use pre-compiled methods when dynamically changing the expression! Let's make sure of that...
+        _compiledRules = null;
+
         synchronized (this) {
             try {
                 _rawProperties.clear();
@@ -423,7 +415,6 @@ public class ExecutableRule {
      * @param validatable <code>Validatable</code>
      * @param binding the Groovy binding to use
      * @return true if the expression passes, false otherwise
-     * @throws ValidationException
      */
     public boolean validate(Validatable validatable, Binding binding) throws ValidationException {
         ExtraPropertyHandlerDto extra = null;
@@ -483,13 +474,12 @@ public class ExecutableRule {
      * @param binding the Groovy binding to use
      * @param extra wrapper for properties or entities to ignore or force
      * @return boolean
-     * @throws ValidationException
      */
     @SuppressWarnings("unchecked")
     private synchronized boolean validateForGroovy(Validatable validatable, Binding binding, ExtraPropertyHandlerDto extra) throws ValidationException {
 
         // if a method is available, invoke it, otherwise execute the script
-        if (_method != null) {
+        if (_compiledRule != null) {
             boolean result;
 
             // clean up any leftover binding properties
@@ -512,7 +502,7 @@ public class ExecutableRule {
             params.add(binding.getVariable("untrimmedline"));
 
             try {
-                result = (Boolean)_method.invoke(_clazz, params.toArray(new Object[0]));
+                result = (Boolean)_compiledRule.invoke(_compiledRules, params.toArray(new Object[0]));
 
                 // read back the forced/ignored entities/properties if there are any
                 if (_checkForcedEntities) {

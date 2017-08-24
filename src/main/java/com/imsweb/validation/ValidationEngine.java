@@ -42,6 +42,8 @@ import com.imsweb.validation.internal.Processor;
 import com.imsweb.validation.internal.ValidatingContext;
 import com.imsweb.validation.internal.ValidatingProcessor;
 import com.imsweb.validation.internal.callable.RuleCompilingCallable;
+import com.imsweb.validation.runtime.CompiledRules;
+import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
@@ -212,6 +214,11 @@ public final class ValidationEngine {
      * The timeout (in seconds) for running edits (or conditions); if an edit runs for longer than the value, it will automatically be killed and fail. Use 0 for no timeout (the default).
      */
     private static int _EDIT_EXECUTION_TIMEOUT = 0;
+
+    /**
+     * Whether or not the pre-compiling mechanism should be used (enabled by default).
+     */
+    private static boolean _PRE_COMPILED_LOOKUP_ENABLED = true;
 
     /**
      * Private lock controlling access to the state of the engine; all methods using the state of the engine (including the validate methods) need to acquire a read lock;
@@ -1807,6 +1814,13 @@ public final class ValidationEngine {
         _EDIT_EXECUTION_TIMEOUT = timeoutInSeconds;
     }
 
+    /**
+     * Disables the pre-compiling mechanism, which is on by default.  That mechanism tries to find a class of pre-compiles rules on the class path.
+     */
+    public static void disablePreParseLookup() {
+        _PRE_COMPILED_LOOKUP_ENABLED = false;
+    }
+
     // ********************************************************************************
     //                  INTERNAL METHODS (no lock required)
     // ********************************************************************************
@@ -1818,6 +1832,9 @@ public final class ValidationEngine {
         if (validator.getValidatorId() == null)
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
 
+        // try to find pre-compiled rules on the class path
+        CompiledRules precompiledRules = _PRE_COMPILED_LOOKUP_ENABLED ? RuntimeUtils.findCompileRules(validator.getId()) : null;
+
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_NUM_COMPILER_THREADS);
         List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
@@ -1827,7 +1844,7 @@ public final class ValidationEngine {
                     r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
                 if (r.getRuleId() == null)
                     throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
-                results.add(service.submit(new RuleCompilingCallable(r, rules, stats)));
+                results.add(service.submit(new RuleCompilingCallable(r, rules, precompiledRules, stats)));
             }
             validator.setRules(new HashSet<>(validator.getRules())); // since internal IDs might have changed
         }

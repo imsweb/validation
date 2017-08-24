@@ -20,6 +20,9 @@ import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.entities.ValidatorVersion;
 import com.imsweb.validation.entities.xml.HistoryEventXmlDto;
 import com.imsweb.validation.entities.xml.RuleXmlDto;
+import com.imsweb.validation.runtime.ParsedContexts;
+import com.imsweb.validation.runtime.ParsedLookups;
+import com.imsweb.validation.runtime.ParsedProperties;
 
 /**
  * This class is used to multi-thread the parsing of the rules.
@@ -52,6 +55,21 @@ public class RuleParsingCallable implements Callable<Void> {
     private Map<String, Rule> _rules;
 
     /**
+     * Pre-parsed rule properties (can be null).
+     */
+    private ParsedProperties _parsedProperties;
+
+    /**
+     * Pre-parsed rule used context entries (can be null).
+     */
+    private ParsedContexts _parsedContexts;
+
+    /**
+     * Pre-parsed rule used lookups (can be null).
+     */
+    private ParsedLookups _parsedLookups;
+
+    /**
      * Constructor.
      * @param xmlRule XML rule object
      * @param ruleId rule ID to use
@@ -59,12 +77,15 @@ public class RuleParsingCallable implements Callable<Void> {
      * @param versions available versions in the validator
      * @param rules rules processed so far, keyed by rule ID
      */
-    public RuleParsingCallable(RuleXmlDto xmlRule, Long ruleId, Validator validator, Map<String, ValidatorVersion> versions, Map<String, Rule> rules) {
+    public RuleParsingCallable(RuleXmlDto xmlRule, Long ruleId, Validator validator, Map<String, ValidatorVersion> versions, Map<String, Rule> rules, ParsedProperties props, ParsedContexts contexts, ParsedLookups lkups) {
         _xmlRule = xmlRule;
         _ruleId = ruleId;
         _validator = validator;
         _versions = versions;
         _rules = rules;
+        _parsedProperties = props;
+        _parsedContexts = contexts;
+        _parsedLookups = lkups;
     }
 
     @Override
@@ -102,8 +123,9 @@ public class RuleParsingCallable implements Callable<Void> {
 
         if (_xmlRule.getExpression() == null)
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no expression provided");
+
         try {
-            rule.setExpression(XmlValidatorFactory.reAlign(_xmlRule.getExpression()));
+            rule.setExpression(XmlValidatorFactory.reAlign(_xmlRule.getExpression()), _parsedProperties, _parsedContexts, _parsedLookups);
         }
         catch (ConstructionException e) {
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; it contain an invalid expression", e);
