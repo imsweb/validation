@@ -6,11 +6,10 @@ package com.imsweb.validation.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
@@ -23,7 +22,6 @@ import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
-import com.imsweb.validation.functions.MetafileContextFunctions;
 import com.imsweb.validation.runtime.CompiledRules;
 import com.imsweb.validation.runtime.RuntimeUtils;
 
@@ -146,11 +144,9 @@ public class ExecutableRule {
         _rawProperties = rule.getRawProperties();
         _potentialContextEntries = rule.getPotentialContextEntries();
 
-        // TODO I am hard-coding these for now; they should come from the JAR somehow
-
         _compiledRules = compiledRules;
         if (compiledRules != null)
-            _compiledRule = RuntimeUtils.findCompiledMethod(compiledRules, rule.getId(), Arrays.asList(Binding.class, Map.class, MetafileContextFunctions.class, List.class, Map.class));
+            _compiledRule = RuntimeUtils.findCompiledMethod(compiledRules, rule.getId(), compiledRules.getMethodParameters().get(rule.getJavaPath()));
 
         synchronized (this) {
             _id = rule.getId();
@@ -477,112 +473,83 @@ public class ExecutableRule {
      */
     @SuppressWarnings("unchecked")
     private synchronized boolean validateForGroovy(Validatable validatable, Binding binding, ExtraPropertyHandlerDto extra) throws ValidationException {
+        boolean success;
+
+        // make sure there are no left-over stuff in the binding
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_FAILING_FLAG, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT, null);
 
         // if a method is available, invoke it, otherwise execute the script
         if (_compiledRule != null) {
-            boolean result;
-
-            // clean up any leftover binding properties
-            binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_FAILING_FLAG, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT, null);
-
             List<Object> params = new ArrayList<>();
             params.add(binding);
-            params.add(binding.getVariable("Context"));
-            params.add(binding.getVariable("Functions"));
-
-            // TODO I am hard-coding these for now; they should come from the JAR
-            params.add(binding.getVariable("untrimmedlines"));
-            params.add(binding.getVariable("untrimmedline"));
+            params.add(binding.getVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY));
+            params.add(binding.getVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY));
+            for (String javaPathPart : StringUtils.split(_rule.getJavaPath(), '.'))
+                params.add(binding.getVariable(javaPathPart));
 
             try {
-                result = (Boolean)_compiledRule.invoke(_compiledRules, params.toArray(new Object[0]));
-
-                // read back the forced/ignored entities/properties if there are any
-                if (_checkForcedEntities) {
-                    Object forcedEntities = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
-                    if (forcedEntities != null)
-                        extra.setForcedEntities((Set<ExtraPropertyEntityHandlerDto>)forcedEntities);
-                    Object forcedProperties = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY);
-                    if (forcedProperties != null)
-                        extra.setForcedProperties((Set<String>)forcedProperties);
-                    Object ignoredProperties = binding.getVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY);
-                    if (ignoredProperties != null)
-                        extra.setIgnoredProperties((Set<String>)ignoredProperties);
-                }
+                success = (Boolean)_compiledRule.invoke(_compiledRules, params.toArray(new Object[0]));
             }
             catch (IllegalAccessException | InvocationTargetException e) {
                 throw new ValidationException("Exception invoking method for edit " + _rule.getId(), e);
             }
-
-            return result;
         }
+        else if (_script != null) {
+            try {
 
-        if (_script == null)
-            return true;
+                _script.setBinding(binding);
 
-        boolean success;
-
-        try {
-            // clean up any leftover binding properties
-            binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_FAILING_FLAG, null);
-            binding.setVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT, null);
-
-            _script.setBinding(binding);
-
-            //System.out.println(_rule.getId());
-            Object result = _script.run();
-            if (result instanceof Boolean)
-                success = (Boolean)result;
-            else
-                throw new ValidationException("result is not a boolean");
-
-            // read back the forced/ignored entities/properties if there are any
-            if (_checkForcedEntities) {
-                Object forcedEntities = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
-                if (forcedEntities != null)
-                    extra.setForcedEntities((Set<ExtraPropertyEntityHandlerDto>)forcedEntities);
-                Object forcedProperties = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY);
-                if (forcedProperties != null)
-                    extra.setForcedProperties((Set<String>)forcedProperties);
-                Object ignoredProperties = binding.getVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY);
-                if (ignoredProperties != null)
-                    extra.setIgnoredProperties((Set<String>)ignoredProperties);
-            }
-
-            // keep track of what the logic actually returns
-            binding.setVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT, result);
-        }
-        catch (Exception e) {
-            StringBuilder buf = new StringBuilder();
-            if (_id != null) {
-                buf.append("Unable to execute edit '").append(_id).append("'");
-                String validated = validatable.getDisplayId();
-                if (validated != null)
-                    buf.append(" on ").append(validatable.getDisplayId()).append(": ");
+                //System.out.println(_rule.getId());
+                Object result = _script.run();
+                if (result instanceof Boolean)
+                    success = (Boolean)result;
                 else
-                    buf.append(": ");
+                    throw new ValidationException("result is not a boolean");
             }
-            else
-                buf.append("Unable to execute edit: ");
-            buf.append(e.getMessage() == null ? "null reference" : e.getMessage());
-            throw new ValidationException(buf.toString(), e);
+            catch (Exception e) {
+                StringBuilder buf = new StringBuilder();
+                if (_id != null) {
+                    buf.append("Unable to execute edit '").append(_id).append("'");
+                    String validated = validatable.getDisplayId();
+                    if (validated != null)
+                        buf.append(" on ").append(validatable.getDisplayId()).append(": ");
+                    else
+                        buf.append(": ");
+                }
+                else
+                    buf.append("Unable to execute edit: ");
+                buf.append(e.getMessage() == null ? "null reference" : e.getMessage());
+                throw new ValidationException(buf.toString(), e);
+            }
+            finally {
+                _script.setBinding(null);
+            }
         }
-        finally {
-            _script.setBinding(null);
+        else
+            success = true;
+
+        // read back the forced/ignored entities/properties if there are any
+        if (_checkForcedEntities) {
+            Object forcedEntities = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
+            if (forcedEntities != null)
+                extra.setForcedEntities((Set<ExtraPropertyEntityHandlerDto>)forcedEntities);
+            Object forcedProperties = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_PROPERTY_KEY);
+            if (forcedProperties != null)
+                extra.setForcedProperties((Set<String>)forcedProperties);
+            Object ignoredProperties = binding.getVariable(ValidationEngine.VALIDATOR_IGNORE_FAILURE_PROPERTY_KEY);
+            if (ignoredProperties != null)
+                extra.setIgnoredProperties((Set<String>)ignoredProperties);
         }
+
+        // keep track of what the logic actually returns (translated edits can set flags in the binding meaning failure even if the logic passes
+        binding.setVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT, success);
 
         return success;
     }
