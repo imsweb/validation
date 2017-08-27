@@ -323,6 +323,9 @@ public class ValidationEngineTest {
     public void testRuntimeValidation() throws ConstructionException, ValidationException {
         Validator v = TestingUtils.loadValidator("fake-validator-runtime");
 
+        // the logic in the XML doesn't reference any lookup, but the runtime Java class returns one...
+        Assert.assertTrue(v.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
+
         Map<String, Object> data = new HashMap<>();
         Validatable validatable = new SimpleMapValidatable("level-runtime", data);
 
