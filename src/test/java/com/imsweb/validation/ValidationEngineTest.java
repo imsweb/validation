@@ -320,6 +320,28 @@ public class ValidationEngineTest {
     }
 
     @Test
+    public void testRuntimeValidation() throws ConstructionException, ValidationException {
+        Validator v = TestingUtils.loadValidator("fake-validator-runtime");
+
+        Map<String, Object> data = new HashMap<>();
+        Validatable validatable = new SimpleMapValidatable("level-runtime", data);
+
+        ValidationEngineInitializationStats stats = ValidationEngine.initialize(v);
+        Assert.assertEquals(1, stats.getNumEditsLoaded());
+        Assert.assertEquals(1, stats.getNumEditsStaticallyCompiled());
+        Assert.assertEquals(0, stats.getNumEditsDynamicallyCompiled());
+        try {
+            data.put("key", "value");
+            TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvrt-rule1");
+            data.put("key", "other");
+            TestingUtils.assertEditFailure(ValidationEngine.validate(validatable), "fvrt-rule1");
+        }
+        finally {
+            ValidationEngine.uninitialize();
+        }
+    }
+
+    @Test
     public void testCrossRootValidation() throws Exception {
 
         // this test uses one validator with two validatable roots; DMS actually uses different validators, but the idea is the same...

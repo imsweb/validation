@@ -159,6 +159,7 @@ public final class TestingUtils {
             _EXTRA_ALIASES.put("level1.level2.level3", "level3");
 
             _EXTRA_ALIASES.put("level", "level");
+            _EXTRA_ALIASES.put("level-runtime", "level-runtime");
 
             _EXTRA_ALIASES.put("root", "root");
             _EXTRA_ALIASES.put("root.repeatedObjects", "repeatedObject");
