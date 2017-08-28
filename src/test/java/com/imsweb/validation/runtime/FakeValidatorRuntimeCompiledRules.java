@@ -34,7 +34,7 @@ public class FakeValidatorRuntimeCompiledRules implements CompiledRules {
         return Collections.singletonMap("level-runtime", parameters);
     }
 
-    public boolean fvrt_rule1(Binding binding, Map<String, Object> context, ValidatorContextFunctions functions, Map<String, Object> data) {
+    public boolean fvrtRule1(Binding binding, Map<String, Object> context, ValidatorContextFunctions functions, Map<String, Object> data) {
         return "value".equals(data.get("key"));
     }
 }

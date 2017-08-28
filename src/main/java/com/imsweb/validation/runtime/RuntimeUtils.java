@@ -14,9 +14,18 @@ public class RuntimeUtils {
 
     public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
 
-    // TODO this won't be enough for more complex edit ID!
     public static String createMethodName(String ruleId) {
-        return ruleId.replace("-", "_");
+        if (ruleId == null || ruleId.isEmpty())
+            throw new RuntimeException("Rule ID cannot be blank!");
+
+        String[] parts = StringUtils.split(ruleId.replaceAll("\\s+|-+|/|_|\\.", " ").replaceAll("\\(.+\\)|[\\W&&[^\\s]]", ""), ' ');
+
+        StringBuilder buf = new StringBuilder();
+        buf.append(StringUtils.uncapitalize(parts[0].toLowerCase()));
+        for (int i = 1; i < parts.length; i++)
+            buf.append(StringUtils.capitalize(parts[i].toLowerCase()));
+
+        return buf.toString();
     }
 
     public static String createCompiledRulesClassName(String validatorId) {

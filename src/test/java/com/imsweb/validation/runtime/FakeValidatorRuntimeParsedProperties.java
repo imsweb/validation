@@ -18,7 +18,7 @@ public class FakeValidatorRuntimeParsedProperties implements ParsedProperties {
         return "TEST-001-01";
     }
 
-    public Set<String> fvrt_rule1() {
+    public Set<String> fvrtRule1() {
         return Collections.singleton("key");
     }
 }
