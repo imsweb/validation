@@ -85,7 +85,7 @@ public final class JavaContextParser {
 
             result = buildListOrMapFromQueue(queue, currentContext, false);
 
-            // TODO FPD a better way to do this is to create the correct instance of the class right away, but this code is a bit complicated...
+            // a better way to do this is to create the correct instance of the class right away, but this code is a bit complicated...
             if (typeHint != null) {
                 try {
                     Class<?> typeClazz = Class.forName(typeHint);

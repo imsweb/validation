@@ -91,7 +91,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     public static final String BINDING_KEY_DATE_COMPONENT = "__date_component";
 
     // Pre-compiled regex and formatters...
-    private static final Pattern _GEN_VAL_P1 = Pattern.compile("(\\-?\\d+)(.*)");
+    private static final Pattern _GEN_VAL_P1 = Pattern.compile("(-?\\d+)(.*)");
     private static final Pattern _GEN_VALID_DATE_IOP_P1 = Pattern.compile("(\\d{8}|\\d{6}\\s{2}|\\d{4}\\s{4})");
     private static final DateTimeFormatter _GEN_DATECMP_IOP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final Pattern _GEN_TRIM_P1 = Pattern.compile("^\\s+");
@@ -260,7 +260,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param binding
      * @param yearsIntoFuture
      */
-    public void GEN_ALLOW_FUTURE_DATE_IOP(Binding binding, int yearsIntoFuture) {
+    public void GEN_ALLOW_FUTURE_DATE_IOP(Binding binding, Object yearsIntoFuture) {
         binding.setVariable(BINDING_KEY_FUTURE_DATE, yearsIntoFuture);
     }
 
@@ -364,11 +364,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param binding
      * @param value1
      * @param value2
-     * @param minMaxFlag
+     * @param minMaxFlagObj
      * @return - internal use only -
      */
-    public int GEN_YEARDIFF_IOP(Binding binding, String value1, String value2, int minMaxFlag) {
-        int dayDiff = GEN_DAYDIFF_IOP(binding, value1, value2, minMaxFlag);
+    public int GEN_YEARDIFF_IOP(Binding binding, String value1, String value2, Object minMaxFlagObj) {
+        int dayDiff = GEN_DAYDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (dayDiff > SENTINEL_TRESHOLD)
             return dayDiff;
 
@@ -384,11 +384,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param value2
      * @param minInt
      * @param maxInt
-     * @param minMaxFlag
+     * @param minMaxFlagObj
      * @return - internal use only -
      */
-    public int GEN_YEARINTERNAL_IOP(Binding binding, String value1, String value2, int minInt, int maxInt, int minMaxFlag) {
-        int yearDiff = GEN_YEARDIFF_IOP(binding, value1, value2, minMaxFlag);
+    public int GEN_YEARINTERNAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
+        int yearDiff = GEN_YEARDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (yearDiff > SENTINEL_TRESHOLD)
             return yearDiff;
 
@@ -402,11 +402,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param binding
      * @param value1
      * @param value2
-     * @param minMaxFlag
+     * @param minMaxFlagObj
      * @return - internal use only -
      */
-    public int GEN_MONTHDIFF_IOP(Binding binding, String value1, String value2, int minMaxFlag) {
-        int dayDiff = GEN_DAYDIFF_IOP(binding, value1, value2, minMaxFlag);
+    public int GEN_MONTHDIFF_IOP(Binding binding, String value1, String value2, Object minMaxFlagObj) {
+        int dayDiff = GEN_DAYDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (dayDiff > SENTINEL_TRESHOLD)
             return dayDiff;
 
@@ -420,11 +420,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param value2
      * @param minInt
      * @param maxInt
-     * @param minMaxFlag
+     * @param minMaxFlagObj
      * @return - internal use only -
      */
-    public int GEN_MONTHINTERNAL_IOP(Binding binding, String value1, String value2, int minInt, int maxInt, int minMaxFlag) {
-        int monthDiff = GEN_MONTHDIFF_IOP(binding, value1, value2, minMaxFlag);
+    public int GEN_MONTHINTERNAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
+        int monthDiff = GEN_MONTHDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (monthDiff > SENTINEL_TRESHOLD)
             return monthDiff;
 
@@ -464,11 +464,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param value2
      * @param minInt
      * @param maxInt
-     * @param minMaxFlag
+     * @param minMaxFlagObj
      * @return - internal use only -
      */
-    public int GEN_DAYINTERNAL_IOP(Binding binding, String value1, String value2, int minInt, int maxInt, int minMaxFlag) {
-        int dayDiff = GEN_DAYDIFF_IOP(binding, value1, value2, minMaxFlag);
+    public int GEN_DAYINTERNAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
+        int dayDiff = GEN_DAYDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (dayDiff > SENTINEL_TRESHOLD)
             return dayDiff;
 
@@ -476,7 +476,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     // helper
-    private boolean runMinFlagLogic(Binding binding, Object value1, Object value2, int minMaxFlag, Object date1, Object date2) {
+    private boolean runMinFlagLogic(Binding binding, Object value1, Object value2, Object minMaxFlagObj, Object date1, Object date2) {
         String val1 = GEN_TO_STRING(value1);
         String val2 = GEN_TO_STRING(value2);
 
@@ -503,7 +503,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     // helper
-    private int applyMinMaxDayDiffFlag(Binding binding, Object value1, Object value2, int minMaxFlag, StringBuilder date1Buf, StringBuilder date2Buf) {
+    private int applyMinMaxDayDiffFlag(Binding binding, Object value1, Object value2, Object minMaxFlagObj, StringBuilder date1Buf, StringBuilder date2Buf) {
         String val1 = GEN_TO_STRING(value1);
         String val2 = GEN_TO_STRING(value2);
 
@@ -522,6 +522,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         date1Buf.append(pad(String.valueOf(y1), 4, "0", true));
         date2Buf.append(pad(String.valueOf(y2), 4, "0", true));
+
+        int minMaxFlag = (Integer)minMaxFlagObj;
 
         // handle month of first value
         int safeBeginningMonth = m1;
@@ -610,7 +612,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     // helper
-    private int applyMinMaxFlag(Binding binding, Object value1, Object value2, int minMaxFlag, StringBuilder date1Buf, StringBuilder date2Buf) {
+    private int applyMinMaxFlag(Binding binding, Object value1, Object value2, Object minMaxFlagObj, StringBuilder date1Buf, StringBuilder date2Buf) {
         String val1 = GEN_TO_STRING(value1);
         String val2 = GEN_TO_STRING(value2);
 
@@ -629,6 +631,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         date1Buf.append(pad(String.valueOf(y1), 4, "0", true));
         date2Buf.append(pad(String.valueOf(y2), 4, "0", true));
+
+        int minMaxFlag = (Integer)minMaxFlagObj;
 
         // handle month of first value
         int safeBeginningMonth = m1;
@@ -864,7 +868,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param length
      * @return - internal use only -
      */
-    public boolean GEN_INLIST(Object value, Object list, Object regex, int startPos, int length) {
+    public boolean GEN_INLIST(Object value, Object list, Object regex, Integer startPos, Integer length) {
         if (value == null)
             return false;
 
@@ -1265,12 +1269,12 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param index
      * @return - internal use only -
      */
-    public Integer GEN_BINLOOKUP(List<List<Integer>> table, int index) {
+    public Integer GEN_BINLOOKUP(List<List<Integer>> table, Object indexObj) {
         if (table == null || table.isEmpty())
             return null;
 
         // Genedits is 1-based
-        index = index - 1;
+        int index = (Integer)indexObj - 1;
 
         int rowSize = table.get(0).size();
         int row = index / rowSize;
@@ -1296,11 +1300,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param col
      * @return - internal use only -
      */
-    public Integer GEN_BINLOOKUP(List<List<Integer>> table, int row, int col) {
+    public Integer GEN_BINLOOKUP(List<List<Integer>> table, Object rowObj, Object colObj) {
 
         // adjust the indexes (GENEDITS is 1-based, we are 0-based)
-        row = row - 1;
-        col = col - 1;
+        int row = (Integer)rowObj - 1;
+        int col = (Integer)colObj - 1;
 
         // return 0 if any of the indexes is out of range
         if (row < 0 || row >= table.size())
@@ -1321,7 +1325,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param start
      * @return - internal use only -
      */
-    public char[] GEN_SUBSTR(Object value, int start) {
+    public char[] GEN_SUBSTR(Object value, Integer start) {
         if (value == null)
             return new char[0];
 
@@ -1342,7 +1346,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param length
      * @return - internal use only -
      */
-    public char[] GEN_SUBSTR(Object value, int start, int length) {
+    public char[] GEN_SUBSTR(Object value, Integer start, Integer length) {
         if (value == null)
             return new char[0];
 
@@ -1375,7 +1379,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param value
      * @param num
      */
-    public void GEN_STRCPY(char[] target, Object value, int num) {
+    public void GEN_STRCPY(char[] target, Object value, Integer num) {
         if (value == null)
             return;
 
@@ -1415,7 +1419,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param num
      * @return - internal use only -
      */
-    public char[] GEN_STRCAT(char[] target, Object value, int num) {
+    public char[] GEN_STRCAT(char[] target, Object value, Integer num) {
         if (value == null || num <= 0)
             return target;
 
@@ -1508,7 +1512,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param width
      * @return - internal use only -
      */
-    public int GEN_AT(Object value, Object text, int width) {
+    public int GEN_AT(Object value, Object text, Integer width) {
         if (value == null || text == null)
             return 0;
 
@@ -1551,7 +1555,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param numChars
      * @return - internal use only -
      */
-    public char[] GEN_RIGHT(Object value, int numChars) {
+    public char[] GEN_RIGHT(Object value, Integer numChars) {
         String val = GEN_TO_STRING(value);
 
         if (val == null)
@@ -1571,7 +1575,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param numChars
      * @return - internal use only -
      */
-    public char[] GEN_LEFT(Object value, int numChars) {
+    public char[] GEN_LEFT(Object value, Integer numChars) {
         String val = GEN_TO_STRING(value);
 
         if (val == null)

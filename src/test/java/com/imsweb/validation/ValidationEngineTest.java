@@ -1235,10 +1235,4 @@ public class ValidationEngineTest {
         }
         Assert.fail("Was expecting an exception, didn't get it...");
     }
-
-    @Test
-    public void testModifySets() {
-        Assert.assertTrue(true);
-        // TODO FPD finish this simple test...
-    }
 }

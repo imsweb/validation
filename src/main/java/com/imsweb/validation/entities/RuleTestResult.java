@@ -11,10 +11,6 @@ import java.util.Set;
 import com.imsweb.validation.TestingContextFunctions.AssertionType;
 import com.imsweb.validation.ValidationException;
 
-// TODO FPD add the rule properties to this object; remove "out" from the context (since the framework adds it); 
-// make sure "_" internal props are not included in the data. Once this is done, remove extra logic from SEER*DMS (ValidatorApiSessionBean.executeTest and RuleWebUtils.formatTestResults)
-// Also, parent SEER*DMS properties values are not correctly returned...
-
 /**
  * A rule test result.
  * <p/>
@@ -22,34 +18,54 @@ import com.imsweb.validation.ValidationException;
  */
 public class RuleTestResult {
 
-    /** Line number for this result (this is not unique per assertion because of for/while loops) */
+    /**
+     * Line number for this result (this is not unique per assertion because of for/while loops)
+     */
     protected Integer _lineNumber;
 
-    /** Assertion index (1-based) for this result (line number and assertion index makes an assertion unique) */
+    /**
+     * Assertion index (1-based) for this result (line number and assertion index makes an assertion unique)
+     */
     protected Integer _assertionIndex;
 
-    /** Assertion type */
+    /**
+     * Assertion type
+     */
     protected AssertionType _assertionType;
 
-    /** Properties that need to be in the failing properties returned by the validation engine */
+    /**
+     * Properties that need to be in the failing properties returned by the validation engine
+     */
     protected Set<String> _assertedFailingProperties;
 
-    /** Whether this test was a success or not (true if the assertion was correct, false otherwise) */
+    /**
+     * Whether this test was a success or not (true if the assertion was correct, false otherwise)
+     */
     protected Boolean _isSuccess;
 
-    /** Rule failure, null if the edit passed */
+    /**
+     * Rule failure, null if the edit passed
+     */
     protected RuleFailure _ruleFailure;
 
-    /** Values of the variables at assertion */
+    /**
+     * Values of the variables at assertion
+     */
     protected Object _values;
 
-    /** Extra context that was provided to the validatable */
+    /**
+     * Extra context that was provided to the validatable
+     */
     protected Map<String, Object> _contextValues;
 
-    /** Validation exception (if the validation engine was unable to run the edit) */
+    /**
+     * Validation exception (if the validation engine was unable to run the edit)
+     */
     protected ValidationException _validationException;
 
-    /** Content of the redirected output, can be used to add log messages from the edit's logic using the <b>out &lt;&lt; 'my message'</b> notation */
+    /**
+     * Content of the redirected output, can be used to add log messages from the edit's logic using the <b>out &lt;&lt; 'my message'</b> notation
+     */
     protected List<String> _log;
 
     /**
@@ -113,9 +129,9 @@ public class RuleTestResult {
     /**
      * Getter.
      * Created on Oct 7, 2011 by depryf
-     * @return the asserted failling properties, might be non-null only for asserty type FAIL
+     * @return the asserted failing properties, might be non-null only for assertion type FAIL
      */
-    public Set<String> getAssertedFailingproperties() {
+    public Set<String> getAssertedFailingProperties() {
         return _assertedFailingProperties;
     }
 
@@ -172,7 +188,7 @@ public class RuleTestResult {
     /**
      * Getter.
      * <p/>
-     * The output containsthe log messages from the edit's logic using the <b>out &lt;&lt; 'my message'</b> notation
+     * The output contains the log messages from the edit's logic using the <b>out &lt;&lt; 'my message'</b> notation
      * <p/>
      * Created on Nov 1, 2011 by depryf
      * @return the content of the redirected output (System.out)
@@ -181,11 +197,6 @@ public class RuleTestResult {
         return _log;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Aug 8, 2011 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -210,11 +221,6 @@ public class RuleTestResult {
         return true;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Aug 8, 2011 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         int prime = 31;
@@ -224,11 +230,6 @@ public class RuleTestResult {
         return result;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Aug 8, 2011 by depryf
-     * @see java.lang.Object#toString()
-     */
     @Override
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public String toString() {
