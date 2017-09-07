@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 1.8**
+
+- Increased the engine version to 5.8
+- Added support for pre-parsed and pre-compiled edits (optimizations).
+
 **Version 1.7**
 
 - Increased the engine version to 5.7
