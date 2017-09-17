@@ -83,6 +83,14 @@ public final class ValidationEngine {
     private static final String _ENGINE_VERSION = "5.8";
 
     /**
+     * The different context types supported by the engine
+     */
+    public static final String CONTEXT_TYPE_GROOVY = "groovy";
+    public static final String CONTEXT_TYPE_JAVA = "java";
+    public static final String CONTEXT_TYPE_TABLE = "table";
+    public static final String CONTEXT_TYPE_TABLE_INDEX_DEF = "table-index-def";
+
+    /**
      * Context key for the helper functions - Functions.
      */
     public static final String VALIDATOR_FUNCTIONS_KEY = "Functions";
@@ -1476,7 +1484,7 @@ public final class ValidationEngine {
      * @param contextKey new context key
      * @param validatorId validator ID
      * @param expression raw expression
-     * @param type type ("java" or "groovy")
+     * @param type type ("java", "groovy", "table", etc...)
      * @return the created <code>ContextEntry</code>
      * @throws ConstructionException
      */
@@ -1520,7 +1528,7 @@ public final class ValidationEngine {
      * @param contextKey new context key
      * @param validatorId validator ID
      * @param expression raw expression
-     * @param type type ("java" or "groovy")
+     * @param type type ("java", "groovy", "table", etc...)
      * @throws ConstructionException
      */
     public static void updateContext(String contextKey, String validatorId, String expression, String type) throws ConstructionException {

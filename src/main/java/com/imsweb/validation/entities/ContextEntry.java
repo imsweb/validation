@@ -34,7 +34,7 @@ public class ContextEntry {
     protected Validator _validator;
 
     /**
-     * Context type ("java" or "groovy")
+     * Context type ("java", "groovy", "table", etc...)
      */
     protected String _type;
 

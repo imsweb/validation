@@ -5,6 +5,7 @@ package com.imsweb.validation;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,8 @@ import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 
+import com.imsweb.validation.entities.ContextTable;
+import com.imsweb.validation.entities.ContextTableIndex;
 import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.entities.Validatable;
@@ -304,10 +307,14 @@ public class ValidatorServices {
     public Object addContextExpression(String expression, Map<String, Object> context, String entryId, String type) throws ConstructionException {
         Object result;
 
-        if ("groovy".equals(type))
+        if (ValidationEngine.CONTEXT_TYPE_GROOVY.equals(type))
             result = addGroovyContextExpression(expression, context, entryId);
-        else if ("java".equals(type))
+        else if (ValidationEngine.CONTEXT_TYPE_JAVA.equals(type))
             result = addJavaContextExpression(expression, context, entryId);
+        else if (ValidationEngine.CONTEXT_TYPE_TABLE.equals(type))
+            result = addTableContextExpression(expression, context, entryId);
+        else if (ValidationEngine.CONTEXT_TYPE_TABLE_INDEX_DEF.equals(type))
+            result = addTableIndexDefContextExpression(expression, context, entryId);
         else
             throw new ConstructionException("Unsupported context type: " + type);
 
@@ -315,7 +322,7 @@ public class ValidatorServices {
     }
 
     /**
-     * Adds the passed groovy context and add it to the provided current context.
+     * Adds the passed groovy context and adds it to the provided current context.
      * <p/>
      * Created on Aug 24, 2010 by depryf
      * @param expression expression to parse
@@ -352,7 +359,7 @@ public class ValidatorServices {
             }
             context.put(entryId, result);
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
             throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'", e);
         }
 
@@ -360,7 +367,7 @@ public class ValidatorServices {
     }
 
     /**
-     * Adds the passed java context and add it to the provided current context.
+     * Adds the passed java context and adds it to the provided current context.
      * <p/>
      * Created on Aug 24, 2010 by depryf
      * @param expression expression to parse
@@ -376,7 +383,67 @@ public class ValidatorServices {
             result = JavaContextParser.parseContext(expression, context);
             context.put(entryId, result);
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
+            throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'", e);
+        }
+
+        return result;
+    }
+
+    /**
+     * Adds the passed table context and adds it to the provided current context.
+     * <p/>
+     * Created on Aug 24, 2010 by depryf
+     * @param expression expression to parse
+     * @param context context
+     * @param entryId context entry ID
+     * @return the "compiled" context entry
+     * @throws ConstructionException
+     */
+    @SuppressWarnings("unchecked")
+    ContextTable addTableContextExpression(String expression, Map<String, Object> context, String entryId) throws ConstructionException {
+        ContextTable result;
+
+        try {
+            Object data = JavaContextParser.parseContext(expression, context);
+            if (!(data instanceof List))
+                throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'; bad format for a table");
+            result = new ContextTable(entryId, (List<List<String>>)data);
+            context.put(entryId, result);
+        }
+        catch (RuntimeException e) {
+            throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'", e);
+        }
+
+        return result;
+    }
+
+    /**
+     * Adds the passed table index definition context and adds it to the provided current context.
+     * <p/>
+     * Created on Aug 24, 2010 by depryf
+     * @param expression expression to parse
+     * @param context context
+     * @param entryId context entry ID
+     * @return the "compiled" context entry
+     * @throws ConstructionException
+     */
+    @SuppressWarnings("unchecked")
+    ContextTableIndex addTableIndexDefContextExpression(String expression, Map<String, Object> context, String entryId) throws ConstructionException {
+        ContextTableIndex result;
+
+        try {
+            Object data = JavaContextParser.parseContext(expression, context);
+            if (!(data instanceof Map))
+                throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'; bad format for a table");
+            Map<String, String> indexInfo = (Map<String, String>)data;
+            String table = indexInfo.get("table");
+            if (!context.containsKey(table))
+                throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'; unknown referenced table '" + table + "'");
+            result = new ContextTableIndex(entryId, (ContextTable)context.get(table), Arrays.asList(StringUtils.split(indexInfo.get("columns"), ',')));
+            context.put(entryId, result);
+        }
+        catch (RuntimeException e) {
             throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'", e);
         }
 

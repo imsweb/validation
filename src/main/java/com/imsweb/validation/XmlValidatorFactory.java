@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -84,6 +85,11 @@ import com.imsweb.validation.runtime.ParsedContexts;
 import com.imsweb.validation.runtime.ParsedLookups;
 import com.imsweb.validation.runtime.ParsedProperties;
 import com.imsweb.validation.runtime.RuntimeUtils;
+
+import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_GROOVY;
+import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_JAVA;
+import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_TABLE;
+import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_TABLE_INDEX_DEF;
 
 /**
  * This class is responsible for reading and writing XML files containing edits definitions.
@@ -446,9 +452,10 @@ public final class XmlValidatorFactory {
                 if (entryType.getId() == null)
                     throw new IOException("Context entry ID is required");
                 entry.setKey(entryType.getId());
-                String contextType = entryType.getType() == null ? "groovy" : entryType.getType();
-                if (!"groovy".equals(contextType) && !"java".equals(contextType))
-                    throw new IOException("Unable to load context '" + entryType.getId() + "' in " + validator.getId() + "; type must be 'groovy' or 'java'");
+                String contextType = entryType.getType() == null ? CONTEXT_TYPE_GROOVY : entryType.getType();
+                List<String> allowed = Arrays.asList(CONTEXT_TYPE_GROOVY, CONTEXT_TYPE_JAVA, CONTEXT_TYPE_TABLE, CONTEXT_TYPE_TABLE_INDEX_DEF);
+                if (!allowed.contains(contextType))
+                    throw new IOException("Unable to load context '" + entryType.getId() + "' in " + validator.getId() + "; type must be in " + allowed);
                 entry.setType(contextType);
                 entry.setExpression(reAlign(entryType.getValue()));
                 rawContext.add(entry);
