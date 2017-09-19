@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.imsweb.validation.entities.ContextTable;
+import com.imsweb.validation.entities.ContextTableIndex;
 import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.Validatable;
 
@@ -25,7 +27,7 @@ public class ValidatorServicesTest {
     public void setUp() throws Exception {
         TestingUtils.init();
     }
-    
+
     /**
      * Created on Aug 27, 2010 by depryf
      */
@@ -139,6 +141,54 @@ public class ValidatorServicesTest {
 
         ValidatorServices.getInstance().addGroovyContextExpression("return {x, y -> x + y}", context, "key4");
         Assert.assertEquals(4, context.size());
+    }
+
+    @Test
+    public void testAddTableContextExpression() throws ConstructionException {
+        Map<String, Object> context = new HashMap<>();
+
+        ValidatorServices.getInstance().addTableContextExpression("[['header1', 'header2'], ['val1', 'val2']]", context, "table1");
+        Assert.assertTrue(((ContextTable)context.get("table1")).getHeaders().contains("header2"));
+
+        ValidatorServices.getInstance().addTableContextExpression("[['header'], ['val1'], ['val2'], ['val3']]", context, "table2");
+        Assert.assertEquals(3, ((ContextTable)context.get("table2")).getData().size());
+    }
+
+    @Test
+    public void testAddTableIndexDefContextExpression() throws ConstructionException {
+        Map<String, Object> context = new HashMap<>();
+
+        // indexes require a table
+        ValidatorServices.getInstance().addTableContextExpression("[['header1', 'header2'], ['val1', 'val2'], ['val1', 'val3']]", context, "tableX");
+
+        // index based on first column doesn't hav unique values -> should use a list
+        ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : 'header1']", context, "index1");
+        Assert.assertFalse(((ContextTableIndex)context.get("index1")).hasUniqueKeys());
+        Assert.assertEquals(1, ((ContextTableIndex)context.get("index1")).find("val1")); // first row with the value should be returned
+
+        // index based on second column has unique values -> should use a map
+        ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : 'header2']", context, "index2");
+        Assert.assertTrue(((ContextTableIndex)context.get("index2")).hasUniqueKeys());
+        Assert.assertEquals(2, ((ContextTableIndex)context.get("index2")).find("val3"));
+
+        // index based on both column has unique values -> should use a map
+        ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : 'header1,header2']", context, "index3");
+        Assert.assertTrue(((ContextTableIndex)context.get("index3")).hasUniqueKeys());
+        Assert.assertEquals(1, ((ContextTableIndex)context.get("index3")).find("val1val2"));
+
+        // spacing doesn't matter in the columns
+        ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : ' header1,  header2 ']", context, "index4");
+        Assert.assertTrue(((ContextTableIndex)context.get("index4")).hasUniqueKeys());
+        Assert.assertEquals(1, ((ContextTableIndex)context.get("index4")).find("val1val2"));
+
+        // a table is required before the index is added
+        try {
+            ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableY', 'columns' : 'header']", context, "index");
+            Assert.fail("Was expecting an exception here!");
+        }
+        catch (ConstructionException e) {
+            // expected
+        }
     }
 
     /**
@@ -286,13 +336,13 @@ public class ValidatorServicesTest {
 
         // first version is not valid
         Assert.assertTrue(services.compareEngineVersions("ABC", "") > 0);
-        Assert.assertTrue(services.compareEngineVersions("ABC", "ABC")  == 0);
+        Assert.assertTrue(services.compareEngineVersions("ABC", "ABC") == 0);
         Assert.assertTrue(services.compareEngineVersions("ABC", "1.0") > 0);
         Assert.assertTrue(services.compareEngineVersions("1.1.1", "1.0") > 0);
 
         // second version is not valid
         Assert.assertTrue(services.compareEngineVersions("", "ABC") < 0);
-        Assert.assertTrue(services.compareEngineVersions("ABC", "ABC")  == 0);
+        Assert.assertTrue(services.compareEngineVersions("ABC", "ABC") == 0);
         Assert.assertTrue(services.compareEngineVersions("1.0", "ABC") < 0);
         Assert.assertTrue(services.compareEngineVersions("1.0", "1.1.1") < 0);
 

@@ -30,7 +30,7 @@ public class ContextTableIndex {
 
         List<Integer> colIdx = new ArrayList<>();
         for (String column : columnsToIndex) {
-            int idx = table.getHeaders().indexOf(column);
+            int idx = table.getHeaders().indexOf(column.trim());
             if (idx == -1)
                 throw new RuntimeException("Unable to find column \"" + column + "\" to index on table \"" + table.getName() + "\"");
             colIdx.add(idx);
@@ -46,7 +46,7 @@ public class ContextTableIndex {
             if (keysAdded.contains(key))
                 keysAreUnique = false;
             keysAdded.add(key);
-            _nonUniqueKeysData.add(new ImmutablePair<>(key, rowIdx));
+            _nonUniqueKeysData.add(new ImmutablePair<>(key, rowIdx + 1)); // adjust for table headers (row 0) which the indexes don't have
         }
 
         if (keysAreUnique) {
@@ -81,6 +81,10 @@ public class ContextTableIndex {
         }
 
         return result;
+    }
+
+    public boolean hasUniqueKeys() {
+        return _uniqueKeysData != null;
     }
 
     @Override

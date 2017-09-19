@@ -32,11 +32,6 @@ public class ContextTable {
         return _data;
     }
 
-    public int find(String value) {
-        // TODO
-        return -1;
-    }
-
     @Override
     public String toString() {
         return _data.toString(); // TODO format data
