@@ -925,155 +925,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
     /**
      * Special genedit method. Internal use only.
-     * <p/>
-     * Created on Apr 5, 2011 by depryf
-     * @param value
-     * @param indexObj
-     * @return - internal use only -
-     */
-    @SuppressWarnings("unchecked")
-    public boolean GEN_ILOOKUP(Object value, Object indexObj) {
-        String val = GEN_TO_STRING(value);
-
-        if (val == null || indexObj == null)
-            return false;
-
-        // index values are trimmed, so the incoming one also need to be trimmed...
-        String trimmedVal = trimRight(val);
-
-        boolean found = false;
-        if (indexObj instanceof List) {
-            for (Object elem : (List<Object>)indexObj) {
-                if (elem instanceof List) {
-                    List<Object> indexAndRecNum = (List<Object>)elem;
-                    if (indexAndRecNum.size() != 2)
-                        throw new RuntimeException("List elements of indexes must be of size 2 (index value and row number)");
-                    Object indexStr = indexAndRecNum.get(0);
-                    if (!(indexStr instanceof String))
-                        throw new RuntimeException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
-                    int comp = trimmedVal.compareTo((String)indexStr);
-                    if (comp == 0) {
-                        found = true;
-                        break;
-                    }
-                    else if (comp < 0)
-                        break; // values in the index are sorted, so we can stop the iteration sooner...
-
-                }
-                else if (elem instanceof String) {
-                    int comp = trimmedVal.compareTo((String)elem);
-                    if (comp == 0) {
-                        found = true;
-                        break;
-                    }
-                    else if (comp < 0)
-                        break; // values in the index are sorted, so we can stop the iteration sooner...
-                }
-                else
-                    throw new RuntimeException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
-            }
-        }
-        else if (indexObj instanceof Map)
-            found = ((Map<Object, Object>)indexObj).containsKey(trimmedVal);
-        else if (indexObj instanceof Set)
-            found = ((Set<Object>)indexObj).contains(trimmedVal);
-        else
-            throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
-
-        return found;
-    }
-
-    /**
-     * Special genedit method. Internal use only.
-     */
-    public boolean GEN_SQLLOOKUP(List<List<Object>> table, List<Object> columnNames, Object value) {
-        if (columnNames.isEmpty())
-            return true;
-
-        String val = GEN_TO_STRING(value);
-
-        int[] colNumbers = new int[columnNames.size()];
-        for (int i = 0; i < colNumbers.length; i++) {
-            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
-            if (colNumbers[i] == -1)
-                return true;
-        }
-
-        for (int r = 1; r < table.size(); r++) {
-            List<Object> row = table.get(r);
-            StringBuilder rowVal = new StringBuilder("");
-            for (int c : colNumbers)
-                rowVal.append(GEN_TO_STRING(row.get(c)));
-
-            if (val.equals(rowVal.toString()))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Special genedit method. Internal use only.
-     */
-    public boolean GEN_SQLRANGELOOKUP(List<List<Object>> table, List<Object> columnNames, Object value, Map<Integer, char[]> tableVars) {
-        if (columnNames.isEmpty())
-            return true;
-
-        String val = GEN_TO_STRING(value);
-
-        int[] colNumbers = new int[columnNames.size()];
-        for (int i = 0; i < colNumbers.length; i++) {
-            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
-            if (colNumbers[i] == -1)
-                return false;
-        }
-
-        int indexOfLargest = -1;
-        String largest = "";
-        for (int r = 1; r < table.size(); r++) {
-            List<Object> row = table.get(r);
-            StringBuilder rowVal = new StringBuilder("");
-            for (int c : colNumbers)
-                rowVal.append(GEN_TO_STRING(row.get(c)));
-            if (StringUtils.isNumeric(val) && StringUtils.isNumeric(rowVal)) {
-                Double rowNum = Double.parseDouble(rowVal.toString());
-                if (rowNum <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowNum > Double.parseDouble(largest))) {
-                    indexOfLargest = r;
-                    largest = rowVal.toString();
-                }
-            }
-            else if (rowVal.toString().compareTo(val) <= 0 && rowVal.toString().compareTo(largest) > 0) {
-                indexOfLargest = r;
-                largest = rowVal.toString();
-            }
-        }
-
-        // side effect, fill in any requested tableVar
-        if (indexOfLargest > -1 && tableVars != null) {
-            List<Object> row = table.get(indexOfLargest);
-            for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
-                if (row == null)
-                    GEN_STRCPY(entry.getValue(), "");
-                else {
-                    int colIdx = entry.getKey();
-                    if (colIdx >= 0 && colIdx < row.size()) {
-                        Object obj = row.get(colIdx);
-                        GEN_STRCPY(entry.getValue(), trimRight(obj == null ? "" : obj.toString()));
-                    }
-                }
-            }
-        }
-        return indexOfLargest > -1;
-    }
-
-    /**
-     * Special genedit method. Internal use only.
-     * <p/>
-     * Created on Apr 5, 2011 by depryf
-     * @param value
-     * @param tableObj
-     * @param indexObj
-     * @param tableVars
-     * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
     public boolean GEN_LOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
@@ -1172,13 +1023,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
     /**
      * Special genedit method. Internal use only.
-     * <p/>
-     * Created on Apr 5, 2011 by depryf
-     * @param value
-     * @param tableObj
-     * @param indexObj
-     * @param tableVars
-     * @return - internal use only -
      */
     @SuppressWarnings("unchecked")
     public boolean GEN_RLOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
@@ -1263,11 +1107,61 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
     /**
      * Special genedit method. Internal use only.
-     * <p/>
-     * Created on Apr 5, 2011 by depryf
-     * @param table
-     * @param index
-     * @return - internal use only -
+     */
+    @SuppressWarnings("unchecked")
+    public boolean GEN_ILOOKUP(Object value, Object indexObj) {
+        String val = GEN_TO_STRING(value);
+
+        if (val == null || indexObj == null)
+            return false;
+
+        // index values are trimmed, so the incoming one also need to be trimmed...
+        String trimmedVal = trimRight(val);
+
+        boolean found = false;
+        if (indexObj instanceof List) {
+            for (Object elem : (List<Object>)indexObj) {
+                if (elem instanceof List) {
+                    List<Object> indexAndRecNum = (List<Object>)elem;
+                    if (indexAndRecNum.size() != 2)
+                        throw new RuntimeException("List elements of indexes must be of size 2 (index value and row number)");
+                    Object indexStr = indexAndRecNum.get(0);
+                    if (!(indexStr instanceof String))
+                        throw new RuntimeException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
+                    int comp = trimmedVal.compareTo((String)indexStr);
+                    if (comp == 0) {
+                        found = true;
+                        break;
+                    }
+                    else if (comp < 0)
+                        break; // values in the index are sorted, so we can stop the iteration sooner...
+
+                }
+                else if (elem instanceof String) {
+                    int comp = trimmedVal.compareTo((String)elem);
+                    if (comp == 0) {
+                        found = true;
+                        break;
+                    }
+                    else if (comp < 0)
+                        break; // values in the index are sorted, so we can stop the iteration sooner...
+                }
+                else
+                    throw new RuntimeException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
+            }
+        }
+        else if (indexObj instanceof Map)
+            found = ((Map<Object, Object>)indexObj).containsKey(trimmedVal);
+        else if (indexObj instanceof Set)
+            found = ((Set<Object>)indexObj).contains(trimmedVal);
+        else
+            throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
+
+        return found;
+    }
+
+    /**
+     * Special genedit method. Internal use only.
      */
     public Integer GEN_BINLOOKUP(List<List<Integer>> table, Object indexObj) {
         if (table == null || table.isEmpty())
@@ -1293,12 +1187,34 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
     /**
      * Special genedit method. Internal use only.
-     * <p/>
-     * Created on Apr 5, 2011 by depryf
-     * @param table
-     * @param row
-     * @param col
-     * @return - internal use only -
+     */
+    public boolean GEN_SQLLOOKUP(List<List<Object>> table, List<Object> columnNames, Object value) {
+        if (columnNames.isEmpty())
+            return true;
+
+        String val = GEN_TO_STRING(value);
+
+        int[] colNumbers = new int[columnNames.size()];
+        for (int i = 0; i < colNumbers.length; i++) {
+            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
+            if (colNumbers[i] == -1)
+                return true;
+        }
+
+        for (int r = 1; r < table.size(); r++) {
+            List<Object> row = table.get(r);
+            StringBuilder rowVal = new StringBuilder("");
+            for (int c : colNumbers)
+                rowVal.append(GEN_TO_STRING(row.get(c)));
+
+            if (val.equals(rowVal.toString()))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Special genedit method. Internal use only.
      */
     public Integer GEN_BINLOOKUP(List<List<Integer>> table, Object rowObj, Object colObj) {
 
@@ -1315,6 +1231,60 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return 0;
 
         return rowData.get(col);
+    }
+
+    /**
+     * Special genedit method. Internal use only.
+     */
+    public boolean GEN_SQLRANGELOOKUP(List<List<Object>> table, List<Object> columnNames, Object value, Map<Integer, char[]> tableVars) {
+        if (columnNames.isEmpty())
+            return true;
+
+        String val = GEN_TO_STRING(value);
+
+        int[] colNumbers = new int[columnNames.size()];
+        for (int i = 0; i < colNumbers.length; i++) {
+            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
+            if (colNumbers[i] == -1)
+                return false;
+        }
+
+        int indexOfLargest = -1;
+        String largest = "";
+        for (int r = 1; r < table.size(); r++) {
+            List<Object> row = table.get(r);
+            StringBuilder rowVal = new StringBuilder("");
+            for (int c : colNumbers)
+                rowVal.append(GEN_TO_STRING(row.get(c)));
+            if (StringUtils.isNumeric(val) && StringUtils.isNumeric(rowVal)) {
+                Double rowNum = Double.parseDouble(rowVal.toString());
+                if (rowNum <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowNum > Double.parseDouble(largest))) {
+                    indexOfLargest = r;
+                    largest = rowVal.toString();
+                }
+            }
+            else if (rowVal.toString().compareTo(val) <= 0 && rowVal.toString().compareTo(largest) > 0) {
+                indexOfLargest = r;
+                largest = rowVal.toString();
+            }
+        }
+
+        // side effect, fill in any requested tableVar
+        if (indexOfLargest > -1 && tableVars != null) {
+            List<Object> row = table.get(indexOfLargest);
+            for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
+                if (row == null)
+                    GEN_STRCPY(entry.getValue(), "");
+                else {
+                    int colIdx = entry.getKey();
+                    if (colIdx >= 0 && colIdx < row.size()) {
+                        Object obj = row.get(colIdx);
+                        GEN_STRCPY(entry.getValue(), trimRight(obj == null ? "" : obj.toString()));
+                    }
+                }
+            }
+        }
+        return indexOfLargest > -1;
     }
 
     /**
@@ -1892,7 +1862,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     public boolean GEN_NAMEEXPR(Object... params) {
         throw new RuntimeException("GEN_NAMEEXPR method is currently not supported!"); // coudn't find a single edit using this method
     }
-
 
     public int GEN_EXTERNALDLL(String dll, String method) {
         return GEN_EXTERNALDLL(dll, method, null, null, null, null, null);

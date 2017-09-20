@@ -6,6 +6,7 @@ package com.imsweb.validation.entities;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
@@ -77,6 +78,46 @@ public class ContextTableIndex {
                 }
                 else if (comp < 0)
                     break; // values in the list are sorted, so we can stop the iteration sooner...
+            }
+        }
+
+        return result;
+    }
+
+    public int findFloor(String value) {
+        int result = -1;
+
+        // if the value is smaller than the smaller index key, return not found (-1)
+        // if the value is greater than the greatest index key, return the last index value
+        // if the value is equals to an index key, return that index value
+        // if a value is not equals to any index keys (but within the range of the keys), return the value of the first key that is greater than the value
+
+        if (_uniqueKeysData != null) {
+            if (value.compareTo(_uniqueKeysData.firstKey()) >= 0) {
+                Entry<String, Integer> entry = _uniqueKeysData.floorEntry(value);
+                if (entry != null)
+                    result = entry.getValue();
+                else if (value.compareTo(_uniqueKeysData.lastKey()) > 0)
+                    result = _uniqueKeysData.lastEntry().getValue();
+            }
+        }
+        else {
+            if (value.compareTo(_nonUniqueKeysData.get(0).getKey()) >= 0) {
+                for (int indexIdx = 0; indexIdx < _nonUniqueKeysData.size(); indexIdx++) {
+                    Pair<String, Integer> pair = _nonUniqueKeysData.get(indexIdx);
+                    int comp = value.compareTo(pair.getKey());
+                    if (comp == 0) {
+                        result = pair.getValue();
+                        break;
+                    }
+                    else if (comp < 0) {
+                        result = _nonUniqueKeysData.get(indexIdx - 1).getValue();
+                        break;
+                    }
+                }
+                if (result == -1)
+                    if (value.compareTo(_nonUniqueKeysData.get(_nonUniqueKeysData.size() - 1).getKey()) > 0)
+                        result = _nonUniqueKeysData.get(_nonUniqueKeysData.size() - 1).getValue();
             }
         }
 
