@@ -23,6 +23,8 @@ import groovy.lang.Binding;
 
 import com.imsweb.staging.Staging;
 import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.entities.ContextTable;
+import com.imsweb.validation.entities.ContextTableIndex;
 
 /**
  * Metafile-related helper methods made available to the edits. If you want to execute translated edits in your project, you need to initialize
@@ -923,11 +925,13 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return val.matches(reg);
     }
 
-    /**
-     * Special genedit method. Internal use only.
-     */
-    @SuppressWarnings("unchecked")
     public boolean GEN_LOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
+        // TODO
+    }
+
+    // this is the old engine (v4) implementation
+    @SuppressWarnings("unchecked")
+    private boolean GEN_LOOKUP_V4(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
 
         if (val == null || (tableObj == null && indexObj == null))
@@ -1019,6 +1023,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
 
         return found;
+    }
+
+    // in the new engine (v5), they kept LOOKUP but it looks like it will be deprecated at some point...
+    private boolean GEN_LOOKUP_V5(Object value, ContextTable table, ContextTableIndex index, Map<Integer, char[]> tableVars) {
+        // TODO
     }
 
     /**
