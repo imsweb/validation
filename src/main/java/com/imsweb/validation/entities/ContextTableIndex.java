@@ -47,7 +47,7 @@ public class ContextTableIndex {
             if (keysAdded.contains(key))
                 keysAreUnique = false;
             keysAdded.add(key);
-            _nonUniqueKeysData.add(new ImmutablePair<>(key, rowIdx + 1)); // adjust for table headers (row 0) which the indexes don't have
+            _nonUniqueKeysData.add(new ImmutablePair<>(key, rowIdx));
         }
 
         if (keysAreUnique) {

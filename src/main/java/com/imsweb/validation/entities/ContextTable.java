@@ -3,6 +3,7 @@
  */
 package com.imsweb.validation.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,7 +35,21 @@ public class ContextTable {
 
     @Override
     public String toString() {
-        return _data.toString(); // TODO format data
+
+        // this might be a bit slow, but oh well; go over all values and compute longest values
+        List<Integer> maxLength = new ArrayList<>(_headers.size());
+        for (int i = 0; i < _headers.size(); i++)
+            maxLength.set(i, _headers.get(i).length());
+        for (List<String> row : _data)
+            for (int col = 0; col < row.size(); col++)
+                maxLength.set(col, Math.max(maxLength.get(col), row.get(col).length()));
+
+        StringBuilder buf = new StringBuilder();
+        buf.append("[");
+        //for (String s : _headers)
+        //    buf.append(StringUtils.join(_headers.stream().map(s -> StringUtils.rightPad(s, )), '|'));
+
+        return buf.toString();
     }
 
     @Override

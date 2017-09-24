@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +23,8 @@ import groovy.lang.Binding;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.TestingUtils;
+import com.imsweb.validation.entities.ContextTable;
+import com.imsweb.validation.entities.ContextTableIndex;
 
 public class MetafileContextFunctionsTest {
 
@@ -1169,115 +1172,62 @@ public class MetafileContextFunctionsTest {
     public void testGEN_SQLLOOKUP() {
 
         // define the table we are going to use
-        List<List<Object>> table = new ArrayList<>();
-        List<Object> row0 = new ArrayList<>();
-        row0.add("GPCODE");
-        row0.add("GPNAME");
-        row0.add("SITELOW");
-        row0.add("SITEHIGH");
-        table.add(row0);
-        List<Object> row1 = new ArrayList<>();
+        List<List<String>> tableData = new ArrayList<>();
+        List<String> row0 = new ArrayList<>();
+        row0.add("GPCODE"); // length 2
+        row0.add("GPNAME"); // length 15
+        row0.add("SITELOW"); // length 4
+        row0.add("SITEHIGH"); // length 4
+        tableData.add(row0);
+        List<String> row1 = new ArrayList<>();
         row1.add("15");
         row1.add("Bones");
         row1.add("C420");
         row1.add("C429");
-        table.add(row1);
-        List<Object> row2 = new ArrayList<>();
+        tableData.add(row1);
+        List<String> row2 = new ArrayList<>();
         row2.add("17");
         row2.add("Skin");
         row2.add("C440");
         row2.add("C449");
-        table.add(row2);
-        List<Object> row3 = new ArrayList<>();
+        tableData.add(row2);
+        List<String> row3 = new ArrayList<>();
         row3.add("18");
         row3.add("Another Bones");
         row3.add("C400");
         row3.add("C409");
-        table.add(row3);
+        tableData.add(row3);
+        ContextTable table = new ContextTable("table", tableData);
 
-        List<Object> columns = new ArrayList<>();
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, ""));
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "123"));
+        // a bad table wouldn't compile in Genedits, so the behavior here doesn't really matter
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(null, null, "", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(null, null, "123", null));
 
-        columns.add("GPNAME");
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "Bones"));
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "Skin"));
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "Another Bones"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BadName"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, ""));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC420"));
+        ContextTableIndex index = new ContextTableIndex("index", table, Collections.singletonList("GPNAME"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "Bones", null));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "Skin", null));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "Another Bones", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "BadName", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "BonesC420", null));
 
-        columns.add("SITELOW");
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "BonesC420"));
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "SkinC440"));
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "Another BonesC400"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC450"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "C420Bones"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "Bones C420"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, " BonesC420"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC420 "));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, ""));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "C440C449"));
+        index = new ContextTableIndex("index", table, Arrays.asList("GPNAME", "SITELOW"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "BonesC420", null));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "SkinC440", null));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "Another BonesC400", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "BonesC450", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "C420Bones", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "Bones C420", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, " BonesC420", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "BonesC420 ", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "C440C449", null));
 
-        columns.add("GPCODE");
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "BonesC42015"));
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "SkinC44017"));
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "Another BonesC40018"));
-        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, columns, "BonesC420"));
-
-        columns.add("BadColumn");
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "BonesC42015"));
-    }
-
-    @Test
-    public void testGEN_SQLRANGELOOKUP() {
-
-        // define the table we are going to use (notice how the table is not sorted according to the GPCODE, but the index is sorted accoding to the SITELOW)
-        List<List<Object>> table = new ArrayList<>();
-        List<Object> row0 = new ArrayList<>();
-        row0.add("GPCODE");
-        row0.add("GPNAME");
-        row0.add("SITELOW");
-        row0.add("SITEHIGH");
-        table.add(row0);
-        List<Object> row1 = new ArrayList<>();
-        row1.add("15");
-        row1.add("Bones");
-        row1.add("C420");
-        row1.add("C429");
-        table.add(row1);
-        List<Object> row2 = new ArrayList<>();
-        row2.add("17");
-        row2.add("Skin");
-        row2.add("C440");
-        row2.add("C449");
-        table.add(row2);
-        List<Object> row3 = new ArrayList<>();
-        row3.add("18");
-        row3.add("Another Bones");
-        row3.add("C400");
-        row3.add("C409");
-        table.add(row3);
-
-        List<Object> columns = new ArrayList<>();
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "", null));
-
-        columns.add("SITELOW");
-        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, columns, "", null));
-        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, columns, "C100", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C400", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C449", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C999", null));
-
-        columns.add("GPCODE");
-        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, columns, "", null));
-        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, columns, "15", null));
-        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, columns, "C10015", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C44915", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C44917", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C40018", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C41000", null));
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "C99915", null));
+        index = new ContextTableIndex("index", table, Arrays.asList("GPNAME", "SITELOW", "GPCODE"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "BonesC42015", null));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "SkinC44017", null));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "Another BonesC40018", null));
+        Assert.assertFalse(_functions.GEN_SQLLOOKUP(table, index, "BonesC420", null));
 
         char[] gpcode = new char[20];
         char[] gpname = new char[20];
@@ -1289,24 +1239,112 @@ public class MetafileContextFunctionsTest {
         tablevars.put(2, sitelow);
         tablevars.put(3, sitehigh);
 
-        _functions.GEN_SQLRANGELOOKUP(table, columns, "", tablevars);
+        _functions.GEN_SQLLOOKUP(table, index, "", tablevars);
         Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
         Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
         Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
         Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
 
-        _functions.GEN_SQLRANGELOOKUP(table, columns, "C42015", tablevars);
+        _functions.GEN_SQLLOOKUP(table, index, "BonesC42015", tablevars);
         Assert.assertEquals("15", _functions.GEN_TO_STRING(tablevars.get(0)));
         Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get(1)));
         Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get(2)));
         Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get(3)));
 
-        // The EDITS50 engine does not change the TABLEVARs if the edit does not pass
-        _functions.GEN_SQLRANGELOOKUP(table, columns, "C10", tablevars);
+        _functions.GEN_SQLLOOKUP(table, index, "ABC", tablevars);
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
+
+        // requesting a bad column wouldn't compile in the Genedits framework, so it's OK to throw an exception...
+        try {
+            new ContextTableIndex("index", table, Arrays.asList("GPNAME", "SITELOW", "GPCODE", "BadColumn"));
+            Assert.fail("Should have been an exception!");
+        }
+        catch (RuntimeException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testGEN_SQLRANGELOOKUP() {
+
+        // define the table we are going to use
+        List<List<String>> tableData = new ArrayList<>();
+        List<String> row0 = new ArrayList<>();
+        row0.add("GPCODE"); // length 2
+        row0.add("GPNAME"); // length 15
+        row0.add("SITELOW"); // length 4
+        row0.add("SITEHIGH"); // length 4
+        tableData.add(row0);
+        List<String> row1 = new ArrayList<>();
+        row1.add("15");
+        row1.add("Bones");
+        row1.add("C420");
+        row1.add("C429");
+        tableData.add(row1);
+        List<String> row2 = new ArrayList<>();
+        row2.add("17");
+        row2.add("Skin");
+        row2.add("C440");
+        row2.add("C449");
+        tableData.add(row2);
+        List<String> row3 = new ArrayList<>();
+        row3.add("18");
+        row3.add("Another Bones");
+        row3.add("C400");
+        row3.add("C409");
+        tableData.add(row3);
+        ContextTable table = new ContextTable("table", tableData);
+
+        // a bad table wouldn't compile in Genedits, so the behavior here doesn't really matter
+        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, null, "", null));
+
+        ContextTableIndex index = new ContextTableIndex("index", table, Collections.singletonList("SITELOW"));
+        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, index, "", null));
+        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, index, "C100", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C400", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C449", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C999", null));
+
+        index = new ContextTableIndex("index", table, Arrays.asList("SITELOW", "GPCODE"));
+        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, index, "", null));
+        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, index, "15", null));
+        Assert.assertFalse(_functions.GEN_SQLRANGELOOKUP(table, index, "C10015", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C44915", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C44917", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C40018", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C41000", null));
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "C99915", null));
+
+        char[] gpcode = new char[20];
+        char[] gpname = new char[20];
+        char[] sitelow = new char[20];
+        char[] sitehigh = new char[20];
+        Map<Integer, char[]> tablevars = new HashMap<>();
+        tablevars.put(0, gpcode);
+        tablevars.put(1, gpname);
+        tablevars.put(2, sitelow);
+        tablevars.put(3, sitehigh);
+
+        _functions.GEN_SQLRANGELOOKUP(table, index, "", tablevars);
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
+
+        _functions.GEN_SQLRANGELOOKUP(table, index, "C42015", tablevars);
         Assert.assertEquals("15", _functions.GEN_TO_STRING(tablevars.get(0)));
         Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get(1)));
         Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get(2)));
         Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get(3)));
+
+        _functions.GEN_SQLRANGELOOKUP(table, index, "C10", tablevars);
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
     }
 
     /**
@@ -1315,41 +1353,43 @@ public class MetafileContextFunctionsTest {
     @Test
     public void testGEN_SQLBadTable() {
 
-        List<List<Object>> table = new ArrayList<>();
-        List<Object> row0 = new ArrayList<>();
+        List<List<String>> tableData = new ArrayList<>();
+        List<String> row0 = new ArrayList<>();
         row0.add("ALPHA1");
         row0.add("ALPHA2");
         row0.add("NUMBER1");
         row0.add("NUMBER2");
-        table.add(row0);
-        List<Object> row1 = new ArrayList<>();
+        tableData.add(row0);
+        List<String> row1 = new ArrayList<>();
         row1.add("abc");
         row1.add("def");
         row1.add("2");
         row1.add("456");
-        table.add(row1);
-        List<Object> row2 = new ArrayList<>();
+        tableData.add(row1);
+        List<String> row2 = new ArrayList<>();
         row2.add("ab");
         row2.add("cdef");
         row2.add("100");
         row2.add("56");
-        table.add(row2);
-        List<Object> row3 = new ArrayList<>();
+        tableData.add(row2);
+        List<String> row3 = new ArrayList<>();
         row3.add("cdef");
         row3.add("ghij");
         row3.add("1");
         row3.add("01");
-        table.add(row3);
-        List<Object> row4 = new ArrayList<>();
+        tableData.add(row3);
+        List<String> row4 = new ArrayList<>();
         row4.add("cdef");
         row4.add("klmn");
         row4.add("10");
         row4.add("1");
-        table.add(row4);
+        tableData.add(row4);
+        ContextTable table = new ContextTable("table", tableData);
 
-        List<Object> columns = new ArrayList<>();
+        List<String> columns = new ArrayList<>();
         columns.add("ALPHA1");
         columns.add("ALPHA2");
+        ContextTableIndex index = new ContextTableIndex("index", table, columns);
 
         char[] alpha1 = new char[20];
         char[] alpha2 = new char[20];
@@ -1362,14 +1402,15 @@ public class MetafileContextFunctionsTest {
         tablevars.put(3, number2);
 
         // If we were looking for a row with ALPHA1 = abcd & ALPHA2 = ef, the function should return false, but we would hit row 1 and return true
-        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, columns, "abcdef"));
+        Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "abcdef", null));
 
         // This is probably not what the user wants; Row 3 -> NUMBER1 = 1 < 10 = Row 4 NUMBER1, and Row 3 -> NUMBER2 = 1 = 1 = Row 4 NUMBER2
         // So Row 3 < Row 4, but Row 3 is returned to tableVars
         columns.clear();
         columns.add("NUMBER1");
         columns.add("NUMBER2");
-        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, columns, "101", tablevars));
+        index = new ContextTableIndex("index", table, columns);
+        Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "101", tablevars));
         Assert.assertEquals("cdef", _functions.GEN_TO_STRING(tablevars.get(0)));
         Assert.assertEquals("ghij", _functions.GEN_TO_STRING(tablevars.get(1)));
         Assert.assertEquals("1", _functions.GEN_TO_STRING(tablevars.get(2)));

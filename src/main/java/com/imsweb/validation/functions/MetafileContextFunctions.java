@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -926,21 +927,22 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     public boolean GEN_LOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
-        // TODO
+        String val = GEN_TO_STRING(value);
+        if (val == null || (tableObj == null && indexObj == null))
+            return false;
+
+        if (tableObj instanceof ContextTable || indexObj instanceof ContextTableIndex)
+            return GEN_LOOKUP_V5(val, (ContextTable)tableObj, (ContextTableIndex)indexObj, tableVars);
+        else
+            return GEN_LOOKUP_V4(val, (List<List<String>>)tableObj, indexObj, tableVars);
     }
 
     // this is the old engine (v4) implementation
     @SuppressWarnings("unchecked")
-    private boolean GEN_LOOKUP_V4(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
-        String val = GEN_TO_STRING(value);
-
-        if (val == null || (tableObj == null && indexObj == null))
-            return false;
+    private boolean GEN_LOOKUP_V4(String val, List<List<String>> table, Object indexObj, Map<Integer, char[]> tableVars) {
 
         // index values are trimmed, so the incoming one also need to be trimmed...
         String trimmedVal = trimRight(val);
-
-        List<List<Object>> table = (List<List<Object>>)tableObj;
 
         // if an index exists, use it!
         boolean found = false;
@@ -993,7 +995,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             else
                 throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
         }
-        else { // otherwise go over the entire table (ignore header)
+        else if (table != null) { // otherwise go over the entire table (ignore header)
             for (int i = 1; i < table.size(); i++) {
                 StringBuilder buf = new StringBuilder();
                 for (Object cell : table.get(i))
@@ -1008,17 +1010,12 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         // side effect, fill in any requested tableVar
         if (tableVars != null && table != null) {
-            List<Object> row = found && valIndex != null ? table.get(valIndex) : null;
+            List<String> row = found && valIndex != null ? table.get(valIndex) : null;
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
-                else {
-                    int colIdx = entry.getKey();
-                    if (colIdx >= 0 && colIdx < row.size()) {
-                        Object obj = row.get(colIdx);
-                        GEN_STRCPY(entry.getValue(), trimRight(obj == null ? "" : obj.toString()));
-                    }
-                }
+                else if (entry.getKey() >= 0 && entry.getKey() < row.size())
+                    GEN_STRCPY(entry.getValue(), trimRight(Objects.toString(row.get(entry.getKey()), "")));
             }
         }
 
@@ -1026,24 +1023,45 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     // in the new engine (v5), they kept LOOKUP but it looks like it will be deprecated at some point...
-    private boolean GEN_LOOKUP_V5(Object value, ContextTable table, ContextTableIndex index, Map<Integer, char[]> tableVars) {
-        // TODO
-    }
-
-    /**
-     * Special genedit method. Internal use only.
-     */
-    @SuppressWarnings("unchecked")
-    public boolean GEN_RLOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
-        String val = GEN_TO_STRING(value);
-
-        // it makes no sense to use RLOOKUP without an index!
-        if (val == null || indexObj == null)
+    private boolean GEN_LOOKUP_V5(String val, ContextTable table, ContextTableIndex index, Map<Integer, char[]> tableVars) {
+        if (index == null)
             return false;
 
-        List<List<String>> table = (List<List<String>>)tableObj;
+        // value searched for is trimmed...
+        int idx = index.find(trimRight(val));
 
+        // side effect, fill in any requested tableVar
+        if (tableVars != null && table != null) {
+            List<String> row = idx != -1 ? table.getData().get(idx) : null;
+            for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
+                if (row == null)
+                    GEN_STRCPY(entry.getValue(), "");
+                else if (entry.getKey() >= 0 && entry.getKey() < row.size())
+                    GEN_STRCPY(entry.getValue(), trimRight(Objects.toString(row.get(entry.getKey()), "")));
+            }
+        }
+
+        return idx != -1;
+    }
+
+    public boolean GEN_RLOOKUP(Object value, Object tableObj, Object indexObj, Map<Integer, char[]> tableVars) {
+        String val = GEN_TO_STRING(value);
+        if (val == null || (tableObj == null && indexObj != null))
+            return false;
+
+        if (tableObj instanceof ContextTable || indexObj instanceof ContextTableIndex)
+            return GEN_RLOOKUP_V5(val, (ContextTable)tableObj, (ContextTableIndex)indexObj, tableVars);
+        else
+            return GEN_RLOOKUP_V4(val, (List<List<String>>)tableObj, indexObj, tableVars);
+    }
+
+    // this is the old engine (v4) implementation
+    @SuppressWarnings("unchecked")
+    public boolean GEN_RLOOKUP_V4(String val, List<List<String>> table, Object indexObj, Map<Integer, char[]> tableVars) {
         Integer valIndex = null;
+
+        if (indexObj == null)
+            return false;
 
         if (indexObj instanceof List) {
             List<List<Object>> indexList = (List<List<Object>>)indexObj;
@@ -1103,20 +1121,36 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
-                else {
-                    int colIdx = entry.getKey();
-                    if (colIdx >= 0 && colIdx < row.size())
-                        GEN_STRCPY(entry.getValue(), GEN_TRIM(row.get(colIdx), TRIM_RIGHT));
-                }
+                else if (entry.getKey() >= 0 && entry.getKey() < row.size())
+                    GEN_STRCPY(entry.getValue(), trimRight(Objects.toString(row.get(entry.getKey()), "")));
             }
         }
 
         return found;
     }
 
-    /**
-     * Special genedit method. Internal use only.
-     */
+    // in the new engine (v5), they kept RLOOKUP but it looks like it will be deprecated at some point...
+    private boolean GEN_RLOOKUP_V5(String val, ContextTable table, ContextTableIndex index, Map<Integer, char[]> tableVars) {
+        if (index == null)
+            return false;
+
+        // value searched for is trimmed...
+        int idx = index.findFloor(trimRight(val));
+
+        // side effect, fill in any requested tableVar
+        if (tableVars != null && table != null) {
+            List<String> row = idx != -1 ? table.getData().get(idx) : null;
+            for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
+                if (row != null)
+                    GEN_STRCPY(entry.getValue(), "");
+                else if (entry.getKey() >= 0 && entry.getKey() < row.size())
+                    GEN_STRCPY(entry.getValue(), trimRight(Objects.toString(row.get(entry.getKey()), "")));
+            }
+        }
+
+        return idx != -1;
+    }
+
     @SuppressWarnings("unchecked")
     public boolean GEN_ILOOKUP(Object value, Object indexObj) {
         String val = GEN_TO_STRING(value);
@@ -1169,6 +1203,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return found;
     }
 
+    @SuppressWarnings("unchecked")
+    public boolean GEN_ILOOKUP(Object value, ContextTable table, ContextTableIndex index, Map<Integer, char[]> tableVars) {
+        return GEN_LOOKUP(value, table, index, null); // new version of ILOOKUP (engine V5) is just the same as regular lookup
+    }
+
     /**
      * Special genedit method. Internal use only.
      */
@@ -1197,34 +1236,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     /**
      * Special genedit method. Internal use only.
      */
-    public boolean GEN_SQLLOOKUP(List<List<Object>> table, List<Object> columnNames, Object value) {
-        if (columnNames.isEmpty())
-            return true;
-
-        String val = GEN_TO_STRING(value);
-
-        int[] colNumbers = new int[columnNames.size()];
-        for (int i = 0; i < colNumbers.length; i++) {
-            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
-            if (colNumbers[i] == -1)
-                return true;
-        }
-
-        for (int r = 1; r < table.size(); r++) {
-            List<Object> row = table.get(r);
-            StringBuilder rowVal = new StringBuilder("");
-            for (int c : colNumbers)
-                rowVal.append(GEN_TO_STRING(row.get(c)));
-
-            if (val.equals(rowVal.toString()))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Special genedit method. Internal use only.
-     */
     public Integer GEN_BINLOOKUP(List<List<Integer>> table, Object rowObj, Object colObj) {
 
         // adjust the indexes (GENEDITS is 1-based, we are 0-based)
@@ -1245,55 +1256,49 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     /**
      * Special genedit method. Internal use only.
      */
-    public boolean GEN_SQLRANGELOOKUP(List<List<Object>> table, List<Object> columnNames, Object value, Map<Integer, char[]> tableVars) {
-        if (columnNames.isEmpty())
-            return true;
+    public boolean GEN_SQLLOOKUP(ContextTable table, ContextTableIndex index, Object value, Map<Integer, char[]> tableVars) {
+        if (index == null)
+            return false;
 
-        String val = GEN_TO_STRING(value);
-
-        int[] colNumbers = new int[columnNames.size()];
-        for (int i = 0; i < colNumbers.length; i++) {
-            colNumbers[i] = table.get(0).indexOf(columnNames.get(i));
-            if (colNumbers[i] == -1)
-                return false;
-        }
-
-        int indexOfLargest = -1;
-        String largest = "";
-        for (int r = 1; r < table.size(); r++) {
-            List<Object> row = table.get(r);
-            StringBuilder rowVal = new StringBuilder("");
-            for (int c : colNumbers)
-                rowVal.append(GEN_TO_STRING(row.get(c)));
-            if (StringUtils.isNumeric(val) && StringUtils.isNumeric(rowVal)) {
-                Double rowNum = Double.parseDouble(rowVal.toString());
-                if (rowNum <= Double.parseDouble(val) && (StringUtils.isEmpty(largest) || rowNum > Double.parseDouble(largest))) {
-                    indexOfLargest = r;
-                    largest = rowVal.toString();
-                }
-            }
-            else if (rowVal.toString().compareTo(val) <= 0 && rowVal.toString().compareTo(largest) > 0) {
-                indexOfLargest = r;
-                largest = rowVal.toString();
-            }
-        }
+        // unlike the other lookup methods, SQLLOOKUP doesn't right trim the value!
+        int idx = index.find(GEN_TO_STRING(value));
 
         // side effect, fill in any requested tableVar
-        if (indexOfLargest > -1 && tableVars != null) {
-            List<Object> row = table.get(indexOfLargest);
+        if (tableVars != null && table != null) {
+            List<String> row = idx != -1 ? table.getData().get(idx) : null;
             for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
                 if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
-                else {
-                    int colIdx = entry.getKey();
-                    if (colIdx >= 0 && colIdx < row.size()) {
-                        Object obj = row.get(colIdx);
-                        GEN_STRCPY(entry.getValue(), trimRight(obj == null ? "" : obj.toString()));
-                    }
-                }
+                else if (entry.getKey() >= 0 && entry.getKey() < row.size())
+                    GEN_STRCPY(entry.getValue(), trimRight(Objects.toString(row.get(entry.getKey()), "")));
             }
         }
-        return indexOfLargest > -1;
+
+        return idx != -1;
+    }
+
+    /**
+     * Special genedit method. Internal use only.
+     */
+    public boolean GEN_SQLRANGELOOKUP(ContextTable table, ContextTableIndex index, Object value, Map<Integer, char[]> tableVars) {
+        if (index == null)
+            return false;
+
+        // unlike the other lookup methods, SQLRANGELOOKUP doesn't right trim the value!
+        int idx = index.findFloor(GEN_TO_STRING(value));
+
+        // side effect, fill in any requested tableVar
+        if (tableVars != null && table != null) {
+            List<String> row = idx != -1 ? table.getData().get(idx) : null;
+            for (Map.Entry<Integer, char[]> entry : tableVars.entrySet()) {
+                if (row == null)
+                    GEN_STRCPY(entry.getValue(), "");
+                else if (entry.getKey() >= 0 && entry.getKey() < row.size())
+                    GEN_STRCPY(entry.getValue(), trimRight(Objects.toString(row.get(entry.getKey()), "")));
+            }
+        }
+
+        return idx != -1;
     }
 
     /**
