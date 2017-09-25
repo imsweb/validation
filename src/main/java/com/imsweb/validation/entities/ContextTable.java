@@ -6,7 +6,14 @@ package com.imsweb.validation.entities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * This class represent a table in the Genedits framework.
+ */
 public class ContextTable {
 
     private String _name;
@@ -36,18 +43,20 @@ public class ContextTable {
     @Override
     public String toString() {
 
-        // this might be a bit slow, but oh well; go over all values and compute longest values
+        // this might be a bit slow, but oh well; go over all values and compute longest length for each column
         List<Integer> maxLength = new ArrayList<>(_headers.size());
-        for (int i = 0; i < _headers.size(); i++)
-            maxLength.set(i, _headers.get(i).length());
+        for (String _header : _headers)
+            maxLength.add(_header.length());
         for (List<String> row : _data)
             for (int col = 0; col < row.size(); col++)
                 maxLength.set(col, Math.max(maxLength.get(col), row.get(col).length()));
 
         StringBuilder buf = new StringBuilder();
-        buf.append("[");
-        //for (String s : _headers)
-        //    buf.append(StringUtils.join(_headers.stream().map(s -> StringUtils.rightPad(s, )), '|'));
+        buf.append(IntStream.range(0, _headers.size()).mapToObj(i -> StringUtils.rightPad("-", maxLength.get(i), "-")).collect(Collectors.joining("|"))).append("\n");
+        buf.append(IntStream.range(0, _headers.size()).mapToObj(i -> StringUtils.rightPad(_headers.get(i), maxLength.get(i))).collect(Collectors.joining("|"))).append("\n");
+        buf.append(IntStream.range(0, _headers.size()).mapToObj(i -> StringUtils.rightPad("-", maxLength.get(i), "-")).collect(Collectors.joining("|"))).append("\n");
+        for (List<String> row : _data)
+            buf.append(IntStream.range(0, row.size()).mapToObj(i -> StringUtils.rightPad(row.get(i), maxLength.get(i))).collect(Collectors.joining("|"))).append("\n");
 
         return buf.toString();
     }

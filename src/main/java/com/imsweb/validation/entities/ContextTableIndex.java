@@ -17,6 +17,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+/**
+ * This class represent a table index in the Genedits framework.
+ * <br/><br/>
+ * When a value is found, the row index in the corresponding table is returned; this is a 0-based value that doesn't take into account the table headers
+ * (so if value 0 is returned, it means the first row of data in the table).
+ */
 public class ContextTableIndex {
 
     private String _name;
@@ -28,6 +34,7 @@ public class ContextTableIndex {
     private List<Pair<String, Integer>> _nonUniqueKeysData;
 
     public ContextTableIndex(String name, ContextTable table, List<String> columnsToIndex) {
+        _name = name;
 
         List<Integer> colIdx = new ArrayList<>();
         for (String column : columnsToIndex) {
@@ -36,6 +43,8 @@ public class ContextTableIndex {
                 throw new RuntimeException("Unable to find column \"" + column + "\" to index on table \"" + table.getName() + "\"");
             colIdx.add(idx);
         }
+
+        _indexedColumns = columnsToIndex;
 
         Set<String> keysAdded = new HashSet<>();
         boolean keysAreUnique = true;
@@ -130,7 +139,20 @@ public class ContextTableIndex {
 
     @Override
     public String toString() {
-        return _name;
+
+        // this might be a bit slow, but oh well; go over all values and compute longest length for each column
+        String title = _name + " (" + StringUtils.join(_indexedColumns, ", ") + ")";
+
+        StringBuilder buf = new StringBuilder();
+        buf.append(StringUtils.rightPad("-", title.length(), "-")).append("\n");
+        buf.append(title).append("\n");
+        buf.append(StringUtils.rightPad("-", title.length(), "-")).append("\n");
+        if (_uniqueKeysData != null)
+            _uniqueKeysData.forEach((key, value) -> buf.append(key).append(" (row #").append(value).append(")\n"));
+        else
+            _nonUniqueKeysData.forEach(p -> buf.append(p.getKey()).append(" (row # ").append(p.getValue()).append(")\n"));
+
+        return buf.toString();
     }
 
     @Override
