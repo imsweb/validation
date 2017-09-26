@@ -164,22 +164,22 @@ public class ValidatorServicesTest {
         // index based on first column doesn't hav unique values -> should use a list
         ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : 'header1']", context, "index1");
         Assert.assertFalse(((ContextTableIndex)context.get("index1")).hasUniqueKeys());
-        Assert.assertEquals(1, ((ContextTableIndex)context.get("index1")).find("val1")); // first row with the value should be returned
+        Assert.assertEquals(0, ((ContextTableIndex)context.get("index1")).find("val1")); // first row with the value should be returned
 
         // index based on second column has unique values -> should use a map
         ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : 'header2']", context, "index2");
         Assert.assertTrue(((ContextTableIndex)context.get("index2")).hasUniqueKeys());
-        Assert.assertEquals(2, ((ContextTableIndex)context.get("index2")).find("val3"));
+        Assert.assertEquals(1, ((ContextTableIndex)context.get("index2")).find("val3"));
 
         // index based on both column has unique values -> should use a map
         ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : 'header1,header2']", context, "index3");
         Assert.assertTrue(((ContextTableIndex)context.get("index3")).hasUniqueKeys());
-        Assert.assertEquals(1, ((ContextTableIndex)context.get("index3")).find("val1val2"));
+        Assert.assertEquals(0, ((ContextTableIndex)context.get("index3")).find("val1val2"));
 
         // spacing doesn't matter in the columns
         ValidatorServices.getInstance().addTableIndexDefContextExpression("['table': 'tableX', 'columns' : ' header1,  header2 ']", context, "index4");
         Assert.assertTrue(((ContextTableIndex)context.get("index4")).hasUniqueKeys());
-        Assert.assertEquals(1, ((ContextTableIndex)context.get("index4")).find("val1val2"));
+        Assert.assertEquals(0, ((ContextTableIndex)context.get("index4")).find("val1val2"));
 
         // a table is required before the index is added
         try {

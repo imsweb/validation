@@ -45,8 +45,8 @@ public class ContextTable {
 
         // this might be a bit slow, but oh well; go over all values and compute longest length for each column
         List<Integer> maxLength = new ArrayList<>(_headers.size());
-        for (String _header : _headers)
-            maxLength.add(_header.length());
+        for (String header : _headers)
+            maxLength.add(header.length());
         for (List<String> row : _data)
             for (int col = 0; col < row.size(); col++)
                 maxLength.set(col, Math.max(maxLength.get(col), row.get(col).length()));
