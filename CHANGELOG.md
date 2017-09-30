@@ -4,7 +4,7 @@
 
 - Increased the engine version to 5.8
 - Added support for pre-parsed and pre-compiled edits (optimizations).
-- Added support for new context types 'table' and 'table-index-def' that will be used for Genedits framework.
+- Added support for new context types 'table' and 'table-index-def' that will be used for Genedits translation framework.
 
 **Version 1.7**
 
