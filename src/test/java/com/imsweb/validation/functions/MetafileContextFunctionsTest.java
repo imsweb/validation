@@ -1233,29 +1233,29 @@ public class MetafileContextFunctionsTest {
         char[] gpname = new char[20];
         char[] sitelow = new char[20];
         char[] sitehigh = new char[20];
-        Map<Integer, char[]> tablevars = new HashMap<>();
-        tablevars.put(0, gpcode);
-        tablevars.put(1, gpname);
-        tablevars.put(2, sitelow);
-        tablevars.put(3, sitehigh);
+        Map<String, char[]> tablevars = new HashMap<>();
+        tablevars.put("GPCODE", gpcode);
+        tablevars.put("GPNAME", gpname);
+        tablevars.put("SITELOW", sitelow);
+        tablevars.put("SITEHIGH", sitehigh);
 
         _functions.GEN_SQLLOOKUP(table, index, "", tablevars);
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPCODE")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPNAME")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITELOW")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITEHIGH")));
 
         _functions.GEN_SQLLOOKUP(table, index, "BonesC42015", tablevars);
-        Assert.assertEquals("15", _functions.GEN_TO_STRING(tablevars.get(0)));
-        Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get(1)));
-        Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get(2)));
-        Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get(3)));
+        Assert.assertEquals("15", _functions.GEN_TO_STRING(tablevars.get("GPCODE")));
+        Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get("GPNAME")));
+        Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get("SITELOW")));
+        Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get("SITEHIGH")));
 
         _functions.GEN_SQLLOOKUP(table, index, "ABC", tablevars);
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPCODE")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPNAME")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITELOW")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITEHIGH")));
 
         // requesting a bad column wouldn't compile in the Genedits framework, so it's OK to throw an exception...
         try {
@@ -1322,29 +1322,29 @@ public class MetafileContextFunctionsTest {
         char[] gpname = new char[20];
         char[] sitelow = new char[20];
         char[] sitehigh = new char[20];
-        Map<Integer, char[]> tablevars = new HashMap<>();
-        tablevars.put(0, gpcode);
-        tablevars.put(1, gpname);
-        tablevars.put(2, sitelow);
-        tablevars.put(3, sitehigh);
+        Map<String, char[]> tablevars = new HashMap<>();
+        tablevars.put("GPCODE", gpcode);
+        tablevars.put("GPNAME", gpname);
+        tablevars.put("SITELOW", sitelow);
+        tablevars.put("SITEHIGH", sitehigh);
 
         _functions.GEN_SQLRANGELOOKUP(table, index, "", tablevars);
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPCODE")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPNAME")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITELOW")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITEHIGH")));
 
         _functions.GEN_SQLRANGELOOKUP(table, index, "C42015", tablevars);
-        Assert.assertEquals("15", _functions.GEN_TO_STRING(tablevars.get(0)));
-        Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get(1)));
-        Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get(2)));
-        Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get(3)));
+        Assert.assertEquals("15", _functions.GEN_TO_STRING(tablevars.get("GPCODE")));
+        Assert.assertEquals("Bones", _functions.GEN_TO_STRING(tablevars.get("GPNAME")));
+        Assert.assertEquals("C420", _functions.GEN_TO_STRING(tablevars.get("SITELOW")));
+        Assert.assertEquals("C429", _functions.GEN_TO_STRING(tablevars.get("SITEHIGH")));
 
         _functions.GEN_SQLRANGELOOKUP(table, index, "C10", tablevars);
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
-        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(3)));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPCODE")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("GPNAME")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITELOW")));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get("SITEHIGH")));
     }
 
     /**
@@ -1395,11 +1395,11 @@ public class MetafileContextFunctionsTest {
         char[] alpha2 = new char[20];
         char[] number1 = new char[20];
         char[] number2 = new char[20];
-        Map<Integer, char[]> tablevars = new HashMap<>();
-        tablevars.put(0, alpha1);
-        tablevars.put(1, alpha2);
-        tablevars.put(2, number1);
-        tablevars.put(3, number2);
+        Map<String, char[]> tablevars = new HashMap<>();
+        tablevars.put("ALPHA1", alpha1);
+        tablevars.put("ALPHA2", alpha2);
+        tablevars.put("NUMBER1", number1);
+        tablevars.put("NUMBER2", number2);
 
         // If we were looking for a row with ALPHA1 = abcd & ALPHA2 = ef, the function should return false, but we would hit row 1 and return true
         Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "abcdef", null));
@@ -1411,10 +1411,10 @@ public class MetafileContextFunctionsTest {
         columns.add("NUMBER2");
         index = new ContextTableIndex("index", table, columns);
         Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "101", tablevars));
-        Assert.assertEquals("cdef", _functions.GEN_TO_STRING(tablevars.get(0)));
-        Assert.assertEquals("ghij", _functions.GEN_TO_STRING(tablevars.get(1)));
-        Assert.assertEquals("1", _functions.GEN_TO_STRING(tablevars.get(2)));
-        Assert.assertEquals("01", _functions.GEN_TO_STRING(tablevars.get(3)));
+        Assert.assertEquals("cdef", _functions.GEN_TO_STRING(tablevars.get("ALPHA1")));
+        Assert.assertEquals("ghij", _functions.GEN_TO_STRING(tablevars.get("ALPHA2")));
+        Assert.assertEquals("1", _functions.GEN_TO_STRING(tablevars.get("NUMBER1")));
+        Assert.assertEquals("01", _functions.GEN_TO_STRING(tablevars.get("NUMBER2")));
     }
 
     @Test
