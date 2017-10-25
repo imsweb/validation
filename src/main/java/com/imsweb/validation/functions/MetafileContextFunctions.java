@@ -1210,7 +1210,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean GEN_ILOOKUP(Object value, ContextTable table, ContextTableIndex index, Map<String, char[]> tableVars) {
+    public boolean GEN_ILOOKUP(Object value, Object table, Object index, Map<?, char[]> tableVars) {
         return GEN_LOOKUP(value, table, index, tableVars); // new version of ILOOKUP (engine V5) is just the same as regular lookup
     }
 
