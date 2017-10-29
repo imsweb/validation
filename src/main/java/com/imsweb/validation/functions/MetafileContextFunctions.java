@@ -1144,7 +1144,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         if (tableVars != null && table != null) {
             List<String> row = idx != -1 ? table.getData().get(idx) : null;
             for (Map.Entry<String, char[]> entry : tableVars.entrySet()) {
-                if (row != null)
+                if (row == null)
                     GEN_STRCPY(entry.getValue(), "");
                 else {
                     int colIdx = table.getHeaders().indexOf(entry.getKey());
