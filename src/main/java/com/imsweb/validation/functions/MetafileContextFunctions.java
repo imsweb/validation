@@ -1028,7 +1028,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return false;
 
         // value searched for is trimmed...
-        int idx = index.find(val);
+        int idx = index.find(trimRight(val));
 
         // side effect, fill in any requested tableVar
         if (tableVars != null && table != null) {
@@ -1138,7 +1138,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return false;
 
         // value searched for is trimmed...
-        int idx = index.findFloor(val);
+        int idx = index.findFloor(trimRight(val));
 
         // side effect, fill in any requested tableVar
         if (tableVars != null && table != null) {
