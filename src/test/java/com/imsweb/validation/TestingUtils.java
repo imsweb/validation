@@ -3,13 +3,17 @@
  */
 package com.imsweb.validation;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 
 import com.imsweb.validation.entities.EditableValidator;
@@ -37,7 +41,7 @@ public final class TestingUtils {
         // initialize engine
         if (!ValidationEngine.isInitialized())
             ValidationEngine.initialize();
-        
+
         // no edits should take more than one second (except the one tha tests the timeout)
         ValidationEngine.enableEditExecutionTimeout(1);
     }
@@ -63,6 +67,16 @@ public final class TestingUtils {
         }
         catch (Exception e) {
             throw new RuntimeException("Unable to unload '" + id + "'", e);
+        }
+    }
+
+    public static String readResource(String path) {
+        try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            IOUtils.copy(is, os);
+            return os.toString();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -123,11 +137,10 @@ public final class TestingUtils {
         if (results.isEmpty())
             Assert.fail("\nWas expecting at least one failure but got none");
     }
-    
+
     public static void assertLogMessage(String x) {
-       Assert.assertTrue(((TestingValidatorServices)ValidatorServices.getInstance()).getLogMessages().contains(x));
+        Assert.assertTrue(((TestingValidatorServices)ValidatorServices.getInstance()).getLogMessages().contains(x));
     }
-    
 
     private static class TestingValidatorContextFunctions extends ValidatorContextFunctions {
 
@@ -150,7 +163,7 @@ public final class TestingUtils {
          * Map of java-path -> alias to use in the edits
          */
         private static final Map<String, String> _EXTRA_ALIASES = new HashMap<>();
-        
+
         private List<String> _logMessages = new ArrayList<>();
 
         static {
@@ -195,7 +208,7 @@ public final class TestingUtils {
 
             return result;
         }
-        
+
         @Override
         public void log(String message) {
             _logMessages.add(message);
@@ -210,7 +223,7 @@ public final class TestingUtils {
         public void logError(String message) {
             _logMessages.add(message);
         }
-        
+
         public List<String> getLogMessages() {
             return _logMessages;
         }

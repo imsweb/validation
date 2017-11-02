@@ -11,6 +11,7 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,11 +49,13 @@ public class ContextTableIndex {
 
         Set<String> keysAdded = new HashSet<>();
         boolean keysAreUnique = true;
+        Pattern pattern = Pattern.compile("\\s+$");
 
         _nonUniqueKeysData = new ArrayList<>();
         for (int rowIdx = 0; rowIdx < table.getData().size(); rowIdx++) {
             List<String> row = table.getData().get(rowIdx);
-            String key = StringUtils.join(colIdx.stream().map(row::get).collect(Collectors.toList()).toArray(new String[0]));
+            // I *think* the index keys are right-trimmed in Genedits (I can't really prove it though)
+            String key = pattern.matcher(StringUtils.join(colIdx.stream().map(row::get).collect(Collectors.toList()).toArray(new String[0]))).replaceAll("");
             if (keysAdded.contains(key))
                 keysAreUnique = false;
             keysAdded.add(key);

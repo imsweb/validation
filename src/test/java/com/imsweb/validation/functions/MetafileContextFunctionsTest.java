@@ -25,6 +25,7 @@ import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.entities.ContextTable;
 import com.imsweb.validation.entities.ContextTableIndex;
+import com.imsweb.validation.internal.context.JavaContextParser;
 
 public class MetafileContextFunctionsTest {
 
@@ -1639,6 +1640,7 @@ public class MetafileContextFunctionsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testGEN_RLOOKUP() throws ConstructionException {
 
         // define the table we are going to use (notice how the table is not sorted according to the GPCODE, but the index is sorted accoding to the SITELOW)
@@ -1902,6 +1904,14 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(0)));
         Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(1)));
         Assert.assertEquals("", _functions.GEN_TO_STRING(tablevars.get(2)));
+
+        // a real case that didn't use to work correctly
+        ContextTable cTable = new ContextTable("NAACCR_CS_OBS", (List<List<String>>)JavaContextParser.parseContext(TestingUtils.readResource("tables/NAACCR_CS_OBS.txt"), null));
+        ContextTableIndex cIndex = new ContextTableIndex("NAACCR_CS_OBS_INDEX1", cTable, Collections.singletonList("INDEX1"));
+        char[] obsType = new char[3];
+        Map<String, char[]> tableVars = Collections.singletonMap("OBS_TYPE", obsType);
+        Assert.assertTrue(_functions.GEN_RLOOKUP("Prostate                        12410                                                               ", cTable, cIndex, tableVars));
+        Assert.assertEquals("13", _functions.GEN_TO_STRING(obsType));
     }
 
     @Test
