@@ -12,6 +12,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.imsweb.validation.ValidationEngineInitializationStats;
 
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_ACCESS_ERROR;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_CAST_ERROR;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_INSTANCIATION_ERROR;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_NOT_FOUND;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_DIFFERENT_VERSION;
+
 public class RuntimeUtils {
 
     public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
@@ -37,27 +43,40 @@ public class RuntimeUtils {
         return result.toString() + "CompiledRules";
     }
 
-    public static CompiledRules findCompileRules(String validatorId, ValidationEngineInitializationStats stats) {
+    public static CompiledRules findCompileRules(String validatorId, String version, ValidationEngineInitializationStats stats) {
         CompiledRules compiledRules;
+
+        String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);
         try {
-            compiledRules = (CompiledRules)(Class.forName(RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId)).newInstance());
+            compiledRules = (CompiledRules)(Class.forName(classPath).newInstance());
         }
         catch (ClassNotFoundException e) {
-            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_NOT_FOUND);
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_NOT_FOUND.replace("{0}", classPath));
             compiledRules = null;
         }
         catch (InstantiationException e) {
-            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_INSTANCIATION_ERROR);
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_INSTANCIATION_ERROR.replace("{0}", classPath));
             compiledRules = null;
         }
         catch (IllegalAccessException e) {
-            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_ACCESS_ERROR);
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_ACCESS_ERROR.replace("{0}", classPath));
             compiledRules = null;
         }
         catch (ClassCastException e) {
-            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_CAST_ERROR);
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_CAST_ERROR.replace("{0}", classPath));
             compiledRules = null;
         }
+
+        if (compiledRules != null && !StringUtils.isBlank(version) && !version.equals(compiledRules.getValidatorVersion())) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_DIFFERENT_VERSION.replace("{0}", compiledRules.getValidatorVersion()).replace("{1}", version));
+            compiledRules = null;
+        }
+
         return compiledRules;
     }
 

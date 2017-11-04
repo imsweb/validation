@@ -1843,8 +1843,8 @@ public final class ValidationEngine {
         // try to find pre-compiled rules on the class path
         CompiledRules precompiledRules = null;
         if (_PRE_COMPILED_LOOKUP_ENABLED)
-            precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), stats);
-        else
+            precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
+        else if (stats != null)
             stats.setReasonNotPreCompiled(validator.getId(), ValidationEngineInitializationStats.REASON_PRE_COMPILED_OFF);
 
         // internalize the rules
