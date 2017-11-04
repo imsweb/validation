@@ -1841,7 +1841,11 @@ public final class ValidationEngine {
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
 
         // try to find pre-compiled rules on the class path
-        CompiledRules precompiledRules = _PRE_COMPILED_LOOKUP_ENABLED ? RuntimeUtils.findCompileRules(validator.getId()) : null;
+        CompiledRules precompiledRules = null;
+        if (_PRE_COMPILED_LOOKUP_ENABLED)
+            precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), stats);
+        else
+            stats.setReasonNotPreCompiled(validator.getId(), ValidationEngineInitializationStats.REASON_PRE_COMPILED_OFF);
 
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_NUM_COMPILER_THREADS);

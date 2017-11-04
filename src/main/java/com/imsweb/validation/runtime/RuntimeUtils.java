@@ -10,6 +10,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.imsweb.validation.ValidationEngineInitializationStats;
+
 public class RuntimeUtils {
 
     public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
@@ -35,12 +37,25 @@ public class RuntimeUtils {
         return result.toString() + "CompiledRules";
     }
 
-    public static CompiledRules findCompileRules(String validatorId) {
+    public static CompiledRules findCompileRules(String validatorId, ValidationEngineInitializationStats stats) {
         CompiledRules compiledRules;
         try {
             compiledRules = (CompiledRules)(Class.forName(RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId)).newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException e) {
+            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_NOT_FOUND);
+            compiledRules = null;
+        }
+        catch (InstantiationException e) {
+            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_INSTANCIATION_ERROR);
+            compiledRules = null;
+        }
+        catch (IllegalAccessException e) {
+            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_ACCESS_ERROR);
+            compiledRules = null;
+        }
+        catch (ClassCastException e) {
+            stats.setReasonNotPreCompiled(validatorId, ValidationEngineInitializationStats.REASON_CLASS_CAST_ERROR);
             compiledRules = null;
         }
         return compiledRules;
