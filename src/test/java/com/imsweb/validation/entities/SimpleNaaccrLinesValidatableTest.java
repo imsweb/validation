@@ -138,18 +138,18 @@ public class SimpleNaaccrLinesValidatableTest {
         v = new SimpleNaaccrLinesValidatable(record);
         validatables = v.followCollection("line");
         line = (Map<String, String>)validatables.get(0).getScope().get("line");
-        Assert.assertEquals("001", line.get("csSiteSpecificFactor25"));
+        Assert.assertNull(line.get("csSiteSpecificFactor25")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
         Assert.assertEquals("peritoneum", line.get("_tnmSchemaId"));
-        Assert.assertEquals("peritoneum", line.get("_csSchemaId"));
+        Assert.assertNull(line.get("_csSchemaId")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
 
         v = new SimpleNaaccrLinesValidatable(Collections.singletonList(record), null, true);
         validatables = v.followCollection("untrimmedline");
         line = (Map<String, String>)validatables.get(0).getScope().get("untrimmedline");
-        Assert.assertEquals("001", line.get("csSiteSpecificFactor25"));
+        Assert.assertNull(line.get("csSiteSpecificFactor25")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
         Assert.assertEquals("peritoneum", line.get("_tnmSchemaId"));
-        Assert.assertEquals("peritoneum", line.get("_csSchemaId"));
+        Assert.assertNull(line.get("_csSchemaId")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
 
-        //Uniniitalize the StagingContextFunctions
+        //Uninitialize the StagingContextFunctions
         ValidatorContextFunctions.initialize(null);
     }
 }

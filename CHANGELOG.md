@@ -5,6 +5,7 @@
 - Increased the engine version to 5.8
 - Added support for pre-parsed and pre-compiled edits (optimizations).
 - Added support for new context types 'table' and 'table-index-def' that will be used for Genedits translation framework.
+- Remove logic that was overriding SSF25 based on TNM Schema ID and Sex in SimpleNaaccrLinesValidatable.
 - Updated staging client from version 2.5 to version 2.9 (TNM 1.5).
 - Updated Groovy library from version 2.4.7 (indy) to version 2.4.12 (indy).
 - Updated XStream library from version 1.4.9 to 1.4.10.
