@@ -190,14 +190,14 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
             if (!hasTnmSchemaId || hasSite || hasHist) {
                 StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getTnmStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_TNM_SCHEMA_ID, schema != null ? schema.getId() : null);
-                if (schema != null) {
-                    String ssf25 = _currentLine.get(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC);
-                    String sex = _currentLine.get(StagingContextFunctions.TNM_INPUT_PROP_SEX);
-                    String hist = _currentLine.get(StagingContextFunctions.CSTAGE_INPUT_PROP_HIST);
-                    String dxYear = _currentLine.get(StagingContextFunctions.CSTAGE_PROP_DX_YEAR);
-                    String newSsf25Value = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getSsf25FromSex(ssf25, sex, hist, dxYear, schema.getId());
-                    _currentLine.put(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC, newSsf25Value);
-                }
+//                if (schema != null) {
+//                    String ssf25 = _currentLine.get(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC);
+//                    String sex = _currentLine.get(StagingContextFunctions.TNM_INPUT_PROP_SEX);
+//                    String hist = _currentLine.get(StagingContextFunctions.CSTAGE_INPUT_PROP_HIST);
+//                    String dxYear = _currentLine.get(StagingContextFunctions.CSTAGE_PROP_DX_YEAR);
+//                    String newSsf25Value = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getSsf25FromSex(ssf25, sex, hist, dxYear, schema.getId());
+//                    _currentLine.put(StagingContextFunctions.CSTAGE_INPUT_PROP_DISC, newSsf25Value);
+//                }
             }
             if (!hasCsSchemaId || hasSite || hasHist) {
                 StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
