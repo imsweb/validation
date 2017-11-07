@@ -53,6 +53,8 @@ import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.Xpp3Driver;
+import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
 
 import com.imsweb.validation.entities.Category;
 import com.imsweb.validation.entities.Condition;
@@ -197,6 +199,11 @@ public final class XmlValidatorFactory {
                 return new SimpleDateFormat("yyyy-MM-dd").format((Date)obj);
             }
         });
+
+        // setup proper security by limiting what classes can be loaded by XStream
+        xstream.addPermission(NoTypePermission.NONE);
+        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.**"}));
+
         return xstream;
     }
 
@@ -956,6 +963,11 @@ public final class XmlValidatorFactory {
         });
         xstream.autodetectAnnotations(true);
         xstream.alias("set", StandaloneSetXmlDto.class);
+
+        // setup proper security by limiting what classes can be loaded by XStream
+        xstream.addPermission(NoTypePermission.NONE);
+        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.**"}));
+
         return xstream;
     }
 
@@ -1221,6 +1233,11 @@ public final class XmlValidatorFactory {
         });
         xstream.autodetectAnnotations(true);
         xstream.alias("tested-validator", TestedValidatorXmlDto.class);
+
+        // setup proper security by limiting what classes can be loaded by XStream
+        xstream.addPermission(NoTypePermission.NONE);
+        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.**"}));
+
         return xstream;
     }
 
