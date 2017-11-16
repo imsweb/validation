@@ -35,6 +35,8 @@ import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validatable;
+import com.imsweb.validation.runtime.CompiledRules;
+import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
  * A <code>ValidatingProcessor</code> is a <code>Processor</code> that runs edits on a particular level of a <code>Validatable</code>.
@@ -102,7 +104,10 @@ public class ValidatingProcessor implements Processor {
                 String key = vContext.getToForce().getId() + "|" + vContext.getToForce().getExpression().hashCode();
                 toForce = _cachedForcedRules.get(key);
                 if (toForce == null) {
-                    toForce = new ExecutableRule(vContext.getToForce());
+                    CompiledRules precompiledRules = null;
+                    if (ValidationEngine.isPreCompiledLookupEnabled() && vContext.getToForce().getValidator() != null)
+                        precompiledRules = RuntimeUtils.findCompileRules(vContext.getToForce().getValidator().getId(), vContext.getToForce().getValidator().getVersion(), null);
+                    toForce = new ExecutableRule(vContext.getToForce(), precompiledRules, null);
                     _cachedForcedRules.put(key, toForce);
                 }
             }

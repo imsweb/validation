@@ -1825,8 +1825,15 @@ public final class ValidationEngine {
     /**
      * Disables the pre-compiling mechanism, which is on by default.  That mechanism tries to find a class of pre-compiles rules on the class path.
      */
-    public static void disablePreParseLookup() {
+    public static void disablePreCompiledLookup() {
         _PRE_COMPILED_LOOKUP_ENABLED = false;
+    }
+
+    /**
+     * Returns true if the pre-compiling mechanism is on, false otherwise.
+     */
+    public static boolean isPreCompiledLookupEnabled() {
+        return _PRE_COMPILED_LOOKUP_ENABLED;
     }
 
     // ********************************************************************************
@@ -1842,7 +1849,7 @@ public final class ValidationEngine {
 
         // try to find pre-compiled rules on the class path
         CompiledRules precompiledRules = null;
-        if (_PRE_COMPILED_LOOKUP_ENABLED)
+        if (isPreCompiledLookupEnabled())
             precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
         else if (stats != null)
             stats.setReasonNotPreCompiled(validator.getId(), ValidationEngineInitializationStats.REASON_PRE_COMPILED_OFF);
