@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,11 +23,21 @@ public class RuntimeUtils {
 
     public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
 
+    private static Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
+    private static Pattern _P2 = Pattern.compile("[()]");
+    private static Pattern _P3 = Pattern.compile("[\\W&&[^\\s]]");
+    private static Pattern _P4 = Pattern.compile("^_|_$");
+
     public static String createMethodName(String ruleId) {
         if (ruleId == null || ruleId.isEmpty())
             throw new RuntimeException("Rule ID cannot be blank!");
 
-        String[] parts = StringUtils.split(ruleId.replaceAll("\\s+|-+|/|_|\\.", " ").replaceAll("\\(.+\\)|[\\W&&[^\\s]]", ""), ' ');
+        ruleId = _P1.matcher(ruleId).replaceAll(" ");
+        ruleId = _P2.matcher(ruleId).replaceAll("_");
+        ruleId = _P3.matcher(ruleId).replaceAll("");
+        ruleId = _P4.matcher(ruleId).replaceAll("");
+
+        String[] parts = StringUtils.split(ruleId, ' ');
 
         StringBuilder buf = new StringBuilder();
         buf.append(StringUtils.uncapitalize(parts[0].toLowerCase()));
