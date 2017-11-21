@@ -1473,6 +1473,20 @@ public final class XmlValidatorFactory {
     }
 
     /**
+     * Disables multi-threaded parsing of the rules, using a single thread; this is the default behavior of the engine.
+     */
+    public static void disableMultiThreadedCompilation() {
+        _NUM_PARSER_THREADS = 1;
+    }
+
+    /**
+     * Enables the pre-parsing mechanism; this is the default behavior of the engine.
+     */
+    public static void enablePreParseLookup() {
+        _PRE_PARSED_LOOKUP_ENABLED = true;
+    }
+
+    /**
      * Disables the pre-parsing mechanism, which is on by default.  That mechanism tries to find a class of pre-parsed properties, lookups, etc... on the class path.
      */
     public static void disablePreParseLookup() {

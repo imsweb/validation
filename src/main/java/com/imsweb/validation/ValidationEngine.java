@@ -1811,6 +1811,13 @@ public final class ValidationEngine {
     }
 
     /**
+     * Disables multi-threaded compilation of the rules, using a single thread; this is the default behavior of the engine.
+     */
+    public static void disableMultiThreadedCompilation() {
+        _NUM_COMPILER_THREADS = 1;
+    }
+
+    /**
      * Enables edit (and condition) execution timeout.
      * <br/><br/>
      * If set to a strictly positive value, and edit that runs for more than the value (in seconds) will be killed and will be seen as a failure.
@@ -1820,6 +1827,20 @@ public final class ValidationEngine {
         if (timeoutInSeconds < 0)
             throw new RuntimeException("Timeout in seconds must be 0 (to disable the timeout) or positive.");
         _EDIT_EXECUTION_TIMEOUT = timeoutInSeconds;
+    }
+
+    /**
+     * Disables edit (and condition) execution timeout; this is the default behavior of the engine.
+     */
+    public static void disableEditExecutionTimeout() {
+        _EDIT_EXECUTION_TIMEOUT = 0;
+    }
+
+    /**
+     * Enables the pre-compiling mechanism; this is the default behavior of the engine.
+     */
+    public static void enablePreCompiledLookup() {
+        _PRE_COMPILED_LOOKUP_ENABLED = true;
     }
 
     /**
