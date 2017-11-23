@@ -482,6 +482,7 @@ public class ValidatorContextFunctions {
             pattern = _cachedRegex.get(reg);
             if (pattern == null) {
                 pattern = Pattern.compile(reg);
+                _cachedRegex.put(reg, pattern);
                 _numCacheMiss++;
             }
             else
