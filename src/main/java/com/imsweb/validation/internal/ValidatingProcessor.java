@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -66,7 +65,7 @@ public class ValidatingProcessor implements Processor {
     private Map<String, Object> _contexts = new ConcurrentHashMap<>();
 
     // cached compiled forced rules (#294)
-    private ValidatingProcessorLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidatingProcessorLRUCache<>(10);
+    private ValidatorLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidatorLRUCache<>(10);
 
     // whether or not stats should be recorded
     private boolean _recordStats = false;
@@ -412,45 +411,6 @@ public class ValidatingProcessor implements Processor {
     @Override
     public String toString() {
         return _currentJavaPath + " [" + (_rules == null ? "?" : _rules.size()) + " rule(s)]";
-    }
-
-    /**
-     * Simple implementation of a LRU cache based on a LinkedHashMap.
-     * @param <A>
-     * @param <B>
-     */
-    private static class ValidatingProcessorLRUCache<A, B> extends LinkedHashMap<A, B> {
-
-        private static final long serialVersionUID = 4701170688038236784L;
-
-        private final int _maxEntries;
-
-        /**
-         * Constructor.
-         * @param maxEntries the maximum number of entries to keep in the cache
-         */
-        public ValidatingProcessorLRUCache(int maxEntries) {
-            super(maxEntries + 1, 1.0f, true);
-            _maxEntries = maxEntries;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this <code>LruCache</code> has more entries than the maximum specified when it was
-         * created.
-         * <p/>
-         * <p>
-         * This method <em>does not</em> modify the underlying <code>Map</code>; it relies on the implementation of
-         * <code>LinkedHashMap</code> to do that, but that behavior is documented in the JavaDoc for
-         * <code>LinkedHashMap</code>.
-         * </p>
-         * @param eldest <code>Entry</code> in question; this implementation doesn't care what it is, since the implementation is only dependent on the size of the cache
-         * @return <tt>true</tt> if the oldest
-         * @see LinkedHashMap#removeEldestEntry(Entry)
-         */
-        @Override
-        protected boolean removeEldestEntry(Entry<A, B> eldest) {
-            return size() > _maxEntries;
-        }
     }
 
     /**

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import groovy.lang.Binding;
 
 import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
+import com.imsweb.validation.internal.ValidatorLRUCache;
 import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 import com.imsweb.validation.shared.ContextFunctionDocDto;
 import com.imsweb.validation.shared.ValidatorLookup;
@@ -141,6 +143,9 @@ public class ValidatorContextFunctions {
 
         return dtos;
     }
+
+    // cached regular expression
+    private ValidatorLRUCache<String, Pattern> _cachedRegex;
 
     /**
      * Forces the given entity (corresponding to the given collection name) to report the given properties when the edit fails.
@@ -434,6 +439,40 @@ public class ValidatorContextFunctions {
     @ContextFunctionDocAnnotation(desc = "Returns the current year as an integer.", example = "Functions.getCurrentYear()")
     public int getCurrentYear() {
         return LocalDate.now().getYear();
+    }
+
+    /**
+     * No documentation on purpose, shouldn't be called from edits!
+     * <br/><br/>
+     * Enables the regex caching
+     * @param cacheSize regex cache size
+     */
+    public void enableRegexCaching(int cacheSize) {
+        _cachedRegex = new ValidatorLRUCache<>(cacheSize);
+    }
+
+    /**
+     * No documentation on purpose, shouldn't be called from edits!
+     * <br/><br/>
+     * Disables the regex caching
+     */
+    public void disableRegexCaching() {
+        _cachedRegex = null;
+    }
+
+    /**
+     * Returns true if the provided value matches according to the provided regular expression.
+     * @param value value to match
+     * @param regex regular expression (Java style) to match against
+     * @return true if the value matches, false otherwise.
+     */
+    public boolean matches(Object value, Object regex) {
+        if (value == null || regex == null)
+            return false;
+        String val = value instanceof String ? (String)value : value.toString();
+        String reg = regex instanceof String ? (String)regex : regex.toString();
+        Pattern pattern = _cachedRegex.computeIfAbsent(reg, Pattern::compile);
+        return pattern.matcher(val).matches();
     }
 }
 
