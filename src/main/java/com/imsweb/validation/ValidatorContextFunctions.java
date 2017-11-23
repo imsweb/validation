@@ -147,6 +147,9 @@ public class ValidatorContextFunctions {
     // cached regular expression
     private ValidatorLRUCache<String, Pattern> _cachedRegex;
 
+    // tmp stats for the cache
+    private long _numCacheHit = 0, _numCacheMiss = 0;
+
     /**
      * Forces the given entity (corresponding to the given collection name) to report the given properties when the edit fails.
      * <p/>
@@ -471,8 +474,28 @@ public class ValidatorContextFunctions {
             return false;
         String val = value instanceof String ? (String)value : value.toString();
         String reg = regex instanceof String ? (String)regex : regex.toString();
-        Pattern pattern = _cachedRegex.computeIfAbsent(reg, Pattern::compile);
+        //Pattern pattern = _cachedRegex == null ? Pattern.compile(reg) : _cachedRegex.computeIfAbsent(reg, Pattern::compile);
+        Pattern pattern;
+        if (_cachedRegex == null)
+            pattern = Pattern.compile(reg);
+        else {
+            pattern = _cachedRegex.get(reg);
+            if (pattern == null) {
+                pattern = Pattern.compile(reg);
+                _numCacheMiss++;
+            }
+            else
+                _numCacheHit++;
+        }
         return pattern.matcher(val).matches();
+    }
+
+    public long getNumCacheHit() {
+        return _numCacheHit;
+    }
+
+    public long getNumCacheMiss() {
+        return _numCacheMiss;
     }
 }
 
