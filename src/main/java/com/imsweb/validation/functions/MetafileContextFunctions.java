@@ -923,7 +923,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         // and again, right spaces stuff...
         reg = _GEN_MATCH_P4.matcher(reg).replaceAll("");
 
-        return val.matches(reg);
+        // calling this base method so the regex can be cached (if regex caching is turned on)
+        return matches(val, reg);
     }
 
     public boolean GEN_LOOKUP(Object value, Object tableObj, Object indexObj, Map<?, char[]> tableVars) {

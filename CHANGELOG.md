@@ -3,7 +3,8 @@
 **Version 1.8**
 
 - Increased the engine version to 5.8
-- Added support for pre-parsed and pre-compiled edits (optimizations).
+- Added support for caching regular expression in context functions.
+- Added support for pre-parsed and pre-compiled edits (optimization).
 - Added support for new context types 'table' and 'table-index-def' that will be used for Genedits translation framework.
 - Remove logic that was overriding SSF25 based on TNM Schema ID and Sex in SimpleNaaccrLinesValidatable.
 - Added a proper security environment to XStream by limiting the classes that it can create when loading XML files.

@@ -144,11 +144,14 @@ public class ValidatorContextFunctions {
         return dtos;
     }
 
-    // cached regular expression
-    private ValidatorLRUCache<String, Pattern> _cachedRegex;
+    // cached regular expressions
+    private ValidatorLRUCache<String, Pattern> _regexCache;
 
-    // tmp stats for the cache
-    private long _numCacheHit = 0, _numCacheMiss = 0;
+    // lock for the cache
+    private static final Object _REGEX_CACHE_LOCK = new Object();
+
+    // stats for the cached regular expressions
+    private long _numRegexCacheHit = 0, _numRegexCacheMiss = 0;
 
     /**
      * Forces the given entity (corresponding to the given collection name) to report the given properties when the edit fails.
@@ -232,7 +235,7 @@ public class ValidatorContextFunctions {
      * @param validatorId validator ID
      * @param contextKey context key
      * @return an object, possibly null
-     * @throws ValidationException
+     * @throws ValidationException if provided validator ID or context key are null or invalid
      */
     @ContextFunctionDocAnnotation(paramName1 = "validatorId", param1 = "validator ID", paramName2 = "contextKey", param2 = "context key",
             desc = "Returns the value of the requested context key, throws an exception if the context is not found.", example = "Functions.getContext('seer', 'Birthplace_Table')")
@@ -255,7 +258,7 @@ public class ValidatorContextFunctions {
      * Created on Dec 20, 2007 by depryf
      * @param id lookup ID
      * @return a <code>ValidatorLookup</code>, never null
-     * @throws ValidationException
+     * @throws ValidationException if provided lookup ID is null or invalid
      */
     @ContextFunctionDocAnnotation(paramName1 = "id", param1 = "Lookup ID", desc = "Returns the lookup corresponding to the requested ID.\n\n" +
             "The returned object is a ValidatorLookup on which the following methods are available:\n" +
@@ -294,7 +297,7 @@ public class ValidatorContextFunctions {
      * Created on Dec 20, 2007 by depryf
      * @param id configuration variable ID
      * @return corresponding value, null if it doesn't exist
-     * @throws ValidationException
+     * @throws ValidationException if provided ID is null
      */
     @ContextFunctionDocAnnotation(paramName1 = "id", param1 = "Configuration variable ID", desc = "Returns the value of the requested configuration variable.",
             example = "Functions.fetchConfVariable('id')")
@@ -451,7 +454,11 @@ public class ValidatorContextFunctions {
      * @param cacheSize regex cache size
      */
     public void enableRegexCaching(int cacheSize) {
-        _cachedRegex = new ValidatorLRUCache<>(cacheSize);
+        if (cacheSize < 1 || cacheSize > 10000)
+            throw new RuntimeException("Cache size must be between 1 and 10,000");
+        _regexCache = new ValidatorLRUCache<>(cacheSize);
+        _numRegexCacheHit = 0;
+        _numRegexCacheMiss = 0;
     }
 
     /**
@@ -460,7 +467,9 @@ public class ValidatorContextFunctions {
      * Disables the regex caching
      */
     public void disableRegexCaching() {
-        _cachedRegex = null;
+        _regexCache = null;
+        _numRegexCacheHit = 0;
+        _numRegexCacheMiss = 0;
     }
 
     /**
@@ -474,29 +483,42 @@ public class ValidatorContextFunctions {
             return false;
         String val = value instanceof String ? (String)value : value.toString();
         String reg = regex instanceof String ? (String)regex : regex.toString();
-        //Pattern pattern = _cachedRegex == null ? Pattern.compile(reg) : _cachedRegex.computeIfAbsent(reg, Pattern::compile);
+
         Pattern pattern;
-        if (_cachedRegex == null)
-            pattern = Pattern.compile(reg);
-        else {
-            pattern = _cachedRegex.get(reg);
-            if (pattern == null) {
+        synchronized (_REGEX_CACHE_LOCK) {
+            if (_regexCache == null)
                 pattern = Pattern.compile(reg);
-                _cachedRegex.put(reg, pattern);
-                _numCacheMiss++;
+            else {
+                pattern = _regexCache.get(reg);
+                if (pattern == null) {
+                    pattern = Pattern.compile(reg);
+                    _regexCache.put(reg, pattern);
+                    _numRegexCacheMiss++;
+                }
+                else
+                    _numRegexCacheHit++;
             }
-            else
-                _numCacheHit++;
         }
+
         return pattern.matcher(val).matches();
     }
 
-    public long getNumCacheHit() {
-        return _numCacheHit;
+    /**
+     * Returns the number of hits in the regex cache.
+     */
+    public long getNumRegexCacheHit() {
+        synchronized (_REGEX_CACHE_LOCK) {
+            return _numRegexCacheHit;
+        }
     }
 
-    public long getNumCacheMiss() {
-        return _numCacheMiss;
+    /**
+     * Returns the number of misses in the regex cache.
+     */
+    public long getNumRegexCacheMiss() {
+        synchronized (_REGEX_CACHE_LOCK) {
+            return _numRegexCacheMiss;
+        }
     }
 }
 

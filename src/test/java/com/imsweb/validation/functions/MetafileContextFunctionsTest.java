@@ -32,7 +32,7 @@ public class MetafileContextFunctionsTest {
     private MetafileContextFunctions _functions = new MetafileContextFunctions();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         TestingUtils.init();
     }
 

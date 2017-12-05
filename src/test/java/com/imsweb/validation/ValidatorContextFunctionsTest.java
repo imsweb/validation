@@ -22,7 +22,7 @@ public class ValidatorContextFunctionsTest {
     private ValidatorContextFunctions _functions = new ValidatorContextFunctions();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         TestingUtils.init();
     }
 
@@ -190,7 +190,7 @@ public class ValidatorContextFunctionsTest {
     }
 
     @Test
-    public void testFetchLookup() throws ValidationException {
+    public void testFetchLookup() {
 
         // null ID
         boolean exception = false;
@@ -206,7 +206,7 @@ public class ValidatorContextFunctionsTest {
 
         // non-null ID -> null (default implementation)
         try {
-            _functions.fetchLookup("lkup_id");
+            Assert.assertNull(_functions.fetchLookup("lkup_id"));
         }
         catch (ValidationException e) {
             exception = true;
@@ -232,7 +232,7 @@ public class ValidatorContextFunctionsTest {
         // non-null ID -> null (default implementation)
         Assert.assertNull(_functions.fetchConfVariable("id"));
     }
-    
+
     @Test
     public void testLog() {
         _functions.log("info!");
@@ -273,16 +273,59 @@ public class ValidatorContextFunctionsTest {
 
     @Test
     public void testGetCurrentDay() {
-        Assert.assertNotNull(_functions.getCurrentDay());
+        Assert.assertTrue(_functions.getCurrentDay() > 0);
     }
 
     @Test
     public void testGetCurrentMonth() {
-        Assert.assertNotNull(_functions.getCurrentMonth());
+        Assert.assertTrue(_functions.getCurrentMonth() > 0);
     }
 
     @Test
     public void testGetCurrentYear() {
-        Assert.assertNotNull(_functions.getCurrentYear());
+        Assert.assertTrue(_functions.getCurrentYear() > 0);
+    }
+
+    @Test
+    public void testMatches() {
+        _functions.disableRegexCaching();
+        Assert.assertFalse(_functions.matches("A", null));
+        Assert.assertFalse(_functions.matches(null, "[A-Z]"));
+        Assert.assertFalse(_functions.matches("", "[A-Z]"));
+        Assert.assertFalse(_functions.matches(" ", "[A-Z]"));
+        Assert.assertFalse(_functions.matches("1", "[A-Z]"));
+        Assert.assertFalse(_functions.matches(1, "[A-Z]"));
+        Assert.assertTrue(_functions.matches("A", "[A-Z]"));
+
+        try {
+            _functions.enableRegexCaching(10);
+            Assert.assertFalse(_functions.matches("A", null));
+            Assert.assertFalse(_functions.matches(null, "[A-Z]"));
+            Assert.assertFalse(_functions.matches("", "[A-Z]"));
+            Assert.assertFalse(_functions.matches(" ", "[A-Z]"));
+            Assert.assertFalse(_functions.matches("1", "[A-Z]"));
+            Assert.assertFalse(_functions.matches(1, "[A-Z]"));
+            Assert.assertTrue(_functions.matches("A", "[A-Z]"));
+            Assert.assertEquals(1, _functions.getNumRegexCacheMiss()); // first time is always a miss
+            Assert.assertEquals(4, _functions.getNumRegexCacheHit()); // any other times is hit (null value/regex doesn't count)
+            // same value, same regex (hit)
+            Assert.assertTrue(_functions.matches("A", "[A-Z]"));
+            Assert.assertEquals(1, _functions.getNumRegexCacheMiss());
+            Assert.assertEquals(5, _functions.getNumRegexCacheHit());
+            // different value, same regex (hit)
+            Assert.assertTrue(_functions.matches("B", "[A-Z]"));
+            Assert.assertEquals(1, _functions.getNumRegexCacheMiss());
+            Assert.assertEquals(6, _functions.getNumRegexCacheHit());
+            // different value, different regex (miss)
+            Assert.assertTrue(_functions.matches("0", "[0-9]"));
+            Assert.assertEquals(2, _functions.getNumRegexCacheMiss());
+            Assert.assertEquals(6, _functions.getNumRegexCacheHit());
+            _functions.disableRegexCaching();
+            Assert.assertEquals(0, _functions.getNumRegexCacheMiss());
+            Assert.assertEquals(0, _functions.getNumRegexCacheHit());
+        }
+        finally {
+            _functions.disableRegexCaching();
+        }
     }
 }
