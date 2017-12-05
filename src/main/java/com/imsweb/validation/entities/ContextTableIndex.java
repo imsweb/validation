@@ -4,6 +4,7 @@
 package com.imsweb.validation.entities;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -11,8 +12,8 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -26,26 +27,31 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public class ContextTableIndex {
 
+    // index name
     private String _name;
 
-    private List<String> _indexedColumns;
-
+    // data structure used for unique keys
     private NavigableMap<String, Integer> _uniqueKeysData;
 
+    // data structure used for non-unique keys
     private List<Pair<String, Integer>> _nonUniqueKeysData;
 
-    public ContextTableIndex(String name, ContextTable table, List<String> columnsToIndex) {
+    /**
+     * Constructor
+     * @param name index name
+     * @param table parent table
+     * @param indexedColumns columns (header) that make up this index
+     */
+    public ContextTableIndex(String name, ContextTable table, List<String> indexedColumns) {
         _name = name;
 
         List<Integer> colIdx = new ArrayList<>();
-        for (String column : columnsToIndex) {
+        for (String column : indexedColumns) {
             int idx = table.getHeaders().indexOf(column.trim());
             if (idx == -1)
                 throw new RuntimeException("Unable to find column \"" + column + "\" to index on table \"" + table.getName() + "\"");
             colIdx.add(idx);
         }
-
-        _indexedColumns = columnsToIndex;
 
         Set<String> keysAdded = new HashSet<>();
         boolean keysAreUnique = true;
@@ -55,7 +61,7 @@ public class ContextTableIndex {
         for (int rowIdx = 0; rowIdx < table.getData().size(); rowIdx++) {
             List<String> row = table.getData().get(rowIdx);
             // I *think* the index keys are right-trimmed in Genedits (I can't really prove it though)
-            String key = pattern.matcher(StringUtils.join(colIdx.stream().map(row::get).collect(Collectors.toList()).toArray(new String[0]))).replaceAll("");
+            String key = pattern.matcher(StringUtils.join(colIdx.stream().map(row::get).toArray(String[]::new))).replaceAll("");
             if (keysAdded.contains(key))
                 keysAreUnique = false;
             keysAdded.add(key);
@@ -68,14 +74,15 @@ public class ContextTableIndex {
                 _uniqueKeysData.put(pair.getKey(), pair.getValue());
             _nonUniqueKeysData = null;
         }
-        else {
-            _nonUniqueKeysData.sort((o1, o2) -> {
-                int result = o1.getKey().compareTo(o2.getKey());
-                return result == 0 ? o1.getValue().compareTo(o2.getValue()) : result;
-            });
-        }
+        else
+            _nonUniqueKeysData.sort(Comparator.comparing((Function<Pair<String, Integer>, String>)Pair::getKey).thenComparingInt(Pair::getValue));
     }
 
+    /**
+     * Returns the row number of the requested value in the parent table, -1 if not found.
+     * @param value value to look for
+     * @return corresponding row number in the parent table, -1 if not found
+     */
     public int find(String value) {
         int result = -1;
 
@@ -96,6 +103,11 @@ public class ContextTableIndex {
         return result;
     }
 
+    /**
+     * Returns the number of the first row that is equals or greater than the requested value, -1 if not found.
+     * @param value value to look for
+     * @return corresponding row number in the parent table, -1 if not found
+     */
     public int findFloor(String value) {
         int result = -1;
 
@@ -136,26 +148,17 @@ public class ContextTableIndex {
         return result;
     }
 
+    /**
+     * Returns true if the index has unique values, false otherwise.
+     * @return true if the index has unique values, false otherwise.
+     */
     public boolean hasUniqueKeys() {
         return _uniqueKeysData != null;
     }
 
     @Override
     public String toString() {
-
-        // this might be a bit slow, but oh well; go over all values and compute longest length for each column
-        String title = _name + " (" + StringUtils.join(_indexedColumns, ", ") + ")";
-
-        StringBuilder buf = new StringBuilder();
-        buf.append(StringUtils.rightPad("-", title.length(), "-")).append("\n");
-        buf.append(title).append("\n");
-        buf.append(StringUtils.rightPad("-", title.length(), "-")).append("\n");
-        if (_uniqueKeysData != null)
-            _uniqueKeysData.forEach((key, value) -> buf.append(key).append(" (row #").append(value).append(")\n"));
-        else
-            _nonUniqueKeysData.forEach(p -> buf.append(p.getKey()).append(" (row # ").append(p.getValue()).append(")\n"));
-
-        return buf.toString();
+        return _name;
     }
 
     @Override
