@@ -92,6 +92,8 @@ public class RuntimeUtils {
     }
 
     public static Method findCompiledMethod(CompiledRules compiledRules, String ruleId, List<Class<?>> parameters) {
+        if (ruleId == null)
+            return null;
         try {
             return compiledRules.getClass().getMethod(RuntimeUtils.createMethodName(ruleId), parameters.toArray(new Class[0]));
         }
@@ -121,7 +123,7 @@ public class RuntimeUtils {
 
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedProperties(ParsedProperties properties, String ruleId) {
-        if (properties == null)
+        if (properties == null || ruleId == null)
             return null;
         try {
             return (Set<String>)properties.getClass().getMethod(createMethodName(ruleId)).invoke(properties);
@@ -151,7 +153,7 @@ public class RuntimeUtils {
 
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedContexts(ParsedContexts contexts, String ruleId) {
-        if (contexts == null)
+        if (contexts == null || ruleId == null)
             return null;
         try {
             return (Set<String>)contexts.getClass().getMethod(createMethodName(ruleId)).invoke(contexts);
@@ -181,7 +183,7 @@ public class RuntimeUtils {
 
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedLookups(ParsedLookups lookups, String ruleId) {
-        if (lookups == null)
+        if (lookups == null || ruleId == null)
             return null;
         try {
             return (Set<String>)lookups.getClass().getMethod(createMethodName(ruleId)).invoke(lookups);

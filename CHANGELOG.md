@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.9**
+
+- Updated staging client from version 2.9 to version 2.10.
+
 **Version 1.8**
 
 - Increased the engine version to 5.8
