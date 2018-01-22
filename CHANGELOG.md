@@ -2,7 +2,7 @@
 
 **Version 1.10**
 
-- Added new "allowOverride" field to the Rule Java entity.
+- Added new "allowOverride" field to the Rule Java entity; this field is not used by this library but will be useful in projects using it.
 
 **Version 1.9**
 
