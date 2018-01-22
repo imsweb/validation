@@ -47,7 +47,7 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
      * context entries that are required by the rule being parsed. They are potential because the parsing is not perfect and we
      * might have some entries that are actually not a context key. In that case the code using this entries will just ignore it.
      * <br/><br/>
-     * In a future version, the "Context." prefix will be rquired for any context, and the parsing will acutally be accurate.
+     * In a future version, the "Context." prefix will be required for any context, and the parsing will actually be accurate.
      * <br/><br/>
      * The parsed context never contain the "Functions" nor "Context" prefixes.
      */
