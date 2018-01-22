@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.10**
+
+- Added new "allowOverride" field to the Rule Java entity.
+
 **Version 1.9**
 
 - Updated staging client from version 2.9 to version 2.10.

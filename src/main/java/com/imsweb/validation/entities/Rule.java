@@ -137,6 +137,11 @@ public class Rule {
     protected String _agency;
 
     /**
+     * Whether the failures from this rule can be overridden or not; this field not used in this library but this is useful for other projects using the library.
+     */
+    protected Boolean _allowOverride;
+
+    /**
      * Constructor.
      * <p/>
      * Created on Nov 9, 2007 by depryf
@@ -151,6 +156,7 @@ public class Rule {
         _potentialContextEntries = new HashSet<>();
         _ignored = Boolean.FALSE;
         _useAndForConditions = Boolean.TRUE;
+        _allowOverride = Boolean.FALSE;
     }
 
     /**
@@ -394,7 +400,7 @@ public class Rule {
      * @param histories the set of <code>RuleHistory</code>
      */
     public void setHistories(Set<RuleHistory> histories) {
-        _histories = histories == null ? new HashSet<RuleHistory>() : histories;
+        _histories = histories == null ? new HashSet<>() : histories;
     }
 
     /**
@@ -474,7 +480,7 @@ public class Rule {
      * @param dependencies the set of dependencie
      */
     public void setDependencies(Set<String> dependencies) {
-        _dependencies = dependencies == null ? new HashSet<String>() : dependencies;
+        _dependencies = dependencies == null ? new HashSet<>() : dependencies;
     }
 
     /**
@@ -494,7 +500,7 @@ public class Rule {
      * @param invertedDependencies the set of inverted dependencies
      */
     public void setInvertedDependencies(Set<String> invertedDependencies) {
-        _invertedDependencies = invertedDependencies == null ? new HashSet<String>() : invertedDependencies;
+        _invertedDependencies = invertedDependencies == null ? new HashSet<>() : invertedDependencies;
     }
 
     /**
@@ -583,6 +589,26 @@ public class Rule {
      */
     public void setAgency(String agency) {
         _agency = agency;
+    }
+
+    /**
+     * Getter
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @return whether override is allowed
+     */
+    public Boolean getAllowOverride() {
+        return _allowOverride;
+    }
+
+    /**
+     * Setter
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param allowOverride whether override is allowed
+     */
+    public void setAllowOverride(Boolean allowOverride) {
+        _allowOverride = allowOverride;
     }
 
     @Override
