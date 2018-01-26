@@ -245,9 +245,9 @@ public class ValidatingProcessor implements Processor {
 
                         RuleFailure failure = new RuleFailure(rule.getRule(), ValidatorServices.getInstance().fillInMessage(msg, validatable), validatable);
                         // extra error messages are used by translated edits only...
-                        failure.setExtraErrorMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES));
+                        failure.setExtraErrorMessages(ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES), validatable));
                         // information messages are used by translated edits only...
-                        failure.setInformationMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES));
+                        failure.setInformationMessages(ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
                         // keep track of the original result
                         failure.setOriginalResult((Boolean)binding.getVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT));
                         results.add(failure);
