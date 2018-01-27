@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.11**
+
+- Fixed bug where values in Genedits messages would not be properly replaced.
+
 **Version 1.10**
 
 - Added new "allowOverride" field to the Rule Java entity; this field is not used by this library but will be useful in projects using it.
