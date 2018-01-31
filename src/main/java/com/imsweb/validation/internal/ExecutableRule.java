@@ -193,6 +193,8 @@ public class ExecutableRule {
         _ignored = execRule._ignored;
         _rawProperties = execRule._rawProperties;
         _potentialContextEntries = execRule._rawProperties;
+        _compiledRules = execRule._compiledRules;
+        _compiledRule = execRule._compiledRule;
         synchronized (this) {
             _id = execRule._id;
             _script = execRule._script;

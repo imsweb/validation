@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.12**
+
+- Fixed a bug affecting pre-compiled edits being dynamically updated in the engine.
+
 **Version 1.11**
 
 - Fixed bug where values in Genedits messages would not be properly replaced.
