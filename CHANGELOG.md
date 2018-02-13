@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.13**
+
+- Updated staging client from version 2.10 to version 2.12. 
+
 **Version 1.12**
 
 - Fixed a bug affecting pre-compiled edits being dynamically updated in the engine.
