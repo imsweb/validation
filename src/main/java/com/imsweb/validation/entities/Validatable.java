@@ -27,6 +27,11 @@ public interface Validatable {
     String KEY_TNM_SCHEMA_ID = "_tnmSchemaId";
 
     /**
+     * Key for the calculated EOD staging schema ID that some validatable implementations put in the context of the executed edits.
+     */
+    String KEY_EOD_SCHEMA_ID = "_eodSchemaId";
+
+    /**
      * Returns the root level of this validatable. This corresponds to the first property in the full java-path of any rulesets.
      * <p/>
      * Created on Mar 6, 2008 by depryf

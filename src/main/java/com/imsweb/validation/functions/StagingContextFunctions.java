@@ -245,6 +245,12 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("ajccTnmPathStageGroup", "path_stage_group_direct");
         EOD_FIELDS.put("ajccTnmPathT", "path_t");
         EOD_FIELDS.put("ajccTnmPathTSuffix", "path_t_suffix");
+        EOD_FIELDS.put("ajccTnmPostTherapyM", "ypath_m");
+        EOD_FIELDS.put("ajccTnmPostTherapyN", "ypath_n");
+        EOD_FIELDS.put("ajccTnmPostTherapyNSuffix", "ypath_n_suffix");
+        EOD_FIELDS.put("ajccTnmPostTherapyStageGroup", "ypath_stage_group_direct");
+        EOD_FIELDS.put("ajccTnmPostTherapyT", "ypath_t");
+        EOD_FIELDS.put("ajccTnmPostTherapyTSuffix", "ypath_t_suffix");
         EOD_FIELDS.put("eodPrimaryTumor", "eod_primary_tumor");
         EOD_FIELDS.put("eodRegionalNodes", "eod_regional_nodes");
         EOD_FIELDS.put("eodMets", "eod_mets");
