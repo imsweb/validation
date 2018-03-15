@@ -121,9 +121,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * Constructor.
      * @param csStaging <code>Staging</code> instance to use for Collaboriative-Stage-related operations.
      * @param tnmStaging <code>Staging</code> instance to use for TNM-related operations.
+     * @param eodStaging <code>Staging</code> instance to use for EOD-related operations.
      */
-    public MetafileContextFunctions(Staging csStaging, Staging tnmStaging) {
-        super(csStaging, tnmStaging);
+    public MetafileContextFunctions(Staging csStaging, Staging tnmStaging, Staging eodStaging) {
+        super(csStaging, tnmStaging, eodStaging);
     }
 
     /**

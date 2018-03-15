@@ -19,13 +19,13 @@ repositories {
 }
 
 dependencies {
-    compile 'com.imsweb:staging-client-java:2.5'
+    compile 'com.imsweb:staging-client-java:3.1'
     compile 'org.codehaus.groovy:groovy:2.4.7:indy'
     compile 'commons-codec:commons-codec:1.10'
     compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'com.thoughtworks.xstream:xstream:1.4.9'
+    compile 'com.thoughtworks.xstream:xstream:1.4.10'
     testCompile 'junit:junit:4.12'
-    testCompile 'com.imsweb:data-generator:1.0'
+    testCompile 'com.imsweb:data-generator:1.4'
 }
 
 // enforce UTF-8 for all compilation tasks

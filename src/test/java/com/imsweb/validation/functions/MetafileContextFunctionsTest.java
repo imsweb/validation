@@ -656,7 +656,7 @@ public class MetafileContextFunctionsTest {
 
         _functions.GEN_ALLOW_FUTURE_DATE_IOP(binding, 1);
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20120202"));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20200202"));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20210202"));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, nextYear.format(yearMonthDayFormatter)));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.format(yearMonthDayFormatter)));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusDays(1).format(yearMonthDayFormatter)));
@@ -664,7 +664,7 @@ public class MetafileContextFunctionsTest {
         _functions.GEN_ALLOW_FUTURE_DATE_IOP(binding, 2);
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20120202"));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20130202"));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20200202"));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20210202"));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, tomorrow.format(yearMonthDayFormatter)));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(1).format(yearMonthDayFormatter)));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, nextYear.plusYears(2).format(yearMonthDayFormatter)));
