@@ -2,7 +2,9 @@
 
 **Version 1.14**
 
-- Updated staging client from version 2.12 to version 2.14. 
+- Updated staging client from version 2.14 to version 3.1.
+- Added support for the EOD staging algorithm.
+- Increased the engine version to 5.9.
 
 **Version 1.13**
 
