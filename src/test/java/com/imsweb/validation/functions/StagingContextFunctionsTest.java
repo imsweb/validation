@@ -454,6 +454,172 @@ public class StagingContextFunctionsTest {
         Assert.assertTrue(_functions.isCocRequiredTnmCode(input, 12));
         Assert.assertFalse(_functions.isCocRequiredTnmCode(input, 23));
     }
+
+    @Test
+    public void testGetEodVersion() {
+        Assert.assertNotNull(_functions.getEodVersion());
+    }
+
+    @Test
+    public void testGetEodSchema() {
+        Map<String, String> input = new HashMap<>();
+        Assert.assertNull(_functions.getEodStagingSchema(null));
+        Assert.assertNull(_functions.getEodStagingSchema(input));
+
+        input.put("primarySite", "C481");
+        input.put("histologyIcdO3", "8000");
+        Assert.assertNull(_functions.getEodStagingSchema(input));
+
+        input.put("sex", "1");
+        Assert.assertNotNull(_functions.getEodStagingSchema(input)); // retroperitoneum
+
+        input.put("schemaDiscriminator1", "1");
+        Assert.assertNotNull(_functions.getEodStagingSchema(input));
+
+        input.put("primarySite", "C111");
+        Assert.assertNotNull(_functions.getEodStagingSchema(input)); // nasopharynx
+
+        input.put("schemaDiscriminator1", "2");
+        Assert.assertNull(_functions.getEodStagingSchema(input));
+
+        input.put("schemaDiscriminator2", "2");
+        Assert.assertNotNull(_functions.getEodStagingSchema(input)); // oropharynx_hpv_mediated_p16_pos
+    }
+
+    @Test
+    public void testGetEodSchemaName() {
+        Map<String, String> input = new HashMap<>();
+        Assert.assertNull(_functions.getEodSchemaName(null));
+        Assert.assertNull(_functions.getEodSchemaName(input));
+
+        input.put("primarySite", "C004");
+        input.put("histologyIcdO3", "8750");
+        input.put("schemaDiscriminator1", "0");
+        Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
+        input.put("primarySite", "C003");
+        Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
+        input.put("schemaDiscriminator1", null);
+        Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
+        input.put("histologyIcdO3", "8720");
+        Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
+        input.put("histologyIcdO3", "8790");
+        Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
+        input.put("histologyIcdO3", "8719");
+        Assert.assertNull(_functions.getEodSchemaName(input));
+        input.put("histologyIcdO3", "8791");
+        Assert.assertNull(_functions.getEodSchemaName(input));
+    }
+
+    @Test
+    public void testGetEodSchemaId() {
+        Map<String, String> input = new HashMap<>();
+        Assert.assertNull(_functions.getEodSchemaId(null));
+        Assert.assertNull(_functions.getEodSchemaId(input));
+
+        input.put("primarySite", "C004");
+        input.put("histologyIcdO3", "8750");
+        input.put("schemaDiscriminator1", "0");
+        Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
+        input.put("primarySite", "C003");
+        Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
+        input.put("schemaDiscriminator1", null);
+        Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
+        input.put("histologyIcdO3", "8720");
+        Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
+        input.put("histologyIcdO3", "8790");
+        Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
+        input.put("histologyIcdO3", "8719");
+        Assert.assertNull(_functions.getEodSchemaId(input));
+        input.put("histologyIcdO3", "8791");
+        Assert.assertNull(_functions.getEodSchemaId(input));
+        input.put("primarySite", "C481");
+        input.put("histologyIcdO3", "8000");
+        input.put("schemaDiscriminator1", null);
+        input.put("sex", "2");
+        Assert.assertEquals("primary_peritoneal_carcinoma", _functions.getEodSchemaId(input));
+        input.put("sex", null);
+        Assert.assertNull(_functions.getEodSchemaId(input));
+    }
+
+    @Test
+    public void testIsAcceptableEodCode() {
+
+        // C447/8000 and eodPrimaryTumor, expecting [000, 100, 200, 700, 800, 999]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C447");
+        input.put("histologyIcdO3", "8000");
+        input.put("csSiteSpecificFactor25", null);
+
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "gradeClinical", "000"));
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "000"));
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "100"));
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "700"));
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "999"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "888"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", null));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", ""));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "xyz"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "-5"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "eodPrimaryTumor", "99999"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, null, "000"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "", "000"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "zyz", "000"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(null, "eodPrimaryTumor", "cX"));
+
+        // C447/8000 and summaryStage2018, expecting [0, 1, 2, 3, 4, 7, 9]
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "summaryStage2018", "1"));
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "summaryStage2018", "0"));
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "summaryStage2018", "4"));
+        Assert.assertTrue(_functions.isAcceptableEodCode(input, "summaryStage2018", "9"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "summaryStage2018", "c5"));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "summaryStage2018", null));
+        Assert.assertFalse(_functions.isAcceptableEodCode(input, "summaryStage2018", ""));
+    }
+
+    @Test
+    public void testIsRequiredEodField() {
+
+        // C619/8000 -> Prostate [psa, prostatePathologicalExtension, numberOfCoresPositive, numberOfCoresExamined, gleasonTertiaryPattern, 
+        //                        gleasonScoreClinical, gleasonPatternsClinical, gleasonScorePathological, gleasonPatternsPathological]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C619");
+        input.put("histologyIcdO3", "8000");
+        input.put("schemaDiscriminator1", null);
+
+        Assert.assertTrue(_functions.isRequiredEodField(input, "gleasonPatternsClinical"));
+        Assert.assertTrue(_functions.isRequiredEodField(input, "psaLabValue"));
+        Assert.assertFalse(_functions.isRequiredEodField(input, "regionalNodesPositive"));
+    }
+
+    @Test
+    public void testIsNeededForStagingEodField() {
+
+        // C619/8000 -> Prostate [psa, prostatePathologicalExtension]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C619");
+        input.put("histologyIcdO3", "8000");
+        input.put("schemaDiscriminator1", null);
+
+        Assert.assertTrue(_functions.isNeededForStagingEodField(input, "psaLabValue"));
+        Assert.assertFalse(_functions.isNeededForStagingEodField(input, "gleasonPatternsClinical"));
+        Assert.assertTrue(_functions.isNeededForStagingEodField(input, "prostatePathologicalExtension"));
+        Assert.assertFalse(_functions.isNeededForStagingEodField(input, "regionalNodesPositive"));
+    }
+
+    @Test
+    public void testIsCocRequiredEodCode() {
+
+        // C619/8000 -> Prostate [psa, prostatePathologicalExtension, numberOfCoresPositive, numberOfCoresExamined, gleasonTertiaryPattern, 
+        //                        gleasonScoreClinical, gleasonPatternsClinical, gleasonScorePathological, gleasonPatternsPathological]
+        Map<String, String> input = new HashMap<>();
+        input.put("primarySite", "C619");
+        input.put("histologyIcdO3", "8000");
+        input.put("schemaDiscriminator1", null);
+
+        Assert.assertTrue(_functions.isCocRequiredEodField(input, "psaLabValue"));
+        Assert.assertTrue(_functions.isCocRequiredEodField(input, "gleasonPatternsClinical"));
+        Assert.assertFalse(_functions.isCocRequiredEodField(input, "regionalNodesPositive"));
+    }
     
     @Test
     public void testExpandKeys() {

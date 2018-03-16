@@ -18,6 +18,9 @@ import com.imsweb.staging.cs.CsSchemaLookup;
 import com.imsweb.staging.entities.StagingSchema;
 import com.imsweb.staging.entities.StagingSchemaInput;
 import com.imsweb.staging.entities.StagingTable;
+import com.imsweb.staging.eod.EodDataProvider;
+import com.imsweb.staging.eod.EodSchemaLookup;
+import com.imsweb.staging.eod.EodStagingData.EodInput;
 import com.imsweb.staging.tnm.TnmDataProvider;
 import com.imsweb.staging.tnm.TnmSchemaLookup;
 import com.imsweb.staging.tnm.TnmStagingData;
@@ -210,9 +213,195 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         TNM_FIELDS.put("csSiteSpecFact25", "ssf25");
     }
 
+    // the standard NAACCR properties used when getting a EOD schema
+    public static final String EOD_INPUT_PROP_SITE = "primarySite";
+    public static final String EOD_INPUT_PROP_HIST = "histologyIcdO3";
+    public static final String EOD_INPUT_PROP_SEX = "sex";
+    public static final String EOD_INPUT_PROP_DISC_1 = "schemaDiscriminator1";
+    public static final String EOD_INPUT_PROP_DISC_2 = "schemaDiscriminator2";
+
+    // EOD metadata tags
+    public static final String EOD_TAG_SEER_REQUIRED = "SEER_REQUIRED";
+    public static final String EOD_TAG_COC_REQUIRED = "COC_REQUIRED";
+    public static final String EOD_TAG_NPCR_REQUIRED = "NPCR_REQUIRED";
+    public static final String EOD_TAG_CCCR_REQUIRED = "CCCR_REQUIRED";
+    public static final String EOD_TAG_SSDI = "SSDI";
+
+    // this maps the EOD fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
+    public static Map<String, String> EOD_FIELDS = new HashMap<>();
+    static {
+        EOD_FIELDS.put("schemaDiscriminator1", "discriminator_1");
+        EOD_FIELDS.put("schemaDiscriminator2", "discriminator_2");
+        EOD_FIELDS.put("schemaDiscriminator3", "discriminator_3");
+        EOD_FIELDS.put("ajccTnmClinM", "clin_m");
+        EOD_FIELDS.put("ajccTnmClinN", "clin_n");
+        EOD_FIELDS.put("ajccTnmClinNSuffix", "clin_n_suffix");
+        EOD_FIELDS.put("ajccTnmClinStageGroup", "clin_stage_group_direct");
+        EOD_FIELDS.put("ajccTnmClinT", "clin_t");
+        EOD_FIELDS.put("ajccTnmClinTSuffix", "clin_t_suffix");
+        EOD_FIELDS.put("ajccTnmPathM", "path_m");
+        EOD_FIELDS.put("ajccTnmPathN", "path_n");
+        EOD_FIELDS.put("ajccTnmPathNSuffix", "path_n_suffix");
+        EOD_FIELDS.put("ajccTnmPathStageGroup", "path_stage_group_direct");
+        EOD_FIELDS.put("ajccTnmPathT", "path_t");
+        EOD_FIELDS.put("ajccTnmPathTSuffix", "path_t_suffix");
+        EOD_FIELDS.put("ajccTnmPostTherapyM", "ypath_m");
+        EOD_FIELDS.put("ajccTnmPostTherapyN", "ypath_n");
+        EOD_FIELDS.put("ajccTnmPostTherapyNSuffix", "ypath_n_suffix");
+        EOD_FIELDS.put("ajccTnmPostTherapyStageGroup", "ypath_stage_group_direct");
+        EOD_FIELDS.put("ajccTnmPostTherapyT", "ypath_t");
+        EOD_FIELDS.put("ajccTnmPostTherapyTSuffix", "ypath_t_suffix");
+        EOD_FIELDS.put("eodPrimaryTumor", "eod_primary_tumor");
+        EOD_FIELDS.put("eodRegionalNodes", "eod_regional_nodes");
+        EOD_FIELDS.put("eodMets", "eod_mets");
+        EOD_FIELDS.put("gradeClinical", "grade_clin");
+        EOD_FIELDS.put("gradePathological", "grade_path");
+        EOD_FIELDS.put("gradePostTherapy", "grade_post_therapy");
+        EOD_FIELDS.put("tumorSizeClinical", "size_clin");
+        EOD_FIELDS.put("tumorSizePathologic", "size_path");
+        EOD_FIELDS.put("tumorSizeSummary", "size_summary");
+        EOD_FIELDS.put("summaryStage2018", "ss2018");
+        EOD_FIELDS.put("rxSummSystemicSurgSeq", "systemic_surg_seq");
+        EOD_FIELDS.put("rxSummSurgRadSeq", "radiation_surg_seq");
+        EOD_FIELDS.put("regionalNodesPositive", "nodes_pos");
+        EOD_FIELDS.put("regionalNodesExamined", "nodes_exam");
+        EOD_FIELDS.put("adenoidCysticBasaloidPattern", "adenoid_cystic_basaloid_pattern");
+        EOD_FIELDS.put("adenopathy", "adenopathy");
+        EOD_FIELDS.put("afpPostOrchiectomyLabValue", "afp_post_orch_lab_value");
+        EOD_FIELDS.put("afpPostOrchiectomyRange", "afp_post_orch_range");
+        EOD_FIELDS.put("afpPreOrchiectomyLabValue", "afp_pre_orch_lab_value");
+        EOD_FIELDS.put("afpPreOrchiectomyRange", "afp_pre_orch_range");
+        EOD_FIELDS.put("afpPretreatmentInterpretation", "afp_pretx_interpretation");
+        EOD_FIELDS.put("afpPretreatmentLabValue", "afp_pretx_lab_value");
+        EOD_FIELDS.put("anemia", "anemia");
+        EOD_FIELDS.put("bSymptoms", "b_symptoms");
+        EOD_FIELDS.put("bilirubinPretreatmentTotalLabValue", "bilirubin_pretx_lab_value");
+        EOD_FIELDS.put("bilirubinPretreatmentUnitOfMeasure", "bilirubin_pretx_unit");
+        EOD_FIELDS.put("boneInvasion", "bone_invasion");
+        EOD_FIELDS.put("brainMolecularMarkers", "brain_molecular_markers");
+        EOD_FIELDS.put("breslowTumorThickness", "breslow_thickness");
+        EOD_FIELDS.put("ca125PretreatmentInterpretation", "ca125_pretx_lab_value");
+        EOD_FIELDS.put("ceaPretreatmentIntrepretation", "cea_pretx_interpretation");
+        EOD_FIELDS.put("ceaPretreatmentLabValue", "cea_pretx_lab_value");
+        EOD_FIELDS.put("chromosome19qLossOfHeterozygosity", "chrom_19q_status");
+        EOD_FIELDS.put("chromosome1pLossOfHeterozygosity", "chrom_1p_status");
+        EOD_FIELDS.put("chromosome3Status", "chrom_3_status");
+        EOD_FIELDS.put("chromosome8qStatus", "chrom_8q_status");
+        EOD_FIELDS.put("circumferentialResectionMargin", "crm");
+        EOD_FIELDS.put("creatininePretreatmentLabValue", "creatinine_pretx_lab_value");
+        EOD_FIELDS.put("creatininePretreatmentUnitOfMeasure", "creatinine_pretx_unit");
+        EOD_FIELDS.put("esophagusAndEgjTumorEpicenter", "esoph_tumor_epicenter");
+        EOD_FIELDS.put("estrogenReceptorPercentPositiveOrRange", "er_percent_positive");
+        EOD_FIELDS.put("estrogenReceptorSummary", "er");
+        EOD_FIELDS.put("estrogenReceptorTotalAllredScore", "er_allred_score");
+        EOD_FIELDS.put("extranodalExtensionClin", "extranodal_ext_clin");
+        EOD_FIELDS.put("extranodalExtensionHeadAndNeckClinical", "extranodal_ext_hn_clin");
+        EOD_FIELDS.put("extranodalExtensionHeadAndNeckPathological", "extranodal_ext_hn_path");
+        EOD_FIELDS.put("extranodalExtensionPath", "extranodal_ext_path");
+        EOD_FIELDS.put("extravascularMatrixPatterns", "extravascular_matrix_patterns");
+        EOD_FIELDS.put("fibrosisScore", "fibrosis_score");
+        EOD_FIELDS.put("figoStage", "figo");
+        EOD_FIELDS.put("gestationalTrophoblasticPrognosticScoringIndex", "gestational_prog_index");
+        EOD_FIELDS.put("gleasonPatternsClinical", "gleason_patterns_clin");
+        EOD_FIELDS.put("gleasonPatternsPathological", "gleason_patterns_path");
+        EOD_FIELDS.put("gleasonScoreClinical", "gleason_score_clin");
+        EOD_FIELDS.put("gleasonScorePathological", "gleason_score_path");
+        EOD_FIELDS.put("gleasonTertiaryPattern", "gleason_tertiary_pattern");
+        EOD_FIELDS.put("hcgPostOrchiectomyLabValue", "hcg_post_orch_lab_value");
+        EOD_FIELDS.put("hcgPostOrchiectomyRange", "hcg_post_orch_range");
+        EOD_FIELDS.put("hcgPreOrchiectomyLabValue", "hcg_pre_orch_lab_value");
+        EOD_FIELDS.put("hcgPreOrchiectomyRange", "hcg_pre_orch_range");
+        EOD_FIELDS.put("her2IhcSummary", "her2_ihc_summary");
+        EOD_FIELDS.put("her2IshDualProbeCopyNumber", "her2_ish_dp_copy_no");
+        EOD_FIELDS.put("her2IshDualProbeRatio", "her2_ish_dp_ratio");
+        EOD_FIELDS.put("her2IshSingleProbeCopyNumber", "her2_ish_sp_copy_no");
+        EOD_FIELDS.put("her2IshSummary", "her2_ish_summary");
+        EOD_FIELDS.put("her2OverallSummary", "her2_summary");
+        EOD_FIELDS.put("heritableTrait", "heritable_trait");
+        EOD_FIELDS.put("highRiskCytogenetics", "high_risk_cytogenetics");
+        EOD_FIELDS.put("highRiskHistologicFeatures", "high_risk_features");
+        EOD_FIELDS.put("hivStatus", "hiv");
+        EOD_FIELDS.put("internationalNormalizedRatioForProthrombinTime", "inr_prothrombin_time");
+        EOD_FIELDS.put("invasionBeyondCapsule", "invasion_beyond_capsule");
+        EOD_FIELDS.put("ipsilateralAdrenalGlandInvolvement", "ipsilateral_adrenal_gland_involv");
+        EOD_FIELDS.put("jak2", "jak2");
+        EOD_FIELDS.put("ki67", "ki67");
+        EOD_FIELDS.put("kitGeneImmunohistochemistry", "kit");
+        EOD_FIELDS.put("kras", "kras");
+        EOD_FIELDS.put("ldhPostOrchiectomyRange", "ldh_post_orch_range");
+        EOD_FIELDS.put("ldhPreOrchiectomyRange", "ldh_pre_orch_range");
+        EOD_FIELDS.put("ldhPretreatmentLevel", "ldh_pretx_level");
+        EOD_FIELDS.put("ldhUpperLimitsOfNormal", "ldh_upper_limit");
+        EOD_FIELDS.put("lnAssessmentMethodFemoralInguinal", "ln_assessment_femoral");
+        EOD_FIELDS.put("lnAssessmentMethodParaAortic", "ln_assessment_para_aortic");
+        EOD_FIELDS.put("lnAssessmentMethodPelvic", "ln_assessment_pelvic");
+        EOD_FIELDS.put("lnDistantAssessmentMethod", "ln_distant_assessment");
+        EOD_FIELDS.put("lnDistantMediastinalScalene", "ln_distant_mediastinal_scalene");
+        EOD_FIELDS.put("lnHeadAndNeckLevels1To3", "ln_hn_1_2_3");
+        EOD_FIELDS.put("lnHeadAndNeckLevels4To5", "ln_hn_4_5");
+        EOD_FIELDS.put("lnHeadAndNeckLevels6To7", "ln_hn_6_7");
+        EOD_FIELDS.put("lnHeadAndNeckOther", "ln_hn_other");
+        EOD_FIELDS.put("lnIsolatedTumorCells", "ln_itc");
+        EOD_FIELDS.put("lnLaterality", "ln_laterality");
+        EOD_FIELDS.put("lnPositiveAxillaryLevel1To2", "ln_pos_axillary_level_1_2");
+        EOD_FIELDS.put("lnSize", "ln_size_of_mets");
+        EOD_FIELDS.put("lnStatusFemoralInguinalParaAorticAndPelvic", "ln_status");
+        EOD_FIELDS.put("lymphocytosis", "lymphocytosis");
+        EOD_FIELDS.put("majorVeinInvolvement", "major_vein_involv");
+        EOD_FIELDS.put("measuredBasalDiameter", "measured_basal_diameter");
+        EOD_FIELDS.put("measuredThickness", "measured_thickness");
+        EOD_FIELDS.put("methylationOfO6MethylguanineMethyltransferase", "mgmt");
+        EOD_FIELDS.put("microsatelliteInstability", "msi");
+        EOD_FIELDS.put("microvascularDensity", "mvd");
+        EOD_FIELDS.put("mitoticCountUvealMelanoma", "mitotic_count_uveal_mel");
+        EOD_FIELDS.put("mitoticRateMelanoma", "mitotic_rate_melanoma");
+        EOD_FIELDS.put("multigeneSignatureMethod", "multigene_signature_method");
+        EOD_FIELDS.put("multigeneSignatureResults", "multigene_signature_result");
+        EOD_FIELDS.put("nccnInternationalPrognosticIndex", "intern_prog_index");
+        EOD_FIELDS.put("numberOfCoresExamined", "number_cores_exam");
+        EOD_FIELDS.put("numberOfCoresPositive", "number_cores_pos");
+        EOD_FIELDS.put("numberOfExaminedParaAorticNodes", "num_exam_para_aortic_nodes");
+        EOD_FIELDS.put("numberOfExaminedPelvicNodes", "num_exam_pelvic_nodes");
+        EOD_FIELDS.put("numberOfPositiveParaAorticNodes", "num_pos_para_aortic_nodes");
+        EOD_FIELDS.put("numberOfPositivePelvicNodes", "num_pos_pelvic_nodes");
+        EOD_FIELDS.put("oncotypeDxRecurrenceScoreDcis", "oncotype_dx_score_dcis");
+        EOD_FIELDS.put("oncotypeDxRecurrenceScoreInvasive", "oncotype_dx_score");
+        EOD_FIELDS.put("oncotypeDxRiskLevelDcis", "oncotype_dx_risk_level_dcis");
+        EOD_FIELDS.put("oncotypeDxRiskLevelInvasive", "oncotype_dx_risk_level");
+        EOD_FIELDS.put("organomegaly", "organomegaly");
+        EOD_FIELDS.put("percentNecrosisPostNeoadjuvant", "post_neoadj_chemo_percent_necrosis");
+        EOD_FIELDS.put("perineuralInvasion", "perineural_invasion");
+        EOD_FIELDS.put("peripheralBloodInvolvement", "peripheral_blood_involv");
+        EOD_FIELDS.put("peritonealCytology", "peritoneal_cytology");
+        EOD_FIELDS.put("pleuralEffusion", "pleural_effusion");
+        EOD_FIELDS.put("primarySclerosingCholangitis", "prim_scleros_cholangitis");
+        EOD_FIELDS.put("profoundImmuneSuppression", "profound_immune_suppression");
+        EOD_FIELDS.put("progesteroneReceptorPercentPositiveOrRange", "pr_percent_positive");
+        EOD_FIELDS.put("progesteroneReceptorSummary", "pr");
+        EOD_FIELDS.put("progesteroneReceptorTotalAllredScore", "pr_allred_score");
+        EOD_FIELDS.put("prostatePathologicalExtension", "prostate_path_extension");
+        EOD_FIELDS.put("psaLabValue", "psa");
+        EOD_FIELDS.put("residualTumorVolumePostCytoreduction", "resid_tumor_vol_post_cyto");
+        EOD_FIELDS.put("responseToNeoadjuvantTherapy", "response_neoadjuv_therapy");
+        EOD_FIELDS.put("sCategoryClinical", "s_category_clin");
+        EOD_FIELDS.put("sCategoryPathologic", "s_category_path");
+        EOD_FIELDS.put("sarcomatoidFeatures", "sarcomatoid_features");
+        EOD_FIELDS.put("seerSiteSpecificFactor1", "seer_ssf1");
+        EOD_FIELDS.put("separateTumorNodules", "separate_tumor_nodules");
+        EOD_FIELDS.put("serumAlbuminPretreatmentLevel", "serum_alb_pretx_level");
+        EOD_FIELDS.put("serumBeta2MicroglobulinPretreatmentLevel", "b2_microglob_pretx_level");
+        EOD_FIELDS.put("serumLdhPretreatmentLabValue", "ldh_pretx_lab_value");
+        EOD_FIELDS.put("thrombocytopenia", "thrombocytopenia");
+        EOD_FIELDS.put("tumorDeposits", "tumor_deposits");
+        EOD_FIELDS.put("tumorGrowthPattern", "tumor_growth_pattern");
+        EOD_FIELDS.put("ulceration", "ulceration");
+        EOD_FIELDS.put("visceralAndParietalPleuralInvasion", "visceral_pleural_invasion");
+    }
+    
     // the staging instances to use for cstage- and tnm-related logic
     protected Staging _csStaging;
     protected Staging _tnmStaging;
+    protected Staging _eodStaging;
 
     // Cached schema ID per schema number for CS
     protected Map<Integer, String> _csSchemaIdByNumber = new HashMap<>();
@@ -221,17 +410,20 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
      * Default constructor
      */
     public StagingContextFunctions() {
-        this(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)), Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST)));
+        this(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)), Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST)), 
+                Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST)));
     }
 
     /**
      * Constructor.
      * @param csStaging a Staging instance responsible for all CStage-related logic
      * @param tnmStaging a Staging instance responsible for all TNM-related logic
+     * @param eodStaging a Staging instance responsible for all EOD-related logic
      */
-    public StagingContextFunctions(Staging csStaging, Staging tnmStaging) {
+    public StagingContextFunctions(Staging csStaging, Staging tnmStaging, Staging eodStaging) {
         _csStaging = csStaging;
         _tnmStaging = tnmStaging;
+        _eodStaging = eodStaging;
 
         if (_csStaging != null) {
             for (String schemaId : _csStaging.getSchemaIds()) {
@@ -909,6 +1101,196 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     /**
+     * @return the EOD library version
+     */
+    @ContextFunctionDocAnnotation(desc = "Returns the EOD version as provided by the EOD library.", example = "def eodVersion = Functions.getEodVersion()")
+    public String getEodVersion() {
+        if (_eodStaging == null)
+            return null;
+
+        return _eodStaging.getVersion();
+    }
+
+    /**
+     * Returns the EOD schema name for the given input, null if there is no schema
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>sex</li>
+     * <li>schemaDiscriminator1</li>
+     * <li>schemaDiscriminator2</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @return the corresponding EOD schema name; null if not found
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
+            desc = "Returns the EOD schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'schemaDiscriminator1', 'schemaDiscriminator2 ', or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getEodSchemaName(inputs)")
+    public String getEodSchemaName(Map<String, String> input) {
+        if (_eodStaging == null)
+            return null;
+
+        StagingSchema schema = getEodStagingSchema(input);
+        return schema == null ? null : schema.getName();
+    }
+
+    /**
+     * Returns the EOD schema ID for the given input, null if there is no schema
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>sex</li>
+     * <li>schemaDiscriminator1</li>
+     * <li>schemaDiscriminator2</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @return the corresponding EOD schema ID; null if not found
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
+            desc = "Returns the TNM schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaId = Functions.getEodSchemaId(inputs)")
+    public String getEodSchemaId(Map<String, String> input) {
+        if (_eodStaging == null)
+            return null;
+
+        StagingSchema schema = getEodStagingSchema(input);
+        return schema == null ? null : schema.getId();
+    }
+
+    /**
+     * Returns true if the given value is valid for the given field with the schema corresponding to the passed input
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>sex</li>
+     * <li>schemaDiscriminator1</li>
+     * <li>schemaDiscriminator2</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param field requested EOD field
+     * @param valueToCheck value to check
+     * @return true if the value is acceptable, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name", paramName3 = "valueToCheck", param3 = "value to validate",
+            desc = "Returns true if the provided value is valid for the EOD schema corresponding to the inputs and the EOD field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAcceptableEodCode(inputs, 'eodPrimaryTumor', record.eodPrimaryTumor)")
+    public boolean isAcceptableEodCode(Map<String, String> input, String field, String valueToCheck) {
+        if (_eodStaging == null || input == null || field == null)
+            return false;
+
+        StagingSchema schema = getEodStagingSchema(input);
+        return schema != null && _eodStaging.isCodeValid(schema.getId(), EOD_FIELDS.get(field), valueToCheck);
+    }
+
+    /**
+     * Returns true if the passed EOD field is required for SEER for the schema corresponding to the passed input.
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>sex</li>
+     * <li>schemaDiscriminator1</li>
+     * <li>schemaDiscriminator2</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param field requested EOD field
+     * @return true if the field is required for SEER, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
+            desc = "Returns true if the passed EOD field is required for SEER for the schema corresponding to the passed input, "
+                    + "false otherwise. Required means either 'seer-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredEodField(inputs, ''eodPrimaryTumor')")
+    public boolean isRequiredEodField(Map<String, String> input, String field) {
+        if (_eodStaging == null || input == null || field == null)
+            return false;
+
+        StagingSchema schema = getEodStagingSchema(input);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED)));
+    }
+
+    /**
+     * Returns true if the passed EODo field is required (needed-for-staging) for SEER for the schema corresponding to the passed input.
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>sex</li>
+     * <li>schemaDiscriminator1</li>
+     * <li>schemaDiscriminator2</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param field requested EOD field
+     * @return true if the field is needed for staging, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
+            desc = "Returns true if the passed EOD field is required (needed-for-staging) for SEER for the schema corresponding to the passed input, "
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isNeededForStagingEodField(inputs, 'eodPrimaryTumor')")
+    public boolean isNeededForStagingEodField(Map<String, String> input, String field) {
+        if (_eodStaging == null || input == null || field == null)
+            return false;
+
+        StagingSchema schema = getEodStagingSchema(input);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
+        if (schemaInput == null)
+            return false;
+
+        return schemaInput.getUsedForStaging();
+    }
+
+    /**
+     * Returns true if the passed EOD field is required for COC for the schema corresponding to the passed input.
+     * <p/>
+     * The data structure should contains the following keys:
+     * <ul>
+     * <li>primarySite</li>
+     * <li>histologyIcdO3</li>
+     * <li>sex</li>
+     * <li>schemaDiscriminator1</li>
+     * <li>schemaDiscriminator2</li>
+     * </ul>
+     * <p/>
+     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param field requested EOD field
+     * @return true if the field is required for COC, false otherwise
+     */
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
+            desc = "Returns true if the passed EOD field is required for COC for the schema corresponding to the passed input, "
+                    + "false otherwise. Required means either 'coc-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isCocRequiredEodField(inputs, 'eodPrimaryTumor')")
+    public boolean isCocRequiredEodField(Map<String, String> input, String field) {
+        if (_eodStaging == null || input == null || field == null)
+            return false;
+
+        StagingSchema schema = getEodStagingSchema(input);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED)));
+    }
+    
+    /**
      * Helper method to get the schema from an input line (using standard NAACCR properties).
      * <br/>
      * I am making this method public because it's useful in many other places in the code...
@@ -953,6 +1335,35 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         List<StagingSchema> schemas = _tnmStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
             return _tnmStaging.getSchema(schemas.get(0).getId());
+
+        return null;
+    }
+
+    /**
+     * Helper method to get the EOD schema from an input line (using standard NAACCR properties).
+     * <br/>
+     * I am making this method public because it's useful in many other places in the code...
+     * @param input input fields (standard NAACCR properties)
+     * @return corresponding schema, maybe null
+     */
+    public StagingSchema getEodStagingSchema(Map<String, String> input) {
+        if (_eodStaging == null || input == null)
+            return null;
+
+        String site = input.get(EOD_INPUT_PROP_SITE);
+        String hist = input.get(EOD_INPUT_PROP_HIST);
+        String disc1 = input.get(EOD_INPUT_PROP_DISC_1);
+        String disc2 = input.get(EOD_INPUT_PROP_DISC_2);
+        String sex = input.get(EOD_INPUT_PROP_SEX);
+
+        EodSchemaLookup lkup = new EodSchemaLookup(site, hist);
+        lkup.setInput(EodInput.DISCRIMINATOR_1.toString(), disc1);
+        lkup.setInput(EodInput.DISCRIMINATOR_2.toString(), disc2);
+        lkup.setInput(EodInput.SEX.toString(), sex);
+
+        List<StagingSchema> schemas = _eodStaging.lookupSchema(lkup);
+        if (schemas.size() == 1)
+            return _eodStaging.getSchema(schemas.get(0).getId());
 
         return null;
     }

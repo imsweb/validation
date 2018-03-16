@@ -113,6 +113,7 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertNull(line.get("csSiteSpecificFactor25"));
         Assert.assertNull(line.get("_tnmSchemaId"));
         Assert.assertNull(line.get("_csSchemaId"));
+        Assert.assertNull(line.get("_eodSchemaId"));
 
         record.put("dateOfDiagnosisYear", "2016");
         record.put("primarySite", "C111");
@@ -123,17 +124,21 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertNull(line.get("csSiteSpecificFactor25"));
         Assert.assertNull(line.get("_tnmSchemaId"));
         Assert.assertNull(line.get("_csSchemaId"));
+        Assert.assertNull(line.get("_eodSchemaId"));
 
         record.put("csSiteSpecificFactor25", "010");
+        record.put("schemaDiscriminator1", "1");
         v = new SimpleNaaccrLinesValidatable(record);
         validatables = v.followCollection("line");
         line = (Map<String, String>)validatables.get(0).getScope().get("line");
         Assert.assertEquals("010", line.get("csSiteSpecificFactor25"));
         Assert.assertEquals("nasopharynx", line.get("_tnmSchemaId"));
         Assert.assertEquals("nasopharynx", line.get("_csSchemaId"));
+        Assert.assertEquals("nasopharynx", line.get("_eodSchemaId"));
 
         record.put("primarySite", "C481");
         record.put("csSiteSpecificFactor25", null);
+        record.put("schemaDiscriminator1", null);
         record.put("sex", "1");
         v = new SimpleNaaccrLinesValidatable(record);
         validatables = v.followCollection("line");
@@ -141,6 +146,7 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertNull(line.get("csSiteSpecificFactor25")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
         Assert.assertEquals("peritoneum", line.get("_tnmSchemaId"));
         Assert.assertNull(line.get("_csSchemaId")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
+        Assert.assertEquals("retroperitoneum", line.get("_eodSchemaId"));
 
         v = new SimpleNaaccrLinesValidatable(Collections.singletonList(record), null, true);
         validatables = v.followCollection("untrimmedline");
@@ -148,6 +154,7 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertNull(line.get("csSiteSpecificFactor25")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
         Assert.assertEquals("peritoneum", line.get("_tnmSchemaId"));
         Assert.assertNull(line.get("_csSchemaId")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
+        Assert.assertEquals("retroperitoneum", line.get("_eodSchemaId"));
 
         //Uninitialize the StagingContextFunctions
         ValidatorContextFunctions.initialize(null);

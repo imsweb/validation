@@ -184,6 +184,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
         if (ValidatorContextFunctions.isInitialized() && ValidatorContextFunctions.getInstance() instanceof StagingContextFunctions) {
             boolean hasCsSchemaId = _currentLine.containsKey(Validatable.KEY_CS_SCHEMA_ID);
             boolean hasTnmSchemaId = _currentLine.containsKey(Validatable.KEY_TNM_SCHEMA_ID);
+            boolean hasEodSchemaId = _currentLine.containsKey(Validatable.KEY_EOD_SCHEMA_ID);
             boolean hasSite = _currentLine.containsKey(StagingContextFunctions.CSTAGE_INPUT_PROP_SITE);
             boolean hasHist = _currentLine.containsKey(StagingContextFunctions.CSTAGE_INPUT_PROP_HIST);
 
@@ -197,6 +198,10 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
             if (!hasCsSchemaId || hasSite || hasHist) {
                 StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_CS_SCHEMA_ID, schema != null ? schema.getId() : null);
+            }
+            if (!hasEodSchemaId || hasSite || hasHist) {
+                StagingSchema schema = ((StagingContextFunctions)ValidatorContextFunctions.getInstance()).getEodStagingSchema(_currentLine);
+                _currentLine.put(Validatable.KEY_EOD_SCHEMA_ID, schema != null ? schema.getId() : null);
             }
         }
     }
