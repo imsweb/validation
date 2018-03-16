@@ -4,6 +4,7 @@
 package com.imsweb.validation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -317,6 +318,19 @@ public class ValidatorServicesTest {
         Assert.assertEquals("Wrong date (Y:2011 M:06 D:)!!!", ValidatorServices.getInstance().fillInMessage("Wrong date (${line.dateOfDiagnosisMinusDay.formatDate()})!!!", v));
         Assert.assertEquals("Wrong date (Y:2011 M:   D:)!!!", ValidatorServices.getInstance().fillInMessage("Wrong date (${line.dateOfDiagnosisMinusDayMonth.formatDate()})!!!", v));
         Assert.assertEquals("Wrong date (Y:     M:   D:)!!!", ValidatorServices.getInstance().fillInMessage("Wrong date (${line.dateOfDiagnosisBlank.formatDate()})!!!", v));
+    }
+
+    @Test
+    public void testFillInMessags() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("vitalStatus", "1");
+        map.put("nameLast", "LAST");
+        Validatable v = new SimpleMapValidatable("TEST", "line", map);
+
+        Assert.assertEquals(null, ValidatorServices.getInstance().fillInMessages(null, v));
+        Assert.assertEquals(new ArrayList<>(), ValidatorServices.getInstance().fillInMessages(new ArrayList<>(), v));
+        Assert.assertEquals(Arrays.asList("Something", "Something else"), ValidatorServices.getInstance().fillInMessages(Arrays.asList("Something", "Something else"), v));
+        Assert.assertEquals(Arrays.asList("Value 1", "Value 'LAST'"), ValidatorServices.getInstance().fillInMessages(Arrays.asList("Value ${line.vitalStatus}", "Value '${line.nameLast}'"), v));
     }
 
     @Test

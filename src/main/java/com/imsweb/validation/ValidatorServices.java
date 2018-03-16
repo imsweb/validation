@@ -511,6 +511,17 @@ public class ValidatorServices {
         return new GroovyShell().parse(expression);
     }
 
+    public List<String> fillInMessages(List<String> originalMessages, Validatable validatable) {
+        if (originalMessages == null)
+            return null;
+
+        List<String> filledInMessages = new ArrayList<>();
+        for (String message : originalMessages)
+            filledInMessages.add(fillInMessage(message, validatable));
+
+        return filledInMessages;
+    }
+
     /**
      * Replaces the property tags by their value (for example {line.vitalStatus})
      * <p/>

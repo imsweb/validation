@@ -1,10 +1,42 @@
 ## Validation Framework Version History
 
+**Version 1.14**
+
+- Updated staging client from version 2.12 to version 2.14. 
+
+**Version 1.13**
+
+- Updated staging client from version 2.10 to version 2.12. 
+
+**Version 1.12**
+
+- Fixed a bug affecting pre-compiled edits being dynamically updated in the engine.
+
+**Version 1.11**
+
+- Fixed bug where values in Genedits messages would not be properly replaced.
+
+**Version 1.10**
+
+- Added new "allowOverride" field to the Rule Java entity; this field is not used by this library but will be useful in projects using it.
+
+**Version 1.9**
+
+- Updated staging client from version 2.9 to version 2.10.
+
 **Version 1.8**
 
 - Increased the engine version to 5.8
-- Added support for pre-parsed and pre-compiled edits (optimizations).
+- Added support for caching regular expression in context functions.
+- Added support for pre-parsed and pre-compiled edits (optimization).
 - Added support for new context types 'table' and 'table-index-def' that will be used for Genedits translation framework.
+- Remove logic that was overriding SSF25 based on TNM Schema ID and Sex in SimpleNaaccrLinesValidatable.
+- Added a proper security environment to XStream by limiting the classes that it can create when loading XML files.
+- Updated staging client from version 2.5 to version 2.9 (TNM 1.5).
+- Updated Groovy library from version 2.4.7 (indy) to version 2.4.12 (indy).
+- Updated XStream library from version 1.4.9 to 1.4.10.
+- Updated Apache commons-lang library from version 3.4 to version 3.6.
+- Updated commons-codec library from version 1.10 to version 1.11.
 
 **Version 1.7**
 

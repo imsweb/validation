@@ -235,7 +235,7 @@ public final class ValidationEngine {
     private static ReentrantReadWriteLock _LOCK = new ReentrantReadWriteLock();
 
     /**
-     * Private constructor, no instanciation of this class!
+     * Private constructor, no instantiation of this class!
      * <p/>
      * Created on Jun 28, 2011 by depryf
      */
@@ -716,10 +716,9 @@ public final class ValidationEngine {
      * @param validatable a <code>Validatable</code>, cannot be null
      * @param rule a <code>Rule</code> object, cannot be null, it doesn't have to exist in the validation engine
      * @return a collection of <code>RuleFailure</code>, maybe empty but not null
-     * @throws ConstructionException if the rule could not be executed
      * @throws ValidationException if anything goes wrong during the validation
      */
-    public static Collection<RuleFailure> validate(Validatable validatable, Rule rule) throws ConstructionException, ValidationException {
+    public static Collection<RuleFailure> validate(Validatable validatable, Rule rule) throws ValidationException {
         _LOCK.readLock().lock();
         try {
             if (rule == null)
@@ -778,7 +777,7 @@ public final class ValidationEngine {
      * Created on Jun 29, 2011 by depryf
      * @param editableRule <code>EditableRule</code>, cannot be null
      * @return the created <code>Rule</code>
-     * @throws ConstructionException
+     * @throws ConstructionException if the rule contains an error
      */
     public static Rule addRule(EditableRule editableRule) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -890,7 +889,7 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param editableRule <code>EditableRule</code>, cannot be null
-     * @throws ConstructionException
+     * @throws ConstructionException if the rule contains an error
      */
     public static void updateRule(EditableRule editableRule) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1024,7 +1023,7 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jul 7, 2011 by depryf
      * @param ruleId rule ID to delete
-     * @throws ConstructionException
+     * @throws ConstructionException if the rule cannot be found
      */
     public static void deleteRule(String ruleId) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1110,7 +1109,7 @@ public final class ValidationEngine {
      * Created on Jun 29, 2011 by depryf
      * @param editableCondition <code>EditableCondition</code>, cannot be null
      * @return the created <code>Condition</code>
-     * @throws ConstructionException
+     * @throws ConstructionException if the condition contains an error
      */
     public static Condition addCondition(EditableCondition editableCondition) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1182,7 +1181,7 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param editableCondition <code>EditableCondition</code>, cannot be null
-     * @throws ConstructionException
+     * @throws ConstructionException if the condition contains an error
      */
     public static void updateCondition(EditableCondition editableCondition) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1257,7 +1256,7 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jul 7, 2011 by depryf
      * @param conditionId condition ID to delete
-     * @throws ConstructionException
+     * @throws ConstructionException if the condition cannot be found
      */
     public static void deleteCondition(String conditionId) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1321,7 +1320,7 @@ public final class ValidationEngine {
      * Created on Jun 29, 2011 by depryf
      * @param editableValidator <code>EditableValidator</code>, cannot be null
      * @return the created <code>Validator</code>
-     * @throws ConstructionException
+     * @throws ConstructionException if the validator contains an error
      */
     public static Validator addValidator(EditableValidator editableValidator) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1390,7 +1389,7 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param editableValidator <code>EditableValidator</code>, cannot be null
-     * @throws ConstructionException
+     * @throws ConstructionException if the validator contains an error
      */
     public static void updateValidator(EditableValidator editableValidator) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1419,7 +1418,7 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jul 7, 2011 by depryf
      * @param validatorId validator ID to delete
-     * @throws ConstructionException
+     * @throws ConstructionException if the validator cannot be found
      */
     public static void deleteValidator(String validatorId) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1446,7 +1445,7 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param editableValidator <code>EditableValidator</code>, cannot be null
-     * @throws ConstructionException
+     * @throws ConstructionException if the validator contains an error
      */
     public static void deleteValidator(EditableValidator editableValidator) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1486,7 +1485,7 @@ public final class ValidationEngine {
      * @param expression raw expression
      * @param type type ("java", "groovy", "table", etc...)
      * @return the created <code>ContextEntry</code>
-     * @throws ConstructionException
+     * @throws ConstructionException if the context contains an error
      */
     public static ContextEntry addContext(Long contextEntryId, String contextKey, String validatorId, String expression, String type) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1529,7 +1528,7 @@ public final class ValidationEngine {
      * @param validatorId validator ID
      * @param expression raw expression
      * @param type type ("java", "groovy", "table", etc...)
-     * @throws ConstructionException
+     * @throws ConstructionException if the context contains an error or is not found
      */
     public static void updateContext(String contextKey, String validatorId, String expression, String type) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1565,7 +1564,7 @@ public final class ValidationEngine {
      * Created on Jul 7, 2011 by depryf
      * @param contextKey new context key
      * @param validatorId validator ID
-     * @throws ConstructionException
+     * @throws ConstructionException if the context is not found
      */
     public static void deleteContext(String contextKey, String validatorId) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1646,7 +1645,7 @@ public final class ValidationEngine {
      * Enables the requested embedded set.
      * @param validatorId validator ID
      * @param setId set ID
-     * @throws ConstructionException
+     * @throws ConstructionException if the set is not found
      */
     public static void enableEmbeddedSet(String validatorId, String setId) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1670,7 +1669,7 @@ public final class ValidationEngine {
      * Disables the requested embedded set.
      * @param validatorId validator ID
      * @param setId set ID
-     * @throws ConstructionException
+     * @throws ConstructionException if the set is not found
      */
     public static void disableEmbeddedSet(String validatorId, String setId) throws ConstructionException {
         _LOCK.writeLock().lock();
@@ -1811,6 +1810,13 @@ public final class ValidationEngine {
     }
 
     /**
+     * Disables multi-threaded compilation of the rules, using a single thread; this is the default behavior of the engine.
+     */
+    public static void disableMultiThreadedCompilation() {
+        _NUM_COMPILER_THREADS = 1;
+    }
+
+    /**
      * Enables edit (and condition) execution timeout.
      * <br/><br/>
      * If set to a strictly positive value, and edit that runs for more than the value (in seconds) will be killed and will be seen as a failure.
@@ -1823,10 +1829,31 @@ public final class ValidationEngine {
     }
 
     /**
+     * Disables edit (and condition) execution timeout; this is the default behavior of the engine.
+     */
+    public static void disableEditExecutionTimeout() {
+        _EDIT_EXECUTION_TIMEOUT = 0;
+    }
+
+    /**
+     * Enables the pre-compiling mechanism; this is the default behavior of the engine.
+     */
+    public static void enablePreCompiledLookup() {
+        _PRE_COMPILED_LOOKUP_ENABLED = true;
+    }
+
+    /**
      * Disables the pre-compiling mechanism, which is on by default.  That mechanism tries to find a class of pre-compiles rules on the class path.
      */
-    public static void disablePreParseLookup() {
+    public static void disablePreCompiledLookup() {
         _PRE_COMPILED_LOOKUP_ENABLED = false;
+    }
+
+    /**
+     * Returns true if the pre-compiling mechanism is on, false otherwise.
+     */
+    public static boolean isPreCompiledLookupEnabled() {
+        return _PRE_COMPILED_LOOKUP_ENABLED;
     }
 
     // ********************************************************************************
@@ -1841,7 +1868,11 @@ public final class ValidationEngine {
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
 
         // try to find pre-compiled rules on the class path
-        CompiledRules precompiledRules = _PRE_COMPILED_LOOKUP_ENABLED ? RuntimeUtils.findCompileRules(validator.getId()) : null;
+        CompiledRules precompiledRules = null;
+        if (isPreCompiledLookupEnabled())
+            precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
+        else if (stats != null)
+            stats.setReasonNotPreCompiled(validator.getId(), ValidationEngineInitializationStats.REASON_PRE_COMPILED_OFF);
 
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_NUM_COMPILER_THREADS);

@@ -16,10 +16,11 @@ public class RuntimeUtilsTest {
         Assert.assertEquals("di", RuntimeUtils.createMethodName("Di"));
         Assert.assertEquals("naaccr0001", RuntimeUtils.createMethodName("NAACCR0001"));
         Assert.assertEquals("naaccr0001", RuntimeUtils.createMethodName("NAACCR-0001"));
-        Assert.assertEquals("naaccr0001", RuntimeUtils.createMethodName("NAACCR_0001"));
+        Assert.assertEquals("naaccr_0001", RuntimeUtils.createMethodName("NAACCR_0001"));
         Assert.assertEquals("naaccr0001", RuntimeUtils.createMethodName("NAACCR 0001"));
         Assert.assertEquals("if100", RuntimeUtils.createMethodName("IF100"));
-        Assert.assertEquals("if100", RuntimeUtils.createMethodName("IF100(2000+)"));
+        Assert.assertEquals("if100_2000", RuntimeUtils.createMethodName("IF100(2000+)"));
+        Assert.assertEquals("if10_0", RuntimeUtils.createMethodName("IF10_0"));
     }
 
     @Test

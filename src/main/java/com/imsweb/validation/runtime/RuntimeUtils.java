@@ -7,18 +7,37 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.imsweb.validation.ValidationEngineInitializationStats;
+
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_ACCESS_ERROR;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_CAST_ERROR;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_INSTANCIATION_ERROR;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_NOT_FOUND;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_DIFFERENT_VERSION;
 
 public class RuntimeUtils {
 
     public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
 
+    private static Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
+    private static Pattern _P2 = Pattern.compile("[()]");
+    private static Pattern _P3 = Pattern.compile("[\\W&&[^\\s]]");
+    private static Pattern _P4 = Pattern.compile("^_|_$");
+
     public static String createMethodName(String ruleId) {
         if (ruleId == null || ruleId.isEmpty())
             throw new RuntimeException("Rule ID cannot be blank!");
 
-        String[] parts = StringUtils.split(ruleId.replaceAll("\\s+|-+|/|_|\\.", " ").replaceAll("\\(.+\\)|[\\W&&[^\\s]]", ""), ' ');
+        ruleId = _P1.matcher(ruleId).replaceAll(" ");
+        ruleId = _P2.matcher(ruleId).replaceAll("_");
+        ruleId = _P3.matcher(ruleId).replaceAll("");
+        ruleId = _P4.matcher(ruleId).replaceAll("");
+
+        String[] parts = StringUtils.split(ruleId, ' ');
 
         StringBuilder buf = new StringBuilder();
         buf.append(StringUtils.uncapitalize(parts[0].toLowerCase()));
@@ -35,18 +54,46 @@ public class RuntimeUtils {
         return result.toString() + "CompiledRules";
     }
 
-    public static CompiledRules findCompileRules(String validatorId) {
+    public static CompiledRules findCompileRules(String validatorId, String version, ValidationEngineInitializationStats stats) {
         CompiledRules compiledRules;
+
+        String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);
         try {
-            compiledRules = (CompiledRules)(Class.forName(RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId)).newInstance());
+            compiledRules = (CompiledRules)(Class.forName(classPath).newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_NOT_FOUND.replace("{0}", classPath));
             compiledRules = null;
         }
+        catch (InstantiationException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_INSTANCIATION_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (IllegalAccessException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_ACCESS_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (ClassCastException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_CAST_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+
+        if (compiledRules != null && !StringUtils.isBlank(version) && !version.equals(compiledRules.getValidatorVersion())) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_DIFFERENT_VERSION.replace("{0}", compiledRules.getValidatorVersion()).replace("{1}", version));
+            compiledRules = null;
+        }
+
         return compiledRules;
     }
 
     public static Method findCompiledMethod(CompiledRules compiledRules, String ruleId, List<Class<?>> parameters) {
+        if (ruleId == null)
+            return null;
         try {
             return compiledRules.getClass().getMethod(RuntimeUtils.createMethodName(ruleId), parameters.toArray(new Class[0]));
         }
@@ -76,7 +123,7 @@ public class RuntimeUtils {
 
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedProperties(ParsedProperties properties, String ruleId) {
-        if (properties == null)
+        if (properties == null || ruleId == null)
             return null;
         try {
             return (Set<String>)properties.getClass().getMethod(createMethodName(ruleId)).invoke(properties);
@@ -106,7 +153,7 @@ public class RuntimeUtils {
 
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedContexts(ParsedContexts contexts, String ruleId) {
-        if (contexts == null)
+        if (contexts == null || ruleId == null)
             return null;
         try {
             return (Set<String>)contexts.getClass().getMethod(createMethodName(ruleId)).invoke(contexts);
@@ -136,7 +183,7 @@ public class RuntimeUtils {
 
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedLookups(ParsedLookups lookups, String ruleId) {
-        if (lookups == null)
+        if (lookups == null || ruleId == null)
             return null;
         try {
             return (Set<String>)lookups.getClass().getMethod(createMethodName(ruleId)).invoke(lookups);

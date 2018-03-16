@@ -331,8 +331,8 @@ public class ValidationEngineTest {
 
         ValidationEngineInitializationStats stats = ValidationEngine.initialize(v);
         Assert.assertEquals(1, stats.getNumEditsLoaded());
-        Assert.assertEquals(1, stats.getNumEditsStaticallyCompiled());
-        Assert.assertEquals(0, stats.getNumEditsDynamicallyCompiled());
+        Assert.assertEquals(1, stats.getNumEditsPreCompiled());
+        Assert.assertEquals(0, stats.getNumEditsCompiled());
         try {
             data.put("key", "value");
             TestingUtils.assertNoEditFailure(ValidationEngine.validate(validatable), "fvrt-rule1");

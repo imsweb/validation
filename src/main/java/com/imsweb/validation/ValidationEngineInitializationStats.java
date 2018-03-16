@@ -3,23 +3,35 @@
  */
 package com.imsweb.validation;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ValidationEngineInitializationStats {
+
+    public static final String REASON_PRE_COMPILED_OFF = "pre-compiled edits lookup is off";
+    public static final String REASON_CLASS_NOT_FOUND = "pre-compiled class '{0}' not found";
+    public static final String REASON_CLASS_INSTANCIATION_ERROR = "unable to create instance of pre-compiled class '{0}'";
+    public static final String REASON_CLASS_ACCESS_ERROR = "pre-compiled class '{0}' can't be accessed";
+    public static final String REASON_CLASS_CAST_ERROR = "pre-compiled class '{0}' was not of type 'CompiledRules'";
+    public static final String REASON_DIFFERENT_VERSION = "pre-compiled class has version {1} but application expected {2}";
 
     private long _initializationDuration;
 
     private AtomicInteger _numEditsLoaded;
 
-    private AtomicInteger _numEditsDynamicallyCompiled;
+    private AtomicInteger _numEditsCompiled;
 
-    private AtomicInteger _numEditsStaticallyCompiled;
+    private AtomicInteger _numEditsPreCompiled;
+
+    private Map<String, String> _reasonNotPreCompiled;
 
     public ValidationEngineInitializationStats() {
         _initializationDuration = 0L;
         _numEditsLoaded = new AtomicInteger();
-        _numEditsDynamicallyCompiled = new AtomicInteger();
-        _numEditsStaticallyCompiled = new AtomicInteger();
+        _numEditsCompiled = new AtomicInteger();
+        _numEditsPreCompiled = new AtomicInteger();
+        _reasonNotPreCompiled = new HashMap<>();
     }
 
     public long getInitializationDuration() {
@@ -38,19 +50,27 @@ public class ValidationEngineInitializationStats {
         _numEditsLoaded.getAndIncrement();
     }
 
-    public int getNumEditsDynamicallyCompiled() {
-        return _numEditsDynamicallyCompiled.get();
+    public int getNumEditsCompiled() {
+        return _numEditsCompiled.get();
     }
 
     public void incrementNumEditsCompiled() {
-        _numEditsDynamicallyCompiled.getAndIncrement();
+        _numEditsCompiled.getAndIncrement();
     }
 
-    public int getNumEditsStaticallyCompiled() {
-        return _numEditsStaticallyCompiled.get();
+    public int getNumEditsPreCompiled() {
+        return _numEditsPreCompiled.get();
     }
 
     public void incrementNumEditsFoundOnClassPath() {
-        _numEditsStaticallyCompiled.getAndIncrement();
+        _numEditsPreCompiled.getAndIncrement();
+    }
+
+    public Map<String, String> getReasonNotPreCompiled() {
+        return _reasonNotPreCompiled;
+    }
+
+    public void setReasonNotPreCompiled(String validatorId, String reason) {
+        _reasonNotPreCompiled.put(validatorId, reason);
     }
 }

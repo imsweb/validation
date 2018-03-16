@@ -40,38 +40,38 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
     /**
      * This will contain the returned properties that have been identified during the parsing
      */
-    private Set<String> _properties;
+    protected Set<String> _properties;
 
     /**
      * These are potential context keys that have been identified during the parsing - potential context keys are the validator
      * context entries that are required by the rule being parsed. They are potential because the parsing is not perfect and we
      * might have some entries that are actually not a context key. In that case the code using this entries will just ignore it.
      * <br/><br/>
-     * In a future version, the "Context." prefix will be rquired for any context, and the parsing will acutally be accurate.
+     * In a future version, the "Context." prefix will be required for any context, and the parsing will actually be accurate.
      * <br/><br/>
      * The parsed context never contain the "Functions" nor "Context" prefixes.
      */
-    private Set<String> _contextEntries;
+    protected Set<String> _contextEntries;
 
     /**
      * This will contain any lookup used in the expression (those are used with the call "fetchLookup")
      */
-    private Set<String> _lookups;
+    protected Set<String> _lookups;
 
     /**
      * These are variable aliases identified during the parsing (used internally only)
      */
-    private Map<String, String> _variableAliases;
+    protected Map<String, String> _variableAliases;
 
     /**
      * Keep track of the defined variables so we don't mistake them for context entries
      */
-    private List<String> _defVariables;
+    protected List<String> _defVariables;
 
     /**
      * Do we need to ensure the 'def' keyword is properly used?
      */
-    private boolean _forceDefKeyword;
+    protected boolean _forceDefKeyword;
 
     /**
      * Constructor
@@ -83,20 +83,15 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
      * @param forceDefKeyword if true and a variable is defined without the def keyword, then an exception will be raised
      */
     public EditCodeVisitorSupport(Set<String> properties, Set<String> contextEntries, Set<String> lookups, boolean forceDefKeyword) {
-        _properties = properties == null ? new HashSet<String>() : properties;
-        _contextEntries = contextEntries == null ? new HashSet<String>() : contextEntries;
-        _lookups = lookups == null ? new HashSet<String>() : lookups;
+        _properties = properties == null ? new HashSet<>() : properties;
+        _contextEntries = contextEntries == null ? new HashSet<>() : contextEntries;
+        _lookups = lookups == null ? new HashSet<>() : lookups;
         _forceDefKeyword = forceDefKeyword;
 
         _variableAliases = new HashMap<>();
         _defVariables = new ArrayList<>();
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 9, 2007 by depryf
-     * @see org.codehaus.groovy.ast.CodeVisitorSupport#visitPropertyExpression(org.codehaus.groovy.ast.expr.PropertyExpression)
-     */
     @Override
     public void visitPropertyExpression(PropertyExpression expression) {
         // if (ctc.primarySite == null) {...}
@@ -147,11 +142,6 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
         super.visitPropertyExpression(expression);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 9, 2007 by depryf
-     * @see org.codehaus.groovy.ast.CodeVisitorSupport#visitVariableExpression(org.codehaus.groovy.ast.expr.VariableExpression)
-     */
     @Override
     public void visitVariableExpression(VariableExpression expression) {
         // this is the old way of accessing context entries (without a prefix); support for this will be removed eventually
@@ -161,18 +151,13 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
                 _contextEntries.add(name);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Apr 30, 2008 by depryf
-     * @see org.codehaus.groovy.ast.CodeVisitorSupport#visitDeclarationExpression(org.codehaus.groovy.ast.expr.DeclarationExpression)
-     */
     @Override
     public void visitDeclarationExpression(DeclarationExpression expression) {
         // def site1 = line1.primarySite
         // def reg = facilityAdmission.registryData
         // def ctc1 = patientc.ctcs.get(index1)
 
-        // this is not perfect because it doesn't take into account the limitted scope, for example a def inside a loop...
+        // this is not perfect because it doesn't take into account the limited scope, for example a def inside a loop...
         _defVariables.add(expression.getLeftExpression().getText());
 
         if (expression.getRightExpression() instanceof MethodCallExpression) {
@@ -197,11 +182,6 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
             expression.getRightExpression().visit(this);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Dec 19, 2007 by depryf
-     * @see org.codehaus.groovy.ast.CodeVisitorSupport#visitForLoop(org.codehaus.groovy.ast.stmt.ForStatement)
-     */
     @Override
     public void visitForLoop(ForStatement forLoop) {
         // for (ctc : patient.ctcs) {...}
@@ -216,11 +196,6 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
             forLoop.getLoopBlock().visit(this);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Jan 16, 2008 by depryf
-     * @see org.codehaus.groovy.ast.CodeVisitorSupport#visitMethodCallExpression(org.codehaus.groovy.ast.expr.MethodCallExpression)
-     */
     @Override
     public void visitMethodCallExpression(MethodCallExpression call) {
         // if (Functions.between(ctc.primarySite, 'C123', 'C456') {...}
@@ -270,11 +245,6 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
         super.visitMethodCallExpression(call);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Apr 21, 2010 by depryf
-     * @see org.codehaus.groovy.ast.CodeVisitorSupport#visitBinaryExpression(org.codehaus.groovy.ast.expr.BinaryExpression)
-     */
     @Override
     public void visitBinaryExpression(BinaryExpression expression) {
         if (_forceDefKeyword) {

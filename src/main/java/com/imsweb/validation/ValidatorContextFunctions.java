@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import groovy.lang.Binding;
 
 import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
+import com.imsweb.validation.internal.ValidatorLRUCache;
 import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 import com.imsweb.validation.shared.ContextFunctionDocDto;
 import com.imsweb.validation.shared.ValidatorLookup;
@@ -142,6 +144,15 @@ public class ValidatorContextFunctions {
         return dtos;
     }
 
+    // cached regular expressions
+    private ValidatorLRUCache<String, Pattern> _regexCache;
+
+    // lock for the cache
+    private static final Object _REGEX_CACHE_LOCK = new Object();
+
+    // stats for the cached regular expressions
+    private long _numRegexCacheHit = 0, _numRegexCacheMiss = 0;
+
     /**
      * Forces the given entity (corresponding to the given collection name) to report the given properties when the edit fails.
      * <p/>
@@ -224,7 +235,7 @@ public class ValidatorContextFunctions {
      * @param validatorId validator ID
      * @param contextKey context key
      * @return an object, possibly null
-     * @throws ValidationException
+     * @throws ValidationException if provided validator ID or context key are null or invalid
      */
     @ContextFunctionDocAnnotation(paramName1 = "validatorId", param1 = "validator ID", paramName2 = "contextKey", param2 = "context key",
             desc = "Returns the value of the requested context key, throws an exception if the context is not found.", example = "Functions.getContext('seer', 'Birthplace_Table')")
@@ -247,7 +258,7 @@ public class ValidatorContextFunctions {
      * Created on Dec 20, 2007 by depryf
      * @param id lookup ID
      * @return a <code>ValidatorLookup</code>, never null
-     * @throws ValidationException
+     * @throws ValidationException if provided lookup ID is null or invalid
      */
     @ContextFunctionDocAnnotation(paramName1 = "id", param1 = "Lookup ID", desc = "Returns the lookup corresponding to the requested ID.\n\n" +
             "The returned object is a ValidatorLookup on which the following methods are available:\n" +
@@ -286,7 +297,7 @@ public class ValidatorContextFunctions {
      * Created on Dec 20, 2007 by depryf
      * @param id configuration variable ID
      * @return corresponding value, null if it doesn't exist
-     * @throws ValidationException
+     * @throws ValidationException if provided ID is null
      */
     @ContextFunctionDocAnnotation(paramName1 = "id", param1 = "Configuration variable ID", desc = "Returns the value of the requested configuration variable.",
             example = "Functions.fetchConfVariable('id')")
@@ -434,6 +445,80 @@ public class ValidatorContextFunctions {
     @ContextFunctionDocAnnotation(desc = "Returns the current year as an integer.", example = "Functions.getCurrentYear()")
     public int getCurrentYear() {
         return LocalDate.now().getYear();
+    }
+
+    /**
+     * No documentation on purpose, shouldn't be called from edits!
+     * <br/><br/>
+     * Enables the regex caching
+     * @param cacheSize regex cache size
+     */
+    public void enableRegexCaching(int cacheSize) {
+        if (cacheSize < 1 || cacheSize > 10000)
+            throw new RuntimeException("Cache size must be between 1 and 10,000");
+        _regexCache = new ValidatorLRUCache<>(cacheSize);
+        _numRegexCacheHit = 0;
+        _numRegexCacheMiss = 0;
+    }
+
+    /**
+     * No documentation on purpose, shouldn't be called from edits!
+     * <br/><br/>
+     * Disables the regex caching
+     */
+    public void disableRegexCaching() {
+        _regexCache = null;
+        _numRegexCacheHit = 0;
+        _numRegexCacheMiss = 0;
+    }
+
+    /**
+     * Returns true if the provided value matches according to the provided regular expression.
+     * @param value value to match
+     * @param regex regular expression (Java style) to match against
+     * @return true if the value matches, false otherwise.
+     */
+    public boolean matches(Object value, Object regex) {
+        if (value == null || regex == null)
+            return false;
+        String val = value instanceof String ? (String)value : value.toString();
+        String reg = regex instanceof String ? (String)regex : regex.toString();
+
+        Pattern pattern;
+        synchronized (_REGEX_CACHE_LOCK) {
+            if (_regexCache == null)
+                pattern = Pattern.compile(reg);
+            else {
+                pattern = _regexCache.get(reg);
+                if (pattern == null) {
+                    pattern = Pattern.compile(reg);
+                    _regexCache.put(reg, pattern);
+                    _numRegexCacheMiss++;
+                }
+                else
+                    _numRegexCacheHit++;
+            }
+        }
+
+        return pattern.matcher(val).matches();
+    }
+
+    /**
+     * Returns the number of hits in the regex cache.
+     */
+    public long getNumRegexCacheHit() {
+        synchronized (_REGEX_CACHE_LOCK) {
+            return _numRegexCacheHit;
+        }
+    }
+
+    /**
+     * Returns the number of misses in the regex cache.
+     */
+    public long getNumRegexCacheMiss() {
+        synchronized (_REGEX_CACHE_LOCK) {
+            return _numRegexCacheMiss;
+        }
     }
 }
 

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +34,8 @@ import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validatable;
+import com.imsweb.validation.runtime.CompiledRules;
+import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
  * A <code>ValidatingProcessor</code> is a <code>Processor</code> that runs edits on a particular level of a <code>Validatable</code>.
@@ -64,7 +65,7 @@ public class ValidatingProcessor implements Processor {
     private Map<String, Object> _contexts = new ConcurrentHashMap<>();
 
     // cached compiled forced rules (#294)
-    private ValidatingProcessorLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidatingProcessorLRUCache<>(10);
+    private ValidatorLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidatorLRUCache<>(10);
 
     // whether or not stats should be recorded
     private boolean _recordStats = false;
@@ -102,7 +103,10 @@ public class ValidatingProcessor implements Processor {
                 String key = vContext.getToForce().getId() + "|" + vContext.getToForce().getExpression().hashCode();
                 toForce = _cachedForcedRules.get(key);
                 if (toForce == null) {
-                    toForce = new ExecutableRule(vContext.getToForce());
+                    CompiledRules precompiledRules = null;
+                    if (ValidationEngine.isPreCompiledLookupEnabled() && vContext.getToForce().getValidator() != null)
+                        precompiledRules = RuntimeUtils.findCompileRules(vContext.getToForce().getValidator().getId(), vContext.getToForce().getValidator().getVersion(), null);
+                    toForce = new ExecutableRule(vContext.getToForce(), precompiledRules, null);
                     _cachedForcedRules.put(key, toForce);
                 }
             }
@@ -241,9 +245,9 @@ public class ValidatingProcessor implements Processor {
 
                         RuleFailure failure = new RuleFailure(rule.getRule(), ValidatorServices.getInstance().fillInMessage(msg, validatable), validatable);
                         // extra error messages are used by translated edits only...
-                        failure.setExtraErrorMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES));
+                        failure.setExtraErrorMessages(ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES), validatable));
                         // information messages are used by translated edits only...
-                        failure.setInformationMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES));
+                        failure.setInformationMessages(ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
                         // keep track of the original result
                         failure.setOriginalResult((Boolean)binding.getVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT));
                         results.add(failure);
@@ -407,45 +411,6 @@ public class ValidatingProcessor implements Processor {
     @Override
     public String toString() {
         return _currentJavaPath + " [" + (_rules == null ? "?" : _rules.size()) + " rule(s)]";
-    }
-
-    /**
-     * Simple implementation of a LRU cache based on a LinkedHashMap.
-     * @param <A>
-     * @param <B>
-     */
-    private static class ValidatingProcessorLRUCache<A, B> extends LinkedHashMap<A, B> {
-
-        private static final long serialVersionUID = 4701170688038236784L;
-
-        private final int _maxEntries;
-
-        /**
-         * Constructor.
-         * @param maxEntries the maximum number of entries to keep in the cache
-         */
-        public ValidatingProcessorLRUCache(int maxEntries) {
-            super(maxEntries + 1, 1.0f, true);
-            _maxEntries = maxEntries;
-        }
-
-        /**
-         * Returns <tt>true</tt> if this <code>LruCache</code> has more entries than the maximum specified when it was
-         * created.
-         * <p/>
-         * <p>
-         * This method <em>does not</em> modify the underlying <code>Map</code>; it relies on the implementation of
-         * <code>LinkedHashMap</code> to do that, but that behavior is documented in the JavaDoc for
-         * <code>LinkedHashMap</code>.
-         * </p>
-         * @param eldest <code>Entry</code> in question; this implementation doesn't care what it is, since the implementation is only dependent on the size of the cache
-         * @return <tt>true</tt> if the oldest
-         * @see LinkedHashMap#removeEldestEntry(Entry)
-         */
-        @Override
-        protected boolean removeEldestEntry(Entry<A, B> eldest) {
-            return size() > _maxEntries;
-        }
     }
 
     /**

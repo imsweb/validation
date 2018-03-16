@@ -199,9 +199,10 @@ public final class XmlValidatorFactory {
                 return new SimpleDateFormat("yyyy-MM-dd").format((Date)obj);
             }
         });
+
         // setup proper security by limiting what classes can be loaded by XStream
         xstream.addPermission(NoTypePermission.NONE);
-        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.entities.xml.*"}));
+        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.**"}));
 
         return xstream;
     }
@@ -962,9 +963,11 @@ public final class XmlValidatorFactory {
         });
         xstream.autodetectAnnotations(true);
         xstream.alias("set", StandaloneSetXmlDto.class);
+
         // setup proper security by limiting what classes can be loaded by XStream
         xstream.addPermission(NoTypePermission.NONE);
-        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.entities.xml.*"}));
+        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.**"}));
+
         return xstream;
     }
 
@@ -1230,8 +1233,11 @@ public final class XmlValidatorFactory {
         });
         xstream.autodetectAnnotations(true);
         xstream.alias("tested-validator", TestedValidatorXmlDto.class);
+
+        // setup proper security by limiting what classes can be loaded by XStream
         xstream.addPermission(NoTypePermission.NONE);
-        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.entities.xml.*"}));
+        xstream.addPermission(new WildcardTypePermission(new String[] {"com.imsweb.validation.**"}));
+
         return xstream;
     }
 
@@ -1464,6 +1470,20 @@ public final class XmlValidatorFactory {
         if (numThreads < 1 || numThreads > 32)
             throw new RuntimeException("Number of threads must be between 1 and 32!");
         _NUM_PARSER_THREADS = numThreads;
+    }
+
+    /**
+     * Disables multi-threaded parsing of the rules, using a single thread; this is the default behavior of the engine.
+     */
+    public static void disableMultiThreadedCompilation() {
+        _NUM_PARSER_THREADS = 1;
+    }
+
+    /**
+     * Enables the pre-parsing mechanism; this is the default behavior of the engine.
+     */
+    public static void enablePreParseLookup() {
+        _PRE_PARSED_LOOKUP_ENABLED = true;
     }
 
     /**
