@@ -345,7 +345,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("lnLaterality", "ln_laterality");
         EOD_FIELDS.put("lnPositiveAxillaryLevel1To2", "ln_pos_axillary_level_1_2");
         EOD_FIELDS.put("lnSize", "ln_size_of_mets");
-        EOD_FIELDS.put("lnStatusFemoralInguinalParaAorticAndPelvic", "ln_status");
+        EOD_FIELDS.put("lnStatusFemoralInguinalParaAorticPelvic", "ln_status");
         EOD_FIELDS.put("lymphocytosis", "lymphocytosis");
         EOD_FIELDS.put("majorVeinInvolvement", "major_vein_involv");
         EOD_FIELDS.put("measuredBasalDiameter", "measured_basal_diameter");
@@ -384,13 +384,13 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("residualTumorVolumePostCytoreduction", "resid_tumor_vol_post_cyto");
         EOD_FIELDS.put("responseToNeoadjuvantTherapy", "response_neoadjuv_therapy");
         EOD_FIELDS.put("sCategoryClinical", "s_category_clin");
-        EOD_FIELDS.put("sCategoryPathologic", "s_category_path");
+        EOD_FIELDS.put("sCategoryPathological", "s_category_path");
         EOD_FIELDS.put("sarcomatoidFeatures", "sarcomatoid_features");
         EOD_FIELDS.put("seerSiteSpecificFactor1", "seer_ssf1");
         EOD_FIELDS.put("separateTumorNodules", "separate_tumor_nodules");
         EOD_FIELDS.put("serumAlbuminPretreatmentLevel", "serum_alb_pretx_level");
         EOD_FIELDS.put("serumBeta2MicroglobulinPretreatmentLevel", "b2_microglob_pretx_level");
-        EOD_FIELDS.put("serumLdhPretreatmentLabValue", "ldh_pretx_lab_value");
+        EOD_FIELDS.put("ldhPretreatmentLabValue", "ldh_pretx_lab_value");
         EOD_FIELDS.put("thrombocytopenia", "thrombocytopenia");
         EOD_FIELDS.put("tumorDeposits", "tumor_deposits");
         EOD_FIELDS.put("tumorGrowthPattern", "tumor_growth_pattern");
