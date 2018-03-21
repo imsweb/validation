@@ -137,9 +137,14 @@ public class Rule {
     protected String _agency;
 
     /**
-     * Whether the failures from this rule can be overridden or not; this field not used in this library but this is useful for other projects using the library.
+     * Whether the failures from this rule can be overridden or not; this field is not used in this library and was added for other projects using the library.
      */
     protected Boolean _allowOverride;
+
+    /**
+     * Whether this rule needs to be reviewed or not; this field is not used in this library and was added for other projects using the library.
+     */
+    protected Boolean _needsReview;
 
     /**
      * Constructor.
@@ -157,6 +162,7 @@ public class Rule {
         _ignored = Boolean.FALSE;
         _useAndForConditions = Boolean.TRUE;
         _allowOverride = Boolean.FALSE;
+        _needsReview = Boolean.FALSE;
     }
 
     /**
@@ -609,6 +615,26 @@ public class Rule {
      */
     public void setAllowOverride(Boolean allowOverride) {
         _allowOverride = allowOverride;
+    }
+
+    /**
+     * Getter
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @return whether this rule needs to be reviewed
+     */
+    public Boolean getNeedsReview() {
+        return _needsReview;
+    }
+
+    /**
+     * Setter
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param needsReview whether this rule needs to be reviewed
+     */
+    public void setNeedsReview(Boolean needsReview) {
+        _needsReview = needsReview;
     }
 
     @Override
