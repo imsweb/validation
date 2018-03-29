@@ -5,6 +5,7 @@
 - Increased the engine version to 5.9.
 - Added support for the EOD staging algorithm.
 - Updated staging client from version 2.12 to version 3.1.
+- Improved parsing logic to better handle null-safe notation.
 - Added new "needsReview" field to the Rule Java entity; this field is not used by this library but will be useful in other projects.
 
 **Version 1.13**
