@@ -281,7 +281,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("brainMolecularMarkers", "brain_molecular_markers");
         EOD_FIELDS.put("breslowTumorThickness", "breslow_thickness");
         EOD_FIELDS.put("ca125PretreatmentInterpretation", "ca125_pretx_lab_value");
-        EOD_FIELDS.put("ceaPretreatmentIntrepretation", "cea_pretx_interpretation");
+        EOD_FIELDS.put("ceaPretreatmentInterpretation", "cea_pretx_interpretation");
         EOD_FIELDS.put("ceaPretreatmentLabValue", "cea_pretx_lab_value");
         EOD_FIELDS.put("chromosome19qLossOfHeterozygosity", "chrom_19q_status");
         EOD_FIELDS.put("chromosome1pLossOfHeterozygosity", "chrom_1p_status");
