@@ -899,8 +899,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     public boolean GEN_MATCH(Object value, Object regex) {
-        if (value == null)
-            return false;
+        // sometimes blanks get passed as null. Genedits seems to allow these edits to run.
+        if (value == null) {
+            value = "";
+        }
 
         String val = GEN_TO_STRING(value);
         String reg = GEN_TO_STRING(regex);
