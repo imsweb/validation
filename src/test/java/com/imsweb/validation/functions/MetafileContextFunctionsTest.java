@@ -452,6 +452,25 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_MATCH("C1  ", regex));
         Assert.assertFalse(_functions.GEN_MATCH("123", regex));
         Assert.assertFalse(_functions.GEN_MATCH("123 ", regex));
+
+        // this one was taken from "Edit Over-rides (SEER REVIEWFL)" in NAACCR Call for Data metafile
+        //    original regex: 1,b
+        // following testing values have been tested within Genedits...
+        regex = "(1)|(\\s)";
+        Assert.assertTrue(_functions.GEN_MATCH("", regex));
+        Assert.assertTrue(_functions.GEN_MATCH(" ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("1", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("2", regex));
+
+        // this one was also taken from "Edit Over-rides (SEER REVIEWFL)" in NAACCR Call for Data metafile
+        //    original regex: 1:3,b
+        // following testing values have been tested within Genedits...
+        regex = "([1-3])|(\\s)";
+        Assert.assertTrue(_functions.GEN_MATCH("", regex));
+        Assert.assertTrue(_functions.GEN_MATCH(" ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("1", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("2", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("4", regex));
     }
 
     @Test
