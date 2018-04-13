@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -210,18 +211,18 @@ public final class TestingUtils {
         }
 
         @Override
-        public void log(String message) {
-            _logMessages.add(message);
+        public void log(Object message) {
+            _logMessages.add(Objects.toString(message, ""));
         }
 
         @Override
-        public void logWarning(String message) {
-            _logMessages.add(message);
+        public void logWarning(Object message) {
+            _logMessages.add(Objects.toString(message, ""));
         }
 
         @Override
-        public void logError(String message) {
-            _logMessages.add(message);
+        public void logError(Object message) {
+            _logMessages.add(Objects.toString(message, ""));
         }
 
         public List<String> getLogMessages() {

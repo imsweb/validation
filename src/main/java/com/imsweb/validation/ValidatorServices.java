@@ -222,21 +222,21 @@ public class ValidatorServices {
      * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void log(String message) {}
+    public void log(Object message) {}
 
     /**
      * Logs the message as a warning
      * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void logWarning(String message) {}
+    public void logWarning(Object message) {}
 
     /**
      * Logs the message as an error
      * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void logError(String message) {}
+    public void logError(Object message) {}
 
     /**
      * Returns the next rule ID to use.

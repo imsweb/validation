@@ -3,6 +3,7 @@
 **Version 1.15**
 
  - Fixed equality of RuleHistory class; reviewed equality/hash of all the other entities.
+ - Changed log methods in ValidatorServices so they accept an Object instead of a String.
 
 **Version 1.14**
 
