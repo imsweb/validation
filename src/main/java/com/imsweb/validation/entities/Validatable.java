@@ -1,5 +1,5 @@
-/**
- *
+/*
+ * Copyright (C) 2011 Information Management Services, Inc.
  */
 package com.imsweb.validation.entities;
 
@@ -85,7 +85,7 @@ public interface Validatable {
      * Created on Nov 8, 2007 by depryf
      * @param collection collection name
      * @return arary of validatable objects
-     * @throws IllegalAccessException
+     * @throws IllegalAccessException if anything goes wrong
      */
     List<Validatable> followCollection(String collection) throws IllegalAccessException;
 
@@ -94,7 +94,7 @@ public interface Validatable {
      * <p/>
      * Created on Nov 8, 2007 by depryf
      * @param propertyName property name
-     * @throws IllegalAccessException
+     * @throws IllegalAccessException if anything goes wrong
      */
     void reportFailureForProperty(String propertyName) throws IllegalAccessException;
 
@@ -107,7 +107,7 @@ public interface Validatable {
      * Created on Apr 27, 2010 by depryf
      * @param toReport properties to report, wrapped into a set of <code>ExtraPropertyEntityHandlerDto</code>
      * @param rawProperties the raw statically parsed properties
-     * @throws IllegalAccessException
+     * @throws IllegalAccessException if anything goes wrong
      */
     void forceFailureForProperties(Set<ExtraPropertyEntityHandlerDto> toReport, Set<String> rawProperties) throws IllegalAccessException;
 

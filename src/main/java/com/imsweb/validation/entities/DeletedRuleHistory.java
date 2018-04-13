@@ -4,9 +4,7 @@
 package com.imsweb.validation.entities;
 
 import java.util.Date;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  * A <code>DeletedRuleHistory</code> represents a single history event for a deleted rule within a validator.
@@ -238,30 +236,16 @@ public class DeletedRuleHistory {
         _reference = reference;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof DeletedRuleHistory))
-            return false;
-        DeletedRuleHistory oth = (DeletedRuleHistory)other;
-        if (_validator == null)
-            return new EqualsBuilder().append(_deletedRuleId, oth.getDeletedRuleId()).isEquals();
-        return new EqualsBuilder().append(_validator.getId(), oth.getValidator().getId()).append(_deletedRuleId, oth.getDeletedRuleId()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeletedRuleHistory that = (DeletedRuleHistory)o;
+        return Objects.equals(_ruleHistoryId, that._ruleHistoryId);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        if (_validator == null)
-            return new HashCodeBuilder().append(_deletedRuleId).toHashCode();
-        return new HashCodeBuilder().append(_validator.getId()).append(_deletedRuleId).toHashCode();
+        return Objects.hash(_ruleHistoryId);
     }
 }

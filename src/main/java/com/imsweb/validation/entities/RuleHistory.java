@@ -4,9 +4,7 @@
 package com.imsweb.validation.entities;
 
 import java.util.Date;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  * A <code>RuleHistory</code> represents a single history event for a given rule.
@@ -15,25 +13,39 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class RuleHistory {
 
-    /** DB ID for this rule history */
+    /**
+     * DB ID for this rule history
+     */
     protected Long _ruleHistoryId;
 
-    /** Message (comment) for this rule histroy */
+    /**
+     * Message (comment) for this rule history
+     */
     protected String _message;
 
-    /** Version for this change */
+    /**
+     * Version for this change
+     */
     protected ValidatorVersion _version;
 
-    /** Username responsible for this rule history */
+    /**
+     * Username responsible for this rule history
+     */
     protected String _username;
 
-    /** <code>Date</code> when this rule history was added */
+    /**
+     * <code>Date</code> when this rule history was added
+     */
     protected Date _date;
 
-    /** Squish reference ID */
+    /**
+     * Squish reference ID
+     */
     protected String _reference;
 
-    /** <code>Rule</code> for which this history is for */
+    /**
+     * <code>Rule</code> for which this history is for
+     */
     protected Rule _rule;
 
     /**
@@ -176,30 +188,16 @@ public class RuleHistory {
         _reference = reference;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof RuleHistory))
-            return false;
-        RuleHistory oth = (RuleHistory)other;
-        if (_rule == null)
-            return new EqualsBuilder().append(_date, oth.getDate()).append(_message, oth.getMessage()).isEquals();
-        return new EqualsBuilder().append(_rule.getId(), oth.getRule().getId()).append(_date, oth.getDate()).append(_message, oth.getMessage()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RuleHistory that = (RuleHistory)o;
+        return Objects.equals(_ruleHistoryId, that._ruleHistoryId);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        if (_rule == null)
-            return new HashCodeBuilder().append(_date).append(_message).toHashCode();
-        return new HashCodeBuilder().append(_rule.getId()).append(_date).append(_message).toHashCode();
+        return Objects.hash(_ruleHistoryId);
     }
 }

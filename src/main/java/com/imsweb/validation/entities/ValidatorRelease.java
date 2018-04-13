@@ -5,6 +5,7 @@ package com.imsweb.validation.entities;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * An object encapsulating the information related to a particular release of an XML edits file (represented by a {@link Validator} Object).
@@ -13,13 +14,19 @@ import java.util.Date;
  */
 public class ValidatorRelease implements Comparable<ValidatorRelease> {
 
-    /** Version for this release */
+    /**
+     * Version for this release
+     */
     protected ValidatorVersion _version;
 
-    /** Date of the release */
+    /**
+     * Date of the release
+     */
     protected Date _date;
 
-    /** Optional description for this release */
+    /**
+     * Optional description for this release
+     */
     protected String _description;
 
     /**
@@ -66,11 +73,6 @@ public class ValidatorRelease implements Comparable<ValidatorRelease> {
         return _description;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 23, 2011 by depryf
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(_version.getRawString());
@@ -79,49 +81,22 @@ public class ValidatorRelease implements Comparable<ValidatorRelease> {
         return buf.toString();
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 23, 2011 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ValidatorRelease other = (ValidatorRelease)obj;
-        if (_version == null) {
-            if (other._version != null)
-                return false;
-        }
-        else if (!_version.equals(other._version))
-            return false;
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ValidatorRelease that = (ValidatorRelease)o;
+        return Objects.equals(_version, that._version);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 23, 2011 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + ((_version == null) ? 0 : _version.hashCode());
-        return result;
+
+        return Objects.hash(_version);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 23, 2011 by depryf
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(ValidatorRelease o) {
-        return getVersion().compareTo(o.getVersion());
+        return _version.compareTo(o.getVersion());
     }
 }

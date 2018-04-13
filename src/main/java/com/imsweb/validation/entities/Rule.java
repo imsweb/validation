@@ -8,8 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.imsweb.validation.ConstructionException;
@@ -643,21 +641,16 @@ public class Rule {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Rule))
-            return false;
-        Rule castOther = (Rule)other;
-        if (getRuleId() != null)
-            return new EqualsBuilder().append(getRuleId(), castOther.getRuleId()).isEquals();
-        else
-            return new EqualsBuilder().append(getId(), castOther.getId()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rule rule = (Rule)o;
+        return Objects.equals(_ruleId, rule._ruleId);
     }
 
     @Override
     public int hashCode() {
-        if (getRuleId() != null)
-            return new HashCodeBuilder().append(getRuleId()).toHashCode();
-        else
-            return new HashCodeBuilder().append(getId()).toHashCode();
+
+        return Objects.hash(_ruleId);
     }
 }

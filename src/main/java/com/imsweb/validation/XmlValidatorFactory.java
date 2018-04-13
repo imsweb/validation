@@ -422,6 +422,7 @@ public final class XmlValidatorFactory {
 
             for (DeletedRuleXmlDto event : deletedRulesType) {
                 DeletedRuleHistory rh = new DeletedRuleHistory();
+                rh.setRuleHistoryId(ValidatorServices.getInstance().getNextRuleHistorySequence());
                 if (event.getId() == null)
                     throw new IOException("Deleted rule ID is required");
                 rh.setDeletedRuleId(event.getId());
@@ -919,8 +920,7 @@ public final class XmlValidatorFactory {
             setType.setName(set.getName());
             setType.setTag(set.getTag());
             setType.setDescription(set.getDescription());
-
-            List<String> inclusions = set.getInclusions() == null ? Collections.emptyList() : new ArrayList<>(set.getInclusions());
+            List<String> inclusions = new ArrayList<>(set.getInclusions() == null ? Collections.emptySet() : set.getInclusions());
             Collections.sort(inclusions);
             if (!inclusions.isEmpty()) {
                 StringBuilder buf = new StringBuilder();
@@ -930,7 +930,7 @@ public final class XmlValidatorFactory {
                 setType.setInclude(buf.toString());
             }
 
-            List<String> exclusions = set.getExclusions() == null ? Collections.emptyList() : new ArrayList<>(set.getExclusions());
+            List<String> exclusions = new ArrayList<>(set.getExclusions() == null ? Collections.emptySet() : set.getExclusions());
             Collections.sort(exclusions);
             if (!exclusions.isEmpty()) {
                 StringBuilder buf = new StringBuilder();
@@ -1504,25 +1504,15 @@ public final class XmlValidatorFactory {
         if (url == null)
             return false;
 
-        InputStream is = null;
-        try {
+        try (InputStream is = url.openStream()) {
             // I don't like to depend on an exception to check the existence but URL doesn't have any method to do that :-(
-            is = url.openStream();
             if (is == null)
                 return false;
         }
         catch (Exception e) {
             return false;
         }
-        finally {
-            try {
-                if (is != null)
-                    is.close();
-            }
-            catch (IOException e) {
-                /* do nothing */
-            }
-        }
+        /* do nothing */
 
         return true;
     }
@@ -1600,24 +1590,14 @@ public final class XmlValidatorFactory {
             return null;
 
         String result;
-        InputStream is = null;
-        try {
-            boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
-            is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream();
+        boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
+        try (InputStream is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream()) {
             result = Hex.encodeHexString(DigestUtils.updateDigest(DigestUtils.getDigest(MessageDigestAlgorithms.SHA_1), is).digest());
         }
         catch (Exception e) {
             return null;
         }
-        finally {
-            try {
-                if (is != null)
-                    is.close();
-            }
-            catch (IOException e) {
-                /* do nothing */
-            }
-        }
+        /* do nothing */
 
         return result;
     }

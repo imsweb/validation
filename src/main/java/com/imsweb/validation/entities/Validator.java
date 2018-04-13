@@ -5,11 +5,9 @@ package com.imsweb.validation.entities;
 
 import java.util.HashSet;
 import java.util.NavigableSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * A <code>Validator</code> is a wrapper for a set of {@link Condition}.
@@ -479,22 +477,16 @@ public class Validator {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Validator))
-            return false;
-        Validator castOther = (Validator)other;
-        if (getValidatorId() != null)
-            return new EqualsBuilder().append(getValidatorId(), castOther.getValidatorId()).isEquals();
-        else
-            return new EqualsBuilder().append(getId(), castOther.getId()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Validator validator = (Validator)o;
+        return Objects.equals(_validatorId, validator._validatorId);
     }
 
     @Override
     public int hashCode() {
-        if (getValidatorId() != null)
-            return new HashCodeBuilder().append(getValidatorId()).toHashCode();
-        else
-            return new HashCodeBuilder().append(getId()).toHashCode();
-    }
 
+        return Objects.hash(_validatorId);
+    }
 }
