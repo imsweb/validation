@@ -70,7 +70,6 @@ public class ContextTable {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(_name);
     }
 }

@@ -314,12 +314,15 @@ public class EmbeddedSet {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EmbeddedSet that = (EmbeddedSet)o;
-        return Objects.equals(_setId, that._setId);
+        if (_setId != null && that._setId != null)
+            return Objects.equals(_setId, that._setId);
+        return Objects.equals(_id, that._id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(_setId);
+        if (_setId != null)
+            return Objects.hash(_setId);
+        return Objects.hash(_id);
     }
 }

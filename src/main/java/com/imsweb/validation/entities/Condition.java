@@ -282,12 +282,15 @@ public class Condition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Condition condition = (Condition)o;
-        return Objects.equals(_conditionId, condition._conditionId);
+        if (_conditionId != null && condition._conditionId != null)
+            return Objects.equals(_conditionId, condition._conditionId);
+        return Objects.equals(_id, condition._id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(_conditionId);
+        if (_conditionId != null)
+            return Objects.hash(_conditionId);
+        return Objects.hash(_id);
     }
 }

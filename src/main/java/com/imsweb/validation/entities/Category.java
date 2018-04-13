@@ -165,11 +165,15 @@ public class Category {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Category category = (Category)o;
-        return Objects.equals(_categoryId, category._categoryId);
+        if (_categoryId != null && category._categoryId != null)
+            return Objects.equals(_categoryId, category._categoryId);
+        return Objects.equals(_id, category._id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_categoryId);
+        if (_categoryId != null)
+            return Objects.hash(_categoryId);
+        return Objects.hash(_id);
     }
 }

@@ -241,11 +241,22 @@ public class DeletedRuleHistory {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeletedRuleHistory that = (DeletedRuleHistory)o;
-        return Objects.equals(_ruleHistoryId, that._ruleHistoryId);
+        if (_ruleHistoryId != null && that._ruleHistoryId != null)
+            return Objects.equals(_ruleHistoryId, that._ruleHistoryId);
+        return Objects.equals(_deletedRuleId, that._deletedRuleId) &&
+                Objects.equals(_deletedRuleName, that._deletedRuleName) &&
+                Objects.equals(_message, that._message) &&
+                Objects.equals(_version, that._version) &&
+                Objects.equals(_username, that._username) &&
+                Objects.equals(_date, that._date) &&
+                Objects.equals(_reference, that._reference) &&
+                Objects.equals(_validator, that._validator);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(_ruleHistoryId);
+        if (_ruleHistoryId != null)
+            return Objects.hash(_ruleHistoryId);
+        return Objects.hash(_deletedRuleId, _deletedRuleName, _message, _version, _username, _date, _reference, _validator);
     }
 }

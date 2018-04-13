@@ -481,12 +481,15 @@ public class Validator {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Validator validator = (Validator)o;
-        return Objects.equals(_validatorId, validator._validatorId);
+        if (_validatorId != null && validator._validatorId != null)
+            return Objects.equals(_validatorId, validator._validatorId);
+        return Objects.equals(_id, validator._id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(_validatorId);
+        if (_validatorId != null)
+            return Objects.hash(_validatorId);
+        return Objects.hash(_id);
     }
 }

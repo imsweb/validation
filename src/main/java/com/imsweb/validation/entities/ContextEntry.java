@@ -155,12 +155,15 @@ public class ContextEntry {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ContextEntry that = (ContextEntry)o;
-        return Objects.equals(_contextEntryId, that._contextEntryId);
+        if (_contextEntryId != null && that._contextEntryId != null)
+            return Objects.equals(_contextEntryId, that._contextEntryId);
+        return Objects.equals(_key, that._key);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(_contextEntryId);
+        if (_contextEntryId != null)
+            return Objects.hash(_contextEntryId);
+        return Objects.hash(_key);
     }
 }
