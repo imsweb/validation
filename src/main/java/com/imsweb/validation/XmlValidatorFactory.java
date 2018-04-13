@@ -1509,10 +1509,9 @@ public final class XmlValidatorFactory {
             if (is == null)
                 return false;
         }
-        catch (Exception e) {
+        catch (IOException | RuntimeException e) {
             return false;
         }
-        /* do nothing */
 
         return true;
     }
@@ -1566,7 +1565,7 @@ public final class XmlValidatorFactory {
                 n = is.read(bytes);
             }
         }
-        catch (IOException e) {
+        catch (IOException | RuntimeException e) {
             /* do nothing */
         }
 
@@ -1594,10 +1593,9 @@ public final class XmlValidatorFactory {
         try (InputStream is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream()) {
             result = Hex.encodeHexString(DigestUtils.updateDigest(DigestUtils.getDigest(MessageDigestAlgorithms.SHA_1), is).digest());
         }
-        catch (Exception e) {
+        catch (IOException | RuntimeException e) {
             return null;
         }
-        /* do nothing */
 
         return result;
     }
