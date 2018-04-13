@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.15**
+
+ - Fixed equality of RuleHistory class; reviewed equality/hash of all the other entities.
+
 **Version 1.14**
 
 - Increased the engine version to 5.9.
