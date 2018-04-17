@@ -19,6 +19,25 @@ import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_C
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_NOT_FOUND;
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_DIFFERENT_VERSION;
 
+/**
+ * This class is used by the engine to support pre-parsed and pre-compiled edits.
+ * <br/>
+ * The engine will used pre-parsed and/or pre-compiled edits if it finds them on the classpath, otherwise it will default back to the regular edits.
+ * <br/>
+ * Pre-parsed edits need to be included in three files implementing a specific interface:
+ * <ul>
+ * <li>ParsedProperties: used to find the pre-parsed used properties</li>
+ * <li>ParsedLookups: used to find the pre-parsed used lookups</li>
+ * <li>ParsedContexts: used to find the pre-parsed used context keys</li>
+ * </ul>
+ * Pre-compiled edits need to be included in a single file implementing a specific interface:
+ * <ul>
+ * <li>CompiledRules: used to find pre-compiled edit expressions</li>
+ * </ul>
+ * The classes and methods must follow strict naming conventions to be found by the engine on the classpath; see the code for the conventions.
+ * <br/>
+ * Typically a caller will use the "create" methods in this class instead of trying to implement the conventions; that's by far the safest way.
+ */
 public class RuntimeUtils {
 
     public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";

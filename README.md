@@ -11,7 +11,7 @@ This framework allows edits to be defined in [Groovy](http://www.groovy-lang.org
 * Large tables can be provided to the edits as contexts and shared among several edits.
 * Edits can be loaded from an XML file, or defined programmatically.
 * Any type of data can be validated; it just needs to implement the *Validatable* interface.
-* The validation engine executing edits is thread safe.
+* The execution of edits is thread safe and the engine can be used in a heavily threaded application.
 * Edits can be dynamically added, modified or removed in the engine.
 * The engine supports an edit testing framework with unit tests written in Groovy as well.
 
@@ -117,6 +117,45 @@ for (<Map<String, String> rec : (RecordLayout)layout.readAllRecords(dataFile)) {
 }
 ```
 
+## Optimizing loading an executing edits
+
+Several mechanisms are in place to speed up the initialization and the execution of the edits; most of those mechanism are turned OFF by default.
+
+### Speed up the initialization by enabling multi-threaded parsing
+
+Groovy edits need to be parsed to be validated and to gather the used properties. That step can be slow for big edits, 
+but it can be optimized by enabling multi-threaded parsing:
+```java
+XmlValidatorFactory.enableMultiThreadedParsing(2);
+```
+The parameter is the number of threads to use; a value of 2 will usually work well for this mechanism. The default is 1.
+
+### Speed up the initialization by enabling multi-threaded compilation
+
+Groovy edits need to be compiled before being executed by the engine. Again, that step can be slow for big edits, 
+but it can be optimized by enabling multi-threaded compilation:
+```java
+ValidationEngine.enableMultiThreadedCompilation(4);
+```
+The parameter is the number of threads to use; a value of 4 will usually work well for this mechanism although it depends on the available resources. The default is 1.
+
+### Speed up the initialization by disabling the re-alignment of the expressions and descriptions
+
+By default the engine will re-align the expressions and descriptions so they look nice in an editor. If you do not intened to display the expressions 
+and/or descriptions, you can turn that feature off: 
+
+```java
+XmlValidatorFactory.disableRealignment();
+```
+By default the feature is ON.
+
+### Speed up the initialization and exuction by using pre-compiled edits
+
+The engine supports registering pre-compiled edits; those edits will completely bypass the parsing and compilation steps. The edits will also need to be strongly typed in their 
+syntax, allowing them to run much faster than regular Groovy edits.
+
+Pre-compiled edits is an advanced features; the engine supports pre-compiled edits by default (it does a lookup on the Java class-path to find them and default to the regular 
+edit if the pre-compiled version is not found), but creating the edits is much more work than maintaining them in an XML file. See the "runtime" package for more information.
 ## About SEER
 
 This library was developed through the [SEER](http://seer.cancer.gov/) program.
