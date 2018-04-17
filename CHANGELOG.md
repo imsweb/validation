@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.17**
+
+- Fixed a bug in re-alignment logic of XmlValidatorFactory; added an option to turn off re-alignment in that class (alignment is still ON by default).
+
 **Version 1.16**
 
 - Fixed equality of Rule class; it was unintentionally modified in previous version.

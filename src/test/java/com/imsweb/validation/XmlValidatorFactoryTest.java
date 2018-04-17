@@ -690,30 +690,75 @@ public class XmlValidatorFactoryTest {
     public void testTrimEmptyLines() {
         Assert.assertNull(XmlValidatorFactory.trimEmptyLines(null, true));
 
-        String s = " some text  ";
-        String exp = "some text";
-        Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+        try {
+            XmlValidatorFactory.enableRealignment();
 
-        s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
-        exp = "abc\n     ed\n\n   fh";
-        Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            String s = " some text  ";
+            String exp = "some text";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
 
+            s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
+            exp = "abc\n     ed\n\n   fh";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "\r\n     \r\n     \n\n   abc\n     ed\n\n   fh\n \n    \r\n     \r\n";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "Some text with\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nmany new lines";
+            exp = "Some text with\n\n\nmany new lines";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "Some text with\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nmany new lines";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            XmlValidatorFactory.disableRealignment();
+
+            s = " some text  ";
+            exp = "some text";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
+            exp = "abc\n     ed\n\n   fh";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(s, XmlValidatorFactory.trimEmptyLines(s, false));
+        }
+        finally {
+            XmlValidatorFactory.enableRealignment();
+        }
     }
 
     @Test
     public void testReAlign() {
         Assert.assertNull(XmlValidatorFactory.reAlign(null));
 
-        String s = "some text  ";
-        String exp = "some text";
-        Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+        try {
+            XmlValidatorFactory.enableRealignment();
 
-        s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
-        exp = "abc \n  - abc\n  - def\n    -- gh\n  -ifk\nlm";
-        Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            String s = "some text  ";
+            String exp = "some text";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
 
-        s = "   abc \n     - abc\n     - def\n -- gh\n     -ifk\n   lm";
-        exp = "abc \n    - abc\n    - def\n-- gh\n    -ifk\n  lm";
-        Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
+            exp = "abc \n  - abc\n  - def\n    -- gh\n  -ifk\nlm";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+
+            s = "   abc \n     - abc\n     - def\n -- gh\n     -ifk\n   lm";
+            exp = "abc \n    - abc\n    - def\n-- gh\n    -ifk\n  lm";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+
+            s = "   abc \r\n     - abc\r\n     - def\r\n -- gh\r\n     -ifk\r\n   lm";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+
+            XmlValidatorFactory.disableRealignment();
+
+            s = "some text  ";
+            Assert.assertEquals(s, XmlValidatorFactory.reAlign(s));
+
+            s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
+            Assert.assertEquals(s, XmlValidatorFactory.reAlign(s));
+        }
+        finally {
+            XmlValidatorFactory.enableRealignment();
+        }
     }
 }
