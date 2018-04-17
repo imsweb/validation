@@ -24,7 +24,7 @@ import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
 
 public final class TestingUtils {
 
-    public static File TMP_DIR = new File(System.getProperty("user.dir") + "/build/test-tmp");
+    public static File TMP_DIR = new File(getWorkingDirectory() + "/build/test-tmp");
 
     public static void init() {
 
@@ -45,6 +45,10 @@ public final class TestingUtils {
 
         // no edits should take more than one second (except the one tha tests the timeout)
         ValidationEngine.enableEditExecutionTimeout(1);
+    }
+
+    public static String getWorkingDirectory() {
+        return System.getProperty("user.dir").replace(".idea\\modules", "");
     }
 
     public static Validator loadValidator(String id) {

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.imsweb.validation.entities.Category;
@@ -41,14 +41,14 @@ import com.imsweb.validation.entities.ValidatorTests;
  */
 public class XmlValidatorFactoryTest {
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() {
         TestingUtils.init();
     }
 
     @Test
     public void testValidatorLoadMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-validator.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml'");
 
@@ -73,7 +73,7 @@ public class XmlValidatorFactoryTest {
         }
 
         // read gzipped file using multi-threading parsing
-        file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-validator.xml.gz");
+        file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml.gz'");
         XmlValidatorFactory.enableMultiThreadedParsing(2);
@@ -88,7 +88,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testValidatorWriteMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-validator.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml'");
         Validator v = XmlValidatorFactory.loadValidatorFromXml(file);
@@ -311,7 +311,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testStandaloneSetLoadMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-set.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml'");
 
@@ -336,7 +336,7 @@ public class XmlValidatorFactoryTest {
         }
 
         // read gzipped file
-        file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-set.xml.gz");
+        file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml.gz'");
         s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
@@ -345,7 +345,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testStandaloneSetWriteMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-set.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml'");
         StandaloneSet s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
@@ -460,7 +460,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testTestsLoadMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-tests.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml'");
 
@@ -485,7 +485,7 @@ public class XmlValidatorFactoryTest {
         }
 
         // read gzipped file
-        file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-tests.xml.gz");
+        file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml.gz'");
         t = XmlValidatorFactory.loadTestsFromXml(file);
@@ -494,7 +494,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testTestsWriteMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-tests.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml'");
         ValidatorTests s = XmlValidatorFactory.loadTestsFromXml(file);
@@ -613,7 +613,7 @@ public class XmlValidatorFactoryTest {
     }
 
     @Test
-    public void testGetXmlValidatorHash() throws IOException {
+    public void testGetXmlValidatorHash() {
         Assert.assertNull(XmlValidatorFactory.getXmlValidatorHash(null));
 
         URL url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml");
