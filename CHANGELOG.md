@@ -1,9 +1,13 @@
 ## Validation Framework Version History
 
+**Version 1.16**
+
+- Fixed equality of Rule class; it was unintentionally modified in previous version.
+
 **Version 1.15**
 
- - Fixed equality of RuleHistory class; reviewed equality/hash of all the other entities.
- - Changed log methods in ValidatorServices so they accept an Object instead of a String.
+- Fixed equality of RuleHistory class; reviewed equality/hash of all the other entities.
+- Changed log methods in ValidatorServices so they accept an Object instead of a String.
 
 **Version 1.14**
 
@@ -168,60 +172,60 @@
 
 **Legacy**
 
- - [SEER*Utils v4.9  ]  Moved all validation classes from "com.imsweb.seerutils.validator" to "com.imsweb.validation".
- - [SEER*Utils v4.8.3]  Fixed the demo programs that can be run on the command line.
- - [SEER*Utils v4.8.2]  Fixed a bug in the testing framework making the validation of a single edit very slow.
- - [SEER*Utils v4.8.1]  Fixed an issue where "forced rules" (see ValidationEngine.validate(validatable, rule)) were sometimes not correctly executed and returned no results.
- - [SEER*Utils v4.8.1]  Added support of an undocumented Genedits method "SET_ERROR"; seems like NCDB-00326 was the only edit to use that method.
- - [SEER*Utils v4.8.1]  Fixed a bug in the parsing of the edits code that would result in some properties not being correctly reported when an edit fails.
- - [SEER*Utils v4.8  ]  Replaced rulesets by conditions and categories; applied other minor changes to the framework.
- - [SEER*Utils v4.6  ]  The ValidatorContextFunctions constructor now takes an optional CStage version; if not provided, the latest available CStage version will be used.
- - [SEER*Utils v4.6  ]  Fixed a bug in INLIST related to ranges containing non-numeric characters.
- - [SEER*Utils v4.6  ]  Added support for reporting deleted edits in the edits XML file; this change doesn't break any API.
- - [SEER*Utils v4.5.6]  Fixed a bug in VAL context method for the translated edits where a result of -1 would be returned instead of 0 for a bad incoming value.
- - [SEER*Utils v4.5.6]  Added a new field "originalResult" on RuleFailure to handle case when translated edits fail because of a flag.
- - [SEER*Utils v4.5.6]  Fixed date values not properly formatted in error messages.
- - [SEER*Utils v4.5.6]  Fixed a problem in GEN_MATCH related to blank values.
- - [SEER*Utils v4.5.6]  Now using <BLANK> instead of <blank> when replacing a blank value in a message.
- - [SEER*Utils v4.5.6]  Optimized calls to LOOKUP and ILOOKUP.
- - [SEER*Utils v4.5.5]  Fixed a bug in the GEN_VALID_DATE_IOP method related to valid days.
- - [SEER*Utils 4.5.5 ]  Tweaked GEN_LOOKUP and GEN_RLOOKUP to accept a null table, allowing more optimization in the translated edits XML files.
- - [SEER*Utils v4.5.5]  Added support for extra error messages and information messages; mainly used for translated edits.
- - [SEER*Utils v4.5.4]  Fixed an exception in GEN_LOOKUP for table using integers instead of strings.
- - [SEER*Utils v4.5.3]  Added an optional list of edit IDs to execute, instead of allowing only a list of IDs to ignore for main validate method.
- - [SEER*Utils v4.5.3]  Now displaying a warning instead of throwing an exception if an edit history date can't be read successfully from an XML file.
- - [SEER*Utils v4.5.3]  Added support for defining a minimum validation engine version in the XML files.
- - [SEER*Utils v4.5.3]  Properties used inside an inner-method of an edit were not properly parsed.
- - [SEER*Utils v4.5.3]  Fixed a trimming issue in GEN_LOOKUP and GEN_ILOOKUP; this affected only translated edits.
- - [SEER*Utils v4.5.2]  Changed the XML validator factory to sort the rule histories when creating an XML file.
- - [SEER*Utils v4.4.2]  Added support in Genedits context methods for DT_TODAY constant (implemented as a method call).
- - [SEER*Utils v4.4.1]  Fixed SAVE_TEXT and SAVE_ERROR_TEXT Genedits context methods that were not properly setting the failing flag.
- - [SEER*Utils v4.4  ]  Optimized the Genedits context functions.
- - [SEER*Utils v4.3.2]  Fixed the XML validator factory to use the OS line separator.
- - [SEER*Utils v4.3.1]  Added support for loading gzipped URL/Files.
- - [SEER*Utils v4.3.1]  Removed default severity on the rules.
- - [SEER*Utils v4.3  ]  Context entries should now be referenced using the "Context." prefix; for now the old way (no prefix) is still supported.
- - [SEER*Utils v4.2.8]  Renamed some fields in the LayoutInfo object.
- - [SEER*Utils v4.2.8]  Improved documentation of the fetchLookup method in the validation engine.
- - [SEER*Utils v4.2.7]  Changed method addContext() so it requires the context key to be unique within the validator, not within the entire engine.
- - [SEER*Utils v4.2.6]  Added new method on EditsSet class to get all the referenced validator IDs.
- - [SEER*Utils v4.2.6]  Failing properties are now returned even if the edit failed because of an exception.
- - [SEER*Utils v4.2.6]  Fixed a bug in GEN_INLIST context function related to blank values.
- - [SEER*Utils v4.1  ]  Fixed and improved Validator Context methods documentation.
- - [SEER*Utils v4.0.1]  Fixed a bug with CStage variables in SimpleNaaccrValidatable.
- - [SEER*Utils v4.0  ]  Allowed extra suffix for validator versions.
- - [SEER*Utils v4.0  ]  Added support for closures in edits tests.
- - [SEER*Utils v3.1  ]  Map values for failing edits wasn't not correctly cloned for SEER*DMS edits.
- - [SEER*Utils v3.0  ]  Now sorting edits test before creating XML file.
- - [SEER*Utils v2.1  ]  Added ValidatorContextFunctions to testing framework.
- - [SEER*Utils v2.1  ]  Added new OBSOLETE codes to ValidatorContextFunctions.
- - [SEER*Utils v2.1  ]  Improved testing framework for SEER*DMS.
- - [SEER*Utils v2.1  ]  Redirected output from running tests on an edit and made it available in a variable.
- - [SEER*Utils v2.1  ]  Edits translation - various issues.
- - [SEER*Utils v2.1  ]  Implemented our own parsing of the java contexts.
- - [SEER*Utils v2.0  ]  Edits translation - bugs in regex translations.
- - [SEER*Utils v1.3  ]  History and Dependencies are now being sroted before being written to the XML file.
- - [SEER*Utils v1.0  ]  Improved validation engine memory usage.
- - [SEER*Utils v1.0  ]  Added a method to return all aliases.
- - [SEER*Utils v1.0  ]  Added a method in the Validation Engine to return a specific rule.
- - [SEER*Utils v1.0  ]  Moved validation engine out of SEER*DMS, into a new shared library.
+- [SEER*Utils v4.9  ]  Moved all validation classes from "com.imsweb.seerutils.validator" to "com.imsweb.validation".
+- [SEER*Utils v4.8.3]  Fixed the demo programs that can be run on the command line.
+- [SEER*Utils v4.8.2]  Fixed a bug in the testing framework making the validation of a single edit very slow.
+- [SEER*Utils v4.8.1]  Fixed an issue where "forced rules" (see ValidationEngine.validate(validatable, rule)) were sometimes not correctly executed and returned no results.
+- [SEER*Utils v4.8.1]  Added support of an undocumented Genedits method "SET_ERROR"; seems like NCDB-00326 was the only edit to use that method.
+- [SEER*Utils v4.8.1]  Fixed a bug in the parsing of the edits code that would result in some properties not being correctly reported when an edit fails.
+- [SEER*Utils v4.8  ]  Replaced rulesets by conditions and categories; applied other minor changes to the framework.
+- [SEER*Utils v4.6  ]  The ValidatorContextFunctions constructor now takes an optional CStage version; if not provided, the latest available CStage version will be used.
+- [SEER*Utils v4.6  ]  Fixed a bug in INLIST related to ranges containing non-numeric characters.
+- [SEER*Utils v4.6  ]  Added support for reporting deleted edits in the edits XML file; this change doesn't break any API.
+- [SEER*Utils v4.5.6]  Fixed a bug in VAL context method for the translated edits where a result of-1 would be returned instead of 0 for a bad incoming value.
+- [SEER*Utils v4.5.6]  Added a new field "originalResult" on RuleFailure to handle case when translated edits fail because of a flag.
+- [SEER*Utils v4.5.6]  Fixed date values not properly formatted in error messages.
+- [SEER*Utils v4.5.6]  Fixed a problem in GEN_MATCH related to blank values.
+- [SEER*Utils v4.5.6]  Now using <BLANK> instead of <blank> when replacing a blank value in a message.
+- [SEER*Utils v4.5.6]  Optimized calls to LOOKUP and ILOOKUP.
+- [SEER*Utils v4.5.5]  Fixed a bug in the GEN_VALID_DATE_IOP method related to valid days.
+- [SEER*Utils 4.5.5 ]  Tweaked GEN_LOOKUP and GEN_RLOOKUP to accept a null table, allowing more optimization in the translated edits XML files.
+- [SEER*Utils v4.5.5]  Added support for extra error messages and information messages; mainly used for translated edits.
+- [SEER*Utils v4.5.4]  Fixed an exception in GEN_LOOKUP for table using integers instead of strings.
+- [SEER*Utils v4.5.3]  Added an optional list of edit IDs to execute, instead of allowing only a list of IDs to ignore for main validate method.
+- [SEER*Utils v4.5.3]  Now displaying a warning instead of throwing an exception if an edit history date can't be read successfully from an XML file.
+- [SEER*Utils v4.5.3]  Added support for defining a minimum validation engine version in the XML files.
+- [SEER*Utils v4.5.3]  Properties used inside an inner-method of an edit were not properly parsed.
+- [SEER*Utils v4.5.3]  Fixed a trimming issue in GEN_LOOKUP and GEN_ILOOKUP; this affected only translated edits.
+- [SEER*Utils v4.5.2]  Changed the XML validator factory to sort the rule histories when creating an XML file.
+- [SEER*Utils v4.4.2]  Added support in Genedits context methods for DT_TODAY constant (implemented as a method call).
+- [SEER*Utils v4.4.1]  Fixed SAVE_TEXT and SAVE_ERROR_TEXT Genedits context methods that were not properly setting the failing flag.
+- [SEER*Utils v4.4  ]  Optimized the Genedits context functions.
+- [SEER*Utils v4.3.2]  Fixed the XML validator factory to use the OS line separator.
+- [SEER*Utils v4.3.1]  Added support for loading gzipped URL/Files.
+- [SEER*Utils v4.3.1]  Removed default severity on the rules.
+- [SEER*Utils v4.3  ]  Context entries should now be referenced using the "Context." prefix; for now the old way (no prefix) is still supported.
+- [SEER*Utils v4.2.8]  Renamed some fields in the LayoutInfo object.
+- [SEER*Utils v4.2.8]  Improved documentation of the fetchLookup method in the validation engine.
+- [SEER*Utils v4.2.7]  Changed method addContext() so it requires the context key to be unique within the validator, not within the entire engine.
+- [SEER*Utils v4.2.6]  Added new method on EditsSet class to get all the referenced validator IDs.
+- [SEER*Utils v4.2.6]  Failing properties are now returned even if the edit failed because of an exception.
+- [SEER*Utils v4.2.6]  Fixed a bug in GEN_INLIST context function related to blank values.
+- [SEER*Utils v4.1  ]  Fixed and improved Validator Context methods documentation.
+- [SEER*Utils v4.0.1]  Fixed a bug with CStage variables in SimpleNaaccrValidatable.
+- [SEER*Utils v4.0  ]  Allowed extra suffix for validator versions.
+- [SEER*Utils v4.0  ]  Added support for closures in edits tests.
+- [SEER*Utils v3.1  ]  Map values for failing edits wasn't not correctly cloned for SEER*DMS edits.
+- [SEER*Utils v3.0  ]  Now sorting edits test before creating XML file.
+- [SEER*Utils v2.1  ]  Added ValidatorContextFunctions to testing framework.
+- [SEER*Utils v2.1  ]  Added new OBSOLETE codes to ValidatorContextFunctions.
+- [SEER*Utils v2.1  ]  Improved testing framework for SEER*DMS.
+- [SEER*Utils v2.1  ]  Redirected output from running tests on an edit and made it available in a variable.
+- [SEER*Utils v2.1  ]  Edits translation- various issues.
+- [SEER*Utils v2.1  ]  Implemented our own parsing of the java contexts.
+- [SEER*Utils v2.0  ]  Edits translation- bugs in regex translations.
+- [SEER*Utils v1.3  ]  History and Dependencies are now being sroted before being written to the XML file.
+- [SEER*Utils v1.0  ]  Improved validation engine memory usage.
+- [SEER*Utils v1.0  ]  Added a method to return all aliases.
+- [SEER*Utils v1.0  ]  Added a method in the Validation Engine to return a specific rule.
+- [SEER*Utils v1.0  ]  Moved validation engine out of SEER*DMS, into a new shared library.
