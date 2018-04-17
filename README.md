@@ -119,7 +119,7 @@ for (<Map<String, String> rec : (RecordLayout)layout.readAllRecords(dataFile)) {
 
 ## Optimizing loading an executing edits
 
-Several mechanisms are in place to speed up the initialization and the execution of the edits; most of those mechanism are turned OFF by default.
+Several mechanisms are in place to speed up the initialization and the execution of the edits; most of those mechanisms are turned OFF by default.
 
 ### Speed up the initialization by enabling multi-threaded parsing
 
@@ -141,7 +141,7 @@ The parameter is the number of threads to use; a value of 4 will usually work we
 
 ### Speed up the initialization by disabling the re-alignment of the expressions and descriptions
 
-By default the engine will re-align the expressions and descriptions so they look nice in an editor. If you do not intened to display the expressions 
+By default the engine will re-align the expressions and descriptions so they look nice in an editor. If you do not intend to display the expressions 
 and/or descriptions, you can turn that feature off: 
 
 ```java
@@ -154,8 +154,8 @@ By default the feature is ON.
 The engine supports registering pre-compiled edits; those edits will completely bypass the parsing and compilation steps. The edits will also need to be strongly typed in their 
 syntax, allowing them to run much faster than regular Groovy edits.
 
-Pre-compiled edits is an advanced features; the engine supports pre-compiled edits by default (it does a lookup on the Java class-path to find them and default to the regular 
-edit if the pre-compiled version is not found), but creating the edits is much more work than maintaining them in an XML file. See the "runtime" package for more information.
+Pre-compiled edits is an advanced features; the engine supports it by default but creating the edits is much more work than maintaining them in an XML file. 
+See the "runtime" package for more information, in particular the RuntimeUtils class.
 ## About SEER
 
 This library was developed through the [SEER](http://seer.cancer.gov/) program.
