@@ -645,12 +645,15 @@ public class Rule {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Rule rule = (Rule)o;
-        return Objects.equals(_ruleId, rule._ruleId);
+        if (_ruleId != null && rule._ruleId != null)
+            return Objects.equals(_ruleId, rule._ruleId);
+        return Objects.equals(_id, rule._id);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(_ruleId);
+        if (_ruleId != null)
+            return Objects.hash(_ruleId);
+        return Objects.hash(_id);
     }
 }
