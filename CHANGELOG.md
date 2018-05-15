@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.18**
+
+- Updated staging client from version 3.1 to version 4.0; that version split the algorithms out of the client, the engine only needs the client at compile time but it still needs the algorithms at runtime.
+
 **Version 1.17**
 
 - Fixed a bug in re-alignment logic of XmlValidatorFactory; added an option to turn off re-alignment in that class (alignment is still ON by default).

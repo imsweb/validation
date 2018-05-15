@@ -11,15 +11,25 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.imsweb.staging.Staging;
+import com.imsweb.staging.cs.CsDataProvider;
+import com.imsweb.staging.eod.EodDataProvider;
+import com.imsweb.staging.tnm.TnmDataProvider;
 import com.imsweb.validation.TestingUtils;
 
 public class StagingContextFunctionsTest {
 
-    private StagingContextFunctions _functions = new StagingContextFunctions();
+    private StagingContextFunctions _functions;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         TestingUtils.init();
+
+        Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST));
+        Staging tnmStaging = Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST));
+        Staging eodStaging = Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST));
+
+        _functions = new StagingContextFunctions(csStaging, tnmStaging, eodStaging);
     }
 
     @Test
@@ -278,8 +288,8 @@ public class StagingContextFunctionsTest {
     }
 
     @Test
-    public void testGetCsObsoleteReason() throws Exception {
-        Assert.assertNull(_functions.getCsObsoleteReason(new HashMap<String, String>(), "", ""));
+    public void testGetCsObsoleteReason() {
+        Assert.assertNull(_functions.getCsObsoleteReason(new HashMap<>(), "", ""));
 
         // testing a single case (Bladder); the goal here is not to test the Obsolete logic, just that the call through is successful
         Map<String, String> input = new HashMap<>();
@@ -620,15 +630,15 @@ public class StagingContextFunctionsTest {
         Assert.assertTrue(_functions.isCocRequiredEodField(input, "gleasonPatternsClinical"));
         Assert.assertFalse(_functions.isCocRequiredEodField(input, "regionalNodesPositive"));
     }
-    
+
     @Test
     public void testExpandKeys() {
-        Assert.assertNotNull(_functions.expandKeys(Collections.singletonMap((Object)"1-9", (Object)"A")));
+        Assert.assertNotNull(_functions.expandKeys(Collections.singletonMap("1-9", "A")));
     }
 
     @Test
     public void testExpandList() {
-        Assert.assertNotNull(_functions.expandList(Collections.singletonList((Object)"1-9")));
+        Assert.assertNotNull(_functions.expandList(Collections.singletonList("1-9")));
     }
 
     @Test

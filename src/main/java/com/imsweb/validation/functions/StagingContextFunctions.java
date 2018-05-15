@@ -12,18 +12,11 @@ import java.util.Map;
 import groovy.lang.IntRange;
 
 import com.imsweb.decisionengine.ColumnDefinition;
+import com.imsweb.staging.SchemaLookup;
 import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.cs.CsSchemaLookup;
 import com.imsweb.staging.entities.StagingSchema;
 import com.imsweb.staging.entities.StagingSchemaInput;
 import com.imsweb.staging.entities.StagingTable;
-import com.imsweb.staging.eod.EodDataProvider;
-import com.imsweb.staging.eod.EodSchemaLookup;
-import com.imsweb.staging.eod.EodStagingData.EodInput;
-import com.imsweb.staging.tnm.TnmDataProvider;
-import com.imsweb.staging.tnm.TnmSchemaLookup;
-import com.imsweb.staging.tnm.TnmStagingData;
 import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
@@ -229,6 +222,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
 
     // this maps the EOD fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
     public static Map<String, String> EOD_FIELDS = new HashMap<>();
+
     static {
         EOD_FIELDS.put("schemaDiscriminator1", "discriminator_1");
         EOD_FIELDS.put("schemaDiscriminator2", "discriminator_2");
@@ -397,7 +391,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("ulceration", "ulceration");
         EOD_FIELDS.put("visceralAndParietalPleuralInvasion", "visceral_pleural_invasion");
     }
-    
+
     // the staging instances to use for cstage- and tnm-related logic
     protected Staging _csStaging;
     protected Staging _tnmStaging;
@@ -405,14 +399,6 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
 
     // Cached schema ID per schema number for CS
     protected Map<Integer, String> _csSchemaIdByNumber = new HashMap<>();
-
-    /**
-     * Default constructor
-     */
-    public StagingContextFunctions() {
-        this(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)), Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST)), 
-                Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST)));
-    }
 
     /**
      * Constructor.
@@ -976,7 +962,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         StagingSchema schema = getTnmStagingSchema(input);
         return schema == null ? null : schema.getId();
     }
-    
+
     /**
      * Returns true if the given value is valid for the given field with the schema corresponding to the passed input
      * <p/>
@@ -1289,7 +1275,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
         return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED)));
     }
-    
+
     /**
      * Helper method to get the schema from an input line (using standard NAACCR properties).
      * <br/>
@@ -1305,7 +1291,10 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         String hist = input.get(CSTAGE_INPUT_PROP_HIST);
         String ssf25 = input.get(CSTAGE_INPUT_PROP_DISC);
 
-        List<StagingSchema> schemas = _csStaging.lookupSchema(new CsSchemaLookup(site, hist, ssf25));
+        SchemaLookup lkup = new SchemaLookup(site, hist);
+        lkup.setInput("ssf25", ssf25);
+
+        List<StagingSchema> schemas = _csStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
             return _csStaging.getSchema(schemas.get(0).getId());
 
@@ -1328,9 +1317,9 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         String ssf25 = input.get(TNM_INPUT_PROP_SSF25);
         String sex = input.get(TNM_INPUT_PROP_SEX);
 
-        TnmSchemaLookup lkup = new TnmSchemaLookup(site, hist);
-        lkup.setInput(TnmStagingData.SSF25_KEY, ssf25);
-        lkup.setInput(TnmStagingData.SEX_KEY, sex);
+        SchemaLookup lkup = new SchemaLookup(site, hist);
+        lkup.setInput("ssf25", ssf25);
+        lkup.setInput("sex", sex);
 
         List<StagingSchema> schemas = _tnmStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
@@ -1356,10 +1345,10 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         String disc2 = input.get(EOD_INPUT_PROP_DISC_2);
         String sex = input.get(EOD_INPUT_PROP_SEX);
 
-        EodSchemaLookup lkup = new EodSchemaLookup(site, hist);
-        lkup.setInput(EodInput.DISCRIMINATOR_1.toString(), disc1);
-        lkup.setInput(EodInput.DISCRIMINATOR_2.toString(), disc2);
-        lkup.setInput(EodInput.SEX.toString(), sex);
+        SchemaLookup lkup = new SchemaLookup(site, hist);
+        lkup.setInput("discriminator_1", disc1);
+        lkup.setInput("discriminator_2", disc2);
+        lkup.setInput("sex", sex);
 
         List<StagingSchema> schemas = _eodStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
@@ -1549,7 +1538,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     /**
-     * Returns the corresponding SSF25 value for the given sex value 
+     * Returns the corresponding SSF25 value for the given sex value
      */
     public String getSsf25FromSex(String ssf25, String sex, String hist, String dxYear, String schemaId) {
         boolean isPeritoneum = "peritoneum".equals(schemaId) || "peritoneum_female_gen".equals(schemaId);

@@ -114,7 +114,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * Default constructor.
      */
     public MetafileContextFunctions() {
-        super();
+        super(null, null, null);
     }
 
     /**
