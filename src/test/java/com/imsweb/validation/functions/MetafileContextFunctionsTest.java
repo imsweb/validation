@@ -21,6 +21,8 @@ import org.junit.Test;
 
 import groovy.lang.Binding;
 
+import com.imsweb.staging.Staging;
+import com.imsweb.staging.cs.CsDataProvider;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.entities.ContextTable;
@@ -29,11 +31,13 @@ import com.imsweb.validation.internal.context.JavaContextParser;
 
 public class MetafileContextFunctionsTest {
 
-    private MetafileContextFunctions _functions = new MetafileContextFunctions();
+    private MetafileContextFunctions _functions;
 
     @Before
     public void setUp() {
         TestingUtils.init();
+
+        _functions = new MetafileContextFunctions(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)));
     }
 
     @Test
@@ -1070,7 +1074,7 @@ public class MetafileContextFunctionsTest {
     }
 
     @Test
-    public void testGEN_ILOOKUP() throws ConstructionException {
+    public void testGEN_ILOOKUP() {
 
         // test a regular index (list of list)
         List<List<Object>> index = new ArrayList<>();
@@ -1923,7 +1927,7 @@ public class MetafileContextFunctionsTest {
     }
 
     @Test
-    public void testGEN_BINLOOKUP() throws ConstructionException {
+    public void testGEN_BINLOOKUP() {
 
         List<List<Integer>> table = new ArrayList<>();
         List<Integer> row0 = new ArrayList<>();

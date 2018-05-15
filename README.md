@@ -25,28 +25,51 @@ You can check out the [release page](https://github.com/imsweb/validation/releas
 
 ## Core concepts
 
-- **ValidationEngine**: this is the class responsible for executing the edits. It needs to be initialized before that can happen.
+**ValidationEngine**
 
-- **XmlValidatorFactory**: provides utility methods for reading/writing edits XML files.
+This is the class responsible for executing the edits. It needs to be initialized before that can happen.
 
-- **Validator**: a logic grouping of edits (for example, the SEER edits, or the NAACCR edits). This is the entities used to
-initialize the validation engine.
+**XmlValidatorFactory**
 
-- **Rule**: edits are called rules in this framework.
+Provides utility methods for reading/writing edits XML files.
 
-- **Context**: validators can also contain contexts; those are usually large data structures (list, maps, etc...) that are accessed by more than one edit.
+**Validator**
+
+A logical grouping of edits (for example, the SEER edits, or the NAACCR edits). This is the entities used to initialize the validation engine.
+
+**Rule**
+
+Edits are called rules in this framework.
+
+**Context**
+
+Validators can also contain contexts; those are usually large data structures (list, maps, etc...) that are accessed by more than one edit. 
 Edits can reference contexts using the prefix *"Context."*.
 
-- **Validatable**: an interface used to tell the engine how to execute the edits on specific data types. This allows very different types
+**Validatable**
+
+An interface used to tell the engine how to execute the edits on specific data types. This allows very different types
 (like a NAACCR line, a Java tumor object or a record from a data entry form) to be wrapped into a validatable and handled by the framework.
 
-- **ValidatorServices**: some services are made available to the edits (like accessing a lookup, or a configuration variable); different applications
+**ValidatorServices**
+
+Some services are made available to the edits (like accessing a lookup, or a configuration variable); different applications
 provide those features differently, therefore the services need to be overridden if the default behavior is not the one needed.
 
-- **ValidatorContextFunctions**: the methods from this class are made available to the edits; they can be called using the prefix *"Function."*.
+**ValidatorContextFunctions**
+
+The methods from this class are made available to the edits; they can be called using the prefix *"Function."*.
 The default implementation provides very basic methods but it can be initialized with a more complex implementation if needed.
-If the edits need to access staging information, the StagingContextFunctions class should be used for initialization.
+
 If the edits have been translated from a Genedits metafile, the MetafileContextFunctions class should be used instead.
+The initialization of that class requires an instance of the following staging algorithm:
+- CS (https://github.com/imsweb/staging-algorithm-cs)
+
+If the edits need to access staging information (to execute SEER edits for example), the StagingContextFunctions class should be used for initialization.
+The initialization of that class requires an instance of the following staging algorithms:
+- CS (https://github.com/imsweb/staging-algorithm-cs)
+- TNM (https://github.com/imsweb/staging-algorithm-tnm)
+- EOD (https://github.com/imsweb/staging-algorithm-eod-public)
 
 ## Usage
 
