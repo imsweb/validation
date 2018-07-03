@@ -212,6 +212,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     public static final String EOD_INPUT_PROP_SEX = "sex";
     public static final String EOD_INPUT_PROP_DISC_1 = "schemaDiscriminator1";
     public static final String EOD_INPUT_PROP_DISC_2 = "schemaDiscriminator2";
+    public static final String EOD_INPUT_PROP_BEHAV = "behaviorIcdO3";
 
     // EOD metadata tags
     public static final String EOD_TAG_SEER_REQUIRED = "SEER_REQUIRED";
@@ -1344,11 +1345,13 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         String disc1 = input.get(EOD_INPUT_PROP_DISC_1);
         String disc2 = input.get(EOD_INPUT_PROP_DISC_2);
         String sex = input.get(EOD_INPUT_PROP_SEX);
+        String behav = input.get(EOD_INPUT_PROP_BEHAV);
 
         SchemaLookup lkup = new SchemaLookup(site, hist);
         lkup.setInput("discriminator_1", disc1);
         lkup.setInput("discriminator_2", disc2);
         lkup.setInput("sex", sex);
+        lkup.setInput("behavior", behav);
 
         List<StagingSchema> schemas = _eodStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
