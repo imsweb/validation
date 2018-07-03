@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.19**
+
+- Changed context function getEodSchemaId() to use 'behavior' as an input.
+
 **Version 1.18**
 
 - Updated staging client from version 3.1 to version 4.0; that version split the algorithms out of the client, the engine only needs the client at compile time but it still needs the algorithms at runtime.
