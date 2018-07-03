@@ -494,6 +494,13 @@ public class StagingContextFunctionsTest {
 
         input.put("schemaDiscriminator2", "2");
         Assert.assertNotNull(_functions.getEodStagingSchema(input)); // oropharynx_hpv_mediated_p16_pos
+
+        input.put("primarySite", "C700");
+        input.put("histologyIcdO3", "8710");
+        input.put("behaviorIcdO3", "0");
+        input.put("schemaDiscriminator1", null);
+        input.put("schemaDiscriminator2", null);
+        Assert.assertNotNull(_functions.getEodStagingSchema(input)); // brain
     }
 
     @Test
