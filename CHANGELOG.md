@@ -3,6 +3,9 @@
 **Version 1.19**
 
 - Changed context function getEodSchemaId() to use 'behavior' as an input.
+- Updated staging client from version 4.0 to version 4.1.
+- Updated TNM algorithm from version 1.8 to version 1.9.
+- Updated EOD algorithm from version 1.2 to version 1.3.
 
 **Version 1.18**
 
