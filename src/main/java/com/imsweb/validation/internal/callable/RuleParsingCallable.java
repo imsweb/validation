@@ -138,7 +138,7 @@ public class RuleParsingCallable implements Callable<Void> {
 
         if (_xmlRule.getDepends() != null && !_xmlRule.getDepends().isEmpty()) {
             Set<String> dependencies = new HashSet<>();
-            for (String s : _xmlRule.getDepends().split(","))
+            for (String s : StringUtils.split(_xmlRule.getDepends(), ','))
                 if (s != null)
                     dependencies.add(s.trim());
             rule.setDependencies(dependencies);

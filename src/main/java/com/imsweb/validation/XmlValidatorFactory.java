@@ -1085,7 +1085,7 @@ public final class XmlValidatorFactory {
                     if (inclusions.containsKey(validatorType.getId()))
                         throw new IOException("There can be only one set of inclusions per validator!");
                     List<String> inc = new ArrayList<>();
-                    for (String s : include.split(","))
+                    for (String s : StringUtils.split(include, ','))
                         inc.add(s.trim());
                     inclusions.put(validatorType.getId(), inc);
                 }
@@ -1097,7 +1097,7 @@ public final class XmlValidatorFactory {
                     if (exclusions.containsKey(validatorType.getId()))
                         throw new IOException("There can be only one set of exclusions per validator!");
                     List<String> exc = new ArrayList<>();
-                    for (String s : exclude.split(","))
+                    for (String s : StringUtils.split(exclude, ','))
                         exc.add(s.trim());
                     exclusions.put(validatorType.getId(), exc);
                 }
@@ -1724,6 +1724,7 @@ public final class XmlValidatorFactory {
             // determine number of extra white spaces
             int extraSpaces = Integer.MAX_VALUE;
             try {
+                @SuppressWarnings("ConstantConditions")
                 LineNumberReader reader = new LineNumberReader(new StringReader(s));
                 String line = reader.readLine();
                 while (line != null) {

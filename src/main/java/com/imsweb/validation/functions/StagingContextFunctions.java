@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import groovy.lang.IntRange;
 
 import com.imsweb.decisionengine.ColumnDefinition;
@@ -611,8 +613,8 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER) || schemaInput
-                .getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
+                (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER))));
 
     }
 
@@ -778,8 +780,8 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC) || schemaInput
-                .getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
+                (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC))));
 
     }
 
@@ -1019,7 +1021,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_SEER_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_SEER_REQUIRED))));
     }
 
     /**
@@ -1084,7 +1086,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_COC_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_COC_REQUIRED))));
     }
 
     /**
@@ -1207,7 +1209,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED))));
     }
 
     /**
@@ -1274,7 +1276,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED))));
     }
 
     /**
@@ -1471,7 +1473,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                         for (int i = ((IntRange)obj).getFromInt(); i <= ((IntRange)obj).getToInt(); i++)
                             result.put(i, val);
                     else if (obj instanceof String && ((String)obj).contains("..")) {
-                        String[] parts = ((String)obj).split("[.]{2}");
+                        String[] parts = StringUtils.split((String)obj, "..");
                         if (parts.length != 2)
                             throw new IllegalStateException("Bad range: " + obj);
                         Integer low = asInt(parts[0]);
@@ -1486,7 +1488,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                 }
             }
             else if (key instanceof String && ((String)key).contains("..")) {
-                String[] parts = ((String)key).split("..");
+                String[] parts = StringUtils.split((String)key, "..");
                 if (parts.length != 2)
                     throw new IllegalStateException("Bad range: " + key);
                 Integer low = asInt(parts[0]);
@@ -1523,7 +1525,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                 for (int i = ((IntRange)obj).getFromInt(); i <= ((IntRange)obj).getToInt(); i++)
                     result.add(i);
             else if (obj instanceof String && ((String)obj).contains("..")) {
-                String[] parts = ((String)obj).split("[.]{2}");
+                String[] parts = StringUtils.split((String)obj, "..");
                 if (parts.length != 2)
                     throw new IllegalStateException("Bad range: " + obj);
                 Integer low = asInt(parts[0]);

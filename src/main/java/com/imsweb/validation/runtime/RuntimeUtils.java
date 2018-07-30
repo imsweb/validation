@@ -17,6 +17,7 @@ import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_C
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_CAST_ERROR;
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_INSTANCIATION_ERROR;
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_NOT_FOUND;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CONSTRUCTOR_NOT_FOUND;
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_DIFFERENT_VERSION;
 
 /**
@@ -78,7 +79,7 @@ public class RuntimeUtils {
 
         String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);
         try {
-            compiledRules = (CompiledRules)(Class.forName(classPath).newInstance());
+            compiledRules = (CompiledRules)(Class.forName(classPath).getDeclaredConstructor().newInstance());
         }
         catch (ClassNotFoundException e) {
             if (stats != null)
@@ -98,6 +99,11 @@ public class RuntimeUtils {
         catch (ClassCastException e) {
             if (stats != null)
                 stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_CAST_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (NoSuchMethodException | InvocationTargetException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CONSTRUCTOR_NOT_FOUND.replace("{0}", classPath));
             compiledRules = null;
         }
 
@@ -132,9 +138,9 @@ public class RuntimeUtils {
     public static ParsedProperties findParsedProperties(String validatorId) {
         ParsedProperties parsedProperties;
         try {
-            parsedProperties = (ParsedProperties)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).newInstance());
+            parsedProperties = (ParsedProperties)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).getDeclaredConstructor().newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedProperties = null;
         }
         return parsedProperties;
@@ -162,9 +168,9 @@ public class RuntimeUtils {
     public static ParsedContexts findParsedContexts(String validatorId) {
         ParsedContexts parsedContexts;
         try {
-            parsedContexts = (ParsedContexts)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).newInstance());
+            parsedContexts = (ParsedContexts)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).getDeclaredConstructor().newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedContexts = null;
         }
         return parsedContexts;
@@ -192,9 +198,9 @@ public class RuntimeUtils {
     public static ParsedLookups findParsedLookups(String validatorId) {
         ParsedLookups parsedLookups;
         try {
-            parsedLookups = (ParsedLookups)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).newInstance());
+            parsedLookups = (ParsedLookups)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).getDeclaredConstructor().newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedLookups = null;
         }
         return parsedLookups;

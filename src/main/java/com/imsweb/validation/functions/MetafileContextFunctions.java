@@ -942,6 +942,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return matches(val, reg);
     }
 
+    @SuppressWarnings("unchecked")
     public boolean GEN_LOOKUP(Object value, Object tableObj, Object indexObj, Map<?, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
         if (val == null || (tableObj == null && indexObj == null))
@@ -1063,6 +1064,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return idx != -1;
     }
 
+    @SuppressWarnings("unchecked")
     public boolean GEN_RLOOKUP(Object value, Object tableObj, Object indexObj, Map<?, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
         if (val == null || (tableObj == null && indexObj != null))

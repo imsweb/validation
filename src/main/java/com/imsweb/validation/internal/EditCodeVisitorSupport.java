@@ -274,7 +274,7 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
     protected String getAliasForPartialPath(String path) {
         String alias = null;
 
-        String[] parts = path.split("[.]");
+        String[] parts = StringUtils.split(path, '.');
         if (parts.length > 0) {
             String javaPath = ValidatorServices.getInstance().getJavaPathForAlias(parts[0]);
             if (javaPath != null) {
@@ -296,6 +296,7 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
     }
 
     // helper
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     protected boolean isInternalContextName(String name) {
         return ValidationEngine.VALIDATOR_FUNCTIONS_KEY.equals(name) || ValidationEngine.VALIDATOR_CONTEXT_KEY.equals(name);
     }

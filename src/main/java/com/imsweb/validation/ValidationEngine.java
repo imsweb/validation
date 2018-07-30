@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1196,7 +1195,7 @@ public final class ValidationEngine {
                 throw new ConstructionException("A group is required when modifying a condition");
             if (editableCondition.getJavaPath() == null)
                 throw new ConstructionException("A java-path is required when adding a condition");
-            if (!_PROCESSOR_ROOTS.containsKey(editableCondition.getJavaPath().split("\\.")[0]))
+            if (!_PROCESSOR_ROOTS.containsKey(StringUtils.split(editableCondition.getJavaPath(), '.')[0]))
                 throw new ConstructionException("Invalid java-path");
             if (!_VALIDATORS.containsKey(editableCondition.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableCondition.getValidatorId());
@@ -2089,7 +2088,7 @@ public final class ValidationEngine {
     }
 
     private static List<ExecutableRule> getRulesSortedByDependencies(Map<Long, ExecutableRule> rules, Map<Long, ExecutableCondition> conditions) throws ConstructionException {
-        List<ExecutableRule> rulesQueue = new LinkedList<>();
+        List<ExecutableRule> rulesQueue = new ArrayList<>();
 
         // cache all of our rules
         Map<String, ExecutableRule> ruleCache = new HashMap<>(rules.size() + 1); // rule-id -> rule object, modified as the process goes on

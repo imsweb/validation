@@ -5,6 +5,7 @@ package com.imsweb.validation.internal.context;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +18,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationEngine;
@@ -43,9 +46,8 @@ public final class JavaContextParser {
      * @param expression expression to parse
      * @param currentContext current context
      * @return the parsed expression (a tree)
-     * @throws ConstructionException
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "JdkObsolete"})
     public static Object parseContext(String expression, Map<String, Object> currentContext) throws ConstructionException {
         Object result;
 
@@ -89,7 +91,7 @@ public final class JavaContextParser {
             if (typeHint != null) {
                 try {
                     Class<?> typeClazz = Class.forName(typeHint);
-                    Object obj = typeClazz.newInstance();
+                    Object obj = typeClazz.getDeclaredConstructor().newInstance();
 
                     if (result instanceof List) {
                         if (!(obj instanceof List) && !(obj instanceof Set))
@@ -107,17 +109,17 @@ public final class JavaContextParser {
                         result = obj;
                     }
                 }
-                catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
                     throw new ConstructionException(e);
                 }
             }
         }
         catch (IOException e) {
             //should not happen
-            throw new ConstructionException("Invalid syntax.");
+            throw new ConstructionException("Invalid syntax.", e);
         }
-        catch (Exception e2) {
-            throw new ConstructionException(e2.getMessage());
+        catch (RuntimeException e2) {
+            throw new ConstructionException(e2.getMessage(), e2);
         }
 
         return result;
@@ -132,9 +134,8 @@ public final class JavaContextParser {
      * @param currentContext current context
      * @param containsListBeginToken whether the queue contains a list beginning token
      * @return a parsed context
-     * @throws ConstructionException
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "JdkObsolete"})
     private static Object buildListOrMapFromQueue(Queue<Symbol> queue, Map<String, Object> currentContext, boolean containsListBeginToken) throws ConstructionException {
         Stack<Object> stack = new Stack<>();
         Object returnValue = null;
@@ -144,10 +145,8 @@ public final class JavaContextParser {
         while (!queue.isEmpty() && s != null) {
             if (s.getType() == SymbolType.NUMBER || s.getType() == SymbolType.STRING)
                 stack.add(s.getValue());
-            else if (s.getType() == SymbolType.LEFT_BRACKET) {
-                containsListBeginToken = true;
-                stack.add(buildListOrMapFromQueue(queue, currentContext, containsListBeginToken));
-            }
+            else if (s.getType() == SymbolType.LEFT_BRACKET)
+                stack.add(buildListOrMapFromQueue(queue, currentContext, true));
             else if (s.getType() == SymbolType.COLON)
                 returnValue = new HashMap<>();
             else if (s.getType() == SymbolType.COMMA)
@@ -247,7 +246,6 @@ public final class JavaContextParser {
      * @param lowValue low value
      * @param queue queue of tokens
      * @return a ruange
-     * @throws ConstructionException
      */
     @SuppressWarnings("rawtypes")
     private static RangeObject createRange(Object lowValue, Queue queue) throws ConstructionException {
@@ -255,7 +253,7 @@ public final class JavaContextParser {
 
         String nextValue = ((Symbol)queue.remove()).getValue().toString();
 
-        if (lowValue == null || !lowValue.toString().matches("[0-9]*") || !nextValue.matches("[0-9]*"))
+        if (lowValue == null || !NumberUtils.isDigits(lowValue.toString()) || !NumberUtils.isDigits(nextValue))
             throw new ConstructionException("Invalid range syntax.");
 
         Integer low = Integer.parseInt(lowValue.toString());

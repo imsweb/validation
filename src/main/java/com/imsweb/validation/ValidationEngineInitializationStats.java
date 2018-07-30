@@ -15,6 +15,7 @@ public class ValidationEngineInitializationStats {
     public static final String REASON_CLASS_ACCESS_ERROR = "pre-compiled class '{0}' can't be accessed";
     public static final String REASON_CLASS_CAST_ERROR = "pre-compiled class '{0}' was not of type 'CompiledRules'";
     public static final String REASON_DIFFERENT_VERSION = "pre-compiled class has version {1} but application expected {2}";
+    public static final String REASON_CONSTRUCTOR_NOT_FOUND = "pre-compiled class '{0}' doesn't define a default constructor";
 
     private long _initializationDuration;
 

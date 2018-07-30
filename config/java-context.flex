@@ -1,5 +1,8 @@
 /*
   Flex definition of the java context syntax.
+
+  After creating the class, add the following to the top:
+     @SuppressWarnings("ALL")
 */
 
 package com.imsweb.validation.internal.context;
