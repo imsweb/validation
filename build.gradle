@@ -46,6 +46,7 @@ tasks.withType(JavaCompile) {
 tasks.withType(Javadoc) {
     options.addStringOption('Xdoclint:none', '-quiet')
 }
+
 // customize the manifest
 jar {
     manifest {
