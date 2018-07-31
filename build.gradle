@@ -22,12 +22,13 @@ repositories {
 dependencies {
     api 'com.imsweb:staging-client-java:4.1'
     api 'org.codehaus.groovy:groovy:2.5.1:indy'
-    api 'commons-codec:commons-codec:1.11'
-    api 'org.apache.commons:commons-lang3:3.7'
     api 'com.thoughtworks.xstream:xstream:1.4.10'
 
+    implementation 'commons-codec:commons-codec:1.11'
+    implementation 'org.apache.commons:commons-lang3:3.7'
+
     testImplementation 'junit:junit:4.12'
-    testImplementation 'com.imsweb:data-generator:1.8'
+    testImplementation 'commons-io:commons-io:2.6'
     testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50'
     testImplementation 'com.imsweb:staging-algorithm-tnm:1.9'
     testImplementation 'com.imsweb:staging-algorithm-eod-public:1.3'
