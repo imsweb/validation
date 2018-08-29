@@ -575,6 +575,14 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals("Hello, World", _functions.GEN_TO_STRING(dest)); /* dest gets "Hello, World"    */
         _functions.GEN_STRCPY(dest, source, -15);
         Assert.assertEquals("Hello, World   ", _functions.GEN_TO_STRING(dest)); /* dest gets "Hello, World   " */
+
+        // in Genedits5, they now automatically add the terminator to the arrays...
+        dest = new char[3];
+        _functions.GEN_STRCPY(dest, "ABC");
+        Assert.assertEquals("ABC", _functions.GEN_TO_STRING(dest));
+        dest = new char[1];
+        _functions.GEN_STRCPY(dest, "A");
+        Assert.assertEquals("A", _functions.GEN_TO_STRING(dest));
     }
 
     @Test
@@ -596,11 +604,18 @@ public class MetafileContextFunctionsTest {
         _functions.GEN_STRCAT(array, "ABC", -4);
         Assert.assertEquals(" ABCABCAABC", _functions.GEN_TO_STRING(array));
 
-        array = new char[5];
+        array = new char[4];
         array[0] = 'A';
         array[1] = '\0';
         _functions.GEN_STRCAT(array, "ABCD");
         Assert.assertEquals("AABC", _functions.GEN_TO_STRING(array));
+
+        // in Genedits5, they now automatically add the terminator to the arrays...
+        array = new char[5];
+        array[0] = 'A';
+        array[1] = '\0';
+        _functions.GEN_STRCAT(array, "ABCD");
+        Assert.assertEquals("AABCD", _functions.GEN_TO_STRING(array));
     }
 
     @Test
@@ -1983,5 +1998,24 @@ public class MetafileContextFunctionsTest {
     @Test
     public void testGEN_DT_TODAY() {
         Assert.assertTrue(_functions.GEN_DT_TODAY().matches("\\d{8}"));
+    }
+
+    @Test
+    public void testGEN_TO_STRING() {
+
+        Assert.assertEquals("ABC", _functions.GEN_TO_STRING("ABC"));
+        Assert.assertEquals("", _functions.GEN_TO_STRING(""));
+        Assert.assertNull(_functions.GEN_TO_STRING(null));
+
+        char[] array = new char[3];
+        array[0] = 'A';
+        array[1] = 'B';
+        array[2] = '\0';
+        Assert.assertEquals("AB", _functions.GEN_TO_STRING(array));
+
+        array[0] = 'A';
+        array[1] = 'B';
+        array[2] = 'C';
+        Assert.assertEquals("ABC", _functions.GEN_TO_STRING(array));
     }
 }

@@ -120,7 +120,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * <br/><br/>
      * Here is an example of how to create the required CS staging object:
      * <code>
-     *    Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.v020550));
+     * Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.v020550));
      * </code>
      * You will also need to add a dependency to the CS algorithm in your project, see https://github.com/imsweb/staging-algorithm-cs
      */
@@ -1412,12 +1412,15 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             num = num * -1;
             pad = true;
         }
-        for (int i = 0; i < num && i < val.length() && i < target.length - 1; i++)
+        for (int i = 0; i < num && i < val.length() && i < target.length; i++)
             target[i] = val.charAt(i);
         if (pad)
-            for (int i = val.length(); i < num && i < target.length - 1; i++)
+            for (int i = val.length(); i < num && i < target.length; i++)
                 target[i] = ' ';
-        target[num] = '\0'; // go C++!
+
+        // in the new Genedits framework, the full array can be used for the content, and so the terminator is assumed at the end...
+        if (num < target.length)
+            target[num] = '\0'; // go C!
     }
 
     /**
@@ -1452,9 +1455,12 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             if (target[idx] == '\0')
                 break;
 
-        for (int i = 0; i < num && i < val.length() && idx < target.length - 1; i++)
+        for (int i = 0; i < num && i < val.length() && idx < target.length; i++)
             target[idx++] = val.charAt(i);
-        target[idx] = '\0'; // go C++!
+
+        // in the new Genedits framework, the full array can be used for the content, and so the terminator is assumed at the end...
+        if (idx < target.length)
+            target[idx] = '\0'; // go C!
 
         return target;
     }
