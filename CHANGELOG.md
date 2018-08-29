@@ -2,6 +2,7 @@
 
 **Version 1.21**
 - Increased the engine version to 5.10.
+- String terminator is not required anymore in genedits context functions dealing with arrays of characters
 - Fixed an issue in GEN_MATCH genedits context function.
 
 **Version 1.20**
