@@ -73,6 +73,15 @@ public class EditCodeVisitorSupportTest {
         parser.parseExpression("id", "if (record.majorSubtype.shortName == 'hrec_naaccr') return false", properties, null, null);
         assertProperties(properties, "record.majorSubtype.shortName");
         properties.clear();
+        parser.parseExpression("id", "if (record.majorSubtype?.shortName == 'hrec_naaccr') return false", properties, null, null);
+        assertProperties(properties, "record.majorSubtype.shortName");
+        properties.clear();
+        parser.parseExpression("id", "if (record.majorSubtype?.otherObject?.shortName == 'hrec_naaccr') return false", properties, null, null);
+        assertProperties(properties, "record.majorSubtype.otherObject.shortName");
+        properties.clear();
+        parser.parseExpression("id", "if (record.majorSubtype.shortName.trim == 'hrec_naaccr') return false", properties, null, null);
+        assertProperties(properties, "record.majorSubtype.shortName");
+        properties.clear();
 
         // declarations
         parser.parseExpression("id", "def alias = ctc; return alias.primarySite != null", properties, null, null);

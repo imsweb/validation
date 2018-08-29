@@ -11,7 +11,7 @@ This framework allows edits to be defined in [Groovy](http://www.groovy-lang.org
 * Large tables can be provided to the edits as contexts and shared among several edits.
 * Edits can be loaded from an XML file, or defined programmatically.
 * Any type of data can be validated; it just needs to implement the *Validatable* interface.
-* The validation engine executing edits is thread safe.
+* The execution of edits is thread safe and the engine can be used in a heavily threaded application.
 * Edits can be dynamically added, modified or removed in the engine.
 * The engine supports an edit testing framework with unit tests written in Groovy as well.
 
@@ -25,28 +25,51 @@ You can check out the [release page](https://github.com/imsweb/validation/releas
 
 ## Core concepts
 
-- **ValidationEngine**: this is the class responsible for executing the edits. It needs to be initialized before that can happen.
+**ValidationEngine**
 
-- **XmlValidatorFactory**: provides utility methods for reading/writing edits XML files.
+This is the class responsible for executing the edits. It needs to be initialized before that can happen.
 
-- **Validator**: a logic grouping of edits (for example, the SEER edits, or the NAACCR edits). This is the entities used to
-initialize the validation engine.
+**XmlValidatorFactory**
 
-- **Rule**: edits are called rules in this framework.
+Provides utility methods for reading/writing edits XML files.
 
-- **Context**: validators can also contain contexts; those are usually large data structures (list, maps, etc...) that are accessed by more than one edit.
+**Validator**
+
+A logical grouping of edits (for example, the SEER edits, or the NAACCR edits). This is the entities used to initialize the validation engine.
+
+**Rule**
+
+Edits are called rules in this framework.
+
+**Context**
+
+Validators can also contain contexts; those are usually large data structures (list, maps, etc...) that are accessed by more than one edit. 
 Edits can reference contexts using the prefix *"Context."*.
 
-- **Validatable**: an interface used to tell the engine how to execute the edits on specific data types. This allows very different types
+**Validatable**
+
+An interface used to tell the engine how to execute the edits on specific data types. This allows very different types
 (like a NAACCR line, a Java tumor object or a record from a data entry form) to be wrapped into a validatable and handled by the framework.
 
-- **ValidatorServices**: some services are made available to the edits (like accessing a lookup, or a configuration variable); different applications
+**ValidatorServices**
+
+Some services are made available to the edits (like accessing a lookup, or a configuration variable); different applications
 provide those features differently, therefore the services need to be overridden if the default behavior is not the one needed.
 
-- **ValidatorContextFunctions**: the methods from this class are made available to the edits; they can be called using the prefix *"Function."*.
+**ValidatorContextFunctions**
+
+The methods from this class are made available to the edits; they can be called using the prefix *"Function."*.
 The default implementation provides very basic methods but it can be initialized with a more complex implementation if needed.
-If the edits need to access staging information, the StagingContextFunctions class should be used for initialization.
+
 If the edits have been translated from a Genedits metafile, the MetafileContextFunctions class should be used instead.
+The initialization of that class requires an instance of the following staging algorithm:
+- CS (https://github.com/imsweb/staging-algorithm-cs)
+
+If the edits need to access staging information (to execute SEER edits for example), the StagingContextFunctions class should be used for initialization.
+The initialization of that class requires an instance of the following staging algorithms:
+- CS (https://github.com/imsweb/staging-algorithm-cs)
+- TNM (https://github.com/imsweb/staging-algorithm-tnm)
+- EOD (https://github.com/imsweb/staging-algorithm-eod-public)
 
 ## Usage
 
@@ -117,6 +140,45 @@ for (<Map<String, String> rec : (RecordLayout)layout.readAllRecords(dataFile)) {
 }
 ```
 
+## Optimizing loading an executing edits
+
+Several mechanisms are in place to speed up the initialization and the execution of the edits; most of those mechanisms are turned OFF by default.
+
+### Speed up the initialization by enabling multi-threaded parsing
+
+Groovy edits need to be parsed to be validated and to gather the used properties. That step can be slow for big edits, 
+but it can be optimized by enabling multi-threaded parsing:
+```java
+XmlValidatorFactory.enableMultiThreadedParsing(2);
+```
+The parameter is the number of threads to use; a value of 2 will usually work well for this mechanism. The default is 1.
+
+### Speed up the initialization by enabling multi-threaded compilation
+
+Groovy edits need to be compiled before being executed by the engine. Again, that step can be slow for big edits, 
+but it can be optimized by enabling multi-threaded compilation:
+```java
+ValidationEngine.enableMultiThreadedCompilation(4);
+```
+The parameter is the number of threads to use; a value of 4 will usually work well for this mechanism although it depends on the available resources. The default is 1.
+
+### Speed up the initialization by disabling the re-alignment of the expressions and descriptions
+
+By default the engine will re-align the expressions and descriptions so they look nice in an editor. If you do not intend to display the expressions 
+and/or descriptions, you can turn that feature off: 
+
+```java
+XmlValidatorFactory.disableRealignment();
+```
+By default the feature is ON.
+
+### Speed up the initialization and exuction by using pre-compiled edits
+
+The engine supports registering pre-compiled edits; those edits will completely bypass the parsing and compilation steps. The edits will also need to be strongly typed in their 
+syntax, allowing them to run much faster than regular Groovy edits.
+
+Pre-compiled edits is an advanced features; the engine supports it by default but creating the edits is much more work than maintaining them in an XML file. 
+See the "runtime" package for more information, in particular the RuntimeUtils class.
 ## About SEER
 
 This library was developed through the [SEER](http://seer.cancer.gov/) program.

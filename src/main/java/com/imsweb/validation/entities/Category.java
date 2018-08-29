@@ -3,8 +3,7 @@
  */
 package com.imsweb.validation.entities;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  * A <code>Category</code> allows to logically group some of the rules from a validator.
@@ -162,21 +161,19 @@ public class Category {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Category))
-            return false;
-        Category castOther = (Category)other;
-        if (getCategoryId() != null)
-            return new EqualsBuilder().append(getCategoryId(), castOther.getCategoryId()).isEquals();
-        else
-            return new EqualsBuilder().append(getId(), castOther.getId()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category)o;
+        if (_categoryId != null && category._categoryId != null)
+            return Objects.equals(_categoryId, category._categoryId);
+        return Objects.equals(_id, category._id);
     }
 
     @Override
     public int hashCode() {
-        if (getCategoryId() != null)
-            return new HashCodeBuilder().append(getCategoryId()).toHashCode();
-        else
-            return new HashCodeBuilder().append(getId()).toHashCode();
+        if (_categoryId != null)
+            return Objects.hash(_categoryId);
+        return Objects.hash(_id);
     }
 }

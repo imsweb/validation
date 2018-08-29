@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -23,7 +24,7 @@ import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
 
 public final class TestingUtils {
 
-    public static File TMP_DIR = new File(System.getProperty("user.dir") + "/build/test-tmp");
+    public static File TMP_DIR = new File(getWorkingDirectory() + "/build/test-tmp");
 
     public static void init() {
 
@@ -44,6 +45,10 @@ public final class TestingUtils {
 
         // no edits should take more than one second (except the one tha tests the timeout)
         ValidationEngine.enableEditExecutionTimeout(1);
+    }
+
+    public static String getWorkingDirectory() {
+        return System.getProperty("user.dir").replace(".idea\\modules", "");
     }
 
     public static Validator loadValidator(String id) {
@@ -210,18 +215,18 @@ public final class TestingUtils {
         }
 
         @Override
-        public void log(String message) {
-            _logMessages.add(message);
+        public void log(Object message) {
+            _logMessages.add(Objects.toString(message, ""));
         }
 
         @Override
-        public void logWarning(String message) {
-            _logMessages.add(message);
+        public void logWarning(Object message) {
+            _logMessages.add(Objects.toString(message, ""));
         }
 
         @Override
-        public void logError(String message) {
-            _logMessages.add(message);
+        public void logError(Object message) {
+            _logMessages.add(Objects.toString(message, ""));
         }
 
         public List<String> getLogMessages() {

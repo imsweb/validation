@@ -84,6 +84,12 @@ public class ValidatorServices {
     private static AtomicInteger _SET_SEQ = new AtomicInteger(0);
 
     /**
+     * Internal sequence to use for rule history IDs (and deleted rule history; they share this sequence)
+     */
+
+    private static AtomicInteger _RULE_HISTORY_SEQ = new AtomicInteger(0);
+
+    /**
      * Private instance of a <code>ValidatorServices</code>
      */
     private static ValidatorServices _INSTANCE;
@@ -91,7 +97,7 @@ public class ValidatorServices {
     /**
      * Pattern for property values replacement
      */
-    private static Pattern _PROP_REPLACEMENT_PATTERN = Pattern.compile("(\\$\\{(.+?)\\})");
+    private static Pattern _PROP_REPLACEMENT_PATTERN = Pattern.compile("(\\$\\{(.+?)})");
 
     /**
      * Map of java-path -> alias to use in the edits
@@ -213,24 +219,24 @@ public class ValidatorServices {
 
     /**
      * Logs the given message
-     * @param message
+     * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void log(String message) {}
+    public void log(Object message) {}
 
     /**
      * Logs the message as a warning
-     * @param message
+     * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void logWarning(String message) {}
+    public void logWarning(Object message) {}
 
     /**
      * Logs the message as an error
-     * @param message
+     * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void logError(String message) {}
+    public void logError(Object message) {}
 
     /**
      * Returns the next rule ID to use.
@@ -293,6 +299,16 @@ public class ValidatorServices {
     }
 
     /**
+     * Returns the next set ID to use.
+     * <p/>
+     * Created on Feb 25, 2008 by depryf
+     * @return next sequence to use
+     */
+    public Long getNextRuleHistorySequence() {
+        return (long)_RULE_HISTORY_SEQ.incrementAndGet();
+    }
+
+    /**
      * Adds the result of the groovy execution of the passed expression, using the passed context. Puts it back into the context
      * under the passed ID
      * <p/>
@@ -302,7 +318,7 @@ public class ValidatorServices {
      * @param entryId context entry ID
      * @param type the type of the entry
      * @return the "compiled" context entry
-     * @throws ConstructionException
+     * @throws ConstructionException if anything goes wrong
      */
     public Object addContextExpression(String expression, Map<String, Object> context, String entryId, String type) throws ConstructionException {
         Object result;
@@ -329,7 +345,7 @@ public class ValidatorServices {
      * @param context context
      * @param entryId context entry ID
      * @return the "compiled" context entry
-     * @throws ConstructionException
+     * @throws ConstructionException if anything goes wrong
      */
     Object addGroovyContextExpression(String expression, Map<String, Object> context, String entryId) throws ConstructionException {
         Object result;
@@ -374,7 +390,7 @@ public class ValidatorServices {
      * @param context context
      * @param entryId context entry ID
      * @return the "compiled" context entry
-     * @throws ConstructionException
+     * @throws ConstructionException if anything goes wrong
      */
     Object addJavaContextExpression(String expression, Map<String, Object> context, String entryId) throws ConstructionException {
         Object result;
@@ -398,7 +414,7 @@ public class ValidatorServices {
      * @param context context
      * @param entryId context entry ID
      * @return the "compiled" context entry
-     * @throws ConstructionException
+     * @throws ConstructionException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
     ContextTable addTableContextExpression(String expression, Map<String, Object> context, String entryId) throws ConstructionException {
@@ -426,7 +442,7 @@ public class ValidatorServices {
      * @param context context
      * @param entryId context entry ID
      * @return the "compiled" context entry
-     * @throws ConstructionException
+     * @throws ConstructionException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
     ContextTableIndex addTableIndexDefContextExpression(String expression, Map<String, Object> context, String entryId) throws ConstructionException {
@@ -461,7 +477,7 @@ public class ValidatorServices {
      * @param properties properties used in the expression (if null, they will not be gathered)
      * @param contextEntries context entries used in the expression (if null, they will not be gathered)
      * @param lookups lookup IDs used in the expression (if null, they will not be gathered)
-     * @throws CompilationFailedException
+     * @throws CompilationFailedException if anything goes wrong
      */
     public void parseExpression(String id, String expression, Set<String> properties, Set<String> contextEntries, Set<String> lookups) throws CompilationFailedException {
         parseExpression(id, expression, properties, contextEntries, lookups, false);
@@ -479,7 +495,7 @@ public class ValidatorServices {
      * @param contextEntries context entries used in the expression (if null, they will not be gathered)
      * @param lookups lookup IDs used in the expression (if null, they will not be gathered)
      * @param forceDefKeyword if true and a variable is defined without the def keyword, then an exception will be raised
-     * @throws CompilationFailedException
+     * @throws CompilationFailedException if anything goes wrong
      */
     public void parseExpression(String id, String expression, Set<String> properties, Set<String> contextEntries, Set<String> lookups, boolean forceDefKeyword) throws CompilationFailedException {
         if (expression == null || expression.trim().isEmpty())
@@ -502,7 +518,7 @@ public class ValidatorServices {
      * Created on Jun 28, 2011 by depryf
      * @param expression expression to compile
      * @return Groovy Script
-     * @throws CompilationFailedException
+     * @throws CompilationFailedException if anything goes wrong
      */
     public Script compileExpression(String expression) throws CompilationFailedException {
         if (expression == null || expression.trim().isEmpty())

@@ -5,6 +5,7 @@ package com.imsweb.validation.internal;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,9 @@ import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
  * @author depryf
  */
 public class EditCodeVisitorSupport extends CodeVisitorSupport {
+
+    // generic methods that can be used at the end of the path as a field (something like 'object.property.trim')
+    private static final List<String> _METHODS_AS_FIELDS = Arrays.asList("size", "empty", "trim", "toUpperCase", "toLowerCase");
 
     /**
      * This will contain the returned properties that have been identified during the parsing
@@ -99,7 +103,7 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
 
         if (expression.getProperty() instanceof ConstantExpression) {
             String prop = expression.getProperty().getText();
-            String[] parts = StringUtils.split(expression.getObjectExpression().getText(), '.');
+            String[] parts = StringUtils.split(StringUtils.replace(expression.getObjectExpression().getText(), "?", ""), '.');
             if (parts.length > 0) {
                 if (ValidationEngine.VALIDATOR_CONTEXT_KEY.equals(parts[0]))
                     _contextEntries.add(prop);
@@ -128,7 +132,8 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
                     if (ValidatorServices.getInstance().getJavaPathForAlias(parts2[0]) != null) {
                         StringBuilder innerBuf = new StringBuilder(parts2[0]);
                         for (int i = 1; i < parts2.length; i++)
-                            innerBuf.append(".").append(parts2[i]);
+                            if (i != parts2.length - 1 || !_METHODS_AS_FIELDS.contains(parts2[i]))
+                                innerBuf.append(".").append(parts2[i]);
                         String property = innerBuf.toString();
                         if (ValidatorServices.getInstance().getAliasForJavaPath(property) == null) {
                             _properties.add(innerBuf.toString());
@@ -269,7 +274,7 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
     protected String getAliasForPartialPath(String path) {
         String alias = null;
 
-        String[] parts = path.split("[.]");
+        String[] parts = StringUtils.split(path, '.');
         if (parts.length > 0) {
             String javaPath = ValidatorServices.getInstance().getJavaPathForAlias(parts[0]);
             if (javaPath != null) {
@@ -291,6 +296,7 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
     }
 
     // helper
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     protected boolean isInternalContextName(String name) {
         return ValidationEngine.VALIDATOR_FUNCTIONS_KEY.equals(name) || ValidationEngine.VALIDATOR_CONTEXT_KEY.equals(name);
     }

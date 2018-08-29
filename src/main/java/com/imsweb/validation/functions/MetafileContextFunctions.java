@@ -111,10 +111,21 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     private boolean _failWarnings = false;
 
     /**
-     * Default constructor.
+     * Minimal constructor. The metafile context methods use the CS staging client and therefore require a staging algorithm to be registered with this constructor.
+     * <br/><br/>
+     * Note that this class can also be initialized with an instance of a TNM and EDO staging client, but no metafile conext methods need those. Historically, Genedits
+     * relied on the CS DLL, but not on any TNM or EOD DLL.
+     * <br/><br/>
+     * You may provide null for the CS staging object, but any CS-related context methods won't work correctly.
+     * <br/><br/>
+     * Here is an example of how to create the required CS staging object:
+     * <code>
+     *    Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.v020550));
+     * </code>
+     * You will also need to add a dependency to the CS algorithm in your project, see https://github.com/imsweb/staging-algorithm-cs
      */
-    public MetafileContextFunctions() {
-        super();
+    public MetafileContextFunctions(Staging csStaging) {
+        super(csStaging, null, null);
     }
 
     /**
@@ -914,7 +925,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         // looks like Genedits considers a regex for a single space to match an empty string...
         if (val.isEmpty()) {
             String tmp = _GEN_MATCH_P2.matcher(reg).replaceAll("\\\\s"); // let's deal only with single spaces, since they seem to do the same in the Genedits language
-            if (tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s") || tmp.equals("(\\s)") || tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)"))
+            boolean noParenthesisCondition = tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s");
+            boolean oneParenthesisCondition = tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)");
+            boolean twoParenthesisCondition = tmp.equals("(\\s)") || tmp.startsWith("(\\s)|") || tmp.endsWith("|(\\s)");
+            if (noParenthesisCondition || oneParenthesisCondition || twoParenthesisCondition)
                 return true;
         }
 
@@ -936,6 +950,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return matches(val, reg);
     }
 
+    @SuppressWarnings("unchecked")
     public boolean GEN_LOOKUP(Object value, Object tableObj, Object indexObj, Map<?, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
         if (val == null || (tableObj == null && indexObj == null))
@@ -1057,6 +1072,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return idx != -1;
     }
 
+    @SuppressWarnings("unchecked")
     public boolean GEN_RLOOKUP(Object value, Object tableObj, Object indexObj, Map<?, char[]> tableVars) {
         String val = GEN_TO_STRING(value);
         if (val == null || (tableObj == null && indexObj != null))

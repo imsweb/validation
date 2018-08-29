@@ -21,6 +21,8 @@ import org.junit.Test;
 
 import groovy.lang.Binding;
 
+import com.imsweb.staging.Staging;
+import com.imsweb.staging.cs.CsDataProvider;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.entities.ContextTable;
@@ -29,11 +31,13 @@ import com.imsweb.validation.internal.context.JavaContextParser;
 
 public class MetafileContextFunctionsTest {
 
-    private MetafileContextFunctions _functions = new MetafileContextFunctions();
+    private MetafileContextFunctions _functions;
 
     @Before
     public void setUp() {
         TestingUtils.init();
+
+        _functions = new MetafileContextFunctions(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)));
     }
 
     @Test
@@ -453,8 +457,26 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_MATCH("123", regex));
         Assert.assertFalse(_functions.GEN_MATCH("123 ", regex));
 
-        // TODO check those assumptions in Genedits...
-        // this one was also taken from "EOD--Old 4 digit (SEER IF264DIG_P1)"
+        // this one was taken from "Edit Over-rides (SEER REVIEWFL)" in NAACCR Call for Data metafile
+        //    original regex: 1,b
+        // following testing values have been tested within Genedits...
+        regex = "(1)|(\\s)";
+        Assert.assertTrue(_functions.GEN_MATCH("", regex));
+        Assert.assertTrue(_functions.GEN_MATCH(" ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("1", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("2", regex));
+
+        // this one was also taken from "Edit Over-rides (SEER REVIEWFL)" in NAACCR Call for Data metafile
+        //    original regex: 1:3,b
+        // following testing values have been tested within Genedits...
+        regex = "([1-3])|(\\s)";
+        Assert.assertTrue(_functions.GEN_MATCH("", regex));
+        Assert.assertTrue(_functions.GEN_MATCH(" ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("1", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("2", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("4", regex));
+
+        // this one was taken from "EOD--Old 4 digit (SEER IF264DIG_P1)"
         //    original regex: [bb,dd]{b,d}{b,d}
         // following testing values have been tested within Genedits...
         regex = "(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))"; // note that the translation seems wrong; there shouldn't be a question mark!

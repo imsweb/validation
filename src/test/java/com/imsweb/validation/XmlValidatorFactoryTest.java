@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.imsweb.validation.entities.Category;
@@ -41,14 +41,14 @@ import com.imsweb.validation.entities.ValidatorTests;
  */
 public class XmlValidatorFactoryTest {
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() {
         TestingUtils.init();
     }
 
     @Test
     public void testValidatorLoadMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-validator.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml'");
 
@@ -73,7 +73,7 @@ public class XmlValidatorFactoryTest {
         }
 
         // read gzipped file using multi-threading parsing
-        file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-validator.xml.gz");
+        file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml.gz'");
         XmlValidatorFactory.enableMultiThreadedParsing(2);
@@ -88,7 +88,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testValidatorWriteMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-validator.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml'");
         Validator v = XmlValidatorFactory.loadValidatorFromXml(file);
@@ -311,7 +311,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testStandaloneSetLoadMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-set.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml'");
 
@@ -336,7 +336,7 @@ public class XmlValidatorFactoryTest {
         }
 
         // read gzipped file
-        file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-set.xml.gz");
+        file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml.gz'");
         s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
@@ -345,7 +345,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testStandaloneSetWriteMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-set.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml'");
         StandaloneSet s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
@@ -460,7 +460,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testTestsLoadMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-tests.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml'");
 
@@ -485,7 +485,7 @@ public class XmlValidatorFactoryTest {
         }
 
         // read gzipped file
-        file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-tests.xml.gz");
+        file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml.gz'");
         t = XmlValidatorFactory.loadTestsFromXml(file);
@@ -494,7 +494,7 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testTestsWriteMethods() throws IOException {
-        File file = new File(System.getProperty("user.dir") + "/src/test/resources/fake-tests.xml");
+        File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml'");
         ValidatorTests s = XmlValidatorFactory.loadTestsFromXml(file);
@@ -613,7 +613,7 @@ public class XmlValidatorFactoryTest {
     }
 
     @Test
-    public void testGetXmlValidatorHash() throws IOException {
+    public void testGetXmlValidatorHash() {
         Assert.assertNull(XmlValidatorFactory.getXmlValidatorHash(null));
 
         URL url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml");
@@ -690,30 +690,75 @@ public class XmlValidatorFactoryTest {
     public void testTrimEmptyLines() {
         Assert.assertNull(XmlValidatorFactory.trimEmptyLines(null, true));
 
-        String s = " some text  ";
-        String exp = "some text";
-        Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+        try {
+            XmlValidatorFactory.enableRealignment();
 
-        s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
-        exp = "abc\n     ed\n\n   fh";
-        Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            String s = " some text  ";
+            String exp = "some text";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
 
+            s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
+            exp = "abc\n     ed\n\n   fh";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "\r\n     \r\n     \n\n   abc\n     ed\n\n   fh\n \n    \r\n     \r\n";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "Some text with\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nmany new lines";
+            exp = "Some text with\n\n\nmany new lines";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "Some text with\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nmany new lines";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            XmlValidatorFactory.disableRealignment();
+
+            s = " some text  ";
+            exp = "some text";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+
+            s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
+            exp = "abc\n     ed\n\n   fh";
+            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(s, XmlValidatorFactory.trimEmptyLines(s, false));
+        }
+        finally {
+            XmlValidatorFactory.enableRealignment();
+        }
     }
 
     @Test
     public void testReAlign() {
         Assert.assertNull(XmlValidatorFactory.reAlign(null));
 
-        String s = "some text  ";
-        String exp = "some text";
-        Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+        try {
+            XmlValidatorFactory.enableRealignment();
 
-        s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
-        exp = "abc \n  - abc\n  - def\n    -- gh\n  -ifk\nlm";
-        Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            String s = "some text  ";
+            String exp = "some text";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
 
-        s = "   abc \n     - abc\n     - def\n -- gh\n     -ifk\n   lm";
-        exp = "abc \n    - abc\n    - def\n-- gh\n    -ifk\n  lm";
-        Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
+            exp = "abc \n  - abc\n  - def\n    -- gh\n  -ifk\nlm";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+
+            s = "   abc \n     - abc\n     - def\n -- gh\n     -ifk\n   lm";
+            exp = "abc \n    - abc\n    - def\n-- gh\n    -ifk\n  lm";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+
+            s = "   abc \r\n     - abc\r\n     - def\r\n -- gh\r\n     -ifk\r\n   lm";
+            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+
+            XmlValidatorFactory.disableRealignment();
+
+            s = "some text  ";
+            Assert.assertEquals(s, XmlValidatorFactory.reAlign(s));
+
+            s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
+            Assert.assertEquals(s, XmlValidatorFactory.reAlign(s));
+        }
+        finally {
+            XmlValidatorFactory.enableRealignment();
+        }
     }
 }

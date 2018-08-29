@@ -25,7 +25,7 @@ import com.imsweb.validation.entities.Validatable;
 public class ValidatorServicesTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         TestingUtils.init();
     }
 
@@ -105,7 +105,7 @@ public class ValidatorServicesTest {
     public void testAddContextExpression() throws ConstructionException {
         Map<String, Object> context = new HashMap<>();
 
-        ValidatorServices.getInstance().addContextExpression("1", context, "key1", "groovy");
+        Assert.assertEquals(1, ValidatorServices.getInstance().addContextExpression("1", context, "key1", "groovy"));
         Assert.assertEquals(1, context.size());
 
         ValidatorServices.getInstance().addContextExpression("[1,2]", context, "key2", "java");
@@ -201,23 +201,23 @@ public class ValidatorServicesTest {
 
         // integer
         ValidatorServices.getInstance().addJavaContextExpression("-1", context, "key");
-        Assert.assertTrue(Integer.valueOf(-1).equals(context.get("key")));
+        Assert.assertEquals(-1, context.get("key"));
 
         // string
         ValidatorServices.getInstance().addJavaContextExpression("'a'", context, "key");
-        Assert.assertTrue("a".equals(context.get("key")));
+        Assert.assertEquals("a", context.get("key"));
 
         // empty list
         List<Object> list = new ArrayList<>();
         ValidatorServices.getInstance().addJavaContextExpression("[]", context, "key");
-        Assert.assertTrue(list.equals(context.get("key")));
+        Assert.assertEquals(list, context.get("key"));
 
         // simple list
         list.add(1);
         list.add(2);
         list.add(3);
         ValidatorServices.getInstance().addJavaContextExpression("[1,2,3]", context, "key");
-        Assert.assertTrue(list.equals(context.get("key")));
+        Assert.assertEquals(list, context.get("key"));
 
         // complex list
         list.add("4");
@@ -236,19 +236,19 @@ public class ValidatorServicesTest {
         list.add(m);
         list.add(20);
         ValidatorServices.getInstance().addJavaContextExpression("[1,2,3, '4',5..7,[8,10 .. 12,14], [1:'a'],20]", context, "key");
-        Assert.assertTrue(list.equals(context.get("key")));
+        Assert.assertEquals(list, context.get("key"));
 
         // empty map
         Map<Object, Object> map = new HashMap<>();
         ValidatorServices.getInstance().addJavaContextExpression("[:]", context, "key");
-        Assert.assertTrue(map.equals(context.get("key")));
+        Assert.assertEquals(map, context.get("key"));
 
         // simple map
         map.put("a", 1);
         map.put("b", 2);
         map.put("c", 3);
         ValidatorServices.getInstance().addJavaContextExpression("['a':1,'b':2,'c':3]", context, "key");
-        Assert.assertTrue(map.equals(context.get("key")));
+        Assert.assertEquals(map, context.get("key"));
 
         // complex map (if the key is a list, it is automatically explosed into its elements)
         map.put("a", 1);
@@ -261,7 +261,7 @@ public class ValidatorServicesTest {
         map.put(7, list);
         map.put("d", 4);
         ValidatorServices.getInstance().addJavaContextExpression("['a':1,'b':2,'c':3, [1,3..5,7] : [1,2,3, '4',5..7,[8,10 .. 12,14], [1:'a'],20] ,'d':4]", context, "key");
-        Assert.assertTrue(map.equals(context.get("key")));
+        Assert.assertEquals(map, context.get("key"));
 
         // reference to other context entries (called variable in JFlex)
         context.put("OTHER_KEY", 3);
@@ -270,14 +270,14 @@ public class ValidatorServicesTest {
         intList.add(2);
         intList.add(3);
         ValidatorServices.getInstance().addJavaContextExpression("[1,2,OTHER_KEY]", context, "key");
-        Assert.assertTrue(intList.equals(context.get("key")));
+        Assert.assertEquals(intList, context.get("key"));
 
         // a more complicated reference
         context.put("mapKey", map);
         intList.add(map);
         intList.add("a");
         ValidatorServices.getInstance().addJavaContextExpression("[1,2,OTHER_KEY, mapKey ,'a']", context, "key");
-        Assert.assertTrue(intList.equals(context.get("key")));
+        Assert.assertEquals(intList, context.get("key"));
 
         // a reference to a non-existing key
         boolean exception = false;
@@ -327,7 +327,7 @@ public class ValidatorServicesTest {
         map.put("nameLast", "LAST");
         Validatable v = new SimpleMapValidatable("TEST", "line", map);
 
-        Assert.assertEquals(null, ValidatorServices.getInstance().fillInMessages(null, v));
+        Assert.assertNull(ValidatorServices.getInstance().fillInMessages(null, v));
         Assert.assertEquals(new ArrayList<>(), ValidatorServices.getInstance().fillInMessages(new ArrayList<>(), v));
         Assert.assertEquals(Arrays.asList("Something", "Something else"), ValidatorServices.getInstance().fillInMessages(Arrays.asList("Something", "Something else"), v));
         Assert.assertEquals(Arrays.asList("Value 1", "Value 'LAST'"), ValidatorServices.getInstance().fillInMessages(Arrays.asList("Value ${line.vitalStatus}", "Value '${line.nameLast}'"), v));
@@ -350,19 +350,19 @@ public class ValidatorServicesTest {
 
         // first version is not valid
         Assert.assertTrue(services.compareEngineVersions("ABC", "") > 0);
-        Assert.assertTrue(services.compareEngineVersions("ABC", "ABC") == 0);
+        Assert.assertEquals(0, services.compareEngineVersions("ABC", "ABC"));
         Assert.assertTrue(services.compareEngineVersions("ABC", "1.0") > 0);
         Assert.assertTrue(services.compareEngineVersions("1.1.1", "1.0") > 0);
 
         // second version is not valid
         Assert.assertTrue(services.compareEngineVersions("", "ABC") < 0);
-        Assert.assertTrue(services.compareEngineVersions("ABC", "ABC") == 0);
+        Assert.assertEquals(0, services.compareEngineVersions("ABC", "ABC"));
         Assert.assertTrue(services.compareEngineVersions("1.0", "ABC") < 0);
         Assert.assertTrue(services.compareEngineVersions("1.0", "1.1.1") < 0);
 
         // versions are both valid
-        Assert.assertTrue(services.compareEngineVersions("1.0", "1.0") == 0);
-        Assert.assertTrue(services.compareEngineVersions("1.1", "1.1") == 0);
+        Assert.assertEquals(0, services.compareEngineVersions("1.0", "1.0"));
+        Assert.assertEquals(0, services.compareEngineVersions("1.1", "1.1"));
         Assert.assertTrue(services.compareEngineVersions("1.0", "1.1") < 0);
         Assert.assertTrue(services.compareEngineVersions("1.1", "1.0") > 0);
         Assert.assertTrue(services.compareEngineVersions("1.0", "2.0") < 0);

@@ -3,8 +3,7 @@
  */
 package com.imsweb.validation.entities;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  * A context entry is one context variable in a {@link Validator} object.
@@ -152,22 +151,19 @@ public class ContextEntry {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof ContextEntry))
-            return false;
-        ContextEntry castOther = (ContextEntry)other;
-        if (getContextEntryId() != null)
-            return new EqualsBuilder().append(getContextEntryId(), castOther.getContextEntryId()).isEquals();
-        else
-            return new EqualsBuilder().append(getKey(), castOther.getKey()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ContextEntry that = (ContextEntry)o;
+        if (_contextEntryId != null && that._contextEntryId != null)
+            return Objects.equals(_contextEntryId, that._contextEntryId);
+        return Objects.equals(_key, that._key);
     }
 
     @Override
     public int hashCode() {
-        if (getContextEntryId() != null)
-            return new HashCodeBuilder().append(getContextEntryId()).toHashCode();
-        else
-            return new HashCodeBuilder().append(getKey()).toHashCode();
+        if (_contextEntryId != null)
+            return Objects.hash(_contextEntryId);
+        return Objects.hash(_key);
     }
-
 }

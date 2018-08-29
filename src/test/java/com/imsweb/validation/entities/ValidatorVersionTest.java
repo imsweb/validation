@@ -12,9 +12,6 @@ import org.junit.Test;
  */
 public class ValidatorVersionTest {
 
-    /**
-     * Created on Feb 23, 2011 by depryf
-     */
     @Test
     public void testFormatValidity() {
         Assert.assertFalse(ValidatorVersion.validateVersionFormat(null));
@@ -34,9 +31,6 @@ public class ValidatorVersionTest {
         Assert.assertTrue(ValidatorVersion.validateVersionFormat("SE13-999-99-9"));
     }
 
-    /**
-     * Created on Feb 23, 2011 by depryf
-     */
     @Test
     public void testComparison() {
 

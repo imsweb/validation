@@ -9,21 +9,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import groovy.lang.IntRange;
 
 import com.imsweb.decisionengine.ColumnDefinition;
+import com.imsweb.staging.SchemaLookup;
 import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.cs.CsSchemaLookup;
 import com.imsweb.staging.entities.StagingSchema;
 import com.imsweb.staging.entities.StagingSchemaInput;
 import com.imsweb.staging.entities.StagingTable;
-import com.imsweb.staging.eod.EodDataProvider;
-import com.imsweb.staging.eod.EodSchemaLookup;
-import com.imsweb.staging.eod.EodStagingData.EodInput;
-import com.imsweb.staging.tnm.TnmDataProvider;
-import com.imsweb.staging.tnm.TnmSchemaLookup;
-import com.imsweb.staging.tnm.TnmStagingData;
 import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
@@ -219,6 +214,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     public static final String EOD_INPUT_PROP_SEX = "sex";
     public static final String EOD_INPUT_PROP_DISC_1 = "schemaDiscriminator1";
     public static final String EOD_INPUT_PROP_DISC_2 = "schemaDiscriminator2";
+    public static final String EOD_INPUT_PROP_BEHAV = "behaviorIcdO3";
 
     // EOD metadata tags
     public static final String EOD_TAG_SEER_REQUIRED = "SEER_REQUIRED";
@@ -229,6 +225,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
 
     // this maps the EOD fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
     public static Map<String, String> EOD_FIELDS = new HashMap<>();
+
     static {
         EOD_FIELDS.put("schemaDiscriminator1", "discriminator_1");
         EOD_FIELDS.put("schemaDiscriminator2", "discriminator_2");
@@ -281,7 +278,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("brainMolecularMarkers", "brain_molecular_markers");
         EOD_FIELDS.put("breslowTumorThickness", "breslow_thickness");
         EOD_FIELDS.put("ca125PretreatmentInterpretation", "ca125_pretx_lab_value");
-        EOD_FIELDS.put("ceaPretreatmentIntrepretation", "cea_pretx_interpretation");
+        EOD_FIELDS.put("ceaPretreatmentInterpretation", "cea_pretx_interpretation");
         EOD_FIELDS.put("ceaPretreatmentLabValue", "cea_pretx_lab_value");
         EOD_FIELDS.put("chromosome19qLossOfHeterozygosity", "chrom_19q_status");
         EOD_FIELDS.put("chromosome1pLossOfHeterozygosity", "chrom_1p_status");
@@ -345,7 +342,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("lnLaterality", "ln_laterality");
         EOD_FIELDS.put("lnPositiveAxillaryLevel1To2", "ln_pos_axillary_level_1_2");
         EOD_FIELDS.put("lnSize", "ln_size_of_mets");
-        EOD_FIELDS.put("lnStatusFemoralInguinalParaAorticAndPelvic", "ln_status");
+        EOD_FIELDS.put("lnStatusFemoralInguinalParaAorticPelvic", "ln_status");
         EOD_FIELDS.put("lymphocytosis", "lymphocytosis");
         EOD_FIELDS.put("majorVeinInvolvement", "major_vein_involv");
         EOD_FIELDS.put("measuredBasalDiameter", "measured_basal_diameter");
@@ -384,20 +381,20 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("residualTumorVolumePostCytoreduction", "resid_tumor_vol_post_cyto");
         EOD_FIELDS.put("responseToNeoadjuvantTherapy", "response_neoadjuv_therapy");
         EOD_FIELDS.put("sCategoryClinical", "s_category_clin");
-        EOD_FIELDS.put("sCategoryPathologic", "s_category_path");
+        EOD_FIELDS.put("sCategoryPathological", "s_category_path");
         EOD_FIELDS.put("sarcomatoidFeatures", "sarcomatoid_features");
         EOD_FIELDS.put("seerSiteSpecificFactor1", "seer_ssf1");
         EOD_FIELDS.put("separateTumorNodules", "separate_tumor_nodules");
         EOD_FIELDS.put("serumAlbuminPretreatmentLevel", "serum_alb_pretx_level");
         EOD_FIELDS.put("serumBeta2MicroglobulinPretreatmentLevel", "b2_microglob_pretx_level");
-        EOD_FIELDS.put("serumLdhPretreatmentLabValue", "ldh_pretx_lab_value");
+        EOD_FIELDS.put("ldhPretreatmentLabValue", "ldh_pretx_lab_value");
         EOD_FIELDS.put("thrombocytopenia", "thrombocytopenia");
         EOD_FIELDS.put("tumorDeposits", "tumor_deposits");
         EOD_FIELDS.put("tumorGrowthPattern", "tumor_growth_pattern");
         EOD_FIELDS.put("ulceration", "ulceration");
         EOD_FIELDS.put("visceralAndParietalPleuralInvasion", "visceral_pleural_invasion");
     }
-    
+
     // the staging instances to use for cstage- and tnm-related logic
     protected Staging _csStaging;
     protected Staging _tnmStaging;
@@ -405,14 +402,6 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
 
     // Cached schema ID per schema number for CS
     protected Map<Integer, String> _csSchemaIdByNumber = new HashMap<>();
-
-    /**
-     * Default constructor
-     */
-    public StagingContextFunctions() {
-        this(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)), Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST)), 
-                Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST)));
-    }
 
     /**
      * Constructor.
@@ -624,8 +613,8 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER) || schemaInput
-                .getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
+                (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER))));
 
     }
 
@@ -791,8 +780,8 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC) || schemaInput
-                .getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
+                (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC))));
 
     }
 
@@ -976,7 +965,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         StagingSchema schema = getTnmStagingSchema(input);
         return schema == null ? null : schema.getId();
     }
-    
+
     /**
      * Returns true if the given value is valid for the given field with the schema corresponding to the passed input
      * <p/>
@@ -1032,7 +1021,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_SEER_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_SEER_REQUIRED))));
     }
 
     /**
@@ -1097,7 +1086,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_COC_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(TNM_TAG_COC_REQUIRED))));
     }
 
     /**
@@ -1220,7 +1209,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED))));
     }
 
     /**
@@ -1287,9 +1276,9 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
             return false;
 
         StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
-        return schemaInput != null && (schemaInput.getUsedForStaging() || schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED)));
+        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && (schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED))));
     }
-    
+
     /**
      * Helper method to get the schema from an input line (using standard NAACCR properties).
      * <br/>
@@ -1305,7 +1294,10 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         String hist = input.get(CSTAGE_INPUT_PROP_HIST);
         String ssf25 = input.get(CSTAGE_INPUT_PROP_DISC);
 
-        List<StagingSchema> schemas = _csStaging.lookupSchema(new CsSchemaLookup(site, hist, ssf25));
+        SchemaLookup lkup = new SchemaLookup(site, hist);
+        lkup.setInput("ssf25", ssf25);
+
+        List<StagingSchema> schemas = _csStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
             return _csStaging.getSchema(schemas.get(0).getId());
 
@@ -1328,9 +1320,9 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         String ssf25 = input.get(TNM_INPUT_PROP_SSF25);
         String sex = input.get(TNM_INPUT_PROP_SEX);
 
-        TnmSchemaLookup lkup = new TnmSchemaLookup(site, hist);
-        lkup.setInput(TnmStagingData.SSF25_KEY, ssf25);
-        lkup.setInput(TnmStagingData.SEX_KEY, sex);
+        SchemaLookup lkup = new SchemaLookup(site, hist);
+        lkup.setInput("ssf25", ssf25);
+        lkup.setInput("sex", sex);
 
         List<StagingSchema> schemas = _tnmStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
@@ -1355,11 +1347,13 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         String disc1 = input.get(EOD_INPUT_PROP_DISC_1);
         String disc2 = input.get(EOD_INPUT_PROP_DISC_2);
         String sex = input.get(EOD_INPUT_PROP_SEX);
+        String behav = input.get(EOD_INPUT_PROP_BEHAV);
 
-        EodSchemaLookup lkup = new EodSchemaLookup(site, hist);
-        lkup.setInput(EodInput.DISCRIMINATOR_1.toString(), disc1);
-        lkup.setInput(EodInput.DISCRIMINATOR_2.toString(), disc2);
-        lkup.setInput(EodInput.SEX.toString(), sex);
+        SchemaLookup lkup = new SchemaLookup(site, hist);
+        lkup.setInput("discriminator_1", disc1);
+        lkup.setInput("discriminator_2", disc2);
+        lkup.setInput("sex", sex);
+        lkup.setInput("behavior", behav);
 
         List<StagingSchema> schemas = _eodStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
@@ -1479,7 +1473,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                         for (int i = ((IntRange)obj).getFromInt(); i <= ((IntRange)obj).getToInt(); i++)
                             result.put(i, val);
                     else if (obj instanceof String && ((String)obj).contains("..")) {
-                        String[] parts = ((String)obj).split("[.]{2}");
+                        String[] parts = StringUtils.split((String)obj, "..");
                         if (parts.length != 2)
                             throw new IllegalStateException("Bad range: " + obj);
                         Integer low = asInt(parts[0]);
@@ -1494,7 +1488,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                 }
             }
             else if (key instanceof String && ((String)key).contains("..")) {
-                String[] parts = ((String)key).split("..");
+                String[] parts = StringUtils.split((String)key, "..");
                 if (parts.length != 2)
                     throw new IllegalStateException("Bad range: " + key);
                 Integer low = asInt(parts[0]);
@@ -1531,7 +1525,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
                 for (int i = ((IntRange)obj).getFromInt(); i <= ((IntRange)obj).getToInt(); i++)
                     result.add(i);
             else if (obj instanceof String && ((String)obj).contains("..")) {
-                String[] parts = ((String)obj).split("[.]{2}");
+                String[] parts = StringUtils.split((String)obj, "..");
                 if (parts.length != 2)
                     throw new IllegalStateException("Bad range: " + obj);
                 Integer low = asInt(parts[0]);
@@ -1549,7 +1543,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
     }
 
     /**
-     * Returns the corresponding SSF25 value for the given sex value 
+     * Returns the corresponding SSF25 value for the given sex value
      */
     public String getSsf25FromSex(String ssf25, String sex, String hist, String dxYear, String schemaId) {
         boolean isPeritoneum = "peritoneum".equals(schemaId) || "peritoneum_female_gen".equals(schemaId);

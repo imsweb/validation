@@ -16,6 +16,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.imsweb.staging.Staging;
+import com.imsweb.staging.cs.CsDataProvider;
+import com.imsweb.staging.eod.EodDataProvider;
+import com.imsweb.staging.tnm.TnmDataProvider;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidatorContextFunctions;
@@ -104,7 +108,10 @@ public class SimpleNaaccrLinesValidatableTest {
     @SuppressWarnings("unchecked")
     public void testGetCsSchemaId() throws IllegalAccessException {
         // This test needs StagingContextFunctions instead of TestingValidatorContextFunctions
-        ValidatorContextFunctions.initialize(new StagingContextFunctions());
+        Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST));
+        Staging tnmStaging = Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST));
+        Staging eodStaging = Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST));
+        ValidatorContextFunctions.initialize(new StagingContextFunctions(csStaging, tnmStaging, eodStaging));
         
         Map<String, String> record = new HashMap<>();
         SimpleNaaccrLinesValidatable v = new SimpleNaaccrLinesValidatable(record);

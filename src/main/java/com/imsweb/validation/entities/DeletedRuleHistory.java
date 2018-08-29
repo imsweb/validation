@@ -4,9 +4,7 @@
 package com.imsweb.validation.entities;
 
 import java.util.Date;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 /**
  * A <code>DeletedRuleHistory</code> represents a single history event for a deleted rule within a validator.
@@ -238,30 +236,27 @@ public class DeletedRuleHistory {
         _reference = reference;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof DeletedRuleHistory))
-            return false;
-        DeletedRuleHistory oth = (DeletedRuleHistory)other;
-        if (_validator == null)
-            return new EqualsBuilder().append(_deletedRuleId, oth.getDeletedRuleId()).isEquals();
-        return new EqualsBuilder().append(_validator.getId(), oth.getValidator().getId()).append(_deletedRuleId, oth.getDeletedRuleId()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeletedRuleHistory that = (DeletedRuleHistory)o;
+        if (_ruleHistoryId != null && that._ruleHistoryId != null)
+            return Objects.equals(_ruleHistoryId, that._ruleHistoryId);
+        return Objects.equals(_deletedRuleId, that._deletedRuleId) &&
+                Objects.equals(_deletedRuleName, that._deletedRuleName) &&
+                Objects.equals(_message, that._message) &&
+                Objects.equals(_version, that._version) &&
+                Objects.equals(_username, that._username) &&
+                Objects.equals(_date, that._date) &&
+                Objects.equals(_reference, that._reference) &&
+                Objects.equals(_validator, that._validator);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Nov 6, 2007 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        if (_validator == null)
-            return new HashCodeBuilder().append(_deletedRuleId).toHashCode();
-        return new HashCodeBuilder().append(_validator.getId()).append(_deletedRuleId).toHashCode();
+        if (_ruleHistoryId != null)
+            return Objects.hash(_ruleHistoryId);
+        return Objects.hash(_deletedRuleId, _deletedRuleName, _message, _version, _username, _date, _reference, _validator);
     }
 }

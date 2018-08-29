@@ -115,6 +115,16 @@ public final class XmlValidatorFactory {
     private static final Pattern _PATTERN_TAB = Pattern.compile("\\t");
 
     /**
+     * Compiled <code>Pattern</code> for non-printable characters
+     */
+    private static final Pattern _CONTROL_CHARACTERS_PATTERN = Pattern.compile("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]");
+
+    /**
+     * Compiled  <code>Pattern</code> for many new lines combined together (at least 3)
+     */
+    private static final Pattern _NEW_LINES_PATTERN = Pattern.compile("(\r?\n){3,}");
+
+    /**
      * Compiled <code>Pattern</code> for leading and trailing empty lines
      */
     private static final Pattern _PATTERN_LEADING_TRAILING_EMPTY_LINES = Pattern.compile("^(\\s*\r?\n)*|(\r?\n\\s*)*$");
@@ -133,6 +143,11 @@ public final class XmlValidatorFactory {
      * Whether or not the pre-parsing mechanism should be used (enabled by default).
      */
     private static boolean _PRE_PARSED_LOOKUP_ENABLED = true;
+
+    /**
+     * Whether or not the expressions, descriptions, messages, etc... should be re-aligned (enabled by default).
+     */
+    private static boolean _REALIGNMENT_ENABLED = true;
 
     /**
      * Private constructor, no instanciation.
@@ -422,6 +437,7 @@ public final class XmlValidatorFactory {
 
             for (DeletedRuleXmlDto event : deletedRulesType) {
                 DeletedRuleHistory rh = new DeletedRuleHistory();
+                rh.setRuleHistoryId(ValidatorServices.getInstance().getNextRuleHistorySequence());
                 if (event.getId() == null)
                     throw new IOException("Deleted rule ID is required");
                 rh.setDeletedRuleId(event.getId());
@@ -919,8 +935,7 @@ public final class XmlValidatorFactory {
             setType.setName(set.getName());
             setType.setTag(set.getTag());
             setType.setDescription(set.getDescription());
-
-            List<String> inclusions = set.getInclusions() == null ? Collections.emptyList() : new ArrayList<>(set.getInclusions());
+            List<String> inclusions = new ArrayList<>(set.getInclusions() == null ? Collections.emptySet() : set.getInclusions());
             Collections.sort(inclusions);
             if (!inclusions.isEmpty()) {
                 StringBuilder buf = new StringBuilder();
@@ -930,7 +945,7 @@ public final class XmlValidatorFactory {
                 setType.setInclude(buf.toString());
             }
 
-            List<String> exclusions = set.getExclusions() == null ? Collections.emptyList() : new ArrayList<>(set.getExclusions());
+            List<String> exclusions = new ArrayList<>(set.getExclusions() == null ? Collections.emptySet() : set.getExclusions());
             Collections.sort(exclusions);
             if (!exclusions.isEmpty()) {
                 StringBuilder buf = new StringBuilder();
@@ -1070,7 +1085,7 @@ public final class XmlValidatorFactory {
                     if (inclusions.containsKey(validatorType.getId()))
                         throw new IOException("There can be only one set of inclusions per validator!");
                     List<String> inc = new ArrayList<>();
-                    for (String s : include.split(","))
+                    for (String s : StringUtils.split(include, ','))
                         inc.add(s.trim());
                     inclusions.put(validatorType.getId(), inc);
                 }
@@ -1082,7 +1097,7 @@ public final class XmlValidatorFactory {
                     if (exclusions.containsKey(validatorType.getId()))
                         throw new IOException("There can be only one set of exclusions per validator!");
                     List<String> exc = new ArrayList<>();
-                    for (String s : exclude.split(","))
+                    for (String s : StringUtils.split(exclude, ','))
                         exc.add(s.trim());
                     exclusions.put(validatorType.getId(), exc);
                 }
@@ -1494,6 +1509,20 @@ public final class XmlValidatorFactory {
     }
 
     /**
+     * Enables the re-alignment mechanism when reading expressions, descriptions, messages, etc... This is the default behavior of the engine.
+     */
+    public static void enableRealignment() {
+        _REALIGNMENT_ENABLED = true;
+    }
+
+    /**
+     * Disables the re-alignment mechanism when reading expressions, descriptions, messages, etc...
+     */
+    public static void disableRealignment() {
+        _REALIGNMENT_ENABLED = false;
+    }
+
+    /**
      * Returns true if the passed <code>URL</code> exists, false otherwise
      * <p/>
      * Created on Mar 6, 2008 by depryf
@@ -1504,24 +1533,13 @@ public final class XmlValidatorFactory {
         if (url == null)
             return false;
 
-        InputStream is = null;
-        try {
+        try (InputStream is = url.openStream()) {
             // I don't like to depend on an exception to check the existence but URL doesn't have any method to do that :-(
-            is = url.openStream();
             if (is == null)
                 return false;
         }
-        catch (Exception e) {
+        catch (IOException | RuntimeException e) {
             return false;
-        }
-        finally {
-            try {
-                if (is != null)
-                    is.close();
-            }
-            catch (IOException e) {
-                /* do nothing */
-            }
         }
 
         return true;
@@ -1576,7 +1594,7 @@ public final class XmlValidatorFactory {
                 n = is.read(bytes);
             }
         }
-        catch (IOException e) {
+        catch (IOException | RuntimeException e) {
             /* do nothing */
         }
 
@@ -1600,23 +1618,12 @@ public final class XmlValidatorFactory {
             return null;
 
         String result;
-        InputStream is = null;
-        try {
-            boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
-            is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream();
+        boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
+        try (InputStream is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream()) {
             result = Hex.encodeHexString(DigestUtils.updateDigest(DigestUtils.getDigest(MessageDigestAlgorithms.SHA_1), is).digest());
         }
-        catch (Exception e) {
+        catch (IOException | RuntimeException e) {
             return null;
-        }
-        finally {
-            try {
-                if (is != null)
-                    is.close();
-            }
-            catch (IOException e) {
-                /* do nothing */
-            }
         }
 
         return result;
@@ -1672,16 +1679,26 @@ public final class XmlValidatorFactory {
      * @return parsed string
      */
     public static String trimEmptyLines(String s, boolean trim) {
-        if (s == null || s.trim().isEmpty())
+        if (StringUtils.isBlank(s))
             return null;
 
-        // replace tabs by 4 spaces
-        s = _PATTERN_TAB.matcher(s).replaceAll("    ");
+        if (_REALIGNMENT_ENABLED) {
 
-        // remove any leading or trailing empty lines
-        s = _PATTERN_LEADING_TRAILING_EMPTY_LINES.matcher(s).replaceAll("");
+            // replace tabs by 4 spaces
+            s = _PATTERN_TAB.matcher(s).replaceAll("    ");
 
-        // remove any leading spaces
+            // remove any control characters
+            s = _CONTROL_CHARACTERS_PATTERN.matcher(s).replaceAll("");
+
+            // the next regex does't like many new lines in the middle of the text; so let's use at most 3 of them!
+            s = _NEW_LINES_PATTERN.matcher(s).replaceAll("\n\n\n");
+
+            // remove any leading or trailing empty lines
+            s = _PATTERN_LEADING_TRAILING_EMPTY_LINES.matcher(s).replaceAll("");
+
+        }
+
+        // remove any leading/trailing spaces
         if (trim)
             s = s.trim();
 
@@ -1696,59 +1713,66 @@ public final class XmlValidatorFactory {
      * @return parsed string
      */
     public static String reAlign(String toAlign) {
-        if (toAlign == null || toAlign.trim().isEmpty())
+        if (StringUtils.isBlank(toAlign))
             return null;
 
-        String s = trimEmptyLines(toAlign, false);
+        if (_REALIGNMENT_ENABLED) {
 
-        // determine number of extra white spaces
-        int extraSpaces = Integer.MAX_VALUE;
-        try {
-            LineNumberReader reader = new LineNumberReader(new StringReader(s));
-            String line = reader.readLine();
-            while (line != null) {
-                int numSpaces = 0;
-                if (!line.trim().isEmpty()) {
-                    for (int i = 0; i < line.length(); i++)
-                        if (line.charAt(i) == ' ')
-                            numSpaces++;
-                        else
-                            break;
+            // let's remove the leading/trailing new lines, but not the leading/trailing spaces of the first/last line (so we can properly re-align)
+            String s = trimEmptyLines(toAlign, false);
 
-                    extraSpaces = Math.min(extraSpaces, numSpaces);
+            // determine number of extra white spaces
+            int extraSpaces = Integer.MAX_VALUE;
+            try {
+                @SuppressWarnings("ConstantConditions")
+                LineNumberReader reader = new LineNumberReader(new StringReader(s));
+                String line = reader.readLine();
+                while (line != null) {
+                    int numSpaces = 0;
+                    if (!line.trim().isEmpty()) {
+                        for (int i = 0; i < line.length(); i++)
+                            if (line.charAt(i) == ' ')
+                                numSpaces++;
+                            else
+                                break;
+
+                        extraSpaces = Math.min(extraSpaces, numSpaces);
+                    }
+
+                    line = reader.readLine();
+                }
+            }
+            catch (Exception e) {
+                return s;
+            }
+
+            // don't bother going on if there is nothing to trim
+            if (extraSpaces == 0 || extraSpaces == Integer.MAX_VALUE)
+                return s.trim();
+
+            // apply the trimming
+            StringBuilder result = new StringBuilder();
+            try {
+                LineNumberReader reader = new LineNumberReader(new StringReader(s));
+                String line = reader.readLine();
+                while (line != null) {
+                    if (!line.trim().isEmpty())
+                        result.append(line.substring(extraSpaces)).append("\n");
+                    else
+                        result.append("\n");
+
+                    line = reader.readLine();
                 }
 
-                line = reader.readLine();
+                result.setLength(result.length() - 1);
             }
-        }
-        catch (Exception e) {
-            return s;
-        }
-
-        // don't bother going on if there is nothing to trim
-        if (extraSpaces == 0 || extraSpaces == Integer.MAX_VALUE)
-            return s.trim();
-
-        // apply the trimming
-        StringBuilder result = new StringBuilder();
-        try {
-            LineNumberReader reader = new LineNumberReader(new StringReader(s));
-            String line = reader.readLine();
-            while (line != null) {
-                if (!line.trim().isEmpty())
-                    result.append(line.substring(extraSpaces)).append("\n");
-                else
-                    result.append("\n");
-
-                line = reader.readLine();
+            catch (Exception e) {
+                return s;
             }
 
-            result.setLength(result.length() - 1);
-        }
-        catch (Exception e) {
-            return s;
+            return result.toString().trim();
         }
 
-        return result.toString().trim();
+        return toAlign;
     }
 }

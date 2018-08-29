@@ -3,6 +3,11 @@
  */
 package com.imsweb.validation.entities;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 /**
  * This class encapsulates the notion of "version" for a validator, providing comparison features.
  * <p/>
@@ -18,19 +23,29 @@ package com.imsweb.validation.entities;
  */
 public class ValidatorVersion implements Comparable<ValidatorVersion> {
 
-    /** The raw representation of the version */
+    /**
+     * The raw representation of the version
+     */
     protected String _rawString;
 
-    /** Prefix part */
+    /**
+     * Prefix part
+     */
     protected String _prefix;
 
-    /** Major number part */
+    /**
+     * Major number part
+     */
     protected Integer _major;
 
-    /** Minor number part */
+    /**
+     * Minor number part
+     */
     protected Integer _minor;
 
-    /** Minor suffix part */
+    /**
+     * Minor suffix part
+     */
     protected Integer _suffix;
 
     /**
@@ -42,7 +57,7 @@ public class ValidatorVersion implements Comparable<ValidatorVersion> {
         if (!validateVersionFormat(rawString))
             throw new RuntimeException("provided raw version does not have a valid format: " + rawString);
 
-        String[] parts = rawString.split("\\-");
+        String[] parts = StringUtils.split(rawString, '-');
 
         _rawString = rawString;
         _prefix = parts[0];
@@ -104,71 +119,27 @@ public class ValidatorVersion implements Comparable<ValidatorVersion> {
         return _suffix;
     }
 
-    /* (non-Javadoc)
-    *
-    * Created on Feb 23, 2011 by depryf
-    * @see java.lang.Object#toString()
-    */
     @Override
     public String toString() {
         return _rawString;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 23, 2011 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ValidatorVersion other = (ValidatorVersion)obj;
-        if (_major == null) {
-            if (other._major != null)
-                return false;
-        }
-        else if (!_major.equals(other._major))
-            return false;
-        if (_minor == null) {
-            if (other._minor != null)
-                return false;
-        }
-        else if (!_minor.equals(other._minor))
-            return false;
-        if (_suffix == null) {
-            if (other._suffix != null)
-                return false;
-        }
-        else if (!_suffix.equals(other._suffix))
-            return false;
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ValidatorVersion that = (ValidatorVersion)o;
+        return Objects.equals(_major, that._major) &&
+                Objects.equals(_minor, that._minor) &&
+                Objects.equals(_suffix, that._suffix);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 23, 2011 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + ((_major == null) ? 0 : _major.hashCode());
-        result = prime * result + ((_minor == null) ? 0 : _minor.hashCode());
-        result = prime * result + ((_suffix == null) ? 0 : _suffix.hashCode());
-        return result;
+
+        return Objects.hash(_major, _minor, _suffix);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Feb 23, 2011 by depryf
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(ValidatorVersion o) {
         int comp = getMajor().compareTo(o.getMajor());
@@ -191,11 +162,11 @@ public class ValidatorVersion implements Comparable<ValidatorVersion> {
         if (rawVersion == null)
             return false;
 
-        String[] parts = rawVersion.split("\\-");
+        String[] parts = StringUtils.split(rawVersion, '-');
         if (parts.length == 3)
-            return parts[1].matches("\\d\\d\\d") && parts[2].matches("\\d\\d");
+            return NumberUtils.isDigits(parts[1]) && parts[1].length() == 3 && NumberUtils.isDigits(parts[2]) && parts[2].length() == 2;
         if (parts.length == 4)
-            return parts[1].matches("\\d\\d\\d") && parts[2].matches("\\d\\d") && parts[3].matches("\\d");
+            return NumberUtils.isDigits(parts[1]) && parts[1].length() == 3 && NumberUtils.isDigits(parts[2]) && parts[2].length() == 2 && NumberUtils.isDigits(parts[3]) && parts[3].length() == 1;
         return false;
     }
 

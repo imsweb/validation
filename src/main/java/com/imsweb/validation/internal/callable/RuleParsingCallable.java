@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import org.apache.commons.lang3.StringUtils;
 
 import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.XmlValidatorFactory;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.RuleHistory;
@@ -137,7 +138,7 @@ public class RuleParsingCallable implements Callable<Void> {
 
         if (_xmlRule.getDepends() != null && !_xmlRule.getDepends().isEmpty()) {
             Set<String> dependencies = new HashSet<>();
-            for (String s : _xmlRule.getDepends().split(","))
+            for (String s : StringUtils.split(_xmlRule.getDepends(), ','))
                 if (s != null)
                     dependencies.add(s.trim());
             rule.setDependencies(dependencies);
@@ -149,6 +150,7 @@ public class RuleParsingCallable implements Callable<Void> {
             for (HistoryEventXmlDto event : _xmlRule.getHistoryEvents()) {
                 if (event.getValue() != null) {
                     RuleHistory rh = new RuleHistory();
+                    rh.setRuleHistoryId(ValidatorServices.getInstance().getNextRuleHistorySequence());
                     rh.setRule(rule);
                     if (event.getVersion() == null)
                         throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no version provided in history entry");

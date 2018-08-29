@@ -4,10 +4,9 @@
 package com.imsweb.validation.entities;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.imsweb.validation.ConstructionException;
@@ -279,21 +278,19 @@ public class Condition {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Condition))
-            return false;
-        Condition castOther = (Condition)other;
-        if (getConditionId() != null)
-            return new EqualsBuilder().append(getConditionId(), castOther.getConditionId()).isEquals();
-        else
-            return new EqualsBuilder().append(getId(), castOther.getId()).isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Condition condition = (Condition)o;
+        if (_conditionId != null && condition._conditionId != null)
+            return Objects.equals(_conditionId, condition._conditionId);
+        return Objects.equals(_id, condition._id);
     }
 
     @Override
     public int hashCode() {
-        if (getConditionId() != null)
-            return new HashCodeBuilder().append(getConditionId()).toHashCode();
-        else
-            return new HashCodeBuilder().append(getId()).toHashCode();
+        if (_conditionId != null)
+            return Objects.hash(_conditionId);
+        return Objects.hash(_id);
     }
 }

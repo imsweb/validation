@@ -17,8 +17,28 @@ import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_C
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_CAST_ERROR;
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_INSTANCIATION_ERROR;
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CLASS_NOT_FOUND;
+import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_CONSTRUCTOR_NOT_FOUND;
 import static com.imsweb.validation.ValidationEngineInitializationStats.REASON_DIFFERENT_VERSION;
 
+/**
+ * This class is used by the engine to support pre-parsed and pre-compiled edits.
+ * <br/>
+ * The engine will used pre-parsed and/or pre-compiled edits if it finds them on the classpath, otherwise it will default back to the regular edits.
+ * <br/>
+ * Pre-parsed edits need to be included in three files implementing a specific interface:
+ * <ul>
+ * <li>ParsedProperties: used to find the pre-parsed used properties</li>
+ * <li>ParsedLookups: used to find the pre-parsed used lookups</li>
+ * <li>ParsedContexts: used to find the pre-parsed used context keys</li>
+ * </ul>
+ * Pre-compiled edits need to be included in a single file implementing a specific interface:
+ * <ul>
+ * <li>CompiledRules: used to find pre-compiled edit expressions</li>
+ * </ul>
+ * The classes and methods must follow strict naming conventions to be found by the engine on the classpath; see the code for the conventions.
+ * <br/>
+ * Typically a caller will use the "create" methods in this class instead of trying to implement the conventions; that's by far the safest way.
+ */
 public class RuntimeUtils {
 
     public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
@@ -59,7 +79,7 @@ public class RuntimeUtils {
 
         String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);
         try {
-            compiledRules = (CompiledRules)(Class.forName(classPath).newInstance());
+            compiledRules = (CompiledRules)(Class.forName(classPath).getDeclaredConstructor().newInstance());
         }
         catch (ClassNotFoundException e) {
             if (stats != null)
@@ -79,6 +99,11 @@ public class RuntimeUtils {
         catch (ClassCastException e) {
             if (stats != null)
                 stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_CAST_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (NoSuchMethodException | InvocationTargetException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CONSTRUCTOR_NOT_FOUND.replace("{0}", classPath));
             compiledRules = null;
         }
 
@@ -113,9 +138,9 @@ public class RuntimeUtils {
     public static ParsedProperties findParsedProperties(String validatorId) {
         ParsedProperties parsedProperties;
         try {
-            parsedProperties = (ParsedProperties)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).newInstance());
+            parsedProperties = (ParsedProperties)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).getDeclaredConstructor().newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedProperties = null;
         }
         return parsedProperties;
@@ -143,9 +168,9 @@ public class RuntimeUtils {
     public static ParsedContexts findParsedContexts(String validatorId) {
         ParsedContexts parsedContexts;
         try {
-            parsedContexts = (ParsedContexts)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).newInstance());
+            parsedContexts = (ParsedContexts)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).getDeclaredConstructor().newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedContexts = null;
         }
         return parsedContexts;
@@ -173,9 +198,9 @@ public class RuntimeUtils {
     public static ParsedLookups findParsedLookups(String validatorId) {
         ParsedLookups parsedLookups;
         try {
-            parsedLookups = (ParsedLookups)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).newInstance());
+            parsedLookups = (ParsedLookups)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).getDeclaredConstructor().newInstance());
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException e) {
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedLookups = null;
         }
         return parsedLookups;

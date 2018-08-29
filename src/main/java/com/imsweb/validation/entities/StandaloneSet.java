@@ -6,6 +6,7 @@ package com.imsweb.validation.entities;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -197,39 +198,16 @@ public class StandaloneSet {
         return include;
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Apr 5, 2011 by depryf
-     * @see java.lang.Object#hashCode()
-     */
     @Override
-    public int hashCode() {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + ((_id == null) ? 0 : _id.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StandaloneSet that = (StandaloneSet)o;
+        return Objects.equals(_id, that._id);
     }
 
-    /* (non-Javadoc)
-     * 
-     * Created on Apr 5, 2011 by depryf
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        StandaloneSet other = (StandaloneSet)obj;
-        if (_id == null) {
-            if (other._id != null)
-                return false;
-        }
-        else if (!_id.equals(other._id))
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(_id);
     }
 }
