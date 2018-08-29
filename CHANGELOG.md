@@ -2,8 +2,8 @@
 
 **Version 1.21**
 - Increased the engine version to 5.10.
-- String terminator is not required anymore in genedits context functions dealing with arrays of characters
-- Fixed an issue in GEN_MATCH genedits context function.
+- String terminator is not required anymore in Genedits context functions dealing with arrays of characters
+- Fixed an issue in MATCH Genedits context function.
 - Fixed logic that combines translated error messages on RuleFailure when there are several messages.
 
 **Version 1.20**
