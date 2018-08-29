@@ -454,17 +454,26 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_MATCH("123 ", regex));
 
         // TODO check those assumptions in Genedits...
-        // this one was also taken from "NAACCR-02266" - also review NAACCR-02180
-        //    original regex: TODO
+        // this one was also taken from "EOD--Old 4 digit (SEER IF264DIG_P1)"
+        //    original regex: [bb,dd]{b,d}{b,d}
         // following testing values have been tested within Genedits...
-        regex = "(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))";
+        regex = "(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))"; // note that the translation seems wrong; there shouldn't be a question mark!
         Assert.assertTrue(_functions.GEN_MATCH("0000", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("9999", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("    ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("123", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("   ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("000 ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("00  ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("0   ", regex));
         Assert.assertFalse(_functions.GEN_MATCH(" 000", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("000 ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("  00", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("   0", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("000", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("00", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("0", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("00 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" 00", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("0 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("0  ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" 0", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("  0", regex));
     }
 
     @Test
@@ -1064,7 +1073,7 @@ public class MetafileContextFunctionsTest {
     }
 
     @Test
-    public void testGEN_ILOOKUP() throws ConstructionException {
+    public void testGEN_ILOOKUP() {
 
         // test a regular index (list of list)
         List<List<Object>> index = new ArrayList<>();
@@ -1917,7 +1926,7 @@ public class MetafileContextFunctionsTest {
     }
 
     @Test
-    public void testGEN_BINLOOKUP() throws ConstructionException {
+    public void testGEN_BINLOOKUP() {
 
         List<List<Integer>> table = new ArrayList<>();
         List<Integer> row0 = new ArrayList<>();

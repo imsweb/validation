@@ -914,10 +914,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         // looks like Genedits considers a regex for a single space to match an empty string...
         if (val.isEmpty()) {
             String tmp = _GEN_MATCH_P2.matcher(reg).replaceAll("\\\\s"); // let's deal only with single spaces, since they seem to do the same in the Genedits language
-            if (tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s") ||
-                    tmp.equals("(\\s)") || tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)") ||
-                    tmp.startsWith("((\\s|") || tmp.startsWith("((\\s)|") ||
-                    tmp.startsWith("(((\\s|") || tmp.startsWith("(((\\s)|"))
+            if (tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s") || tmp.equals("(\\s)") || tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)"))
                 return true;
         }
 
@@ -926,6 +923,14 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         // and again, right spaces stuff...
         reg = _GEN_MATCH_P4.matcher(reg).replaceAll("");
+
+        // this is a short term fix for a specific problem, but I am now convinced my implementation of the MATCH method is wrong, I don't think it should
+        // right-trim values; I will submit an issue in GitHub to look more into it (I need to run more tests against GENEDITS)
+        if ("(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))".equals(regex) || "(((\\s\\s)|(\\d\\d))((\\s)|(\\d))((\\s)|(\\d)))".equals(regex)) {
+            if (val.isEmpty())
+                return true;
+            reg = "(\\s\\s|\\d\\d)(\\s|\\d)?(\\s|\\d)?";
+        }
 
         // calling this base method so the regex can be cached (if regex caching is turned on)
         return matches(val, reg);
