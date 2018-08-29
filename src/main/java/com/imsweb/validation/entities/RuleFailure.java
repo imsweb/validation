@@ -303,7 +303,7 @@ public class RuleFailure {
             if (_extraErrorMessages != null && !_extraErrorMessages.isEmpty()) {
                 buf.append(" (");
                 for (String msg : _extraErrorMessages)
-                    buf.append(msg).append(";");
+                    buf.append(msg).append("; ");
                 buf.setLength(buf.length() - 2);
                 buf.append(")");
             }
