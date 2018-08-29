@@ -1,6 +1,9 @@
 ## Validation Framework Version History
 
 **Version 1.20**
+- Fixed an issue in GEN_MATCH genedits context function.
+
+**Version 1.20**
 
 - Updated Groovy library from version 2.4.12 (indy) to version 2.5.1 (indy).
 - Updated Apache commons-lang library from version 3.6 to version 3.7.
