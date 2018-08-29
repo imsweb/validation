@@ -452,6 +452,19 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_MATCH("C1  ", regex));
         Assert.assertFalse(_functions.GEN_MATCH("123", regex));
         Assert.assertFalse(_functions.GEN_MATCH("123 ", regex));
+
+        // TODO check those assumptions in Genedits...
+        // this one was also taken from "NAACCR-02266" - also review NAACCR-02180
+        //    original regex: TODO
+        // following testing values have been tested within Genedits...
+        regex = "(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))";
+        Assert.assertTrue(_functions.GEN_MATCH("0000", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("9999", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("    ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("123", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("   ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" 000", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("000 ", regex));
     }
 
     @Test
