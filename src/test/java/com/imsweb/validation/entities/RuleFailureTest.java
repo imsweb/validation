@@ -27,6 +27,9 @@ public class RuleFailureTest {
 
         failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG3"));
         Assert.assertEquals("NAME: MSG1 (MSG2; MSG3)", failure.getCombinedMessage());
+
+        failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG1", "MSG2"));
+        Assert.assertEquals("NAME: MSG1 (MSG2)", failure.getCombinedMessage());
     }
 
 }

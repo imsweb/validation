@@ -4,6 +4,7 @@
 package com.imsweb.validation.entities;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -289,6 +290,7 @@ public class RuleFailure {
     /**
      * For edits translated from a metafile, this returns the combined message and extra error messages using the following format:<br/>
      * &nbsp;&nbsp;&nbsp;EDIT_NAME: MESSAGE (EXTRA_MESSAGE1; EXTRA_MESSAGE2, etc...)
+     * Messages are de-duplicated.
      * <p/>
      * For other edits, this just returns the message.
      * @param maxLength if greater then 0, the returned message will be cut-off to be less or equal in length to the parameter
@@ -300,12 +302,16 @@ public class RuleFailure {
         if (_rule != null && _rule.getName() != null && _rule.getJavaPath().startsWith("untrimmedlines.")) {
             StringBuilder buf = new StringBuilder();
             buf.append(_rule.getName()).append(": ").append(_message);
-            if (_extraErrorMessages != null && !_extraErrorMessages.isEmpty()) {
-                buf.append(" (");
-                for (String msg : _extraErrorMessages)
-                    buf.append(msg).append("; ");
-                buf.setLength(buf.length() - 2);
-                buf.append(")");
+            if (_extraErrorMessages != null) {
+                LinkedHashSet<String> messages = new LinkedHashSet<>(_extraErrorMessages);
+                messages.remove(_message);
+                if (!messages.isEmpty()) {
+                    buf.append(" (");
+                    for (String msg : messages)
+                        buf.append(msg).append("; ");
+                    buf.setLength(buf.length() - 2);
+                    buf.append(")");
+                }
             }
             result = buf.toString();
         }
