@@ -120,7 +120,7 @@ public class ValidatorServices {
     /**
      * Cached pattern for the versions
      */
-    private static final Pattern _VERSIONS_PATTERN = Pattern.compile("\\d(\\.\\d)*");
+    private static final Pattern _VERSIONS_PATTERN = Pattern.compile("\\d+(\\.\\d+)+");
 
     /**
      * Initializes this class with the passed instance.

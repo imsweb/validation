@@ -369,5 +369,11 @@ public class ValidatorServicesTest {
         Assert.assertTrue(services.compareEngineVersions("2.0", "1.0") > 0);
         Assert.assertTrue(services.compareEngineVersions("1.0", "2.1") < 0);
         Assert.assertTrue(services.compareEngineVersions("2.1", "1.0") > 0);
+        Assert.assertTrue(services.compareEngineVersions("5.9", "5.10") < 0);
+        Assert.assertTrue(services.compareEngineVersions("5.10", "5.9") > 0);
+        Assert.assertEquals(0, services.compareEngineVersions("5.10", "5.10"));
+        Assert.assertTrue(services.compareEngineVersions("10.0", "10.1") < 0);
+        Assert.assertTrue(services.compareEngineVersions("10.1", "10.0") > 0);
+        Assert.assertEquals(0, services.compareEngineVersions("10.1", "10.1"));
     }
 }
