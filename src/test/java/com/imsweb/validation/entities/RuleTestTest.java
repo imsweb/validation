@@ -20,7 +20,7 @@ import com.imsweb.validation.XmlValidatorFactory;
 public class RuleTestTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         TestingUtils.init();
     }
 

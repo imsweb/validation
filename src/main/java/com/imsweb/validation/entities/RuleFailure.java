@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -278,7 +279,9 @@ public class RuleFailure {
 
     /**
      * For edits translated from a metafile, this returns the combined message and extra error messages using the following format:<br/>
-     * &nbsp;&nbsp;&nbsp;EDIT_NAME: MESSAGE (EXTRA_MESSAGE1; EXTRA_MESSAGE2, etc...)
+     * &nbsp;&nbsp;&nbsp;MESSAGE; EXTRA_MESSAGE1; EXTRA_MESSAGE2, etc...
+     * <br/>
+     * Messages are de-duplicated.
      * <p/>
      * For other edits, this just returns the message.
      * @return combined error message
@@ -289,7 +292,8 @@ public class RuleFailure {
 
     /**
      * For edits translated from a metafile, this returns the combined message and extra error messages using the following format:<br/>
-     * &nbsp;&nbsp;&nbsp;EDIT_NAME: MESSAGE (EXTRA_MESSAGE1; EXTRA_MESSAGE2, etc...)
+     * &nbsp;&nbsp;&nbsp;MESSAGE; EXTRA_MESSAGE1; EXTRA_MESSAGE2, etc...
+     * <br/>
      * Messages are de-duplicated.
      * <p/>
      * For other edits, this just returns the message.
@@ -299,21 +303,11 @@ public class RuleFailure {
     public String getCombinedMessage(int maxLength) {
         String result;
 
-        if (_rule != null && _rule.getName() != null && _rule.getJavaPath().startsWith("untrimmedlines.")) {
-            StringBuilder buf = new StringBuilder();
-            buf.append(_rule.getName()).append(": ").append(_message);
-            if (_extraErrorMessages != null) {
-                LinkedHashSet<String> messages = new LinkedHashSet<>(_extraErrorMessages);
-                messages.remove(_message);
-                if (!messages.isEmpty()) {
-                    buf.append(" (");
-                    for (String msg : messages)
-                        buf.append(msg).append("; ");
-                    buf.setLength(buf.length() - 2);
-                    buf.append(")");
-                }
-            }
-            result = buf.toString();
+        if (_rule != null && _rule.getJavaPath().startsWith("untrimmedlines.") && _extraErrorMessages != null && !_extraErrorMessages.isEmpty()) {
+            LinkedHashSet<String> messages = new LinkedHashSet<>();
+            messages.add(_message);
+            messages.addAll(_extraErrorMessages);
+            result = StringUtils.join(messages, "; ");
         }
         else
             result = _message;
