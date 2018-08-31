@@ -41,6 +41,16 @@ A logical grouping of edits (for example, the SEER edits, or the NAACCR edits). 
 
 Edits are called rules in this framework.
 
+Rules represents a (usually small) piece of logic that returns a boolean value (true if the edit passes, false if it fails).
+
+Rules must define a Java path which represents the logical entity the edits run on. 
+
+or example, if a rule defines "record" as its Java path, the rule will run on record objects and will access the properties by calling "record.property". 
+On the other hand, if the path is defined as "patient.tumor.treatment", the rule will run on every treatment of every tumor of a given patient object 
+and it will access the properties by calling "treatment.property" or "tumor.property" or "patient.property'.
+
+The concept of Java path is tied to the Validatable class which is addressed hereunder.
+
 **Context**
 
 Validators can also contain contexts; those are usually large data structures (list, maps, etc...) that are accessed by more than one edit. 
@@ -50,6 +60,18 @@ Edits can reference contexts using the prefix *"Context."*.
 
 An interface used to tell the engine how to execute the edits on specific data types. This allows very different types
 (like a NAACCR line, a Java tumor object or a record from a data entry form) to be wrapped into a validatable and handled by the framework.
+
+A Validatable is logically linked to the rules by its Java path. Every rule (and condition) define a Java path; a Validatable defines a root Java path. 
+The engine uses that information to know which rules to execute for a given Validatable.
+
+Example 1: a rule defines the Java path "record" and another one defines "patient", the SimpleMapValidatable is used (it defines its root Java path as "record"); 
+the first rule will be executed when that SimpleMapValidatable is validated, the second rule won't.
+
+Example 2: a rule defines the Java path "patient.tumor.treatment"; a customized Validatable defining a root Java path "patient" is used. That rule will be 
+executed when that Validatable is validated. The Validatable will be responsible for building the data required by the rules at each level of the path. 
+So it will build the "patient" data and the engine will run the "patient" rules; it will then build the "tumor" data ()for each tumor on the patient) and the 
+engine will run the "patient.tumor" rules on that data; and finally it will build the "treatment" data (for each treatment of each tumor) and the 
+engine will run the "patient.tumor.treatment" rules on that data.
 
 **ValidatorServices**
 
