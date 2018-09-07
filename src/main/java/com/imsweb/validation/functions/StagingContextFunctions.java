@@ -262,6 +262,7 @@ public class StagingContextFunctions extends ValidatorContextFunctions {
         EOD_FIELDS.put("rxSummSurgRadSeq", "radiation_surg_seq");
         EOD_FIELDS.put("regionalNodesPositive", "nodes_pos");
         EOD_FIELDS.put("regionalNodesExamined", "nodes_exam");
+        EOD_FIELDS.put("lymphVascularInvasion", "lvi");
         EOD_FIELDS.put("adenoidCysticBasaloidPattern", "adenoid_cystic_basaloid_pattern");
         EOD_FIELDS.put("adenopathy", "adenopathy");
         EOD_FIELDS.put("afpPostOrchiectomyLabValue", "afp_post_orch_lab_value");
