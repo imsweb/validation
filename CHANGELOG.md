@@ -1,5 +1,8 @@
 ## Validation Framework Version History
 
+**Version 1.22**
+- Added 'lvi' to the list of EOD fields in StagingContextFunctions
+
 **Version 1.21**
 - Increased the engine version to 5.10.
 - String terminator is not required anymore in Genedits context functions dealing with arrays of characters
