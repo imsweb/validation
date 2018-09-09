@@ -9,6 +9,8 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.imsweb.validation.ValidationEngine;
+
 public class RuleFailureTest {
 
     @Test
@@ -27,7 +29,7 @@ public class RuleFailureTest {
         failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG3"));
         Assert.assertEquals("MSG1; MSG2; MSG3", failure.getCombinedMessage());
 
-        failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG1", "MSG2"));
+        failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG1", "MSG2", ValidationEngine.NO_MESSAGE_MSG));
         Assert.assertEquals("MSG1; MSG2", failure.getCombinedMessage());
     }
 

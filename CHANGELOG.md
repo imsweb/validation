@@ -1,11 +1,13 @@
 ## Validation Framework Version History
 
 **Version 1.22**
-- Added 'lvi' to the list of EOD fields in StagingContextFunctions
+- Increased the engine version to 5.11.
+- Added 'lvi' to the list of EOD fields in StagingContextFunctions.
+- Added support for a special 'No error message defined' error message.
 
 **Version 1.21**
 - Increased the engine version to 5.10.
-- String terminator is not required anymore in Genedits context functions dealing with arrays of characters
+- String terminator is not required anymore in Genedits context functions dealing with arrays of characters.
 - Fixed an issue in MATCH Genedits context function.
 - Fixed logic that combines translated error messages on RuleFailure when there are several messages.
 

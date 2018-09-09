@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.imsweb.validation.ValidationEngine;
+
 /**
  * This class represents a single rule failure returned by the validation engine.
  * <p/>
@@ -303,11 +305,13 @@ public class RuleFailure {
     public String getCombinedMessage(int maxLength) {
         String result;
 
-        if (_rule != null && _rule.getJavaPath().startsWith("untrimmedlines.") && _extraErrorMessages != null && !_extraErrorMessages.isEmpty()) {
+        if (_rule != null && _rule.getJavaPath() != null && _rule.getJavaPath().startsWith("untrimmedlines.") && _extraErrorMessages != null && !_extraErrorMessages.isEmpty()) {
             LinkedHashSet<String> messages = new LinkedHashSet<>();
             messages.add(_message);
             messages.addAll(_extraErrorMessages);
-            result = StringUtils.join(messages, "; ");
+            if (messages.size() > 1)
+                messages.remove(ValidationEngine.NO_MESSAGE_MSG);
+            result = StringUtils.join(messages, ". ");
         }
         else
             result = _message;

@@ -79,7 +79,7 @@ public final class ValidationEngine {
     /**
      * Engine version (used to check compatibility with the edits)
      */
-    private static final String _ENGINE_VERSION = "5.10";
+    private static final String _ENGINE_VERSION = "5.11";
 
     /**
      * The different context types supported by the engine
@@ -158,6 +158,11 @@ public final class ValidationEngine {
      * Message used when a timeout happened while executing a rule.
      */
     public static final String INTERRUPTED_MSG = "Edit execution was interrupted.";
+
+    /**
+     * Message used when a rule doesn't define an error message.
+     */
+    public static final String NO_MESSAGE_MSG = "No error message defined.";
 
     /**
      * Map of <code>Validator</code>s, keyed by validator ID
