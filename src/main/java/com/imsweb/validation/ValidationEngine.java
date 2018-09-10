@@ -162,7 +162,7 @@ public final class ValidationEngine {
     /**
      * Message used when a rule doesn't define an error message.
      */
-    public static final String NO_MESSAGE_MSG = "No error message defined.";
+    public static final String NO_MESSAGE_DEFINED_MSG = "No default error message defined.";
 
     /**
      * Map of <code>Validator</code>s, keyed by validator ID

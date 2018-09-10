@@ -24,13 +24,17 @@ public class RuleFailureTest {
         Assert.assertEquals("MSG1", failure.getCombinedMessage());
 
         failure.setExtraErrorMessages(Collections.singletonList("MSG2"));
-        Assert.assertEquals("MSG1; MSG2", failure.getCombinedMessage());
+        Assert.assertEquals("MSG1. MSG2", failure.getCombinedMessage());
 
         failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG3"));
-        Assert.assertEquals("MSG1; MSG2; MSG3", failure.getCombinedMessage());
+        Assert.assertEquals("MSG1. MSG2. MSG3", failure.getCombinedMessage());
 
-        failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG1", "MSG2", ValidationEngine.NO_MESSAGE_MSG));
-        Assert.assertEquals("MSG1; MSG2", failure.getCombinedMessage());
+        failure.setExtraErrorMessages(Arrays.asList("MSG2", "MSG1", "MSG2", ValidationEngine.NO_MESSAGE_DEFINED_MSG));
+        Assert.assertEquals("MSG1. MSG2", failure.getCombinedMessage());
+
+        failure.setMessage(ValidationEngine.NO_MESSAGE_DEFINED_MSG);
+        failure.setExtraErrorMessages(null);
+        Assert.assertEquals(ValidationEngine.NO_MESSAGE_DEFINED_MSG, failure.getCombinedMessage());
     }
 
 }

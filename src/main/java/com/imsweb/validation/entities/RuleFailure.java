@@ -281,9 +281,9 @@ public class RuleFailure {
 
     /**
      * For edits translated from a metafile, this returns the combined message and extra error messages using the following format:<br/>
-     * &nbsp;&nbsp;&nbsp;MESSAGE; EXTRA_MESSAGE1; EXTRA_MESSAGE2, etc...
+     * &nbsp;&nbsp;&nbsp;MESSAGE. EXTRA_MESSAGE1. EXTRA_MESSAGE2. etc...
      * <br/>
-     * Messages are de-duplicated.
+     * Messages are de-duplicated. Default "ValidationEngine.NO_MESSAGE_DEFINED_MSG" is automatically removed if at least one other message is defined.
      * <p/>
      * For other edits, this just returns the message.
      * @return combined error message
@@ -294,9 +294,9 @@ public class RuleFailure {
 
     /**
      * For edits translated from a metafile, this returns the combined message and extra error messages using the following format:<br/>
-     * &nbsp;&nbsp;&nbsp;MESSAGE; EXTRA_MESSAGE1; EXTRA_MESSAGE2, etc...
+     * &nbsp;&nbsp;&nbsp;MESSAGE. EXTRA_MESSAGE1. EXTRA_MESSAGE2. etc...
      * <br/>
-     * Messages are de-duplicated.
+     * Messages are de-duplicated. Default "ValidationEngine.NO_MESSAGE_DEFINED_MSG" is automatically removed if at least one other message is defined.
      * <p/>
      * For other edits, this just returns the message.
      * @param maxLength if greater then 0, the returned message will be cut-off to be less or equal in length to the parameter
@@ -310,7 +310,7 @@ public class RuleFailure {
             messages.add(_message);
             messages.addAll(_extraErrorMessages);
             if (messages.size() > 1)
-                messages.remove(ValidationEngine.NO_MESSAGE_MSG);
+                messages.remove(ValidationEngine.NO_MESSAGE_DEFINED_MSG);
             result = StringUtils.join(messages, ". ");
         }
         else
