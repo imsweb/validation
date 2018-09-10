@@ -3,7 +3,7 @@
 **Version 1.22**
 - Increased the engine version to 5.11.
 - Added 'lvi' to the list of EOD fields in StagingContextFunctions.
-- Added support for a special 'No error message defined' error message.
+- Added support for a special 'No default error message defined' error message.
 
 **Version 1.21**
 - Increased the engine version to 5.10.
