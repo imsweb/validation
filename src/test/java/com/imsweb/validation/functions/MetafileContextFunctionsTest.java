@@ -2018,4 +2018,19 @@ public class MetafileContextFunctionsTest {
         array[2] = 'C';
         Assert.assertEquals("ABC", _functions.GEN_TO_STRING(array));
     }
+
+    @Test
+    public void testGEN_AT() {
+        Assert.assertEquals(0, _functions.GEN_AT("08", null));
+        Assert.assertEquals(0, _functions.GEN_AT("08", ""));
+        Assert.assertEquals(0, _functions.GEN_AT("08", "X"));
+        Assert.assertEquals(0, _functions.GEN_AT("08", "XX"));
+        Assert.assertEquals(1, _functions.GEN_AT("08", "08"));
+        Assert.assertEquals(0, _functions.GEN_AT("08", "8"));
+
+        Assert.assertEquals(1, _functions.GEN_AT("08", "08"));
+        Assert.assertEquals(0, _functions.GEN_AT("08", "00"));
+        Assert.assertEquals(0, _functions.GEN_AT("00", "08"));
+        Assert.assertEquals(1, _functions.GEN_AT("00", "00"));
+    }
 }
