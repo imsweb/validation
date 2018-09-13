@@ -79,7 +79,7 @@ public final class ValidationEngine {
     /**
      * Engine version (used to check compatibility with the edits)
      */
-    private static final String _ENGINE_VERSION = "5.12";
+    private static final String _ENGINE_VERSION = "5.11";
 
     /**
      * The different context types supported by the engine
