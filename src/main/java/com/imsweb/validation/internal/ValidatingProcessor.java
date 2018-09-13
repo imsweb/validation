@@ -238,17 +238,21 @@ public class ValidatingProcessor implements Processor {
 
                     // if failure, need to keep track of it since other depending rules might not have to run
                     if (!success) {
-                        String msg = rule.getMessage();
-                        String overriddenMsg = (String)binding.getVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE);
-                        if (overriddenMsg != null)
-                            msg = overriddenMsg;
+                        String message = ValidatorServices.getInstance().fillInMessage(rule.getMessage(), validatable);
 
-                        RuleFailure failure = new RuleFailure(rule.getRule(), ValidatorServices.getInstance().fillInMessage(msg, validatable), validatable);
-                        // extra error messages are used by translated edits only...
-                        failure.setExtraErrorMessages(ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES), validatable));
-                        // information messages are used by translated edits only...
+                        // translated edits can override the default error message
+                        String overriddenError = (String)binding.getVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE);
+                        if (overriddenError != null)
+                            message = ValidatorServices.getInstance().fillInMessage(overriddenError, validatable);
+
+                        // translated edits can dynamically report error messages
+                        List<String> extraErrors = ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES), validatable);
+                        if (extraErrors != null && !extraErrors.isEmpty())
+                            message = StringUtils.join(extraErrors, ". ");
+
+                        RuleFailure failure = new RuleFailure(rule.getRule(), message, validatable);
+                        failure.setExtraErrorMessages(extraErrors);
                         failure.setInformationMessages(ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
-                        // keep track of the original result
                         failure.setOriginalResult((Boolean)binding.getVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT));
                         results.add(failure);
                         currentRuleFailures.add(id);
@@ -330,7 +334,7 @@ public class ValidatingProcessor implements Processor {
 
     /**
      * Sets the rules on this processor.
-     * @param rules
+     * @param rules rules to set.
      */
     public synchronized void setRules(List<ExecutableRule> rules) {
         _rules.clear();
@@ -339,7 +343,7 @@ public class ValidatingProcessor implements Processor {
 
     /**
      * Sets the conditions on this processor.
-     * @param conditions
+     * @param conditions conditions to set.
      */
     public synchronized void setConditions(Collection<ExecutableCondition> conditions) {
         _conditions.clear();

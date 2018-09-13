@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.23**
+- Increased the engine version to 5.12.
+- Fixed dynamic error messages reported by translated edits.
+
 **Version 1.22**
 - Increased the engine version to 5.11.
 - Added 'lvi' to the list of EOD fields in StagingContextFunctions.

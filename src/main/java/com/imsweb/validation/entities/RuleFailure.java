@@ -4,15 +4,11 @@
 package com.imsweb.validation.entities;
 
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import com.imsweb.validation.ValidationEngine;
 
 /**
  * This class represents a single rule failure returned by the validation engine.
@@ -22,12 +18,12 @@ import com.imsweb.validation.ValidationEngine;
 public class RuleFailure {
 
     /**
-     * Rule object (link to the parent)
+     * Rule object (link to the parent).
      */
     protected Rule _rule;
 
     /**
-     * Failure message
+     * Failure message (for translated edits, it might not be the message defined by the edit itself since messages can dynamically be added).
      */
     protected String _message;
 
@@ -235,7 +231,7 @@ public class RuleFailure {
 
     /**
      * Getter for the information messages
-     * @return list of information messsages, can be null or empty
+     * @return list of information messages, can be null or empty
      */
     public List<String> getInformationMessages() {
         return _informationMessages;
@@ -277,46 +273,5 @@ public class RuleFailure {
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(_rule).append(_properties).toHashCode();
-    }
-
-    /**
-     * For edits translated from a metafile, this returns the combined message and extra error messages using the following format:<br/>
-     * &nbsp;&nbsp;&nbsp;MESSAGE. EXTRA_MESSAGE1. EXTRA_MESSAGE2. etc...
-     * <br/>
-     * Messages are de-duplicated. Default "ValidationEngine.NO_MESSAGE_DEFINED_MSG" is automatically removed if at least one other message is defined.
-     * <p/>
-     * For other edits, this just returns the message.
-     * @return combined error message
-     */
-    public String getCombinedMessage() {
-        return getCombinedMessage(-1);
-    }
-
-    /**
-     * For edits translated from a metafile, this returns the combined message and extra error messages using the following format:<br/>
-     * &nbsp;&nbsp;&nbsp;MESSAGE. EXTRA_MESSAGE1. EXTRA_MESSAGE2. etc...
-     * <br/>
-     * Messages are de-duplicated. Default "ValidationEngine.NO_MESSAGE_DEFINED_MSG" is automatically removed if at least one other message is defined.
-     * <p/>
-     * For other edits, this just returns the message.
-     * @param maxLength if greater then 0, the returned message will be cut-off to be less or equal in length to the parameter
-     * @return combined error message
-     */
-    public String getCombinedMessage(int maxLength) {
-        String result;
-
-        if (_rule != null && _rule.getJavaPath() != null && _rule.getJavaPath().startsWith("untrimmedlines.") && _extraErrorMessages != null && !_extraErrorMessages.isEmpty()) {
-            LinkedHashSet<String> messages = new LinkedHashSet<>();
-            messages.add(_message);
-            messages.addAll(_extraErrorMessages);
-            if (messages.size() > 1)
-                messages.remove(ValidationEngine.NO_MESSAGE_DEFINED_MSG);
-            result = StringUtils.join(messages, ". ");
-        }
-        else
-            result = _message;
-
-        return maxLength > 0 && result != null && result.length() > maxLength ? (result.substring(0, maxLength - 3) + "...") : result;
-
     }
 }
