@@ -3,13 +3,13 @@
  */
 package com.imsweb.validation.entities;
 
+import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.functions.TestingContextFunctions.AssertionType;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.imsweb.validation.TestingContextFunctions.AssertionType;
-import com.imsweb.validation.ValidationException;
 
 /**
  * A rule test result.

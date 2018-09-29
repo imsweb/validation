@@ -3,22 +3,20 @@
  */
 package com.imsweb.validation.entities;
 
+import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidatorContextFunctions;
+import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.functions.TestingContextFunctions;
+import groovy.lang.Binding;
+import groovy.lang.Script;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
-import groovy.lang.Binding;
-import groovy.lang.Script;
-
-import com.imsweb.validation.TestingContextFunctions;
-import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.ValidatorContextFunctions;
-import com.imsweb.validation.ValidatorServices;
 
 /**
  * A single rule test (a Groovy script).

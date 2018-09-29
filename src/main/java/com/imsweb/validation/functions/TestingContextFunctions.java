@@ -1,34 +1,20 @@
 /*
  * Copyright (C) 2011 Information Management Services, Inc.
  */
-package com.imsweb.validation;
+package com.imsweb.validation.functions;
+
+import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.entities.*;
+import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-
-import com.imsweb.validation.entities.Rule;
-import com.imsweb.validation.entities.RuleFailure;
-import com.imsweb.validation.entities.RuleTest;
-import com.imsweb.validation.entities.RuleTestResult;
-import com.imsweb.validation.entities.SimpleMapValidatable;
-import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
-import com.imsweb.validation.entities.Validatable;
-import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
 /**
  * Context available to the testing framework. The testing Groovy scripts can access the methdos of this context
