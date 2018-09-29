@@ -8,7 +8,7 @@ package com.imsweb.validation;
  * <p/>
  * Created on Feb 23, 2011 by depryf
  */
-public class ValidationEngineStats {
+public class EngineStats {
 
     /**
      * ID for this DTO (can represent anything - polisher ID, registry coding task ID, auto-cons rule ID, etc...)
@@ -42,7 +42,7 @@ public class ValidationEngineStats {
      * @param id ID for this stat
      * @param time time for this stat
      */
-    public ValidationEngineStats(String id, Long time) {
+    public EngineStats(String id, Long time) {
         _id = id;
         _numRun = 1L;
         _totalTime = time;
@@ -157,7 +157,7 @@ public class ValidationEngineStats {
      * @param dto <code>ValidatorStatsDto</code>, can't be null
      * @param time time
      */
-    public static synchronized void reportRun(ValidationEngineStats dto, long time) {
+    public static synchronized void reportRun(EngineStats dto, long time) {
         if (time >= 0) {
             dto.setNumRun(dto.getNumRun() + 1);
             dto.setTotalTime(dto.getTotalTime() + time);

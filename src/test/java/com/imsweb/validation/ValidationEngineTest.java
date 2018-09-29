@@ -3,20 +3,6 @@
  */
 package com.imsweb.validation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.imsweb.validation.entities.Condition;
 import com.imsweb.validation.entities.EditableCondition;
 import com.imsweb.validation.entities.EditableRule;
@@ -28,6 +14,19 @@ import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.internal.ValidatingContext;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ValidationEngineTest {
@@ -329,7 +328,7 @@ public class ValidationEngineTest {
         Map<String, Object> data = new HashMap<>();
         Validatable validatable = new SimpleMapValidatable("level-runtime", data);
 
-        ValidationEngineInitializationStats stats = ValidationEngine.initialize(v);
+        EngineInitStats stats = ValidationEngine.initialize(v);
         Assert.assertEquals(1, stats.getNumEditsLoaded());
         Assert.assertEquals(1, stats.getNumEditsPreCompiled());
         Assert.assertEquals(0, stats.getNumEditsCompiled());

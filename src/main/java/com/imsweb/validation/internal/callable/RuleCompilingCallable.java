@@ -3,13 +3,13 @@
  */
 package com.imsweb.validation.internal.callable;
 
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import com.imsweb.validation.ValidationEngineInitializationStats;
+import com.imsweb.validation.EngineInitStats;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.internal.ExecutableRule;
 import com.imsweb.validation.runtime.CompiledRules;
+
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * This class is used to multi-thread the compilation of the rules.
@@ -34,14 +34,14 @@ public class RuleCompilingCallable implements Callable<Void> {
     /**
      * Initialization stats.
      */
-    private ValidationEngineInitializationStats _stats;
+    private EngineInitStats _stats;
 
     /**
      * Constructor.
      * @param rule rule to compile
      * @param rules collection of compiled rules
      */
-    public RuleCompilingCallable(Rule rule, Map<Long, ExecutableRule> rules, CompiledRules compiledRules, ValidationEngineInitializationStats stats) {
+    public RuleCompilingCallable(Rule rule, Map<Long, ExecutableRule> rules, CompiledRules compiledRules, EngineInitStats stats) {
         _rule = rule;
         _rules = rules;
         _compiledRules = compiledRules;

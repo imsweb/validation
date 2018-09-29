@@ -3,25 +3,6 @@
  */
 package com.imsweb.validation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.imsweb.validation.entities.Category;
 import com.imsweb.validation.entities.Condition;
 import com.imsweb.validation.entities.ContextEntry;
@@ -43,6 +24,24 @@ import com.imsweb.validation.internal.ValidatingProcessor;
 import com.imsweb.validation.internal.callable.RuleCompilingCallable;
 import com.imsweb.validation.runtime.CompiledRules;
 import com.imsweb.validation.runtime.RuntimeUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
@@ -266,7 +265,7 @@ public final class ValidationEngine {
      * Created on Mar 6, 2008 by depryf
      * @return initialization statistics
      */
-    public static ValidationEngineInitializationStats initialize() {
+    public static EngineInitStats initialize() {
         try {
             return initialize((List<Validator>)null);
         }
@@ -283,7 +282,7 @@ public final class ValidationEngine {
      * @return initialization statistics
      * @throws ConstructionException if a ... construction exception happens...
      */
-    public static ValidationEngineInitializationStats initialize(Validator validator) throws ConstructionException {
+    public static EngineInitStats initialize(Validator validator) throws ConstructionException {
         return initialize(validator == null ? null : Collections.singletonList(validator));
     }
 
@@ -295,10 +294,10 @@ public final class ValidationEngine {
      * @return initialization statistics
      * @throws ConstructionException if a ... construction exception happens...
      */
-    public static ValidationEngineInitializationStats initialize(List<Validator> validators) throws ConstructionException {
+    public static EngineInitStats initialize(List<Validator> validators) throws ConstructionException {
         _STATUS = ValidationEngineStatus.INITIALIZING;
 
-        ValidationEngineInitializationStats stats = new ValidationEngineInitializationStats();
+        EngineInitStats stats = new EngineInitStats();
         long start = System.currentTimeMillis();
 
         _LOCK.writeLock().lock();
@@ -1755,7 +1754,7 @@ public final class ValidationEngine {
      * Created on Nov 30, 2007 by depryf
      * @return a collection of <code>StatsDTO</code> object, possibly empty
      */
-    public static Map<String, ValidationEngineStats> getStats() {
+    public static Map<String, EngineStats> getStats() {
         _LOCK.readLock().lock();
         try {
             return ValidatingProcessor.getStats();
@@ -1864,7 +1863,7 @@ public final class ValidationEngine {
     //                  INTERNAL METHODS (no lock required)
     // ********************************************************************************
 
-    private static void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, ValidationEngineInitializationStats stats) throws ConstructionException {
+    private static void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, EngineInitStats stats) throws ConstructionException {
 
         if (validator.getValidatorId() == null)
             validator.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence());
@@ -1876,7 +1875,7 @@ public final class ValidationEngine {
         if (isPreCompiledLookupEnabled())
             precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
         else if (stats != null)
-            stats.setReasonNotPreCompiled(validator.getId(), ValidationEngineInitializationStats.REASON_PRE_COMPILED_OFF);
+            stats.setReasonNotPreCompiled(validator.getId(), EngineInitStats.REASON_PRE_COMPILED_OFF);
 
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_NUM_COMPILER_THREADS);

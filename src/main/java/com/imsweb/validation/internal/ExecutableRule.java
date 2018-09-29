@@ -3,27 +3,25 @@
  */
 package com.imsweb.validation.internal;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.groovy.control.CompilationFailedException;
-
-import groovy.lang.Binding;
-import groovy.lang.Script;
-
 import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.EngineInitStats;
 import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.ValidationEngineInitializationStats;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.runtime.CompiledRules;
 import com.imsweb.validation.runtime.RuntimeUtils;
+import groovy.lang.Binding;
+import groovy.lang.Script;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.groovy.control.CompilationFailedException;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created on Jun 28, 2011 by depryf
@@ -131,7 +129,7 @@ public class ExecutableRule {
      * @param compiledRules pre-compiled rules (can be null in which case a Groovy Script will be compiled)
      * @param stats initialization stats (can be null)
      */
-    public ExecutableRule(Rule rule, CompiledRules compiledRules, ValidationEngineInitializationStats stats) throws ConstructionException {
+    public ExecutableRule(Rule rule, CompiledRules compiledRules, EngineInitStats stats) throws ConstructionException {
         _rule = rule;
         _internalId = rule.getRuleId();
         _internalValidatorId = rule.getValidator() != null ? rule.getValidator().getValidatorId() : null;

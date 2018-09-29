@@ -3,6 +3,19 @@
  */
 package com.imsweb.validation.internal;
 
+import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.EngineStats;
+import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.ValidatorContextFunctions;
+import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.entities.RuleFailure;
+import com.imsweb.validation.entities.Validatable;
+import com.imsweb.validation.runtime.CompiledRules;
+import com.imsweb.validation.runtime.RuntimeUtils;
+import groovy.lang.Binding;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,21 +35,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.lang3.StringUtils;
-
-import groovy.lang.Binding;
-
-import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.ValidationEngineStats;
-import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.ValidatorContextFunctions;
-import com.imsweb.validation.ValidatorServices;
-import com.imsweb.validation.entities.RuleFailure;
-import com.imsweb.validation.entities.Validatable;
-import com.imsweb.validation.runtime.CompiledRules;
-import com.imsweb.validation.runtime.RuntimeUtils;
-
 /**
  * A <code>ValidatingProcessor</code> is a <code>Processor</code> that runs edits on a particular level of a <code>Validatable</code>.
  * <p/>
@@ -47,7 +45,7 @@ import com.imsweb.validation.runtime.RuntimeUtils;
 public class ValidatingProcessor implements Processor {
 
     // map of stats object to keep track of how long each polisher takes to run
-    private static final Map<String, ValidationEngineStats> _STATS = new HashMap<>();
+    private static final Map<String, EngineStats> _STATS = new HashMap<>();
 
     // the current java path for this validating processor
     private String _currentJavaPath;
@@ -230,9 +228,9 @@ public class ValidatingProcessor implements Processor {
                     if (_recordStats && id != null && !id.trim().isEmpty()) {
                         synchronized (_STATS) {
                             if (_STATS.containsKey(id))
-                                ValidationEngineStats.reportRun(_STATS.get(id), endTime - startTime);
+                                EngineStats.reportRun(_STATS.get(id), endTime - startTime);
                             else
-                                _STATS.put(id, new ValidationEngineStats(id, endTime - startTime));
+                                _STATS.put(id, new EngineStats(id, endTime - startTime));
                         }
                     }
 
@@ -395,7 +393,7 @@ public class ValidatingProcessor implements Processor {
      * Created on Nov 30, 2007 by depryf
      * @return a collection of <code>StatsDTO</code> object, possibly empty
      */
-    public static Map<String, ValidationEngineStats> getStats() {
+    public static Map<String, EngineStats> getStats() {
         synchronized (_STATS) {
             return Collections.unmodifiableMap(_STATS);
         }
