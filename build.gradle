@@ -12,6 +12,7 @@ group = 'com.imsweb'
 version = file('VERSION').text.trim()
 description = 'This framework allows edits to be defined in Groovy and to be executed on various data types.'
 sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 println "Starting build using ${Jvm.current()}"
 
