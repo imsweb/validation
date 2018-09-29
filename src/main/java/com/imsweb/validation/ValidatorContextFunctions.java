@@ -5,8 +5,6 @@ package com.imsweb.validation;
 
 import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 import com.imsweb.validation.internal.ValidatorLRUCache;
-import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
-import com.imsweb.validation.shared.ContextFunctionDocDto;
 import groovy.lang.Binding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;

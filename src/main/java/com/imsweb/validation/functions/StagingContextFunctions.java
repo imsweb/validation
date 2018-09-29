@@ -3,24 +3,22 @@
  */
 package com.imsweb.validation.functions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
-import groovy.lang.IntRange;
-
 import com.imsweb.decisionengine.ColumnDefinition;
 import com.imsweb.staging.SchemaLookup;
 import com.imsweb.staging.Staging;
 import com.imsweb.staging.entities.StagingSchema;
 import com.imsweb.staging.entities.StagingSchemaInput;
 import com.imsweb.staging.entities.StagingTable;
+import com.imsweb.validation.ContextFunctionDocAnnotation;
 import com.imsweb.validation.ValidatorContextFunctions;
-import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
+import groovy.lang.IntRange;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Staging-related helper methods made available to the edits. If you want to execute edits that call some staging utility methods, you need to initialize

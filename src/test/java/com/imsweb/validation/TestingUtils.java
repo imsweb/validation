@@ -6,7 +6,6 @@ package com.imsweb.validation;
 import com.imsweb.validation.entities.EditableValidator;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validator;
-import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 

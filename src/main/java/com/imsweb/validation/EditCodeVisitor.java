@@ -3,7 +3,6 @@
  */
 package com.imsweb.validation;
 
-import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.ast.CodeVisitorSupport;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;

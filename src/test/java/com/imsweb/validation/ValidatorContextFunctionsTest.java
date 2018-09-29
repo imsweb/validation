@@ -3,19 +3,16 @@
  */
 package com.imsweb.validation;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
+import groovy.lang.Binding;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import groovy.lang.Binding;
-
-import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
-import com.imsweb.validation.shared.ContextFunctionDocDto;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ValidatorContextFunctionsTest {
 

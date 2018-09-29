@@ -4,6 +4,7 @@
 package com.imsweb.validation.functions;
 
 import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.ContextFunctionDocAnnotation;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.entities.Rule;
@@ -13,7 +14,6 @@ import com.imsweb.validation.entities.RuleTestResult;
 import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.entities.Validatable;
-import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010 Information Management Services, Inc.
  */
-package com.imsweb.validation.shared;
+package com.imsweb.validation;
 
 import java.util.ArrayList;
 import java.util.List;
