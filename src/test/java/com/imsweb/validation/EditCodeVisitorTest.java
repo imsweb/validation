@@ -1,7 +1,11 @@
 /*
  * Copyright (C) 2010 Information Management Services, Inc.
  */
-package com.imsweb.validation.internal;
+package com.imsweb.validation;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,22 +15,10 @@ import java.util.Collections;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.TestingUtils;
-import com.imsweb.validation.ValidatorServices;
-
-/**
- * Created on Mar 1, 2011 by depryf
- * @author depryf
- */
-public class EditCodeVisitorSupportTest {
+public class EditCodeVisitorTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         TestingUtils.init();
     }
 
@@ -34,7 +26,7 @@ public class EditCodeVisitorSupportTest {
      * Created on Dec 10, 2009 by depryf
      */
     @Test
-    public void testParsing() throws ConstructionException, IOException {
+    public void testParsing() {
         SortedSet<String> properties = new TreeSet<>();
 
         // we will use the service to parse (wraps some of the complexity)
@@ -274,8 +266,8 @@ public class EditCodeVisitorSupportTest {
         SortedSet<String> lookups = new TreeSet<>();
         String exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-test.txt"));
         ValidatorServices.getInstance().parseExpression("id", exp, rawProperties, null, lookups);
-        assertProperties(rawProperties, expected.toArray(new String[expected.size()]));
-        assertProperties(lookups, expectedLkup.toArray(new String[expectedLkup.size()]));
+        assertProperties(rawProperties, expected.toArray(new String[0]));
+        assertProperties(lookups, expectedLkup.toArray(new String[0]));
 
         // another full test
         expected.clear();
@@ -338,7 +330,7 @@ public class EditCodeVisitorSupportTest {
      */
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testProperUseOfDefKeyword() throws ConstructionException {
+    public void testProperUseOfDefKeyword() {
         boolean exception = false;
 
         // we will use the service to parse (wraps some of the complexity)
@@ -352,8 +344,7 @@ public class EditCodeVisitorSupportTest {
         try {
             parser.parseExpression("id", "var1 = null; def var2 = 0; if (var1 == null) {def var5 = var2; var5++}; for (i in 1..5) {def var3 = var2; var3++}; def var4 = var2; return var1;", null,
                     null, null, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             exception = true;
         }
         if (!exception)
@@ -363,8 +354,7 @@ public class EditCodeVisitorSupportTest {
         try {
             parser.parseExpression("id", "def var1 = null; var2 = 0; if (var1 == null) {def var5 = var2; var5++}; for (i in 1..5) {def var3 = var2; var3++}; def var4 = var2; return var1;", null,
                     null, null, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             exception = true;
         }
         if (!exception)
@@ -374,8 +364,7 @@ public class EditCodeVisitorSupportTest {
         try {
             parser.parseExpression("id", "def var1 = null; def var2 = 0; if (var1 == null) {var5 = var2; var5++}; for (i in 1..5) {def var3 = var2; var3++}; def var4 = var2; return var1;", null,
                     null, null, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             exception = true;
         }
         if (!exception)
@@ -385,8 +374,7 @@ public class EditCodeVisitorSupportTest {
         try {
             parser.parseExpression("id", "def var1 = null; def var2 = 0; if (var1 == null) {def var5 = var2; var5++}; for (i in 1..5) {var3 = var2; var3++}; def var4 = var2; return var1;", null,
                     null, null, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             exception = true;
         }
         if (!exception)
@@ -396,8 +384,7 @@ public class EditCodeVisitorSupportTest {
         try {
             parser.parseExpression("id", "def var1 = null; def var2 = 0; if (var1 == null) {def var5 = var2; var5++}; for (i in 1..5) {def var3 = var2; var3++}; def var4 = var2; return var1;", null,
                     null, null, true);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             exception = true;
         }
         if (!exception)
@@ -422,11 +409,8 @@ public class EditCodeVisitorSupportTest {
     // helper
     private String getContent(URL url) {
         StringBuilder buffer = new StringBuilder();
-        BufferedReader br = null;
 
-        try {
-            br = new BufferedReader(new InputStreamReader(url.openStream()));
-
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()))) {
             String line = br.readLine();
             while (line != null) {
                 buffer.append(line);
@@ -434,19 +418,10 @@ public class EditCodeVisitorSupportTest {
 
                 line = br.readLine();
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        finally {
-            try {
-                if (br != null)
-                    br.close();
-            }
-            catch (IOException e) {
-                // ignored
-            }
-        }
+        // ignored
 
         return buffer.toString();
     }

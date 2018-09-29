@@ -3,6 +3,23 @@
  */
 package com.imsweb.validation;
 
+import com.imsweb.validation.entities.ContextTable;
+import com.imsweb.validation.entities.ContextTableIndex;
+import com.imsweb.validation.entities.SimpleMapValidatable;
+import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
+import com.imsweb.validation.entities.Validatable;
+import com.imsweb.validation.internal.context.JavaContextParser;
+import com.imsweb.validation.shared.ValidatorLookup;
+import groovy.lang.Binding;
+import groovy.lang.Closure;
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.groovy.ast.MethodNode;
+import org.codehaus.groovy.ast.ModuleNode;
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.control.SourceUnit;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,26 +32,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.groovy.ast.MethodNode;
-import org.codehaus.groovy.ast.ModuleNode;
-import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.control.SourceUnit;
-
-import groovy.lang.Binding;
-import groovy.lang.Closure;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-
-import com.imsweb.validation.entities.ContextTable;
-import com.imsweb.validation.entities.ContextTableIndex;
-import com.imsweb.validation.entities.SimpleMapValidatable;
-import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
-import com.imsweb.validation.entities.Validatable;
-import com.imsweb.validation.internal.EditCodeVisitorSupport;
-import com.imsweb.validation.internal.context.JavaContextParser;
-import com.imsweb.validation.shared.ValidatorLookup;
 
 /**
  * This class provides basic utility services to the validation engine.
@@ -506,7 +503,7 @@ public class ValidatorServices {
         su.completePhase();
         su.convert();
         ModuleNode tree = su.getAST();
-        EditCodeVisitorSupport visitor = new EditCodeVisitorSupport(properties, contextEntries, lookups, forceDefKeyword);
+        EditCodeVisitor visitor = new EditCodeVisitor(properties, contextEntries, lookups, forceDefKeyword);
         tree.getStatementBlock().visit(visitor);
         for (MethodNode method : tree.getMethods())
             method.getCode().visit(visitor);

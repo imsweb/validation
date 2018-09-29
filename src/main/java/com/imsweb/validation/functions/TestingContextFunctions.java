@@ -6,15 +6,32 @@ package com.imsweb.validation.functions;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.entities.*;
+import com.imsweb.validation.entities.Rule;
+import com.imsweb.validation.entities.RuleFailure;
+import com.imsweb.validation.entities.RuleTest;
+import com.imsweb.validation.entities.RuleTestResult;
+import com.imsweb.validation.entities.SimpleMapValidatable;
+import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
+import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Context available to the testing framework. The testing Groovy scripts can access the methdos of this context
@@ -68,9 +85,8 @@ public class TestingContextFunctions {
      * <p/>
      * Created on Oct 2, 2011 by Fabian
      * @param test <code>RuleTest</code>, cannot be null
-     * @throws Exception if the test does not correspond to an existing rule
      */
-    public TestingContextFunctions(RuleTest test, Rule rule) throws Exception {
+    public TestingContextFunctions(RuleTest test, Rule rule) {
         _ruleId = test.getTestedRuleId();
         _rule = rule;
         _tests = new TreeMap<>();
@@ -104,7 +120,7 @@ public class TestingContextFunctions {
             private StringBuilder _buf = new StringBuilder();
 
             @Override
-            public void write(int b) throws IOException {
+            public void write(int b) {
                 _buf.append((char)b);
             }
 
@@ -171,7 +187,7 @@ public class TestingContextFunctions {
             private StringBuilder _buf = new StringBuilder();
 
             @Override
-            public void write(int b) throws IOException {
+            public void write(int b) {
                 _buf.append((char)b);
             }
 
@@ -367,11 +383,7 @@ public class TestingContextFunctions {
     protected void insertTestingResult(int lineNum, AssertionType type, boolean success, RuleFailure failure, Object values, Map<String, Object> contextValues, ValidationException exc, Set<String> f, OutputStream os) {
 
         // get the list of results for this line number
-        List<RuleTestResult> list = _tests.get(lineNum);
-        if (list == null) {
-            list = new ArrayList<>();
-            _tests.put(lineNum, list);
-        }
+        List<RuleTestResult> list = _tests.computeIfAbsent(lineNum, k -> new ArrayList<>());
 
         // build the log content from the output stream
         List<String> log = new ArrayList<>();

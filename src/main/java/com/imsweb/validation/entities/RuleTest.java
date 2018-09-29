@@ -101,9 +101,8 @@ public class RuleTest {
      * <p/>
      * Created on Aug 8, 2011 by depryf
      * @return a map of Integer (line number) -> list of <code>RuleTestResult</code>, the list indexes determines the assertion indexes
-     * @throws Exception
      */
-    public Map<Integer, List<RuleTestResult>> executeTest() throws Exception {
+    public Map<Integer, List<RuleTestResult>> executeTest() {
         return executeTest(new TestingContextFunctions(this, null), null);
     }
 
@@ -113,9 +112,8 @@ public class RuleTest {
      * Created on Aug 8, 2011 by depryf
      * @param rule a <code>Rule</code> to use for the test (useful for testing modified rules or new ones)
      * @return a map of Integer (line number) -> list of <code>RuleTestResult</code>, the list indexes determines the assertion indexes
-     * @throws Exception
      */
-    public Map<Integer, List<RuleTestResult>> executeTest(Rule rule) throws Exception {
+    public Map<Integer, List<RuleTestResult>> executeTest(Rule rule) {
         return executeTest(new TestingContextFunctions(this, rule), rule);
     }
 
@@ -125,9 +123,8 @@ public class RuleTest {
      * Created on Aug 8, 2011 by depryf
      * @param context a <code>TestingContextFunctions</code>, can be nulls
      * @return a map of Integer (line number) -> list of <code>RuleTestResult</code>, the list indexes determines the assertion indexes
-     * @throws Exception
      */
-    public Map<Integer, List<RuleTestResult>> executeTest(TestingContextFunctions context) throws Exception {
+    public Map<Integer, List<RuleTestResult>> executeTest(TestingContextFunctions context) {
         return executeTest(context, null);
     }
 
@@ -138,9 +135,8 @@ public class RuleTest {
      * @param context a <code>TestingContextFunctions</code>, can be nulls
      * @param rule a <code>Rule</code> to use for the test (useful for testing modified rules or new ones)
      * @return a map of Integer (line number) -> list of <code>RuleTestResult</code>, the list indexes determines the assertion indexes
-     * @throws Exception
      */
-    public Map<Integer, List<RuleTestResult>> executeTest(TestingContextFunctions context, Rule rule) throws Exception {
+    public Map<Integer, List<RuleTestResult>> executeTest(TestingContextFunctions context, Rule rule) {
 
         // better safe than sorry
         if (context == null)

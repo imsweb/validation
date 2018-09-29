@@ -1,17 +1,9 @@
 /*
  * Copyright (C) 2008 Information Management Services, Inc.
  */
-package com.imsweb.validation.internal;
+package com.imsweb.validation;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.ast.CodeVisitorSupport;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
@@ -25,10 +17,14 @@ import org.codehaus.groovy.ast.expr.PropertyExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.stmt.ForStatement;
 
-import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.ValidatorContextFunctions;
-import com.imsweb.validation.ValidatorServices;
-import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Parses groovy edits to gather used properties...
@@ -36,7 +32,7 @@ import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
  * Created on Jan 15, 2008 by depryf
  * @author depryf
  */
-public class EditCodeVisitorSupport extends CodeVisitorSupport {
+public class EditCodeVisitor extends CodeVisitorSupport {
 
     // generic methods that can be used at the end of the path as a field (something like 'object.property.trim')
     private static final List<String> _METHODS_AS_FIELDS = Arrays.asList("size", "empty", "trim", "toUpperCase", "toLowerCase");
@@ -86,7 +82,7 @@ public class EditCodeVisitorSupport extends CodeVisitorSupport {
      * @param lookups place holder for gathered lookups (can be null)
      * @param forceDefKeyword if true and a variable is defined without the def keyword, then an exception will be raised
      */
-    public EditCodeVisitorSupport(Set<String> properties, Set<String> contextEntries, Set<String> lookups, boolean forceDefKeyword) {
+    public EditCodeVisitor(Set<String> properties, Set<String> contextEntries, Set<String> lookups, boolean forceDefKeyword) {
         _properties = properties == null ? new HashSet<>() : properties;
         _contextEntries = contextEntries == null ? new HashSet<>() : contextEntries;
         _lookups = lookups == null ? new HashSet<>() : lookups;
