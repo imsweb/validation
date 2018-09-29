@@ -162,7 +162,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
 
         if (expression.getRightExpression() instanceof MethodCallExpression) {
             MethodCallExpression call = (MethodCallExpression)expression.getRightExpression();
-            for (Method m : ValidatorContextFunctions.getInstance().getClass().getMethods()) {
+            for (Method m : ValidationContextFunctions.getInstance().getClass().getMethods()) {
                 if (m.getName().equals(call.getMethodAsString()) && m.getAnnotation(ContextFunctionAliasAnnotation.class) != null) {
                     _variableAliases.put(expression.getLeftExpression().getText(), m.getAnnotation(ContextFunctionAliasAnnotation.class).value());
                     break;

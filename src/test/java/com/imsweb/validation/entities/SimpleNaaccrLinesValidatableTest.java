@@ -3,6 +3,18 @@
  */
 package com.imsweb.validation.entities;
 
+import com.imsweb.staging.Staging;
+import com.imsweb.staging.cs.CsDataProvider;
+import com.imsweb.staging.eod.EodDataProvider;
+import com.imsweb.staging.tnm.TnmDataProvider;
+import com.imsweb.validation.TestingUtils;
+import com.imsweb.validation.ValidationContextFunctions;
+import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.functions.StagingContextFunctions;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,19 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.eod.EodDataProvider;
-import com.imsweb.staging.tnm.TnmDataProvider;
-import com.imsweb.validation.TestingUtils;
-import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.ValidatorContextFunctions;
-import com.imsweb.validation.functions.StagingContextFunctions;
 
 public class SimpleNaaccrLinesValidatableTest {
 
@@ -111,7 +110,7 @@ public class SimpleNaaccrLinesValidatableTest {
         Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST));
         Staging tnmStaging = Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST));
         Staging eodStaging = Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST));
-        ValidatorContextFunctions.initialize(new StagingContextFunctions(csStaging, tnmStaging, eodStaging));
+        ValidationContextFunctions.initialize(new StagingContextFunctions(csStaging, tnmStaging, eodStaging));
         
         Map<String, String> record = new HashMap<>();
         SimpleNaaccrLinesValidatable v = new SimpleNaaccrLinesValidatable(record);
@@ -164,6 +163,6 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertEquals("retroperitoneum", line.get("_eodSchemaId"));
 
         //Uninitialize the StagingContextFunctions
-        ValidatorContextFunctions.initialize(null);
+        ValidationContextFunctions.initialize(null);
     }
 }

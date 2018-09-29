@@ -47,17 +47,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
  * <br/><br/>
  * The first thing that needs to happen before using the engine for validation is to initialize the services and the context methods. This is accomplished
- * by calling the initialize method of the {@link ValidationServices} and {@link ValidatorContextFunctions} classes. That method takes as an argument
+ * by calling the initialize method of the {@link ValidationServices} and {@link ValidationContextFunctions} classes. That method takes as an argument
  * an instance of those classes; to use the default implementation, just instanciate those classes themselves:
  * <pre>
  *     ValidationServices.initialize(new ValidationServices());
- *     ValidatorContextFunctions.initialize(new ValidatorContextFunctions());
+ *     ValidationContextFunctions.initialize(new ValidationContextFunctions());
  * </pre>
  * But a more complex application might need more customize services and extra context functions available to the Groovy edits; in that case those classes
  * should be extended and initialized with the customized versions:
  * <pre>
  *     ValidationServices.initialize(new MyCustomValidatorServices());
- *     ValidatorContextFunctions.initialize(new MyCustomValidatorContextFunctions());
+ *     ValidationContextFunctions.initialize(new MyCustomValidatorContextFunctions());
  * </pre>
  * The second thing to do is to initialize the engine using one of its <b>initialize()</b> methods. Those methods take as argument one or several
  * {@link Validator} objects, which represent a logical group of {@link Rule} (edits); usually in a file. The {@link Validator} object can be built programmatically,

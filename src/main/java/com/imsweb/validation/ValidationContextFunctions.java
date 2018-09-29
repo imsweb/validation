@@ -25,17 +25,17 @@ import java.util.regex.Pattern;
  * there are more advanced implementations that extends this class and can be provided in the initialize() method.
  * <br/><br/>
  * To initialize the framework with these basic method, call the following:<br/><br/>
- * <i>ValidatorContextFunctions.initialize(new ValidatorContextFunction())</i>
+ * <i>ValidationContextFunctions.initialize(new ValidatorContextFunction())</i>
  * As of version 1.5, the functions are lazily initialized with the default implementation; so if you don't need a special implementation,
  * there is no need to initialize this class anymore.
  * <br/><br/>
  * To add your own methods to the context of the edits, create a class that extends this one, add the methods, and call the following:<br/><br/>
- * <i>ValidatorContextFunctions.initialize(new MyValidatorContextFunction())</i>
+ * <i>ValidationContextFunctions.initialize(new MyValidatorContextFunction())</i>
  */
-public class ValidatorContextFunctions {
+public class ValidationContextFunctions {
 
     // unique private instance
-    private static ValidatorContextFunctions _INSTANCE;
+    private static ValidationContextFunctions _INSTANCE;
 
     /**
      * Initializes this class with the passed instance.
@@ -44,9 +44,9 @@ public class ValidatorContextFunctions {
      * <i>isInitialized()</i> methods if you don't want this behavior.
      * <p/>
      * Created on Feb 11, 2008 by depryf
-     * @param instance a <code>ValidatorContextFunctions</code> instance
+     * @param instance a <code>ValidationContextFunctions</code> instance
      */
-    public static synchronized void initialize(ValidatorContextFunctions instance) {
+    public static synchronized void initialize(ValidationContextFunctions instance) {
         _INSTANCE = instance;
     }
 
@@ -61,14 +61,14 @@ public class ValidatorContextFunctions {
     }
 
     /**
-     * Gets current instance of the <code>ValidatorContextFunctions</code>
+     * Gets current instance of the <code>ValidationContextFunctions</code>
      * <p/>
      * Created on Feb 11, 2008 by depryf
-     * @return a <code>ValidatorContextFunctions</code>
+     * @return a <code>ValidationContextFunctions</code>
      */
-    public static synchronized ValidatorContextFunctions getInstance() {
+    public static synchronized ValidationContextFunctions getInstance() {
         if (_INSTANCE == null)
-            _INSTANCE = new ValidatorContextFunctions();
+            _INSTANCE = new ValidationContextFunctions();
 
         return _INSTANCE;
     }

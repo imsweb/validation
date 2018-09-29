@@ -3,9 +3,9 @@
  */
 package com.imsweb.validation.entities;
 
+import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationServices;
-import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.functions.TestingContextFunctions;
 import groovy.lang.Binding;
 import groovy.lang.Script;
@@ -146,7 +146,7 @@ public class RuleTest {
         Script script = ValidationServices.getInstance().compileExpression(_translatedScriptText);
         Binding binding = new Binding();
         binding.setVariable(ValidationEngine.VALIDATOR_TESTING_FUNCTIONS_KEY, context);
-        binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidatorContextFunctions.getInstance());
+        binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidationContextFunctions.getInstance());
         script.setBinding(binding);
 
         // execute the script

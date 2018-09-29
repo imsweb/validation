@@ -5,9 +5,9 @@ package com.imsweb.validation.internal;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.EngineStats;
+import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.ValidatorContextFunctions;
 import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validatable;
@@ -300,7 +300,7 @@ public class ValidatingProcessor implements Processor {
         Binding binding = new Binding();
 
         // add static context
-        binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidatorContextFunctions.getInstance());
+        binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidationContextFunctions.getInstance());
         binding.setVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY, _contexts); // new way of referencing contexts (using a prefix)
         for (Entry<String, Object> entry : _contexts.entrySet()) // old way of using the contexts (without a prefix); for now we still support it...
             binding.setVariable(entry.getKey(), entry.getValue());

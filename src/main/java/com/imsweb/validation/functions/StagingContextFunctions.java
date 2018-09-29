@@ -10,7 +10,7 @@ import com.imsweb.staging.entities.StagingSchema;
 import com.imsweb.staging.entities.StagingSchemaInput;
 import com.imsweb.staging.entities.StagingTable;
 import com.imsweb.validation.ContextFunctionDocAnnotation;
-import com.imsweb.validation.ValidatorContextFunctions;
+import com.imsweb.validation.ValidationContextFunctions;
 import groovy.lang.IntRange;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,9 +22,9 @@ import java.util.Map;
 
 /**
  * Staging-related helper methods made available to the edits. If you want to execute edits that call some staging utility methods, you need to initialize
- * the context functions with an instance of this class. Otherwise you should just use the ValidatorContextFunctions one.
+ * the context functions with an instance of this class. Otherwise you should just use the ValidationContextFunctions one.
  */
-public class StagingContextFunctions extends ValidatorContextFunctions {
+public class StagingContextFunctions extends ValidationContextFunctions {
 
     // the standard NAACCR properties used when getting a CStage schema
     public static final String CSTAGE_INPUT_PROP_SITE = "primarySite";

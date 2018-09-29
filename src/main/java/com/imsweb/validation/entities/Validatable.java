@@ -3,11 +3,12 @@
  */
 package com.imsweb.validation.entities;
 
+import com.imsweb.validation.ValidationContextFunctions;
+import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 
 /**
  * Validatable interface, this represents a wrapper for the different entities that can be validated.
@@ -102,7 +103,7 @@ public interface Validatable {
      * Force a failure on the passed properties.
      * <br/></br/>
      * This is an advanced feature that allows an edit to report a failure on a property that is not actually used. See the
-     * <code>forceFailureOnProperty()</code> method on the {@link com.imsweb.validation.ValidatorContextFunctions} class.
+     * <code>forceFailureOnProperty()</code> method on the {@link ValidationContextFunctions} class.
      * <p/>
      * Created on Apr 27, 2010 by depryf
      * @param toReport properties to report, wrapped into a set of <code>ExtraPropertyEntityHandlerDto</code>

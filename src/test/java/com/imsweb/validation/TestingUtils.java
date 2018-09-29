@@ -34,8 +34,8 @@ public final class TestingUtils {
             ValidationServices.initialize(new TestingValidationServices());
 
         // initialize context functions
-        if (!ValidatorContextFunctions.isInitialized())
-            ValidatorContextFunctions.initialize(new TestingValidatorContextFunctions());
+        if (!ValidationContextFunctions.isInitialized())
+            ValidationContextFunctions.initialize(new TestingValidationContextFunctions());
 
         // initialize engine
         if (!ValidationEngine.isInitialized())
@@ -145,7 +145,7 @@ public final class TestingUtils {
         Assert.assertTrue(((TestingValidationServices) ValidationServices.getInstance()).getLogMessages().contains(x));
     }
 
-    private static class TestingValidatorContextFunctions extends ValidatorContextFunctions {
+    private static class TestingValidationContextFunctions extends ValidationContextFunctions {
 
         @SuppressWarnings("unused")
         @ContextFunctionAliasAnnotation(value = "ctc")

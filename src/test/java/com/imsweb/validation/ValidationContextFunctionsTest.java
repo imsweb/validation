@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ValidatorContextFunctionsTest {
+public class ValidationContextFunctionsTest {
 
-    private ValidatorContextFunctions _functions = new ValidatorContextFunctions();
+    private ValidationContextFunctions _functions = new ValidationContextFunctions();
 
     @Before
     public void setUp() {
@@ -25,7 +25,7 @@ public class ValidatorContextFunctionsTest {
 
     @Test
     public void testDocumentation() {
-        List<ContextFunctionDocDto> list = ValidatorContextFunctions.getMethodsDocumentation();
+        List<ContextFunctionDocDto> list = ValidationContextFunctions.getMethodsDocumentation();
         Assert.assertFalse(list.isEmpty());
         for (ContextFunctionDocDto dto : list) {
             Assert.assertNotNull(dto.getMethodName());

@@ -350,7 +350,7 @@ public class ValidationServices {
             Script script = new GroovyShell().parse(expression);
 
             Binding binding = new Binding();
-            binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidatorContextFunctions.getInstance());
+            binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidationContextFunctions.getInstance());
             binding.setVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY, context); // new way of referencing contexts (using a prefix)
             for (Entry<String, Object> entry : context.entrySet()) // old way of using the contexts (without a prefix); for now we still support it...
                 binding.setVariable(entry.getKey(), entry.getValue());
