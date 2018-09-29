@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010 Information Management Services, Inc.
  */
-package com.imsweb.validation.shared;
+package com.imsweb.validation;
 
 /**
  * Interface for a lookup item (lookups are collection of lookup items).
@@ -9,7 +9,7 @@ package com.imsweb.validation.shared;
  * Created on Apr 5, 2011 by depryf
  * @author depryf
  */
-public interface ValidatorLookupItem {
+public interface ValidationLookupItem {
 
     /**
      * Returns the key corresponding to this lookup item.

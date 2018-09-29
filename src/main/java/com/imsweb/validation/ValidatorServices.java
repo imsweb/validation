@@ -9,7 +9,6 @@ import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.internal.context.JavaContextParser;
-import com.imsweb.validation.shared.ValidatorLookup;
 import groovy.lang.Binding;
 import groovy.lang.Closure;
 import groovy.lang.GroovyShell;
@@ -191,14 +190,14 @@ public class ValidatorServices {
     }
 
     /**
-     * Returns the <code>ValidatorLookup</code> corresponding to the passed ID.
+     * Returns the <code>ValidationLookup</code> corresponding to the passed ID.
      * <p/>
      * Created on Feb 8, 2008 by depryf
      * @param id ID of the lookup to fetch
      * @return corresponding <code>Lookup</code> or null if we didn't find it
      */
     @SuppressWarnings("UnusedParameters")
-    public ValidatorLookup getLookupById(String id) {
+    public ValidationLookup getLookupById(String id) {
         return null;
     }
 

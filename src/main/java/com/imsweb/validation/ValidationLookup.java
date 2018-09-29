@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2010 Information Management Services, Inc.
  */
-package com.imsweb.validation.shared;
+package com.imsweb.validation;
 
 import java.util.Set;
 
@@ -14,7 +14,7 @@ import java.util.Set;
  * Created on Apr 5, 2011 by depryf
  * @author depryf
  */
-public interface ValidatorLookup {
+public interface ValidationLookup {
 
     /**
      * Returns the ID for this lookup

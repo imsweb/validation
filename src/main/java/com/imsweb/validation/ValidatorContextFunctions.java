@@ -3,6 +3,14 @@
  */
 package com.imsweb.validation;
 
+import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
+import com.imsweb.validation.internal.ValidatorLRUCache;
+import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
+import com.imsweb.validation.shared.ContextFunctionDocDto;
+import groovy.lang.Binding;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,17 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
-import groovy.lang.Binding;
-
-import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
-import com.imsweb.validation.internal.ValidatorLRUCache;
-import com.imsweb.validation.shared.ContextFunctionDocAnnotation;
-import com.imsweb.validation.shared.ContextFunctionDocDto;
-import com.imsweb.validation.shared.ValidatorLookup;
 
 /**
  * Helper methods made available to the edits.
@@ -253,15 +250,15 @@ public class ValidatorContextFunctions {
     }
 
     /**
-     * Returns the <code>ValidatorLookup</code> corresponding to the passed ID, throws an exception if such a lookup doesn't exist.
+     * Returns the <code>ValidationLookup</code> corresponding to the passed ID, throws an exception if such a lookup doesn't exist.
      * <p/>
      * Created on Dec 20, 2007 by depryf
      * @param id lookup ID
-     * @return a <code>ValidatorLookup</code>, never null
+     * @return a <code>ValidationLookup</code>, never null
      * @throws ValidationException if provided lookup ID is null or invalid
      */
     @ContextFunctionDocAnnotation(paramName1 = "id", param1 = "Lookup ID", desc = "Returns the lookup corresponding to the requested ID.\n\n" +
-            "The returned object is a ValidatorLookup on which the following methods are available:\n" +
+            "The returned object is a ValidationLookup on which the following methods are available:\n" +
             "    String getId()\n" +
             "    String getByKey(String key)\n" +
             "    String getByKeyWithCase(String key)\n" +
@@ -280,11 +277,11 @@ public class ValidatorContextFunctions {
             "    boolean containsPair(String key, String value)\n" +
             "    boolean containsPairWithCase(String key, String value)\n",
             example = "Functions.fetchLookup('lookup_id').containsKey(value)")
-    public ValidatorLookup fetchLookup(String id) throws ValidationException {
+    public ValidationLookup fetchLookup(String id) throws ValidationException {
         if (id == null)
             throw new ValidationException("Unable to load lookup <null>");
 
-        ValidatorLookup lookup = ValidatorServices.getInstance().getLookupById(id);
+        ValidationLookup lookup = ValidatorServices.getInstance().getLookupById(id);
         if (lookup == null)
             throw new ValidationException("Unable to load lookup '" + id + "'");
 
