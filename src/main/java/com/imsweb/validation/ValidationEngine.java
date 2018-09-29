@@ -61,7 +61,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * </pre>
  * The second thing to do is to initialize the engine using one of its <b>initialize()</b> methods. Those methods take as argument one or several
  * {@link Validator} objects, which represent a logical group of {@link Rule} (edits); usually in a file. The {@link Validator} object can be built programmatically,
- * or parsed from XML using the utility methods from the {@link XmlValidatorFactory} class.
+ * or parsed from XML using the utility methods from the {@link ValidationXmlUtils} class.
  * <br/><br/>
  * After initializing the engine, the <b>validate()</b> methods can be called. They take as argument a {@link Validatable} object. Those objects are
  * application-dependent; the validation module only defines an interface (and a few simple implementations, like {@link com.imsweb.validation.entities.SimpleMapValidatable}
@@ -1313,7 +1313,7 @@ public final class ValidationEngine {
      * <p/>
      * The following steps should be performed:
      * <ol>
-     * <li>Create a new Validator object by loading it from XML using the XmlValidatorFactory, or create it programmatically</li>
+     * <li>Create a new Validator object by loading it from XML using the ValidationXmlUtils, or create it programmatically</li>
      * <li>Wrap the validator into an editable validator by passing it to the EditableValidator's constructor. </li>
      * <li>Call this method using the editable validator</li>
      * </ol>

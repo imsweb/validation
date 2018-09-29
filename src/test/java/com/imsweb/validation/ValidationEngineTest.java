@@ -66,7 +66,7 @@ public class ValidationEngineTest {
         Assert.assertFalse(ValidationEngine.isInitialized());
 
         // initialize with a regular validator
-        Validator v = XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml"));
+        Validator v = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml"));
         ValidationEngine.initialize(v);
         Assert.assertTrue(ValidationEngine.isInitialized());
         Assert.assertFalse(ValidationEngine.getValidators().isEmpty());

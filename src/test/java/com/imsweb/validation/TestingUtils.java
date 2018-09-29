@@ -3,6 +3,13 @@
  */
 package com.imsweb.validation;
 
+import com.imsweb.validation.entities.EditableValidator;
+import com.imsweb.validation.entities.RuleFailure;
+import com.imsweb.validation.entities.Validator;
+import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -13,14 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-
-import com.imsweb.validation.entities.EditableValidator;
-import com.imsweb.validation.entities.RuleFailure;
-import com.imsweb.validation.entities.Validator;
-import com.imsweb.validation.shared.ContextFunctionAliasAnnotation;
 
 public final class TestingUtils {
 
@@ -56,7 +55,7 @@ public final class TestingUtils {
 
         if (v == null) {
             try {
-                v = ValidationEngine.addValidator(new EditableValidator(XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
+                v = ValidationEngine.addValidator(new EditableValidator(ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
             }
             catch (Exception e) {
                 throw new RuntimeException("Unable to load '" + id + "'", e);

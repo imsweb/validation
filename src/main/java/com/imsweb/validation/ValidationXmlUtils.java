@@ -3,6 +3,51 @@
  */
 package com.imsweb.validation;
 
+import com.imsweb.validation.entities.Category;
+import com.imsweb.validation.entities.Condition;
+import com.imsweb.validation.entities.ContextEntry;
+import com.imsweb.validation.entities.DeletedRuleHistory;
+import com.imsweb.validation.entities.EmbeddedSet;
+import com.imsweb.validation.entities.Rule;
+import com.imsweb.validation.entities.RuleHistory;
+import com.imsweb.validation.entities.RuleTest;
+import com.imsweb.validation.entities.StandaloneSet;
+import com.imsweb.validation.entities.Validator;
+import com.imsweb.validation.entities.ValidatorRelease;
+import com.imsweb.validation.entities.ValidatorTests;
+import com.imsweb.validation.entities.ValidatorVersion;
+import com.imsweb.validation.entities.xml.CategoryXmlDto;
+import com.imsweb.validation.entities.xml.ConditionXmlDto;
+import com.imsweb.validation.entities.xml.ContextEntryXmlDto;
+import com.imsweb.validation.entities.xml.DeletedRuleXmlDto;
+import com.imsweb.validation.entities.xml.HistoryEventXmlDto;
+import com.imsweb.validation.entities.xml.ReleaseXmlDto;
+import com.imsweb.validation.entities.xml.RuleXmlDto;
+import com.imsweb.validation.entities.xml.SetXmlDto;
+import com.imsweb.validation.entities.xml.StandaloneSetValidatorXmlDto;
+import com.imsweb.validation.entities.xml.StandaloneSetXmlDto;
+import com.imsweb.validation.entities.xml.TestXmlDto;
+import com.imsweb.validation.entities.xml.TestedValidatorXmlDto;
+import com.imsweb.validation.entities.xml.ValidatorXmlDto;
+import com.imsweb.validation.internal.callable.RuleParsingCallable;
+import com.imsweb.validation.runtime.ParsedContexts;
+import com.imsweb.validation.runtime.ParsedLookups;
+import com.imsweb.validation.runtime.ParsedProperties;
+import com.imsweb.validation.runtime.RuntimeUtils;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import com.thoughtworks.xstream.core.util.QuickWriter;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+import com.thoughtworks.xstream.io.xml.Xpp3Driver;
+import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.MessageDigestAlgorithms;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -41,53 +86,6 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.codec.digest.MessageDigestAlgorithms;
-import org.apache.commons.lang3.StringUtils;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-import com.thoughtworks.xstream.core.util.QuickWriter;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import com.thoughtworks.xstream.io.xml.Xpp3Driver;
-import com.thoughtworks.xstream.security.NoTypePermission;
-import com.thoughtworks.xstream.security.WildcardTypePermission;
-
-import com.imsweb.validation.entities.Category;
-import com.imsweb.validation.entities.Condition;
-import com.imsweb.validation.entities.ContextEntry;
-import com.imsweb.validation.entities.DeletedRuleHistory;
-import com.imsweb.validation.entities.EmbeddedSet;
-import com.imsweb.validation.entities.Rule;
-import com.imsweb.validation.entities.RuleHistory;
-import com.imsweb.validation.entities.RuleTest;
-import com.imsweb.validation.entities.StandaloneSet;
-import com.imsweb.validation.entities.Validator;
-import com.imsweb.validation.entities.ValidatorRelease;
-import com.imsweb.validation.entities.ValidatorTests;
-import com.imsweb.validation.entities.ValidatorVersion;
-import com.imsweb.validation.entities.xml.CategoryXmlDto;
-import com.imsweb.validation.entities.xml.ConditionXmlDto;
-import com.imsweb.validation.entities.xml.ContextEntryXmlDto;
-import com.imsweb.validation.entities.xml.DeletedRuleXmlDto;
-import com.imsweb.validation.entities.xml.HistoryEventXmlDto;
-import com.imsweb.validation.entities.xml.ReleaseXmlDto;
-import com.imsweb.validation.entities.xml.RuleXmlDto;
-import com.imsweb.validation.entities.xml.SetXmlDto;
-import com.imsweb.validation.entities.xml.StandaloneSetValidatorXmlDto;
-import com.imsweb.validation.entities.xml.StandaloneSetXmlDto;
-import com.imsweb.validation.entities.xml.TestXmlDto;
-import com.imsweb.validation.entities.xml.TestedValidatorXmlDto;
-import com.imsweb.validation.entities.xml.ValidatorXmlDto;
-import com.imsweb.validation.internal.callable.RuleParsingCallable;
-import com.imsweb.validation.runtime.ParsedContexts;
-import com.imsweb.validation.runtime.ParsedLookups;
-import com.imsweb.validation.runtime.ParsedProperties;
-import com.imsweb.validation.runtime.RuntimeUtils;
-
 import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_GROOVY;
 import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_JAVA;
 import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_TABLE;
@@ -98,7 +96,7 @@ import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_TABLE_INDEX_DE
  * <p/>
  * Created on Apr 26, 2011 by depryf
  */
-public final class XmlValidatorFactory {
+public final class ValidationXmlUtils {
 
     /**
      * The attributes of the root tag
@@ -154,7 +152,7 @@ public final class XmlValidatorFactory {
      * <p/>
      * Created on Apr 19, 2010 by depryf
      */
-    private XmlValidatorFactory() {
+    private ValidationXmlUtils() {
     }
 
     // ****************************************************************************************************
@@ -456,7 +454,7 @@ public final class XmlValidatorFactory {
                     throw new IOException("Deleted rule date is required");
                 rh.setDate(event.getDate());
                 rh.setReference(event.getRef());
-                rh.setMessage(XmlValidatorFactory.trimEmptyLines(event.getValue(), true));
+                rh.setMessage(ValidationXmlUtils.trimEmptyLines(event.getValue(), true));
                 histories.add(rh);
             }
         }

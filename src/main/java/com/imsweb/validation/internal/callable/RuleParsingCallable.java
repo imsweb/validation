@@ -3,18 +3,9 @@
  */
 package com.imsweb.validation.internal.callable;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.ValidationXmlUtils;
 import com.imsweb.validation.ValidatorServices;
-import com.imsweb.validation.XmlValidatorFactory;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.RuleHistory;
 import com.imsweb.validation.entities.Validator;
@@ -24,6 +15,14 @@ import com.imsweb.validation.entities.xml.RuleXmlDto;
 import com.imsweb.validation.runtime.ParsedContexts;
 import com.imsweb.validation.runtime.ParsedLookups;
 import com.imsweb.validation.runtime.ParsedProperties;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * This class is used to multi-thread the parsing of the rules.
@@ -126,7 +125,7 @@ public class RuleParsingCallable implements Callable<Void> {
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no expression provided");
 
         try {
-            rule.setExpression(XmlValidatorFactory.reAlign(_xmlRule.getExpression()), _parsedProperties, _parsedContexts, _parsedLookups);
+            rule.setExpression(ValidationXmlUtils.reAlign(_xmlRule.getExpression()), _parsedProperties, _parsedContexts, _parsedLookups);
         }
         catch (ConstructionException e) {
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; it contain an invalid expression", e);
@@ -134,7 +133,7 @@ public class RuleParsingCallable implements Callable<Void> {
 
         if (_xmlRule.getMessage() == null)
             throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no message provided");
-        rule.setMessage(XmlValidatorFactory.trimEmptyLines(_xmlRule.getMessage(), true));
+        rule.setMessage(ValidationXmlUtils.trimEmptyLines(_xmlRule.getMessage(), true));
 
         if (_xmlRule.getDepends() != null && !_xmlRule.getDepends().isEmpty()) {
             Set<String> dependencies = new HashSet<>();
@@ -144,7 +143,7 @@ public class RuleParsingCallable implements Callable<Void> {
             rule.setDependencies(dependencies);
         }
         if (_xmlRule.getDescription() != null)
-            rule.setDescription(XmlValidatorFactory.reAlign(_xmlRule.getDescription()));
+            rule.setDescription(ValidationXmlUtils.reAlign(_xmlRule.getDescription()));
         if (_xmlRule.getHistoryEvents() != null && !_xmlRule.getHistoryEvents().isEmpty()) {
             Set<RuleHistory> history = new HashSet<>();
             for (HistoryEventXmlDto event : _xmlRule.getHistoryEvents()) {
@@ -167,7 +166,7 @@ public class RuleParsingCallable implements Callable<Void> {
                     rh.setReference(event.getRef());
                     if (event.getValue() == null)
                         throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no content provided in history entry");
-                    rh.setMessage(XmlValidatorFactory.trimEmptyLines(event.getValue(), true));
+                    rh.setMessage(ValidationXmlUtils.trimEmptyLines(event.getValue(), true));
                     history.add(rh);
                 }
             }

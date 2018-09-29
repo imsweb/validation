@@ -3,15 +3,14 @@
  */
 package com.imsweb.validation.entities;
 
-import java.util.List;
-import java.util.Map;
-
+import com.imsweb.validation.TestingUtils;
+import com.imsweb.validation.ValidationXmlUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.imsweb.validation.TestingUtils;
-import com.imsweb.validation.XmlValidatorFactory;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created on Aug 8, 2011 by depryf
@@ -28,7 +27,7 @@ public class RuleTestTest {
     public void testTesting() throws Exception {
         TestingUtils.loadValidator("fake-validator-naaccr-lines");
 
-        ValidatorTests allTests = XmlValidatorFactory.loadTestsFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-tests.xml"));
+        ValidatorTests allTests = ValidationXmlUtils.loadTestsFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-tests.xml"));
         for (RuleTest test : allTests.getTests().values()) {
             Map<Integer, List<RuleTestResult>> results = test.executeTest();
             if ("fvnl-rule1".equals(test.getTestedRuleId())) {

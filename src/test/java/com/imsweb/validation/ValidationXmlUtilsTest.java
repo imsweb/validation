@@ -3,6 +3,22 @@
  */
 package com.imsweb.validation;
 
+import com.imsweb.validation.entities.Category;
+import com.imsweb.validation.entities.Condition;
+import com.imsweb.validation.entities.DeletedRuleHistory;
+import com.imsweb.validation.entities.EditableValidator;
+import com.imsweb.validation.entities.EmbeddedSet;
+import com.imsweb.validation.entities.Rule;
+import com.imsweb.validation.entities.RuleHistory;
+import com.imsweb.validation.entities.RuleTest;
+import com.imsweb.validation.entities.StandaloneSet;
+import com.imsweb.validation.entities.Validator;
+import com.imsweb.validation.entities.ValidatorTests;
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -18,28 +34,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.SystemUtils;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.imsweb.validation.entities.Category;
-import com.imsweb.validation.entities.Condition;
-import com.imsweb.validation.entities.DeletedRuleHistory;
-import com.imsweb.validation.entities.EditableValidator;
-import com.imsweb.validation.entities.EmbeddedSet;
-import com.imsweb.validation.entities.Rule;
-import com.imsweb.validation.entities.RuleHistory;
-import com.imsweb.validation.entities.RuleTest;
-import com.imsweb.validation.entities.StandaloneSet;
-import com.imsweb.validation.entities.Validator;
-import com.imsweb.validation.entities.ValidatorTests;
-
 /**
  * Created on Feb 23, 2011 by depryf
  * @author depryf
  */
-public class XmlValidatorFactoryTest {
+public class ValidationXmlUtilsTest {
 
     @BeforeClass
     public static void setUp() {
@@ -53,22 +52,22 @@ public class XmlValidatorFactoryTest {
             Assert.fail("This test requires the file 'fake-validator.xml'");
 
         // read using a URL
-        Validator v = XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml"));
+        Validator v = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml"));
         assertFakeValidator(v);
 
         // read using a file
-        v = XmlValidatorFactory.loadValidatorFromXml(file);
+        v = ValidationXmlUtils.loadValidatorFromXml(file);
         assertFakeValidator(v);
 
         // read from input stream
         try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("fake-validator.xml")) {
-            v = XmlValidatorFactory.loadValidatorFromXml(is);
+            v = ValidationXmlUtils.loadValidatorFromXml(is);
             assertFakeValidator(v);
         }
 
         // read from reader
         try (Reader reader = new FileReader(file)) {
-            v = XmlValidatorFactory.loadValidatorFromXml(reader);
+            v = ValidationXmlUtils.loadValidatorFromXml(reader);
             assertFakeValidator(v);
         }
 
@@ -76,13 +75,13 @@ public class XmlValidatorFactoryTest {
         file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml.gz'");
-        XmlValidatorFactory.enableMultiThreadedParsing(2);
+        ValidationXmlUtils.enableMultiThreadedParsing(2);
         try {
-            v = XmlValidatorFactory.loadValidatorFromXml(file);
+            v = ValidationXmlUtils.loadValidatorFromXml(file);
             assertFakeValidator(v);
         }
         finally {
-            XmlValidatorFactory.enableMultiThreadedParsing(1);
+            ValidationXmlUtils.enableMultiThreadedParsing(1);
         }
     }
 
@@ -91,129 +90,129 @@ public class XmlValidatorFactoryTest {
         File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml'");
-        Validator v = XmlValidatorFactory.loadValidatorFromXml(file);
+        Validator v = ValidationXmlUtils.loadValidatorFromXml(file);
 
         File targetFile = new File(TestingUtils.TMP_DIR, "xml-validator-test.xml");
 
         // write using a file
-        XmlValidatorFactory.writeValidatorToXml(v, targetFile);
+        ValidationXmlUtils.writeValidatorToXml(v, targetFile);
         assertFakeValidator(targetFile);
 
         // write using an output stream
         try (FileOutputStream fos = new FileOutputStream(targetFile)) {
-            XmlValidatorFactory.writeValidatorToXml(v, fos);
+            ValidationXmlUtils.writeValidatorToXml(v, fos);
         }
         assertFakeValidator(targetFile);
 
         // write using a writer
         try (FileWriter writer = new FileWriter(targetFile)) {
-            XmlValidatorFactory.writeValidatorToXml(v, writer);
+            ValidationXmlUtils.writeValidatorToXml(v, writer);
         }
         assertFakeValidator(targetFile);
 
         // write gzipped file using multi-threading parsing
         targetFile = new File(TestingUtils.TMP_DIR, "xml-validator-test.xml.gz");
-        XmlValidatorFactory.enableMultiThreadedParsing(2);
+        ValidationXmlUtils.enableMultiThreadedParsing(2);
         try {
-            XmlValidatorFactory.writeValidatorToXml(v, targetFile);
+            ValidationXmlUtils.writeValidatorToXml(v, targetFile);
             assertFakeValidator(targetFile);
         }
         finally {
-            XmlValidatorFactory.enableMultiThreadedParsing(1);
+            ValidationXmlUtils.enableMultiThreadedParsing(1);
         }
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorNoId() throws IOException {
-        XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml"));
+        ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorTwoDescriptions() throws IOException {
-        XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-bad-xml.xml"));
+        ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-bad-xml.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorBadExpression() throws IOException {
-        XmlValidatorFactory.enableMultiThreadedParsing(2);
+        ValidationXmlUtils.enableMultiThreadedParsing(2);
         try {
-            XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-bad-groovy.xml"));
+            ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-bad-groovy.xml"));
         }
         finally {
-            XmlValidatorFactory.enableMultiThreadedParsing(1);
+            ValidationXmlUtils.enableMultiThreadedParsing(1);
         }
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorReleaseNoDate() throws IOException {
-        XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-release-no-date.xml"));
+        ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-release-no-date.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorLoadNullFile() throws IOException {
-        XmlValidatorFactory.loadValidatorFromXml((File)null);
+        ValidationXmlUtils.loadValidatorFromXml((File)null);
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorLoadNullUrl() throws IOException {
-        XmlValidatorFactory.loadValidatorFromXml((URL)null);
+        ValidationXmlUtils.loadValidatorFromXml((URL)null);
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorLoadNullInputStream() throws IOException {
-        XmlValidatorFactory.loadValidatorFromXml((InputStream)null);
+        ValidationXmlUtils.loadValidatorFromXml((InputStream)null);
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorLoadNullReader() throws IOException {
-        XmlValidatorFactory.loadValidatorFromXml((Reader)null);
+        ValidationXmlUtils.loadValidatorFromXml((Reader)null);
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorWriteNullFile() throws IOException {
-        XmlValidatorFactory.writeValidatorToXml(new Validator(), (File)null);
+        ValidationXmlUtils.writeValidatorToXml(new Validator(), (File)null);
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorWriteNullValidatorForFile() throws IOException {
-        XmlValidatorFactory.writeValidatorToXml(null, new File(TestingUtils.TMP_DIR, "whatever.xml"));
+        ValidationXmlUtils.writeValidatorToXml(null, new File(TestingUtils.TMP_DIR, "whatever.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorWriteNullOutputStream() throws IOException {
-        XmlValidatorFactory.writeValidatorToXml(new Validator(), (OutputStream)null);
+        ValidationXmlUtils.writeValidatorToXml(new Validator(), (OutputStream)null);
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorWriteNullValidatorForOutputStream() throws IOException {
-        XmlValidatorFactory.writeValidatorToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeValidatorToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorWriteNullWriter() throws IOException {
-        XmlValidatorFactory.writeValidatorToXml(new Validator(), (Writer)null);
+        ValidationXmlUtils.writeValidatorToXml(new Validator(), (Writer)null);
     }
 
     @Test(expected = IOException.class)
     public void testValidatorErrorWriteNullValidatorForWriter() throws IOException {
-        XmlValidatorFactory.writeValidatorToXml(null, new FileWriter(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeValidatorToXml(null, new FileWriter(new File(TestingUtils.TMP_DIR, "whatever.xml")));
     }
 
     @Test
     public void testValidatorEmptyData() throws IOException, ConstructionException {
-        Validator v = XmlValidatorFactory.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-empty.xml"));
+        Validator v = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-empty.xml"));
 
         ValidationEngine.addValidator(new EditableValidator(v));
         ValidationEngine.deleteValidator(new EditableValidator(v));
 
         File targetFile = new File(TestingUtils.TMP_DIR, "xml-validator-test.xml");
         targetFile.deleteOnExit();
-        XmlValidatorFactory.writeValidatorToXml(v, targetFile);
+        ValidationXmlUtils.writeValidatorToXml(v, targetFile);
     }
 
     // helper
     private void assertFakeValidator(File file) throws IOException {
-        Validator v = XmlValidatorFactory.loadValidatorFromXml(file);
+        Validator v = ValidationXmlUtils.loadValidatorFromXml(file);
         assertFakeValidator(v);
         if (!file.delete())
             Assert.fail("Unable to delete temp file");
@@ -316,22 +315,22 @@ public class XmlValidatorFactoryTest {
             Assert.fail("This test requires the file 'fake-set.xml'");
 
         // read using a URL
-        StandaloneSet s = XmlValidatorFactory.loadStandaloneSetFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-set.xml"));
+        StandaloneSet s = ValidationXmlUtils.loadStandaloneSetFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-set.xml"));
         assertFakeSet(s);
 
         // read using a file
-        s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
+        s = ValidationXmlUtils.loadStandaloneSetFromXml(file);
         assertFakeSet(s);
 
         // read from input stream
         try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("fake-set.xml")) {
-            s = XmlValidatorFactory.loadStandaloneSetFromXml(is);
+            s = ValidationXmlUtils.loadStandaloneSetFromXml(is);
             assertFakeSet(s);
         }
 
         // read from reader
         try (Reader reader = new FileReader(file)) {
-            s = XmlValidatorFactory.loadStandaloneSetFromXml(reader);
+            s = ValidationXmlUtils.loadStandaloneSetFromXml(reader);
             assertFakeSet(s);
         }
 
@@ -339,7 +338,7 @@ public class XmlValidatorFactoryTest {
         file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml.gz'");
-        s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
+        s = ValidationXmlUtils.loadStandaloneSetFromXml(file);
         assertFakeSet(s);
     }
 
@@ -348,90 +347,90 @@ public class XmlValidatorFactoryTest {
         File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-set.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-set.xml'");
-        StandaloneSet s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
+        StandaloneSet s = ValidationXmlUtils.loadStandaloneSetFromXml(file);
 
         File targetFile = new File(TestingUtils.TMP_DIR, "xml-set-test.xml");
 
         // write using a file
-        XmlValidatorFactory.writeStandaloneSetToXml(s, targetFile);
+        ValidationXmlUtils.writeStandaloneSetToXml(s, targetFile);
         assertFakeSet(targetFile);
 
         // write using an output stream
         try (FileOutputStream fos = new FileOutputStream(targetFile)) {
-            XmlValidatorFactory.writeStandaloneSetToXml(s, fos);
+            ValidationXmlUtils.writeStandaloneSetToXml(s, fos);
         }
         assertFakeSet(targetFile);
 
         // write using a writer
         try (FileWriter writer = new FileWriter(targetFile)) {
-            XmlValidatorFactory.writeStandaloneSetToXml(s, writer);
+            ValidationXmlUtils.writeStandaloneSetToXml(s, writer);
         }
         assertFakeSet(targetFile);
 
         // write gzipped file using multi-threading parsing
         targetFile = new File(TestingUtils.TMP_DIR, "xml-set-test.xml.gz");
-        XmlValidatorFactory.writeStandaloneSetToXml(s, targetFile);
+        ValidationXmlUtils.writeStandaloneSetToXml(s, targetFile);
         assertFakeSet(targetFile);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorNoId() throws IOException {
-        XmlValidatorFactory.loadStandaloneSetFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-set-no-id.xml"));
+        ValidationXmlUtils.loadStandaloneSetFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-set-no-id.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorLoadNullFile() throws IOException {
-        XmlValidatorFactory.loadStandaloneSetFromXml((File)null);
+        ValidationXmlUtils.loadStandaloneSetFromXml((File)null);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorLoadNullUrl() throws IOException {
-        XmlValidatorFactory.loadStandaloneSetFromXml((URL)null);
+        ValidationXmlUtils.loadStandaloneSetFromXml((URL)null);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorLoadNullInputFile() throws IOException {
-        XmlValidatorFactory.loadStandaloneSetFromXml((InputStream)null);
+        ValidationXmlUtils.loadStandaloneSetFromXml((InputStream)null);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorLoadNullReader() throws IOException {
-        XmlValidatorFactory.loadStandaloneSetFromXml((Reader)null);
+        ValidationXmlUtils.loadStandaloneSetFromXml((Reader)null);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorWriteNullFile() throws IOException {
-        XmlValidatorFactory.writeStandaloneSetToXml(new StandaloneSet(), (File)null);
+        ValidationXmlUtils.writeStandaloneSetToXml(new StandaloneSet(), (File)null);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorWriteNullSetForFile() throws IOException {
-        XmlValidatorFactory.writeStandaloneSetToXml(null, new File(TestingUtils.TMP_DIR, "whatever.xml"));
+        ValidationXmlUtils.writeStandaloneSetToXml(null, new File(TestingUtils.TMP_DIR, "whatever.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorWriteNullOutputStream() throws IOException {
-        XmlValidatorFactory.writeStandaloneSetToXml(new StandaloneSet(), (OutputStream)null);
+        ValidationXmlUtils.writeStandaloneSetToXml(new StandaloneSet(), (OutputStream)null);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorWriteNullSetForOutputStream() throws IOException {
-        XmlValidatorFactory.writeStandaloneSetToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeStandaloneSetToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorWriteNullWriter() throws IOException {
-        XmlValidatorFactory.writeStandaloneSetToXml(new StandaloneSet(), (Writer)null);
+        ValidationXmlUtils.writeStandaloneSetToXml(new StandaloneSet(), (Writer)null);
     }
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorWriteNullSetForWriter() throws IOException {
-        XmlValidatorFactory.writeValidatorToXml(null, new FileWriter(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeValidatorToXml(null, new FileWriter(new File(TestingUtils.TMP_DIR, "whatever.xml")));
     }
 
     // helper
     private void assertFakeSet(File file) throws IOException {
-        StandaloneSet s = XmlValidatorFactory.loadStandaloneSetFromXml(file);
+        StandaloneSet s = ValidationXmlUtils.loadStandaloneSetFromXml(file);
         assertFakeSet(s);
         if (!file.delete())
             Assert.fail("Unable to delete temp file");
@@ -465,22 +464,22 @@ public class XmlValidatorFactoryTest {
             Assert.fail("This test requires the file 'fake-tests.xml'");
 
         // read using a URL
-        ValidatorTests t = XmlValidatorFactory.loadTestsFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-tests.xml"));
+        ValidatorTests t = ValidationXmlUtils.loadTestsFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-tests.xml"));
         assertFakeTests(t);
 
         // read using a file
-        t = XmlValidatorFactory.loadTestsFromXml(file);
+        t = ValidationXmlUtils.loadTestsFromXml(file);
         assertFakeTests(t);
 
         // read from input stream
         try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("fake-tests.xml")) {
-            t = XmlValidatorFactory.loadTestsFromXml(is);
+            t = ValidationXmlUtils.loadTestsFromXml(is);
             assertFakeTests(t);
         }
 
         // read from reader
         try (Reader reader = new FileReader(file)) {
-            t = XmlValidatorFactory.loadTestsFromXml(reader);
+            t = ValidationXmlUtils.loadTestsFromXml(reader);
             assertFakeTests(t);
         }
 
@@ -488,7 +487,7 @@ public class XmlValidatorFactoryTest {
         file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml.gz'");
-        t = XmlValidatorFactory.loadTestsFromXml(file);
+        t = ValidationXmlUtils.loadTestsFromXml(file);
         assertFakeTests(t);
     }
 
@@ -497,90 +496,90 @@ public class XmlValidatorFactoryTest {
         File file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-tests.xml");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-tests.xml'");
-        ValidatorTests s = XmlValidatorFactory.loadTestsFromXml(file);
+        ValidatorTests s = ValidationXmlUtils.loadTestsFromXml(file);
 
         File targetFile = new File(TestingUtils.TMP_DIR, "xml-set-test.xml");
 
         // write using a file
-        XmlValidatorFactory.writeTestsToXml(s, targetFile);
+        ValidationXmlUtils.writeTestsToXml(s, targetFile);
         assertFakeTests(targetFile);
 
         // write using an output stream
         try (FileOutputStream fos = new FileOutputStream(targetFile)) {
-            XmlValidatorFactory.writeTestsToXml(s, fos);
+            ValidationXmlUtils.writeTestsToXml(s, fos);
         }
         assertFakeTests(targetFile);
 
         // write using a writer
         try (FileWriter writer = new FileWriter(targetFile)) {
-            XmlValidatorFactory.writeTestsToXml(s, writer);
+            ValidationXmlUtils.writeTestsToXml(s, writer);
         }
         assertFakeTests(targetFile);
 
         // write gzipped file using multi-threading parsing
         targetFile = new File(TestingUtils.TMP_DIR, "xml-tests-test.xml.gz");
-        XmlValidatorFactory.writeTestsToXml(s, targetFile);
+        ValidationXmlUtils.writeTestsToXml(s, targetFile);
         assertFakeTests(targetFile);
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorBadScript() throws IOException {
-        XmlValidatorFactory.loadStandaloneSetFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-tests-exception.xml"));
+        ValidationXmlUtils.loadStandaloneSetFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-tests-exception.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorLoadNullFile() throws IOException {
-        XmlValidatorFactory.loadTestsFromXml((File)null);
+        ValidationXmlUtils.loadTestsFromXml((File)null);
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorLoadNullUrl() throws IOException {
-        XmlValidatorFactory.loadTestsFromXml((URL)null);
+        ValidationXmlUtils.loadTestsFromXml((URL)null);
     }
 
     @Test(expected = IOException.class)
     public void testTestErrorLoadNullInputStream() throws IOException {
-        XmlValidatorFactory.loadTestsFromXml((InputStream)null);
+        ValidationXmlUtils.loadTestsFromXml((InputStream)null);
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorLoadNullReader() throws IOException {
-        XmlValidatorFactory.loadTestsFromXml((Reader)null);
+        ValidationXmlUtils.loadTestsFromXml((Reader)null);
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorWriteNullFile() throws IOException {
-        XmlValidatorFactory.writeTestsToXml(new ValidatorTests(), (File)null);
+        ValidationXmlUtils.writeTestsToXml(new ValidatorTests(), (File)null);
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorWriteNullSetForFile() throws IOException {
-        XmlValidatorFactory.writeTestsToXml(null, new File(TestingUtils.TMP_DIR, "whatever.xml"));
+        ValidationXmlUtils.writeTestsToXml(null, new File(TestingUtils.TMP_DIR, "whatever.xml"));
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorWriteNullOutputStream() throws IOException {
-        XmlValidatorFactory.writeTestsToXml(new ValidatorTests(), (OutputStream)null);
+        ValidationXmlUtils.writeTestsToXml(new ValidatorTests(), (OutputStream)null);
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorWriteNullSetForOutputStream() throws IOException {
-        XmlValidatorFactory.writeTestsToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeTestsToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorWriteNullWriter() throws IOException {
-        XmlValidatorFactory.writeTestsToXml(new ValidatorTests(), (Writer)null);
+        ValidationXmlUtils.writeTestsToXml(new ValidatorTests(), (Writer)null);
     }
 
     @Test(expected = IOException.class)
     public void testTestsErrorWriteNullSetForWriter() throws IOException {
-        XmlValidatorFactory.writeTestsToXml(null, new FileWriter(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeTestsToXml(null, new FileWriter(new File(TestingUtils.TMP_DIR, "whatever.xml")));
     }
 
     // helper
     private void assertFakeTests(File file) throws IOException {
-        ValidatorTests t = XmlValidatorFactory.loadTestsFromXml(file);
+        ValidatorTests t = ValidationXmlUtils.loadTestsFromXml(file);
         assertFakeTests(t);
         if (!file.delete())
             Assert.fail("Unable to delete temp file");
@@ -608,157 +607,157 @@ public class XmlValidatorFactoryTest {
 
     @Test
     public void testTargetValidatorXmlExists() {
-        Assert.assertFalse(XmlValidatorFactory.targetValidatorXmlExists(null));
-        Assert.assertTrue(XmlValidatorFactory.targetValidatorXmlExists(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml")));
+        Assert.assertFalse(ValidationXmlUtils.targetValidatorXmlExists(null));
+        Assert.assertTrue(ValidationXmlUtils.targetValidatorXmlExists(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml")));
     }
 
     @Test
     public void testGetXmlValidatorHash() {
-        Assert.assertNull(XmlValidatorFactory.getXmlValidatorHash(null));
+        Assert.assertNull(ValidationXmlUtils.getXmlValidatorHash(null));
 
         URL url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml");
-        Assert.assertNotNull(XmlValidatorFactory.getXmlValidatorHash(url));
+        Assert.assertNotNull(ValidationXmlUtils.getXmlValidatorHash(url));
 
         URL url2 = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz");
-        Assert.assertNotNull(XmlValidatorFactory.getXmlValidatorHash(url2));
+        Assert.assertNotNull(ValidationXmlUtils.getXmlValidatorHash(url2));
 
         // doesn't matter if the URL is gzipped, the hash should be the same...
         if (SystemUtils.IS_OS_WINDOWS) // this doesn't work on linux, not sure why...
-            Assert.assertEquals(XmlValidatorFactory.getXmlValidatorHash(url), XmlValidatorFactory.getXmlValidatorHash(url2));
+            Assert.assertEquals(ValidationXmlUtils.getXmlValidatorHash(url), ValidationXmlUtils.getXmlValidatorHash(url2));
     }
 
     @Test
     public void testGetXmlValidatorRootAttributes() {
         Map<String, String> expected = new HashMap<>();
-        expected.put(XmlValidatorFactory.ROOT_ATTR_ID, "fake-validator");
-        expected.put(XmlValidatorFactory.ROOT_ATTR_NAME, "Fake Validator");
-        expected.put(XmlValidatorFactory.ROOT_ATTR_VERSION, "TEST-002-01");
-        expected.put(XmlValidatorFactory.ROOT_ATTR_MIN_ENGINE_VERSION, "4.0");
-        expected.put(XmlValidatorFactory.ROOT_ATTR_TRANSLATED_FROM, "test");
-        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml")));
-        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz")));
-        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-multi-line.xml")));
+        expected.put(ValidationXmlUtils.ROOT_ATTR_ID, "fake-validator");
+        expected.put(ValidationXmlUtils.ROOT_ATTR_NAME, "Fake Validator");
+        expected.put(ValidationXmlUtils.ROOT_ATTR_VERSION, "TEST-002-01");
+        expected.put(ValidationXmlUtils.ROOT_ATTR_MIN_ENGINE_VERSION, "4.0");
+        expected.put(ValidationXmlUtils.ROOT_ATTR_TRANSLATED_FROM, "test");
+        Assert.assertEquals(expected, ValidationXmlUtils.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml")));
+        Assert.assertEquals(expected, ValidationXmlUtils.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz")));
+        Assert.assertEquals(expected, ValidationXmlUtils.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-multi-line.xml")));
 
         expected.clear();
-        expected.put(XmlValidatorFactory.ROOT_ATTR_NAME, "Fake Validator No ID");
-        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml")));
+        expected.put(ValidationXmlUtils.ROOT_ATTR_NAME, "Fake Validator No ID");
+        Assert.assertEquals(expected, ValidationXmlUtils.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml")));
 
         expected.clear();
-        expected.put(XmlValidatorFactory.ROOT_ATTR_ID, "fake-validator-large-prefix");
-        expected.put(XmlValidatorFactory.ROOT_ATTR_NAME, "Fake Validator Large Prefix");
-        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-large-prefix-text.xml")));
+        expected.put(ValidationXmlUtils.ROOT_ATTR_ID, "fake-validator-large-prefix");
+        expected.put(ValidationXmlUtils.ROOT_ATTR_NAME, "Fake Validator Large Prefix");
+        Assert.assertEquals(expected, ValidationXmlUtils.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("fake-validator-large-prefix-text.xml")));
 
         expected.clear();
-        Assert.assertEquals(expected, XmlValidatorFactory.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("property-parsing-test.txt")));
+        Assert.assertEquals(expected, ValidationXmlUtils.getXmlValidatorRootAttributes(Thread.currentThread().getContextClassLoader().getResource("property-parsing-test.txt")));
     }
 
     @Test
     public void testGetXmlValidatorId() {
-        Assert.assertNull(XmlValidatorFactory.getXmlValidatorId(null));
-        Assert.assertNull(XmlValidatorFactory.getXmlValidatorId(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml")));
+        Assert.assertNull(ValidationXmlUtils.getXmlValidatorId(null));
+        Assert.assertNull(ValidationXmlUtils.getXmlValidatorId(Thread.currentThread().getContextClassLoader().getResource("fake-validator-no-id.xml")));
 
         URL url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml");
-        Assert.assertEquals("fake-validator", XmlValidatorFactory.getXmlValidatorId(url));
+        Assert.assertEquals("fake-validator", ValidationXmlUtils.getXmlValidatorId(url));
 
         url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz");
-        Assert.assertEquals("fake-validator", XmlValidatorFactory.getXmlValidatorId(url));
+        Assert.assertEquals("fake-validator", ValidationXmlUtils.getXmlValidatorId(url));
     }
 
     @Test
     public void testGetXmlValidatorName() {
-        Assert.assertNull(XmlValidatorFactory.getXmlValidatorName(null));
+        Assert.assertNull(ValidationXmlUtils.getXmlValidatorName(null));
 
         URL url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml");
-        Assert.assertEquals("Fake Validator", XmlValidatorFactory.getXmlValidatorName(url));
+        Assert.assertEquals("Fake Validator", ValidationXmlUtils.getXmlValidatorName(url));
 
         url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz");
-        Assert.assertEquals("Fake Validator", XmlValidatorFactory.getXmlValidatorName(url));
+        Assert.assertEquals("Fake Validator", ValidationXmlUtils.getXmlValidatorName(url));
     }
 
     @Test
     public void testGetXmlValidatorVersion() {
-        Assert.assertNull(XmlValidatorFactory.getXmlValidatorVersion(null));
+        Assert.assertNull(ValidationXmlUtils.getXmlValidatorVersion(null));
 
         URL url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml");
-        Assert.assertEquals("TEST-002-01", XmlValidatorFactory.getXmlValidatorVersion(url));
+        Assert.assertEquals("TEST-002-01", ValidationXmlUtils.getXmlValidatorVersion(url));
 
         url = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz");
-        Assert.assertEquals("TEST-002-01", XmlValidatorFactory.getXmlValidatorVersion(url));
+        Assert.assertEquals("TEST-002-01", ValidationXmlUtils.getXmlValidatorVersion(url));
     }
 
     @Test
     public void testTrimEmptyLines() {
-        Assert.assertNull(XmlValidatorFactory.trimEmptyLines(null, true));
+        Assert.assertNull(ValidationXmlUtils.trimEmptyLines(null, true));
 
         try {
-            XmlValidatorFactory.enableRealignment();
+            ValidationXmlUtils.enableRealignment();
 
             String s = " some text  ";
             String exp = "some text";
-            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
             s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
             exp = "abc\n     ed\n\n   fh";
-            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
             s = "\r\n     \r\n     \n\n   abc\n     ed\n\n   fh\n \n    \r\n     \r\n";
-            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
             s = "Some text with\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nmany new lines";
             exp = "Some text with\n\n\nmany new lines";
-            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
             s = "Some text with\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nmany new lines";
-            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
-            XmlValidatorFactory.disableRealignment();
+            ValidationXmlUtils.disableRealignment();
 
             s = " some text  ";
             exp = "some text";
-            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
+            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
             s = "\n     \n     \n\n   abc\n     ed\n\n   fh\n \n    \n     \n";
             exp = "abc\n     ed\n\n   fh";
-            Assert.assertEquals(exp, XmlValidatorFactory.trimEmptyLines(s, true));
-            Assert.assertEquals(s, XmlValidatorFactory.trimEmptyLines(s, false));
+            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
+            Assert.assertEquals(s, ValidationXmlUtils.trimEmptyLines(s, false));
         }
         finally {
-            XmlValidatorFactory.enableRealignment();
+            ValidationXmlUtils.enableRealignment();
         }
     }
 
     @Test
     public void testReAlign() {
-        Assert.assertNull(XmlValidatorFactory.reAlign(null));
+        Assert.assertNull(ValidationXmlUtils.reAlign(null));
 
         try {
-            XmlValidatorFactory.enableRealignment();
+            ValidationXmlUtils.enableRealignment();
 
             String s = "some text  ";
             String exp = "some text";
-            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            Assert.assertEquals(exp, ValidationXmlUtils.reAlign(s));
 
             s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
             exp = "abc \n  - abc\n  - def\n    -- gh\n  -ifk\nlm";
-            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            Assert.assertEquals(exp, ValidationXmlUtils.reAlign(s));
 
             s = "   abc \n     - abc\n     - def\n -- gh\n     -ifk\n   lm";
             exp = "abc \n    - abc\n    - def\n-- gh\n    -ifk\n  lm";
-            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            Assert.assertEquals(exp, ValidationXmlUtils.reAlign(s));
 
             s = "   abc \r\n     - abc\r\n     - def\r\n -- gh\r\n     -ifk\r\n   lm";
-            Assert.assertEquals(exp, XmlValidatorFactory.reAlign(s));
+            Assert.assertEquals(exp, ValidationXmlUtils.reAlign(s));
 
-            XmlValidatorFactory.disableRealignment();
+            ValidationXmlUtils.disableRealignment();
 
             s = "some text  ";
-            Assert.assertEquals(s, XmlValidatorFactory.reAlign(s));
+            Assert.assertEquals(s, ValidationXmlUtils.reAlign(s));
 
             s = "   abc \n     - abc\n     - def\n       -- gh\n     -ifk\n   lm";
-            Assert.assertEquals(s, XmlValidatorFactory.reAlign(s));
+            Assert.assertEquals(s, ValidationXmlUtils.reAlign(s));
         }
         finally {
-            XmlValidatorFactory.enableRealignment();
+            ValidationXmlUtils.enableRealignment();
         }
     }
 }
