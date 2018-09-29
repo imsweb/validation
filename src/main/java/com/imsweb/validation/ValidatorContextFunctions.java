@@ -279,7 +279,7 @@ public class ValidatorContextFunctions {
         if (id == null)
             throw new ValidationException("Unable to load lookup <null>");
 
-        ValidationLookup lookup = ValidatorServices.getInstance().getLookupById(id);
+        ValidationLookup lookup = ValidationServices.getInstance().getLookupById(id);
         if (lookup == null)
             throw new ValidationException("Unable to load lookup '" + id + "'");
 
@@ -300,7 +300,7 @@ public class ValidatorContextFunctions {
         if (id == null)
             throw new ValidationException("Unable to fetch configuration variable for null value");
 
-        return ValidatorServices.getInstance().getConfVariable(id);
+        return ValidationServices.getInstance().getConfVariable(id);
     }
 
     /**
@@ -312,7 +312,7 @@ public class ValidatorContextFunctions {
     @ContextFunctionDocAnnotation(paramName1 = "message", param1 = "Message", desc = "Logs the given message.",
             example = "Functions.log('message')")
     public void log(String message) {
-        ValidatorServices.getInstance().log(message);
+        ValidationServices.getInstance().log(message);
     }
 
     /**
@@ -324,7 +324,7 @@ public class ValidatorContextFunctions {
     @ContextFunctionDocAnnotation(paramName1 = "message", param1 = "Message", desc = "Logs the given message as a warning.",
             example = "Functions.logWarning('warning message')")
     public void logWarning(String message) {
-        ValidatorServices.getInstance().logWarning(message);
+        ValidationServices.getInstance().logWarning(message);
     }
 
     /**
@@ -336,7 +336,7 @@ public class ValidatorContextFunctions {
     @ContextFunctionDocAnnotation(paramName1 = "message", param1 = "Message", desc = "Logs the given message as a error.",
             example = "Functions.logError('error message')")
     public void logError(String message) {
-        ValidatorServices.getInstance().logError(message);
+        ValidationServices.getInstance().logError(message);
     }
 
     /**

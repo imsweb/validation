@@ -42,7 +42,7 @@ public class ContextEntry {
      * <p/>
      * In a system persisting the context entries in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextContextEntrySequence() method in <code>ValidatorServices</code>.
+     * getNextContextEntrySequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the contextEntryId persistence ID
@@ -56,7 +56,7 @@ public class ContextEntry {
      * <p/>
      * In a system persisting the context entries in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextContextEntrySequence() method in <code>ValidatorServices</code>.
+     * getNextContextEntrySequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @param contextEntryId rule persistence ID

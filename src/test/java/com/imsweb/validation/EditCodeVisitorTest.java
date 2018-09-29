@@ -30,7 +30,7 @@ public class EditCodeVisitorTest {
         SortedSet<String> properties = new TreeSet<>();
 
         // we will use the service to parse (wraps some of the complexity)
-        ValidatorServices parser = ValidatorServices.getInstance();
+        ValidationServices parser = ValidationServices.getInstance();
 
         // special conditions
         parser.parseExpression("id", null, properties, null, null);
@@ -265,7 +265,7 @@ public class EditCodeVisitorTest {
         SortedSet<String> rawProperties = new TreeSet<>();
         SortedSet<String> lookups = new TreeSet<>();
         String exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-test.txt"));
-        ValidatorServices.getInstance().parseExpression("id", exp, rawProperties, null, lookups);
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, lookups);
         assertProperties(rawProperties, expected.toArray(new String[0]));
         assertProperties(lookups, expectedLkup.toArray(new String[0]));
 
@@ -277,7 +277,7 @@ public class EditCodeVisitorTest {
         expected.add("line.censusTract2000");
         rawProperties.clear();
         exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-seer-test.txt"));
-        ValidatorServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
         Assert.assertEquals(expected, rawProperties);
 
         // another full test
@@ -290,7 +290,7 @@ public class EditCodeVisitorTest {
         rawProperties.clear();
         context.clear();
         exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-single-test.txt"));
-        ValidatorServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
         Assert.assertEquals(expected, rawProperties);
 
         // another full test
@@ -307,7 +307,7 @@ public class EditCodeVisitorTest {
         rawProperties.clear();
         context.clear();
         exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-function-test.txt"));
-        ValidatorServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
         Assert.assertEquals(expected, rawProperties);
 
         // another test based on a bug
@@ -317,11 +317,11 @@ public class EditCodeVisitorTest {
         expected.add("line.behaviorIcdO3");
         rawProperties.clear();
         exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test.txt"));
-        ValidatorServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
         Assert.assertEquals(expected, rawProperties);
         rawProperties.clear();
         exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test2.txt"));
-        ValidatorServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
         Assert.assertEquals(expected, rawProperties);
     }
 
@@ -334,7 +334,7 @@ public class EditCodeVisitorTest {
         boolean exception = false;
 
         // we will use the service to parse (wraps some of the complexity)
-        ValidatorServices parser = ValidatorServices.getInstance();
+        ValidationServices parser = ValidationServices.getInstance();
 
         // all variable are defined with the 'def' keyword -> no exception
         parser.parseExpression("id", "def var1 = null; def var2 = 0; if (var1 == null) {def var5 = var2; var5++}; for (i in 1..5) {def var3 = var2; var3++}; def var4 = var2; return var1;", null,

@@ -6,6 +6,7 @@ package com.imsweb.validation.internal;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.imsweb.validation.ValidationServices;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
@@ -13,7 +14,6 @@ import groovy.lang.Script;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.Condition;
 import com.imsweb.validation.entities.Validatable;
 
@@ -77,7 +77,7 @@ public class ExecutableCondition {
 
         synchronized (this) {
             try {
-                _script = ValidatorServices.getInstance().compileExpression(condition.getExpression());
+                _script = ValidationServices.getInstance().compileExpression(condition.getExpression());
             }
             catch (CompilationFailedException e) {
                 _script = null;
@@ -194,7 +194,7 @@ public class ExecutableCondition {
     public void setExpression(String expression) throws ConstructionException {
         synchronized (this) {
             try {
-                _script = ValidatorServices.getInstance().compileExpression(expression);
+                _script = ValidationServices.getInstance().compileExpression(expression);
             }
             catch (CompilationFailedException e) {
                 _script = null;

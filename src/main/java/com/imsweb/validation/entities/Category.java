@@ -52,7 +52,7 @@ public class Category {
      * <p/>
      * In a system persisting the categories in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextCategorySequence() method in <code>ValidatorServices</code>.
+     * getNextCategorySequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the category persistence ID
@@ -66,7 +66,7 @@ public class Category {
      * <p/>
      * In a system persisting the categories in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextCategorySequence() method in <code>ValidatorServices</code>.
+     * getNextCategorySequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @param categoryId category persistence ID

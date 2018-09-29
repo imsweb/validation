@@ -124,13 +124,13 @@ public class EditCodeVisitor extends CodeVisitorSupport {
                     buf.append(".").append(prop);
 
                     String[] parts2 = StringUtils.split(buf.toString(), '.');
-                    if (ValidatorServices.getInstance().getJavaPathForAlias(parts2[0]) != null) {
+                    if (ValidationServices.getInstance().getJavaPathForAlias(parts2[0]) != null) {
                         StringBuilder innerBuf = new StringBuilder(parts2[0]);
                         for (int i = 1; i < parts2.length; i++)
                             if (i != parts2.length - 1 || !_METHODS_AS_FIELDS.contains(parts2[i]))
                                 innerBuf.append(".").append(parts2[i]);
                         String property = innerBuf.toString();
-                        if (ValidatorServices.getInstance().getAliasForJavaPath(property) == null) {
+                        if (ValidationServices.getInstance().getAliasForJavaPath(property) == null) {
                             _properties.add(innerBuf.toString());
                             return;
                         }
@@ -146,7 +146,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
     public void visitVariableExpression(VariableExpression expression) {
         // this is the old way of accessing context entries (without a prefix); support for this will be removed eventually
         String name = expression.getName();
-        if (!"this".equals(name) && !_defVariables.contains(name) && ValidatorServices.getInstance().getJavaPathForAlias(name) == null)
+        if (!"this".equals(name) && !_defVariables.contains(name) && ValidationServices.getInstance().getJavaPathForAlias(name) == null)
             if (!isInternalContextName(name))
                 _contextEntries.add(name);
     }
@@ -229,11 +229,11 @@ public class EditCodeVisitor extends CodeVisitorSupport {
             _contextEntries.add(method);
         // any method called on "this" is a context entry (this is the old way of calling contexts, without a prefix...)
         if ((call.getObjectExpression() instanceof VariableExpression && "this".equals(caller)) && !_defVariables.contains(method))
-            if (ValidatorServices.getInstance().getJavaPathForAlias(method) == null && !isInternalContextName(method))
+            if (ValidationServices.getInstance().getJavaPathForAlias(method) == null && !isInternalContextName(method))
                 _contextEntries.add(method);
         // the calling object could also be a context entry: ARRAY.contains(...)
         if ((call.getObjectExpression() instanceof VariableExpression && !"this".equals(caller)) && !_defVariables.contains(caller))
-            if (ValidatorServices.getInstance().getJavaPathForAlias(caller) == null && !isInternalContextName(caller))
+            if (ValidationServices.getInstance().getJavaPathForAlias(caller) == null && !isInternalContextName(caller))
                 _contextEntries.add(caller);
 
         if ("fetchLookup".equals(method)) {
@@ -271,12 +271,12 @@ public class EditCodeVisitor extends CodeVisitorSupport {
 
         String[] parts = StringUtils.split(path, '.');
         if (parts.length > 0) {
-            String javaPath = ValidatorServices.getInstance().getJavaPathForAlias(parts[0]);
+            String javaPath = ValidationServices.getInstance().getJavaPathForAlias(parts[0]);
             if (javaPath != null) {
                 StringBuilder buf = new StringBuilder(javaPath);
                 for (int i = 1; i < parts.length; i++)
                     buf.append(".").append(parts[i]);
-                alias = ValidatorServices.getInstance().getAliasForJavaPath(buf.toString());
+                alias = ValidationServices.getInstance().getAliasForJavaPath(buf.toString());
                 // I know, this is a hack, but I can't make it work otherwise; this is due to the fact that normally, the 
                 // top level of an entity (so validatable root) is an entity (for example a patient), but for the SEER edits,
                 // it is a collection (lines, which is a collection of line). That messes up a lot of things...

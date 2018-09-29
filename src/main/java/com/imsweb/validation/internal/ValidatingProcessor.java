@@ -8,7 +8,7 @@ import com.imsweb.validation.EngineStats;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidatorContextFunctions;
-import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.runtime.CompiledRules;
@@ -236,21 +236,21 @@ public class ValidatingProcessor implements Processor {
 
                     // if failure, need to keep track of it since other depending rules might not have to run
                     if (!success) {
-                        String message = ValidatorServices.getInstance().fillInMessage(rule.getMessage(), validatable);
+                        String message = ValidationServices.getInstance().fillInMessage(rule.getMessage(), validatable);
 
                         // translated edits can override the default error message
                         String overriddenError = (String)binding.getVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE);
                         if (overriddenError != null)
-                            message = ValidatorServices.getInstance().fillInMessage(overriddenError, validatable);
+                            message = ValidationServices.getInstance().fillInMessage(overriddenError, validatable);
 
                         // translated edits can dynamically report error messages
-                        List<String> extraErrors = ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES), validatable);
+                        List<String> extraErrors = ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES), validatable);
                         if (extraErrors != null && !extraErrors.isEmpty())
                             message = StringUtils.join(extraErrors, ". ");
 
                         RuleFailure failure = new RuleFailure(rule.getRule(), message, validatable);
                         failure.setExtraErrorMessages(extraErrors);
-                        failure.setInformationMessages(ValidatorServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
+                        failure.setInformationMessages(ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
                         failure.setOriginalResult((Boolean)binding.getVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT));
                         results.add(failure);
                         currentRuleFailures.add(id);

@@ -10,7 +10,7 @@ import java.util.Set;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.ValidationServices;
 
 /**
  * A <code>Condition</code> allows a pre-condition to be set for one or several rules.
@@ -85,7 +85,7 @@ public class Condition {
      * <p/>
      * In a system persisting the conditions in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextConditionSequence() method in <code>ValidatorServices</code>.
+     * getNextConditionSequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the condition persistence ID
@@ -99,7 +99,7 @@ public class Condition {
      * <p/>
      * In a system persisting the conditions in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextConditionSequence() method in <code>ValidatorServices</code>.
+     * getNextConditionSequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @param conditionId condition persistence ID
@@ -193,7 +193,7 @@ public class Condition {
         if (expression != null && !expression.trim().isEmpty()) {
             synchronized (this) {
                 try {
-                    ValidatorServices.getInstance().parseExpression("condition", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
+                    ValidationServices.getInstance().parseExpression("condition", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
                 }
                 catch (CompilationFailedException e) {
                     throw new ConstructionException("Unable to parse condition " + getId(), e);

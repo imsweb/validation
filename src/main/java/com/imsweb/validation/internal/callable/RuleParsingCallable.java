@@ -4,8 +4,8 @@
 package com.imsweb.validation.internal.callable;
 
 import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.ValidationXmlUtils;
-import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.RuleHistory;
 import com.imsweb.validation.entities.Validator;
@@ -149,7 +149,7 @@ public class RuleParsingCallable implements Callable<Void> {
             for (HistoryEventXmlDto event : _xmlRule.getHistoryEvents()) {
                 if (event.getValue() != null) {
                     RuleHistory rh = new RuleHistory();
-                    rh.setRuleHistoryId(ValidatorServices.getInstance().getNextRuleHistorySequence());
+                    rh.setRuleHistoryId(ValidationServices.getInstance().getNextRuleHistorySequence());
                     rh.setRule(rule);
                     if (event.getVersion() == null)
                         throw new IOException("Unable to load '" + rule.getId() + "' in " + _validator.getId() + "; no version provided in history entry");

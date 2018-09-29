@@ -47,16 +47,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
  * <br/><br/>
  * The first thing that needs to happen before using the engine for validation is to initialize the services and the context methods. This is accomplished
- * by calling the initialize method of the {@link ValidatorServices} and {@link ValidatorContextFunctions} classes. That method takes as an argument
+ * by calling the initialize method of the {@link ValidationServices} and {@link ValidatorContextFunctions} classes. That method takes as an argument
  * an instance of those classes; to use the default implementation, just instanciate those classes themselves:
  * <pre>
- *     ValidatorServices.initialize(new ValidatorServices());
+ *     ValidationServices.initialize(new ValidationServices());
  *     ValidatorContextFunctions.initialize(new ValidatorContextFunctions());
  * </pre>
  * But a more complex application might need more customize services and extra context functions available to the Groovy edits; in that case those classes
  * should be extended and initialized with the customized versions:
  * <pre>
- *     ValidatorServices.initialize(new MyCustomValidatorServices());
+ *     ValidationServices.initialize(new MyCustomValidatorServices());
  *     ValidatorContextFunctions.initialize(new MyCustomValidatorContextFunctions());
  * </pre>
  * The second thing to do is to initialize the engine using one of its <b>initialize()</b> methods. Those methods take as argument one or several
@@ -800,7 +800,7 @@ public final class ValidationEngine {
                 throw new ConstructionException("Edit IDs must be unique within the edits engine, cannot add '" + editableRule.getId() + "'");
             if (!_VALIDATORS.containsKey(editableRule.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableRule.getValidatorId());
-            if (!ValidatorServices.getInstance().getAllJavaPaths().containsKey(editableRule.getJavaPath()))
+            if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableRule.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableRule.getJavaPath());
 
             // verify the condition exists if provided
@@ -824,7 +824,7 @@ public final class ValidationEngine {
             rule.setId(editableRule.getId());
             rule.setRuleId(editableRule.getRuleId());
             if (rule.getRuleId() == null)
-                rule.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
+                rule.setRuleId(ValidationServices.getInstance().getNextRuleSequence());
             rule.setName(editableRule.getName());
             rule.setJavaPath(editableRule.getJavaPath());
             rule.setExpression(editableRule.getExpression());
@@ -909,7 +909,7 @@ public final class ValidationEngine {
                 throw new ConstructionException("A message is required when modifying an edit");
             if (!_VALIDATORS.containsKey(editableRule.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableRule.getValidatorId());
-            if (!ValidatorServices.getInstance().getAllJavaPaths().containsKey(editableRule.getJavaPath()))
+            if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableRule.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableRule.getJavaPath());
 
             // get original executable rule
@@ -1129,7 +1129,7 @@ public final class ValidationEngine {
                 throw new ConstructionException("Condition IDs must be unique within the edits engine, cannot add '" + editableCondition.getId() + "'");
             if (!_VALIDATORS.containsKey(editableCondition.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableCondition.getValidatorId());
-            if (!ValidatorServices.getInstance().getAllJavaPaths().containsKey(editableCondition.getJavaPath()))
+            if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableCondition.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableCondition.getJavaPath());
 
             // create the condition to add
@@ -1137,7 +1137,7 @@ public final class ValidationEngine {
             condition.setId(editableCondition.getId());
             condition.setConditionId(editableCondition.getConditionId());
             if (condition.getConditionId() == null)
-                condition.setConditionId(ValidatorServices.getInstance().getNextConditionSequence());
+                condition.setConditionId(ValidationServices.getInstance().getNextConditionSequence());
             condition.setId(editableCondition.getId());
             condition.setName(editableCondition.getName());
             condition.setDescription(editableCondition.getDescription());
@@ -1203,7 +1203,7 @@ public final class ValidationEngine {
                 throw new ConstructionException("Invalid java-path");
             if (!_VALIDATORS.containsKey(editableCondition.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableCondition.getValidatorId());
-            if (!ValidatorServices.getInstance().getAllJavaPaths().containsKey(editableCondition.getJavaPath()))
+            if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableCondition.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableCondition.getJavaPath());
 
             // get original executable condition
@@ -1335,7 +1335,7 @@ public final class ValidationEngine {
             Validator v = new Validator();
             v.setValidatorId(editableValidator.getValidatorId());
             if (v.getValidatorId() == null)
-                v.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence());
+                v.setValidatorId(ValidationServices.getInstance().getNextValidatorSequence());
             v.setId(editableValidator.getId());
             v.setName(editableValidator.getName());
             v.setReleases(editableValidator.getReleases());
@@ -1482,7 +1482,7 @@ public final class ValidationEngine {
      * Adds a new context entry for the provided validator ID.
      * <p/>
      * Created on Jul 7, 2011 by depryf
-     * @param contextEntryId internal ID for the new context, if null a new ID will be generated using the ValidatorServices.getNextContextEntrySequence()
+     * @param contextEntryId internal ID for the new context, if null a new ID will be generated using the ValidationServices.getNextContextEntrySequence()
      * @param contextKey new context key
      * @param validatorId validator ID
      * @param expression raw expression
@@ -1505,7 +1505,7 @@ public final class ValidationEngine {
             if (contexts == null)
                 throw new ConstructionException("Invalid group: " + validatorId);
 
-            ValidatorServices.getInstance().addContextExpression(expression, contexts, contextKey, type);
+            ValidationServices.getInstance().addContextExpression(expression, contexts, contextKey, type);
 
             updateProcessorsContexts(_CONTEXTS);
 
@@ -1549,7 +1549,7 @@ public final class ValidationEngine {
             if (!contexts.containsKey(contextKey))
                 throw new ConstructionException("Group " + validatorId + " does not contain a context for key " + contextKey);
 
-            ValidatorServices.getInstance().addContextExpression(expression, contexts, contextKey, type);
+            ValidationServices.getInstance().addContextExpression(expression, contexts, contextKey, type);
 
             updateProcessorsContexts(_CONTEXTS);
 
@@ -1866,7 +1866,7 @@ public final class ValidationEngine {
     private static void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, EngineInitStats stats) throws ConstructionException {
 
         if (validator.getValidatorId() == null)
-            validator.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence());
+            validator.setValidatorId(ValidationServices.getInstance().getNextValidatorSequence());
         if (validator.getValidatorId() == null)
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
 
@@ -1883,7 +1883,7 @@ public final class ValidationEngine {
         if (validator.getRules() != null) {
             for (Rule r : validator.getRules()) {
                 if (r.getRuleId() == null)
-                    r.setRuleId(ValidatorServices.getInstance().getNextRuleSequence());
+                    r.setRuleId(ValidationServices.getInstance().getNextRuleSequence());
                 if (r.getRuleId() == null)
                     throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
                 results.add(service.submit(new RuleCompilingCallable(r, rules, precompiledRules, stats)));
@@ -1895,7 +1895,7 @@ public final class ValidationEngine {
         if (validator.getConditions() != null) {
             for (Condition c : validator.getConditions()) {
                 if (c.getConditionId() == null)
-                    c.setConditionId(ValidatorServices.getInstance().getNextConditionSequence());
+                    c.setConditionId(ValidationServices.getInstance().getNextConditionSequence());
                 if (c.getConditionId() == null)
                     throw new ConstructionException("Conditions must have a non-null internal ID to be registered in the engine");
                 conditions.put(c.getConditionId(), new ExecutableCondition(c));
@@ -1907,7 +1907,7 @@ public final class ValidationEngine {
         if (validator.getCategories() != null) {
             for (Category c : validator.getCategories())
                 if (c.getCategoryId() == null)
-                    c.setCategoryId(ValidatorServices.getInstance().getNextCategorySequence());
+                    c.setCategoryId(ValidationServices.getInstance().getNextCategorySequence());
             validator.setCategories(new HashSet<>(validator.getCategories())); // since internal IDs might have changed
         }
 
@@ -1916,20 +1916,20 @@ public final class ValidationEngine {
             Set<ContextEntry> reRun = new HashSet<>();
             for (ContextEntry entry : validator.getRawContext()) {
                 if (entry.getContextEntryId() == null)
-                    entry.setContextEntryId(ValidatorServices.getInstance().getNextContextEntrySequence());
+                    entry.setContextEntryId(ValidationServices.getInstance().getNextContextEntrySequence());
                 try {
                     // this is really not great, a better way would be to fully parse the context expressions, but that will do for now...
                     if (entry.getExpression().contains(VALIDATOR_CONTEXT_KEY + "."))
                         reRun.add(entry);
                     else
-                        ValidatorServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+                        ValidationServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
                 }
                 catch (ConstructionException e) {
                     reRun.add(entry);
                 }
             }
             for (ContextEntry entry : reRun)
-                ValidatorServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+                ValidationServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
             validator.setRawContext(new HashSet<>(validator.getRawContext())); // since internal IDs might have changed
         }
 
@@ -1937,7 +1937,7 @@ public final class ValidationEngine {
         if (validator.getSets() != null) {
             for (EmbeddedSet s : validator.getSets())
                 if (s.getSetId() == null)
-                    s.setSetId(ValidatorServices.getInstance().getNextSetSequence());
+                    s.setSetId(ValidationServices.getInstance().getNextSetSequence());
             validator.setSets(new HashSet<>(validator.getSets())); // since internal IDs might have changed
         }
 
@@ -1973,7 +1973,7 @@ public final class ValidationEngine {
         for (Validator v : validators) {
             if (validatorIds.contains(v.getId()))
                 throw new ConstructionException("Group ID '" + v.getId() + "' is not unique");
-            if (v.getMinEngineVersion() != null && ValidatorServices.getInstance().compareEngineVersions(v.getMinEngineVersion(), _ENGINE_VERSION) > 0)
+            if (v.getMinEngineVersion() != null && ValidationServices.getInstance().compareEngineVersions(v.getMinEngineVersion(), _ENGINE_VERSION) > 0)
                 throw new ConstructionException("Group ID '" + v.getId() + "' requires version " + v.getMinEngineVersion() + "; current version is " + _ENGINE_VERSION);
             validatorIds.add(v.getId());
 
@@ -2013,7 +2013,7 @@ public final class ValidationEngine {
             return new HashSet<>();
 
         // pre-condition: if a forced rule is provided, it must have a known java path
-        if (vContext.getToForce() != null && !ValidatorServices.getInstance().getAllJavaPaths().containsKey(vContext.getToForce().getJavaPath()))
+        if (vContext.getToForce() != null && !ValidationServices.getInstance().getAllJavaPaths().containsKey(vContext.getToForce().getJavaPath()))
             throw new ValidationException("Unknown java path for forced edit: " + vContext.getToForce().getJavaPath());
 
         // process the validatable
@@ -2026,7 +2026,7 @@ public final class ValidationEngine {
         _PROCESSOR_ROOTS.clear();
 
         // go through each java path and create/get the corresponding processors        
-        for (String javaPath : ValidatorServices.getInstance().getAllJavaPaths().keySet()) {
+        for (String javaPath : ValidationServices.getInstance().getAllJavaPaths().keySet()) {
             String[] parts = StringUtils.split(javaPath, '.');
 
             // keep track of the roots (I couldn't find a concurrent implementation of a set, so I am using a map with dummy objects)

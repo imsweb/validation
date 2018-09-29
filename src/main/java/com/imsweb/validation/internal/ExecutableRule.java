@@ -7,7 +7,7 @@ import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.EngineInitStats;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.runtime.CompiledRules;
@@ -152,7 +152,7 @@ public class ExecutableRule {
             // only compile Groovy script if no re-compiled Groovy method was available...
             if (_compiledRule == null) {
                 try {
-                    _script = ValidatorServices.getInstance().compileExpression(rule.getExpression());
+                    _script = ValidationServices.getInstance().compileExpression(rule.getExpression());
                 }
                 catch (CompilationFailedException e) {
                     throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);
@@ -376,8 +376,8 @@ public class ExecutableRule {
             try {
                 _rawProperties.clear();
                 _potentialContextEntries.clear();
-                ValidatorServices.getInstance().parseExpression("rule", expression, _rawProperties, _potentialContextEntries, null);
-                _script = ValidatorServices.getInstance().compileExpression(expression);
+                ValidationServices.getInstance().parseExpression("rule", expression, _rawProperties, _potentialContextEntries, null);
+                _script = ValidationServices.getInstance().compileExpression(expression);
             }
             catch (CompilationFailedException e) {
                 _script = null;

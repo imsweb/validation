@@ -38,16 +38,16 @@ import java.util.regex.Pattern;
  * These services need to be initialized before using the engine or the factory
  * <br/><br/>
  * To initialize the framework with the default services, call the following:<br/><br/>
- * <i>ValidatorServices.initialize(new ValidatorServices())</i>
+ * <i>ValidationServices.initialize(new ValidationServices())</i>
  * As of version 1.5, the services are lazily initialized with the default implementation; so if you don't need a special behavior,
  * there is no need to initialize this class anymore.
  * <br/><br/>
  * To implement your own services, create a class that extends this one, override the methods, and call the following:<br/><br/>
- * <i>ValidatorServices.initialize(new MyValidatorServices())</i>
+ * <i>ValidationServices.initialize(new MyValidatorServices())</i>
  * <p/>
  * Created on Feb 8, 2008 by depryf
  */
-public class ValidatorServices {
+public class ValidationServices {
 
     /**
      * Internal sequence to use for rule IDs
@@ -86,9 +86,9 @@ public class ValidatorServices {
     private static AtomicInteger _RULE_HISTORY_SEQ = new AtomicInteger(0);
 
     /**
-     * Private instance of a <code>ValidatorServices</code>
+     * Private instance of a <code>ValidationServices</code>
      */
-    private static ValidatorServices _INSTANCE;
+    private static ValidationServices _INSTANCE;
 
     /**
      * Pattern for property values replacement
@@ -125,9 +125,9 @@ public class ValidatorServices {
      * <i>isInitialized()</i> methods if you don't want this behavior.
      * <p/>
      * Created on Feb 11, 2008 by depryf
-     * @param instance a <code>ValidatorServices</code>
+     * @param instance a <code>ValidationServices</code>
      */
-    public static void initialize(ValidatorServices instance) {
+    public static void initialize(ValidationServices instance) {
         _INSTANCE = instance;
     }
 
@@ -142,14 +142,14 @@ public class ValidatorServices {
     }
 
     /**
-     * Gets current instance of the <code>ValidatorServices</code>
+     * Gets current instance of the <code>ValidationServices</code>
      * <p/>
      * Created on Feb 11, 2008 by depryf
-     * @return a <code>ValidatorServices</code>
+     * @return a <code>ValidationServices</code>
      */
-    public static synchronized ValidatorServices getInstance() {
+    public static synchronized ValidationServices getInstance() {
         if (_INSTANCE == null)
-            _INSTANCE = new ValidatorServices();
+            _INSTANCE = new ValidationServices();
 
         return _INSTANCE;
     }

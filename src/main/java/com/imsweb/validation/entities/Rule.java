@@ -8,10 +8,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.imsweb.validation.ValidationServices;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.runtime.ParsedContexts;
 import com.imsweb.validation.runtime.ParsedLookups;
 import com.imsweb.validation.runtime.ParsedProperties;
@@ -168,7 +168,7 @@ public class Rule {
      * <p/>
      * In a system persisting the rules in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextRuleSequence() method in <code>ValidatorServices</code>.
+     * getNextRuleSequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the rule persistence ID
@@ -182,7 +182,7 @@ public class Rule {
      * <p/>
      * In a system persisting the rules in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextRuleSequence() method in <code>ValidatorServices</code>.
+     * getNextRuleSequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @param ruleId rule persistence ID
@@ -340,7 +340,7 @@ public class Rule {
                     _rawProperties.clear();
                     _potentialContextEntries.clear();
                     _usedLookupIds.clear();
-                    ValidatorServices.getInstance().parseExpression("rule", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
+                    ValidationServices.getInstance().parseExpression("rule", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
                 }
                 catch (CompilationFailedException e) {
                     throw new ConstructionException("Unable to parse rule " + getId(), e);

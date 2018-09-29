@@ -30,8 +30,8 @@ public final class TestingUtils {
             throw new RuntimeException("Unable to create tmp folder '" + TMP_DIR.getPath() + "'");
 
         // initialize services
-        if (!ValidatorServices.isInitialized())
-            ValidatorServices.initialize(new TestingValidatorServices());
+        if (!ValidationServices.isInitialized())
+            ValidationServices.initialize(new TestingValidationServices());
 
         // initialize context functions
         if (!ValidatorContextFunctions.isInitialized())
@@ -142,7 +142,7 @@ public final class TestingUtils {
     }
 
     public static void assertLogMessage(String x) {
-        Assert.assertTrue(((TestingValidatorServices)ValidatorServices.getInstance()).getLogMessages().contains(x));
+        Assert.assertTrue(((TestingValidationServices) ValidationServices.getInstance()).getLogMessages().contains(x));
     }
 
     private static class TestingValidatorContextFunctions extends ValidatorContextFunctions {
@@ -160,7 +160,7 @@ public final class TestingUtils {
         }
     }
 
-    private static class TestingValidatorServices extends ValidatorServices {
+    private static class TestingValidationServices extends ValidationServices {
 
         /**
          * Map of java-path -> alias to use in the edits

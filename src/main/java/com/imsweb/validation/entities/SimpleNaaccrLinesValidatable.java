@@ -13,8 +13,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.imsweb.staging.entities.StagingSchema;
+import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.ValidatorContextFunctions;
-import com.imsweb.validation.ValidatorServices;
 import com.imsweb.validation.functions.StagingContextFunctions;
 import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 
@@ -168,7 +168,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
      */
     private SimpleNaaccrLinesValidatable(SimpleNaaccrLinesValidatable parent, String prefix, Map<String, String> map, Map<String, Object> context, boolean useUntrimmedNotation) {
         _prefix = prefix;
-        _alias = ValidatorServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+\\]", ""));
+        _alias = ValidationServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+\\]", ""));
         _lines = null;
         _currentLine = map;
         _parent = parent;

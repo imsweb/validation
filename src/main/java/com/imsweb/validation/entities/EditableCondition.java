@@ -63,7 +63,7 @@ public class EditableCondition {
      * <p/>
      * In a system persisting the rules in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextConditionSequence() method in <code>ValidatorServices</code>.
+     * getNextConditionSequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the condition persistence ID
@@ -77,7 +77,7 @@ public class EditableCondition {
      * <p/>
      * In a system persisting the rulesets in a database, that would represent a database primary key.
      * In a system using only memory objects loaded from XML, it should be assigned using the
-     * getNextConditionSequence() method in <code>ValidatorServices</code>.
+     * getNextConditionSequence() method in <code>ValidationServices</code>.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @param conditionId condition persistence ID

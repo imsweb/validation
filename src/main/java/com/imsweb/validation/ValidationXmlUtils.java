@@ -302,7 +302,7 @@ public final class ValidationXmlUtils {
             ValidatorXmlDto validatorType = (ValidatorXmlDto)createValidatorXStream().fromXML(reader);
 
             Validator validator = new Validator();
-            validator.setValidatorId(ValidatorServices.getInstance().getNextValidatorSequence());
+            validator.setValidatorId(ValidationServices.getInstance().getNextValidatorSequence());
             if (validatorType.getId() == null)
                 throw new IOException("Validator ID is required");
             validator.setId(validatorType.getId());
@@ -435,7 +435,7 @@ public final class ValidationXmlUtils {
 
             for (DeletedRuleXmlDto event : deletedRulesType) {
                 DeletedRuleHistory rh = new DeletedRuleHistory();
-                rh.setRuleHistoryId(ValidatorServices.getInstance().getNextRuleHistorySequence());
+                rh.setRuleHistoryId(ValidationServices.getInstance().getNextRuleHistorySequence());
                 if (event.getId() == null)
                     throw new IOException("Deleted rule ID is required");
                 rh.setDeletedRuleId(event.getId());
@@ -468,7 +468,7 @@ public final class ValidationXmlUtils {
         if (contextEntries != null && !contextEntries.isEmpty()) {
             for (ContextEntryXmlDto entryType : contextEntries) {
                 ContextEntry entry = new ContextEntry();
-                entry.setContextEntryId(ValidatorServices.getInstance().getNextContextEntrySequence());
+                entry.setContextEntryId(ValidationServices.getInstance().getNextContextEntrySequence());
                 entry.setValidator(validator);
                 if (entryType.getId() == null)
                     throw new IOException("Context entry ID is required");
@@ -506,7 +506,7 @@ public final class ValidationXmlUtils {
 
                 // create new object
                 Category category = new Category();
-                category.setCategoryId(ValidatorServices.getInstance().getNextCategorySequence());
+                category.setCategoryId(ValidationServices.getInstance().getNextCategorySequence());
 
                 // copy properties
                 category.setId(type.getId().trim());
@@ -543,7 +543,7 @@ public final class ValidationXmlUtils {
 
                 // create the object
                 Condition condition = new Condition();
-                condition.setConditionId(ValidatorServices.getInstance().getNextConditionSequence());
+                condition.setConditionId(ValidationServices.getInstance().getNextConditionSequence());
 
                 // copy the properties
                 condition.setId(type.getId().trim());
@@ -592,7 +592,7 @@ public final class ValidationXmlUtils {
                 if (rules.containsKey(type.getId()))
                     throw new IOException("Edit '" + type.getId() + "' defined more than once in group " + validator.getId());
 
-                results.add(service.submit(new RuleParsingCallable(type, ValidatorServices.getInstance().getNextRuleSequence(), validator, versions, rules, props, contexts, lookups)));
+                results.add(service.submit(new RuleParsingCallable(type, ValidationServices.getInstance().getNextRuleSequence(), validator, versions, rules, props, contexts, lookups)));
             }
 
             // we won't be submitting new work anymore
@@ -645,7 +645,7 @@ public final class ValidationXmlUtils {
 
                 // create new object
                 EmbeddedSet set = new EmbeddedSet();
-                set.setSetId(ValidatorServices.getInstance().getNextSetSequence());
+                set.setSetId(ValidationServices.getInstance().getNextSetSequence());
 
                 // copy properties
                 set.setId(type.getId().trim());

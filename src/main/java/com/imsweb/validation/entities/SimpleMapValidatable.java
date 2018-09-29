@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import com.imsweb.validation.ValidatorServices;
+import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 
 /**
@@ -147,7 +147,7 @@ public class SimpleMapValidatable implements Validatable {
      */
     private SimpleMapValidatable(SimpleMapValidatable parent, String prefix, Map<String, Object> map) {
         _prefix = prefix;
-        _alias = ValidatorServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+\\]", ""));
+        _alias = ValidationServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+\\]", ""));
         _current = map;
         _parent = parent;
         _prefixes = new HashMap<>(_parent.getPrefixes());
@@ -235,7 +235,7 @@ public class SimpleMapValidatable implements Validatable {
             for (String prop : props) {
                 int pos = prop.indexOf('.');
                 if (pos >= 0) {
-                    String javaPath = ValidatorServices.getInstance().getJavaPathForAlias(prop.substring(0, pos));
+                    String javaPath = ValidationServices.getInstance().getJavaPathForAlias(prop.substring(0, pos));
                     int colPos = javaPath == null ? -1 : javaPath.lastIndexOf(".");
                     if (javaPath != null && colPos >= 0) {
                         String collectionName = javaPath.substring(colPos + 1);
