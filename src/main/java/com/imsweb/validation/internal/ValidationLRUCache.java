@@ -6,13 +6,13 @@ package com.imsweb.validation.internal;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-public class ValidatorLRUCache<A, B> extends LinkedHashMap<A, B> {
+public class ValidationLRUCache<A, B> extends LinkedHashMap<A, B> {
 
     private static final long serialVersionUID = 1L;
 
     private final int _maxEntries;
 
-    public ValidatorLRUCache(int maxEntries) {
+    public ValidationLRUCache(int maxEntries) {
         super(maxEntries + 1, 1.0f, true);
         _maxEntries = maxEntries;
     }

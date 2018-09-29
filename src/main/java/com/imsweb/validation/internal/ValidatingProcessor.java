@@ -63,7 +63,7 @@ public class ValidatingProcessor implements Processor {
     private Map<String, Object> _contexts = new ConcurrentHashMap<>();
 
     // cached compiled forced rules (#294)
-    private ValidatorLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidatorLRUCache<>(10);
+    private ValidationLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidationLRUCache<>(10);
 
     // whether or not stats should be recorded
     private boolean _recordStats = false;

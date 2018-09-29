@@ -4,7 +4,7 @@
 package com.imsweb.validation;
 
 import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
-import com.imsweb.validation.internal.ValidatorLRUCache;
+import com.imsweb.validation.internal.ValidationLRUCache;
 import groovy.lang.Binding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -140,7 +140,7 @@ public class ValidationContextFunctions {
     }
 
     // cached regular expressions
-    private ValidatorLRUCache<String, Pattern> _regexCache;
+    private ValidationLRUCache<String, Pattern> _regexCache;
 
     // lock for the cache
     private static final Object _REGEX_CACHE_LOCK = new Object();
@@ -451,7 +451,7 @@ public class ValidationContextFunctions {
     public void enableRegexCaching(int cacheSize) {
         if (cacheSize < 1 || cacheSize > 10000)
             throw new RuntimeException("Cache size must be between 1 and 10,000");
-        _regexCache = new ValidatorLRUCache<>(cacheSize);
+        _regexCache = new ValidationLRUCache<>(cacheSize);
         _numRegexCacheHit = 0;
         _numRegexCacheMiss = 0;
     }
