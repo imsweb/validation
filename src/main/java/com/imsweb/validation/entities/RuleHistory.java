@@ -49,6 +49,16 @@ public class RuleHistory {
     protected Rule _rule;
 
     /**
+     * A String representation of the old rule values for this history entry; not used by the framework
+     */
+    protected String _oldRule;
+
+    /**
+     * A String representation of the new rule values for this history entry; not used by the framework
+     */
+    protected String _newRule;
+
+    /**
      * Getter.
      * <p/>
      * Created on Feb 23, 2011 by depryf
@@ -186,6 +196,22 @@ public class RuleHistory {
      */
     public void setReference(String reference) {
         _reference = reference;
+    }
+
+    public String getOldRule() {
+        return _oldRule;
+    }
+
+    public void setOldRule(String oldRule) {
+        _oldRule = oldRule;
+    }
+
+    public String getNewRule() {
+        return _newRule;
+    }
+
+    public void setNewRule(String newRule) {
+        _newRule = newRule;
     }
 
     @Override
