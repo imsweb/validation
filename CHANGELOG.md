@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.24**
+
+- Added two new fields to the RuleHistory class to keep track of the before/after changes; those fields are not used directly by the framework.
+
 **Version 1.23**
 
 - Fixed dynamic error messages reported by translated edits.

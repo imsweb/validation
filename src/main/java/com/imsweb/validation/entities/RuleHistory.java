@@ -49,6 +49,16 @@ public class RuleHistory {
     protected Rule _rule;
 
     /**
+     * String representation of the old value(s) of the rule (before the changes); not used by the framework itself
+     */
+    protected String _oldRule;
+
+    /**
+     * String representation of the new value(s) of the rule (after the changes); not used by the framework itself
+     */
+    protected String _newRule;
+
+    /**
      * Getter.
      * <p/>
      * Created on Feb 23, 2011 by depryf
