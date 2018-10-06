@@ -68,6 +68,9 @@ public class ValidatingProcessor implements Processor {
     // whether or not stats should be recorded
     private boolean _recordStats = false;
 
+    // whether the processor should be looking for pre-compiled rules
+    private boolean _preCompiledLookupEnabled;
+
     // time out in seconds when executing an edit or a condition
     private int _timeout;
 
@@ -79,10 +82,12 @@ public class ValidatingProcessor implements Processor {
      * <p/>
      * Created on Aug 15, 2011 by depryf
      * @param javaPath current java path for this validating processor
+     * @param preCompiledLookupEnabled whether or not pre-compiled rules should be looked up
      * @param editExecutionTimeout timeout for edits (0 or negative means no timeout)
      */
-    public ValidatingProcessor(String javaPath, int editExecutionTimeout) {
+    public ValidatingProcessor(String javaPath, boolean preCompiledLookupEnabled, int editExecutionTimeout) {
         _currentJavaPath = javaPath;
+        _preCompiledLookupEnabled = preCompiledLookupEnabled;
         _timeout = editExecutionTimeout;
         if (editExecutionTimeout > 0)
             _executor = Executors.newSingleThreadExecutor();
@@ -102,7 +107,7 @@ public class ValidatingProcessor implements Processor {
                 toForce = _cachedForcedRules.get(key);
                 if (toForce == null) {
                     CompiledRules precompiledRules = null;
-                    if (ValidationEngine.isPreCompiledLookupEnabled() && vContext.getToForce().getValidator() != null)
+                    if (_preCompiledLookupEnabled && vContext.getToForce().getValidator() != null)
                         precompiledRules = RuntimeUtils.findCompileRules(vContext.getToForce().getValidator().getId(), vContext.getToForce().getValidator().getVersion(), null);
                     toForce = new ExecutableRule(vContext.getToForce(), precompiledRules, null);
                     _cachedForcedRules.put(key, toForce);

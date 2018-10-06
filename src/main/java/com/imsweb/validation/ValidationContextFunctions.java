@@ -31,6 +31,13 @@ import java.util.regex.Pattern;
  * <br/><br/>
  * To add your own methods to the context of the edits, create a class that extends this one, add the methods, and call the following:<br/><br/>
  * <i>ValidationContextFunctions.initialize(new MyValidatorContextFunction())</i>
+ * <br/><br/>
+ * A special method in this class is the "getContext" method; it allows an edit from one validator to access a context from
+ * another validator. In version 2.0, the engine was re-written to become non-static and allow multiple engines to run
+ * concurrently (if you are not planning on using that feature, you can stop reading!). The method uses the static cached
+ * engine (see ValidationEngine.getInstance()) and therefore it is not compatible with multiple engines. This is a known
+ * issue that might be fixed in the future, but since referencing contexts from other validators is very uncommon, the
+ * issue will be left unresolved for now.
  */
 public class ValidationContextFunctions {
 
@@ -139,11 +146,11 @@ public class ValidationContextFunctions {
         return dtos;
     }
 
+    // lock for the cache
+    private final Object _regexCacheLock = new Object();
+
     // cached regular expressions
     private ValidationLRUCache<String, Pattern> _regexCache;
-
-    // lock for the cache
-    private static final Object _REGEX_CACHE_LOCK = new Object();
 
     // stats for the cached regular expressions
     private long _numRegexCacheHit = 0, _numRegexCacheMiss = 0;
@@ -240,7 +247,8 @@ public class ValidationContextFunctions {
         if (contextKey == null)
             throw new ValidationException("Context key is required when accessing a context entry.");
 
-        Object context = ValidationEngine.getContext(contextKey, validatorId);
+        // this method uses the default (static) cached engine, this is a know limitation that hopefully won't cause trouble to anybody
+        Object context = ValidationEngine.getInstance().getContext(contextKey, validatorId);
         if (context == null)
             throw new ValidationException("Unknown context key '" + contextKey + "' from group '" + validatorId + "'");
 
@@ -480,7 +488,7 @@ public class ValidationContextFunctions {
         String reg = regex instanceof String ? (String)regex : regex.toString();
 
         Pattern pattern;
-        synchronized (_REGEX_CACHE_LOCK) {
+        synchronized (_regexCacheLock) {
             if (_regexCache == null)
                 pattern = Pattern.compile(reg);
             else {
@@ -502,7 +510,7 @@ public class ValidationContextFunctions {
      * Returns the number of hits in the regex cache.
      */
     public long getNumRegexCacheHit() {
-        synchronized (_REGEX_CACHE_LOCK) {
+        synchronized (_regexCacheLock) {
             return _numRegexCacheHit;
         }
     }
@@ -511,7 +519,7 @@ public class ValidationContextFunctions {
      * Returns the number of misses in the regex cache.
      */
     public long getNumRegexCacheMiss() {
-        synchronized (_REGEX_CACHE_LOCK) {
+        synchronized (_regexCacheLock) {
             return _numRegexCacheMiss;
         }
     }

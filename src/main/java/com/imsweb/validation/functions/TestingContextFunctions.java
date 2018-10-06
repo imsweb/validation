@@ -3,8 +3,6 @@
  */
 package com.imsweb.validation.functions;
 
-import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.ContextFunctionDocAnnotation;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.entities.Rule;
@@ -65,31 +63,51 @@ public class TestingContextFunctions {
         FAIL
     }
 
-    /**
-     * Tested rule ID
-     */
+    // tested rule ID
     protected String _ruleId;
 
-    /**
-     * Tested Rule
-     */
+    // tested rule, if not provided, it will be fetched from the referenced engine using the tested rule ID
     protected Rule _rule;
 
-    /**
-     * Map of tests, key is the line number in the script, value is a list of tests (list will have more then one element in repetitions like for loops)
-     */
+    // map of tests, key is the line number in the script, value is a list of tests (list will have more then one element in repetitions like for loops)
     protected Map<Integer, List<RuleTestResult>> _tests;
+
+    // referenced engine, if not provided, the default instance will be used
+    protected ValidationEngine _engine;
+
+    /**
+     * Constructor.
+     * <p/>
+     * Created on Oct 2, 2011 by Fabian
+     */
+    public TestingContextFunctions(RuleTest test) {
+        this(test, null);
+    }
 
     /**
      * Constructor.
      * <p/>
      * Created on Oct 2, 2011 by Fabian
      * @param test <code>RuleTest</code>, cannot be null
+     * @param rule tested <code>Rule</code>, can be null
      */
     public TestingContextFunctions(RuleTest test, Rule rule) {
+        this(test, rule, ValidationEngine.getInstance());
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * Created on Oct 5, 2018 by depryf
+     * @param test <code>RuleTest</code>, cannot be null
+     * @param rule tested <code>Rule</code>, can be null
+     * @param engine referenced <code>ValidationEngine</code>
+     */
+    public TestingContextFunctions(RuleTest test, Rule rule, ValidationEngine engine) {
         _ruleId = test.getTestedRuleId();
         _rule = rule;
         _tests = new TreeMap<>();
+        _engine = engine;
     }
 
     /**
@@ -99,7 +117,6 @@ public class TestingContextFunctions {
      * @param lineNumber test line number
      * @param dataObj test inputs
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public void assertPass(int lineNumber, Object dataObj) {
         assertPass(lineNumber, dataObj, null);
     }
@@ -112,7 +129,6 @@ public class TestingContextFunctions {
      * @param dataObj test inputs
      * @param context extra context for the test
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public void assertPass(int lineNumber, Object dataObj, Map<String, Object> context) {
 
         // redirect the output
@@ -145,9 +161,6 @@ public class TestingContextFunctions {
             // add testing result
             insertTestingResult(lineNumber, AssertionType.PASS, success, failure, dataObj, context, null, null, output);
         }
-        catch (ConstructionException e) {
-            insertTestingResult(lineNumber, AssertionType.FAIL, false, null, dataObj, context, new ValidationException(e), null, output);
-        }
         catch (ValidationException e) {
             insertTestingResult(lineNumber, AssertionType.PASS, false, null, dataObj, context, e, null, output);
         }
@@ -161,7 +174,6 @@ public class TestingContextFunctions {
      * @param dataObj test inputs
      * @param failingProperties array of properties that needs to appear in the list of failing properties for this failure
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public void assertFail(int lineNumber, Object dataObj, String... failingProperties) {
         assertFail(lineNumber, dataObj, null, failingProperties);
     }
@@ -176,7 +188,6 @@ public class TestingContextFunctions {
      * @param context extra context for the test
      */
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public void assertFail(int lineNumber, Object dataObj, Map<String, Object> context, String... failingProperties) {
         Set<String> props = new HashSet<>();
         if (failingProperties != null)
@@ -212,9 +223,6 @@ public class TestingContextFunctions {
             // add testing result
             insertTestingResult(lineNumber, AssertionType.FAIL, success, failure, dataObj, context, null, props, output);
         }
-        catch (ConstructionException e) {
-            insertTestingResult(lineNumber, AssertionType.FAIL, false, null, dataObj, context, new ValidationException(e), props, output);
-        }
         catch (ValidationException e) {
             insertTestingResult(lineNumber, AssertionType.FAIL, false, null, dataObj, context, e, props, output);
         }
@@ -226,7 +234,6 @@ public class TestingContextFunctions {
      * Created on Nov 18, 2011 by depryf
      * @return created entity
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public List<Map<String, String>> createLines() {
         return new ArrayList<>();
     }
@@ -237,7 +244,6 @@ public class TestingContextFunctions {
      * Created on Nov 18, 2011 by depryf
      * @return created entity
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public Map<String, String> createLine() {
         return new HashMap<>();
     }
@@ -248,7 +254,6 @@ public class TestingContextFunctions {
      * Created on Nov 18, 2011 by depryf
      * @return created entity
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public Map<String, String> createLine(List<Map<String, String>> lines) {
         Map<String, String> line = createLine();
         lines.add(line);
@@ -261,7 +266,6 @@ public class TestingContextFunctions {
      * Created on Nov 18, 2011 by depryf
      * @return created entity
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public List<Map<String, String>> createUntrimmedlines() {
         return new ArrayList<>();
     }
@@ -272,7 +276,6 @@ public class TestingContextFunctions {
      * Created on Nov 18, 2011 by depryf
      * @return created entity
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public Map<String, String> createUntrimmedline() {
         return new HashMap<>();
     }
@@ -283,7 +286,6 @@ public class TestingContextFunctions {
      * Created on Nov 18, 2011 by depryf
      * @return created entity
      */
-    @ContextFunctionDocAnnotation(desc = "TODO")
     public Map<String, String> createUntrimmedline(List<Map<String, String>> untrimmedlines) {
         Map<String, String> untrimmedline = createUntrimmedline();
         untrimmedlines.add(untrimmedline);
@@ -308,11 +310,11 @@ public class TestingContextFunctions {
      * @param context extra context, may be null
      * @return the test results, a collection of <code>RuleFailure</code>
      */
-    protected Collection<RuleFailure> runTest(Object data, Map<String, Object> context) throws ConstructionException, ValidationException {
+    protected Collection<RuleFailure> runTest(Object data, Map<String, Object> context) throws ValidationException {
         if (_rule != null)
-            return ValidationEngine.validate(createValidatable(data, context), _rule);
+            return _engine.validate(createValidatable(data, context), _rule);
         else
-            return ValidationEngine.validate(createValidatable(data, context), _ruleId);
+            return _engine.validate(createValidatable(data, context), _ruleId);
     }
 
     /**
@@ -332,7 +334,7 @@ public class TestingContextFunctions {
 
         Rule r = _rule;
         if (r == null)
-            r = ValidationEngine.getRule(_ruleId);
+            r = _engine.getRule(_ruleId);
         if (r != null) {
             String javaPath = r.getJavaPath();
             if (javaPath != null) {
@@ -444,7 +446,7 @@ public class TestingContextFunctions {
         Set<String> usedProperties = null;
         Rule r = _rule;
         if (r == null)
-            r = ValidationEngine.getRule(_ruleId);
+            r = _engine.getRule(_ruleId);
         if (r != null && r.getJavaPath() != null) {
             String javaPath = r.getJavaPath();
             if (javaPath.startsWith("lines") || javaPath.startsWith("untrimmedlines")) {

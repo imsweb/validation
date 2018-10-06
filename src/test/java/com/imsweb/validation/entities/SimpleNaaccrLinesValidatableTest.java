@@ -27,7 +27,7 @@ import java.util.TreeSet;
 public class SimpleNaaccrLinesValidatableTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         TestingUtils.init();
     }
 
@@ -36,7 +36,7 @@ public class SimpleNaaccrLinesValidatableTest {
         TestingUtils.loadValidator("fake-validator-naaccr-lines");
 
         StringWriter writer = new StringWriter();
-        Map<String, Object> context = Collections.singletonMap("out", (Object)writer);
+        Map<String, Object> context = Collections.singletonMap("out", writer);
 
         Map<String, String> e1 = new HashMap<>();
         e1.put("primarySite", "C001"); //  // should fail first rule
@@ -62,38 +62,37 @@ public class SimpleNaaccrLinesValidatableTest {
         Assert.assertEquals("?", v.getDisplayId());
         Assert.assertNull(v.getCurrentTumorId());
         Assert.assertEquals("lines", v.getRootLevel());
-        TestingUtils.assertEditFailure(ValidationEngine.validate(v), "fvnl-rule1");
+        TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule1");
 
         // test that the reported paths are correct
         SortedSet<String> expected = new TreeSet<>();
         expected.add("lines.line[0].primarySite");
 
         SortedSet<String> actual = new TreeSet<>();
-        for (RuleFailure f : ValidationEngine.validate(v))
-            for (String prop : f.getProperties())
-                actual.add(prop);
+        for (RuleFailure f : ValidationEngine.getInstance().validate(v))
+            actual.addAll(f.getProperties());
         Assert.assertEquals(expected, actual);
 
         v = new SimpleNaaccrLinesValidatable(e2);
-        TestingUtils.assertEditFailure(ValidationEngine.validate(v), "fvnl-rule1"); // exception bc 'out' not defined
-        TestingUtils.assertEditFailure(ValidationEngine.validate(v), "fvnl-rule2");
+        TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule1"); // exception bc 'out' not defined
+        TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule2");
 
         List<Map<String, String>> list = new ArrayList<>();
         list.add(e2);
         list.add(e1);
         v = new SimpleNaaccrLinesValidatable(list, context);
-        TestingUtils.assertNoEditFailure(ValidationEngine.validate(v), "fvnl-rule2");
-        TestingUtils.assertEditFailure(ValidationEngine.validate(v), "fvnl-rule1");
+        TestingUtils.assertNoEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule2");
+        TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule1");
         RuleFailure e1Failure = null;
-        for (RuleFailure failure : ValidationEngine.validate(v))
+        for (RuleFailure failure : ValidationEngine.getInstance().validate(v))
             if (failure.getRule().getId().equals("fvnl-rule1"))
                 e1Failure = failure;
         if (e1Failure != null)
             Assert.assertEquals("lines.line[1].primarySite", e1Failure.getProperties().iterator().next());
 
         v = new SimpleNaaccrLinesValidatable(e2);
-        TestingUtils.assertEditFailure(ValidationEngine.validate(v), "fvnl-rule1"); // exception bc 'out' not defined
-        TestingUtils.assertEditFailure(ValidationEngine.validate(v), "fvnl-rule2");
+        TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule1"); // exception bc 'out' not defined
+        TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule2");
 
         // test the current level
         Assert.assertEquals("lines", v.getCurrentLevel());

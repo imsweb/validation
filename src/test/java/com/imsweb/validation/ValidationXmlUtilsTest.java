@@ -202,8 +202,8 @@ public class ValidationXmlUtilsTest {
     public void testValidatorEmptyData() throws IOException, ConstructionException {
         Validator v = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-empty.xml"));
 
-        ValidationEngine.addValidator(new EditableValidator(v));
-        ValidationEngine.deleteValidator(new EditableValidator(v));
+        ValidationEngine.getInstance().addValidator(new EditableValidator(v));
+        ValidationEngine.getInstance().deleteValidator(new EditableValidator(v));
 
         File targetFile = new File(TestingUtils.TMP_DIR, "xml-validator-test.xml");
         targetFile.deleteOnExit();

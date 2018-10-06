@@ -3,7 +3,7 @@
  */
 package com.imsweb.validation.runtime;
 
-import com.imsweb.validation.EngineInitStats;
+import com.imsweb.validation.InitializationStats;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.imsweb.validation.EngineInitStats.REASON_CLASS_ACCESS_ERROR;
-import static com.imsweb.validation.EngineInitStats.REASON_CLASS_CAST_ERROR;
-import static com.imsweb.validation.EngineInitStats.REASON_CLASS_INSTANCIATION_ERROR;
-import static com.imsweb.validation.EngineInitStats.REASON_CLASS_NOT_FOUND;
-import static com.imsweb.validation.EngineInitStats.REASON_CONSTRUCTOR_NOT_FOUND;
-import static com.imsweb.validation.EngineInitStats.REASON_DIFFERENT_VERSION;
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_ACCESS_ERROR;
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_CAST_ERROR;
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_INSTANCIATION_ERROR;
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_NOT_FOUND;
+import static com.imsweb.validation.InitializationStats.REASON_CONSTRUCTOR_NOT_FOUND;
+import static com.imsweb.validation.InitializationStats.REASON_DIFFERENT_VERSION;
 
 /**
  * This class is used by the engine to support pre-parsed and pre-compiled edits.
@@ -73,7 +73,7 @@ public class RuntimeUtils {
         return result.toString() + "CompiledRules";
     }
 
-    public static CompiledRules findCompileRules(String validatorId, String version, EngineInitStats stats) {
+    public static CompiledRules findCompileRules(String validatorId, String version, InitializationStats stats) {
         CompiledRules compiledRules;
 
         String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);

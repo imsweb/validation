@@ -1080,8 +1080,6 @@ public final class ValidationXmlUtils {
                 set.addReferencedValidatorId(validatorType.getId());
                 String include = validatorType.getInclude();
                 if (include != null && !include.trim().isEmpty()) {
-                    if (inclusions.containsKey(validatorType.getId()))
-                        throw new IOException("There can be only one set of inclusions per validator!");
                     List<String> inc = new ArrayList<>();
                     for (String s : StringUtils.split(include, ','))
                         inc.add(s.trim());
@@ -1092,8 +1090,6 @@ public final class ValidationXmlUtils {
                 Map<String, List<String>> exclusions = new HashMap<>();
                 String exclude = validatorType.getExclude();
                 if (exclude != null && !exclude.trim().isEmpty()) {
-                    if (exclusions.containsKey(validatorType.getId()))
-                        throw new IOException("There can be only one set of exclusions per validator!");
                     List<String> exc = new ArrayList<>();
                     for (String s : StringUtils.split(exclude, ','))
                         exc.add(s.trim());

@@ -4,7 +4,7 @@
 package com.imsweb.validation.internal;
 
 import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.EngineInitStats;
+import com.imsweb.validation.InitializationStats;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidationServices;
@@ -129,7 +129,7 @@ public class ExecutableRule {
      * @param compiledRules pre-compiled rules (can be null in which case a Groovy Script will be compiled)
      * @param stats initialization stats (can be null)
      */
-    public ExecutableRule(Rule rule, CompiledRules compiledRules, EngineInitStats stats) throws ConstructionException {
+    public ExecutableRule(Rule rule, CompiledRules compiledRules, InitializationStats stats) throws ConstructionException {
         _rule = rule;
         _internalId = rule.getRuleId();
         _internalValidatorId = rule.getValidator() != null ? rule.getValidator().getValidatorId() : null;

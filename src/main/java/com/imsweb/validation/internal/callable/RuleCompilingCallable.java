@@ -3,7 +3,7 @@
  */
 package com.imsweb.validation.internal.callable;
 
-import com.imsweb.validation.EngineInitStats;
+import com.imsweb.validation.InitializationStats;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.internal.ExecutableRule;
 import com.imsweb.validation.runtime.CompiledRules;
@@ -34,14 +34,14 @@ public class RuleCompilingCallable implements Callable<Void> {
     /**
      * Initialization stats.
      */
-    private EngineInitStats _stats;
+    private InitializationStats _stats;
 
     /**
      * Constructor.
      * @param rule rule to compile
      * @param rules collection of compiled rules
      */
-    public RuleCompilingCallable(Rule rule, Map<Long, ExecutableRule> rules, CompiledRules compiledRules, EngineInitStats stats) {
+    public RuleCompilingCallable(Rule rule, Map<Long, ExecutableRule> rules, CompiledRules compiledRules, InitializationStats stats) {
         _rule = rule;
         _rules = rules;
         _compiledRules = compiledRules;

@@ -43,6 +43,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+// TODO FD review this documentation
+
 /**
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
  * <br/><br/>
@@ -164,34 +166,46 @@ public final class ValidationEngine {
     public static final String NO_MESSAGE_DEFINED_MSG = "No default error message defined.";
 
     /**
+     * Cached instance of an engine.
+     */
+    private static ValidationEngine _INSTANCE = new ValidationEngine();
+
+    /**
+     * Returns the cached engine.
+     */
+    public static ValidationEngine getInstance() {
+        return _INSTANCE;
+    }
+
+    /**
      * Map of <code>Validator</code>s, keyed by validator ID
      */
-    private static Map<String, Validator> _VALIDATORS = new ConcurrentHashMap<>();
+    private Map<String, Validator> _validators = new ConcurrentHashMap<>();
 
     /**
      * Map of <code>Processor</code>s, keyed by java-path root
      */
-    private static Map<String, ValidatingProcessor> _PROCESSORS = new ConcurrentHashMap<>();
+    private Map<String, ValidatingProcessor> _processors = new ConcurrentHashMap<>();
 
     /**
      * Currently used processor roots (for SEER, that would be "lines", for DMS it would be "patient", etc...)
      */
-    private static Map<String, Object> _PROCESSOR_ROOTS = new ConcurrentHashMap<>();
+    private Map<String, Object> _processorRoots = new ConcurrentHashMap<>();
 
     /**
      * Map of <code>ExecutableRule</code>s, keyed by rule internal ID
      */
-    private static Map<Long, ExecutableRule> _EXECUTABLE_RULES = new ConcurrentHashMap<>();
+    private Map<Long, ExecutableRule> _executableRules = new ConcurrentHashMap<>();
 
     /**
      * Map of <code>ExecutableCondition</code>s, keyed by condition internal ID
      */
-    private static Map<Long, ExecutableCondition> _EXECUTABLE_CONDITIONS = new ConcurrentHashMap<>();
+    private Map<Long, ExecutableCondition> _executableConditions = new ConcurrentHashMap<>();
 
     /**
      * Compiled contexts, keyed by validator internal ID and context ID
      */
-    private static Map<Long, Map<String, Object>> _CONTEXTS = new ConcurrentHashMap<>();
+    private Map<Long, Map<String, Object>> _contexts = new ConcurrentHashMap<>();
 
     /**
      * Possible statuses for the engine
@@ -214,36 +228,28 @@ public final class ValidationEngine {
     /**
      * Current engine status
      */
-    private static ValidationEngineStatus _STATUS = ValidationEngineStatus.NOT_INITIALIZED;
+    private ValidationEngineStatus _status = ValidationEngineStatus.NOT_INITIALIZED;
 
     /**
      * The number of threads to use to compile the rules (see enableMultiThreadedCompilation() method)
      */
-    private static int _NUM_COMPILER_THREADS = 1;
+    private int _numCompilerThreads = 1;
 
     /**
      * The timeout (in seconds) for running edits (or conditions); if an edit runs for longer than the value, it will automatically be killed and fail. Use 0 for no timeout (the default).
      */
-    private static int _EDIT_EXECUTION_TIMEOUT = 0;
+    private int _editExecutionTimeout = 0;
 
     /**
      * Whether or not the pre-compiling mechanism should be used (enabled by default).
      */
-    private static boolean _PRE_COMPILED_LOOKUP_ENABLED = true;
+    private boolean _preCompiledLookupEnabled = true;
 
     /**
      * Private lock controlling access to the state of the engine; all methods using the state of the engine (including the validate methods) need to acquire a read lock;
      * all methods changing the state of the engine need to acquire a write lock.
      */
-    private static ReentrantReadWriteLock _LOCK = new ReentrantReadWriteLock();
-
-    /**
-     * Private constructor, no instantiation of this class!
-     * <p/>
-     * Created on Jun 28, 2011 by depryf
-     */
-    private ValidationEngine() {
-    }
+    private ReentrantReadWriteLock _lock = new ReentrantReadWriteLock();
 
     // ********************************************************************************
     //                INITIALIZATION METHOD (require the write lock)
@@ -255,19 +261,34 @@ public final class ValidationEngine {
      * Created on Aug 12, 2009 by depryf
      * @return true if the engine has been initialized, false otherwise.
      */
-    public static boolean isInitialized() {
-        return _STATUS == ValidationEngineStatus.INITIALIZED;
+    public boolean isInitialized() {
+        return _status == ValidationEngineStatus.INITIALIZED;
+    }
+
+    /**
+     * Initializes thisvalidation engine.
+     * <p/>
+     * Created on Mar 6, 2008 by depryf
+     */
+    public void initialize() {
+        try {
+            initialize(new InitializationOptions(), Collections.emptyList());
+        }
+        catch (ConstructionException e) {
+            throw new RuntimeException(e); // should never happen since we are not really initializing anything...
+        }
     }
 
     /**
      * Initializes this validation engine.
      * <p/>
      * Created on Mar 6, 2008 by depryf
+     * @param options initialization options
      * @return initialization statistics
      */
-    public static EngineInitStats initialize() {
+    public InitializationStats initialize(InitializationOptions options) {
         try {
-            return initialize((List<Validator>)null);
+            return initialize(options, Collections.emptyList());
         }
         catch (ConstructionException e) {
             throw new RuntimeException(e); // should never happen since we are not really initializing anything...
@@ -282,8 +303,21 @@ public final class ValidationEngine {
      * @return initialization statistics
      * @throws ConstructionException if a ... construction exception happens...
      */
-    public static EngineInitStats initialize(Validator validator) throws ConstructionException {
-        return initialize(validator == null ? null : Collections.singletonList(validator));
+    public InitializationStats initialize(Validator validator) throws ConstructionException {
+        return initialize(new InitializationOptions(), Collections.singletonList(validator));
+    }
+
+    /**
+     * Initializes this validation engine using the provided <code>Validator</code>.
+     * <p/>
+     * Created on Mar 6, 2008 by depryf
+     * @param options initialization options
+     * @param validator <code>Validator</code> to load
+     * @return initialization statistics
+     * @throws ConstructionException if a ... construction exception happens...
+     */
+    public InitializationStats initialize(InitializationOptions options, Validator validator) throws ConstructionException {
+        return initialize(options, Collections.singletonList(validator));
     }
 
     /**
@@ -294,15 +328,35 @@ public final class ValidationEngine {
      * @return initialization statistics
      * @throws ConstructionException if a ... construction exception happens...
      */
-    public static EngineInitStats initialize(List<Validator> validators) throws ConstructionException {
-        _STATUS = ValidationEngineStatus.INITIALIZING;
+    public InitializationStats initialize(List<Validator> validators) throws ConstructionException {
+        return initialize(new InitializationOptions(), validators);
+    }
 
-        EngineInitStats stats = new EngineInitStats();
+    /**
+     * Initializes this validation engine using the provided list of <code>Validator</code>.
+     * <p/>
+     * Created on Mar 6, 2008 by depryf
+     * @param options initialization options
+     * @param validators list of <code>Validator</code> to load
+     * @return initialization statistics
+     * @throws ConstructionException if a ... construction exception happens...
+     */
+    public InitializationStats initialize(InitializationOptions options, List<Validator> validators) throws ConstructionException {
+        _status = ValidationEngineStatus.INITIALIZING;
+
+        if (options == null)
+            options = new InitializationOptions();
+
+        InitializationStats stats = new InitializationStats();
         long start = System.currentTimeMillis();
 
-        _LOCK.writeLock().lock();
+        _lock.writeLock().lock();
         try {
             uninitialize();
+
+            // TODO use the options
+            //turnStatisticsOn(options.enableEngineStats());
+
             if (validators != null) {
                 checkValidatorConstraints(validators);
 
@@ -321,23 +375,23 @@ public final class ValidationEngine {
                 List<ExecutableRule> sortedRules = getRulesSortedByDependencies(rules, conditions);
 
                 // at this point we checked everything, so let's update the internal state of the engine
-                _EXECUTABLE_CONDITIONS.putAll(conditions);
-                _EXECUTABLE_RULES.putAll(rules);
-                _CONTEXTS.putAll(allContexts);
+                _executableConditions.putAll(conditions);
+                _executableRules.putAll(rules);
+                _contexts.putAll(allContexts);
                 populateProcessors(sortedRules);
 
                 // update the raw structure only if the state was successfully updated...
                 for (Validator v : validators)
-                    _VALIDATORS.put(v.getId(), v);
+                    _validators.put(v.getId(), v);
             }
             else
                 populateProcessors(null);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
 
-        _STATUS = ValidationEngineStatus.INITIALIZED;
+        _status = ValidationEngineStatus.INITIALIZED;
 
         stats.setInitializationDuration(System.currentTimeMillis() - start);
 
@@ -345,24 +399,24 @@ public final class ValidationEngine {
     }
 
     /**
-     * Un-initializes the validation engine; the engine can't be used after this call, unless it is re-initialized.
+     * Un-initializes the engine; the engine can't be used after this call, unless it is re-initialized.
      * <p/>
      * Created on Apr 15, 2010 by depryf
      */
-    public static void uninitialize() {
-        _STATUS = ValidationEngineStatus.NOT_INITIALIZED;
+    public void uninitialize() {
+        _status = ValidationEngineStatus.NOT_INITIALIZED;
 
-        _LOCK.writeLock().lock();
+        _lock.writeLock().lock();
         try {
-            _VALIDATORS.clear();
-            _PROCESSORS.clear();
-            _PROCESSOR_ROOTS.clear();
-            _EXECUTABLE_RULES.clear();
-            _EXECUTABLE_CONDITIONS.clear();
-            _CONTEXTS.clear();
+            _validators.clear();
+            _processors.clear();
+            _processorRoots.clear();
+            _executableRules.clear();
+            _executableConditions.clear();
+            _contexts.clear();
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -378,13 +432,13 @@ public final class ValidationEngine {
      * Created on Jun 29, 2011 by depryf
      * @return all the <code>Validator</code>s contained in the engine, keyed by their ID; maybe empty but never null
      */
-    public static Map<String, Validator> getValidators() {
-        _LOCK.readLock().lock();
+    public Map<String, Validator> getValidators() {
+        _lock.readLock().lock();
         try {
-            return Collections.unmodifiableMap(_VALIDATORS);
+            return Collections.unmodifiableMap(_validators);
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -398,16 +452,16 @@ public final class ValidationEngine {
      * @return the <code>Validator</code> for the requested ID, null if not found
      */
 
-    public static Validator getValidator(String validatorId) {
+    public Validator getValidator(String validatorId) {
         if (validatorId == null)
             return null;
 
-        _LOCK.readLock().lock();
+        _lock.readLock().lock();
         try {
-            return _VALIDATORS.get(validatorId);
+            return _validators.get(validatorId);
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -418,7 +472,7 @@ public final class ValidationEngine {
      * @param conditionId condition ID
      * @return requested <code>Condition</code>, null if not found
      */
-    public static Condition getCondition(String conditionId) {
+    public Condition getCondition(String conditionId) {
         return getCondition(conditionId, null);
     }
 
@@ -430,20 +484,20 @@ public final class ValidationEngine {
      * @param validatorId validator ID (if null then the condition will be searched among all the available validators)
      * @return requested <code>Condition</code>, null if not found
      */
-    public static Condition getCondition(String conditionId, String validatorId) {
+    public Condition getCondition(String conditionId, String validatorId) {
         if (conditionId == null)
             return null;
 
-        _LOCK.readLock().lock();
+        _lock.readLock().lock();
         try {
             if (validatorId != null) {
-                Validator v = _VALIDATORS.get(validatorId);
+                Validator v = _validators.get(validatorId);
                 if (v == null)
                     return null;
                 return v.getCondition(conditionId);
             }
 
-            for (Validator v : _VALIDATORS.values()) {
+            for (Validator v : _validators.values()) {
                 Condition c = v.getCondition(conditionId);
                 if (c != null)
                     return c;
@@ -452,7 +506,7 @@ public final class ValidationEngine {
             return null;
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -463,7 +517,7 @@ public final class ValidationEngine {
      * @param categoryId category ID
      * @return requested <code>Category</code>, null if not found
      */
-    public static Category getCategory(String categoryId) {
+    public Category getCategory(String categoryId) {
         return getCategory(categoryId, null);
     }
 
@@ -475,20 +529,20 @@ public final class ValidationEngine {
      * @param validatorId validator ID (if null then the category will be searched among all the available validators)
      * @return requested <code>Category</code>, null if not found
      */
-    public static Category getCategory(String categoryId, String validatorId) {
+    public Category getCategory(String categoryId, String validatorId) {
         if (categoryId == null)
             return null;
 
-        _LOCK.readLock().lock();
+        _lock.readLock().lock();
         try {
             if (validatorId != null) {
-                Validator v = _VALIDATORS.get(validatorId);
+                Validator v = _validators.get(validatorId);
                 if (v == null)
                     return null;
                 return v.getCategory(categoryId);
             }
 
-            for (Validator v : _VALIDATORS.values()) {
+            for (Validator v : _validators.values()) {
                 Category c = v.getCategory(categoryId);
                 if (c != null)
                     return c;
@@ -497,7 +551,7 @@ public final class ValidationEngine {
             return null;
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -508,7 +562,7 @@ public final class ValidationEngine {
      * @param ruleId rule ID
      * @return requested <code>Rule</code>, null if not found
      */
-    public static Rule getRule(String ruleId) {
+    public Rule getRule(String ruleId) {
         return getRule(ruleId, null);
     }
 
@@ -520,20 +574,20 @@ public final class ValidationEngine {
      * @param validatorId validator ID (if null then the rule will be searched among all the available validators)
      * @return requested <code>Rule</code>, null if not found
      */
-    public static Rule getRule(String ruleId, String validatorId) {
+    public Rule getRule(String ruleId, String validatorId) {
         if (ruleId == null)
             return null;
 
-        _LOCK.readLock().lock();
+        _lock.readLock().lock();
         try {
             if (validatorId != null) {
-                Validator v = _VALIDATORS.get(validatorId);
+                Validator v = _validators.get(validatorId);
                 if (v == null)
                     return null;
                 return v.getRule(ruleId);
             }
 
-            for (Validator v : _VALIDATORS.values()) {
+            for (Validator v : _validators.values()) {
                 Rule r = v.getRule(ruleId);
                 if (r != null)
                     return r;
@@ -542,7 +596,7 @@ public final class ValidationEngine {
             return null;
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -553,7 +607,7 @@ public final class ValidationEngine {
      * @param contextKey context key (if null, then null will be returned)
      * @return requested compiled context, null if not found
      */
-    public static Object getContext(String contextKey) {
+    public Object getContext(String contextKey) {
         return getContext(contextKey, null);
     }
 
@@ -565,20 +619,20 @@ public final class ValidationEngine {
      * @param validatorId validator ID (if null then the context will be searched among all the available validators)
      * @return requested compiled context, null if not found
      */
-    public static Object getContext(String contextKey, String validatorId) {
+    public Object getContext(String contextKey, String validatorId) {
         if (contextKey == null)
             return null;
 
-        _LOCK.readLock().lock();
+        _lock.readLock().lock();
         try {
             if (validatorId != null) {
-                Validator v = _VALIDATORS.get(validatorId);
+                Validator v = _validators.get(validatorId);
                 if (v == null)
                     return null;
-                return _CONTEXTS.get(v.getValidatorId()).get(contextKey);
+                return _contexts.get(v.getValidatorId()).get(contextKey);
             }
 
-            for (Map<String, Object> context : _CONTEXTS.values()) {
+            for (Map<String, Object> context : _contexts.values()) {
                 Object c = context.get(contextKey);
                 if (c != null)
                     return c;
@@ -587,7 +641,7 @@ public final class ValidationEngine {
             return null;
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -605,13 +659,13 @@ public final class ValidationEngine {
      * @return a collection of <code>RuleFailure</code>, maybe empty but not null
      * @throws ValidationException if anything goes wrong during the validation
      */
-    public static Collection<RuleFailure> validate(Validatable validatable) throws ValidationException {
-        _LOCK.readLock().lock();
+    public Collection<RuleFailure> validate(Validatable validatable) throws ValidationException {
+        _lock.readLock().lock();
         try {
             return internalValidate(validatable, new ValidatingContext());
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -631,15 +685,15 @@ public final class ValidationEngine {
      * @return a collection of <code>RuleFailure</code>, maybe empty but not null
      * @throws ValidationException if anything goes wrong during the validation
      */
-    public static Collection<RuleFailure> validate(Validatable validatable, Collection<String> ruleIdsToIgnore) throws ValidationException {
-        _LOCK.readLock().lock();
+    public Collection<RuleFailure> validate(Validatable validatable, Collection<String> ruleIdsToIgnore) throws ValidationException {
+        _lock.readLock().lock();
         try {
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToIgnore(ruleIdsToIgnore);
             return internalValidate(validatable, vContext);
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -660,8 +714,8 @@ public final class ValidationEngine {
      * @return a collection of <code>RuleFailure</code>, maybe empty but not null
      * @throws ValidationException if anything goes wrong during the validation
      */
-    public static Collection<RuleFailure> validate(Validatable validatable, Collection<String> ruleIdsToIgnore, Collection<String> ruleIdsToExecute) throws ValidationException {
-        _LOCK.readLock().lock();
+    public Collection<RuleFailure> validate(Validatable validatable, Collection<String> ruleIdsToIgnore, Collection<String> ruleIdsToExecute) throws ValidationException {
+        _lock.readLock().lock();
         try {
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToIgnore(ruleIdsToIgnore);
@@ -669,7 +723,7 @@ public final class ValidationEngine {
             return internalValidate(validatable, vContext);
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -689,8 +743,8 @@ public final class ValidationEngine {
      * @return a collection of <code>RuleFailure</code>, maybe empty but not null
      * @throws ValidationException if anything goes wrong during the validation
      */
-    public static Collection<RuleFailure> validate(Validatable validatable, String ruleId) throws ValidationException {
-        _LOCK.readLock().lock();
+    public Collection<RuleFailure> validate(Validatable validatable, String ruleId) throws ValidationException {
+        _lock.readLock().lock();
         try {
             Rule rule = getRule(ruleId);
             if (rule == null)
@@ -700,7 +754,7 @@ public final class ValidationEngine {
             return internalValidate(validatable, vContext);
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -721,8 +775,8 @@ public final class ValidationEngine {
      * @return a collection of <code>RuleFailure</code>, maybe empty but not null
      * @throws ValidationException if anything goes wrong during the validation
      */
-    public static Collection<RuleFailure> validate(Validatable validatable, Rule rule) throws ValidationException {
-        _LOCK.readLock().lock();
+    public Collection<RuleFailure> validate(Validatable validatable, Rule rule) throws ValidationException {
+        _lock.readLock().lock();
         try {
             if (rule == null)
                 throw new RuntimeException("This method requires a non-null rule!");
@@ -734,7 +788,7 @@ public final class ValidationEngine {
             return internalValidate(validatable, vContext);
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -751,13 +805,13 @@ public final class ValidationEngine {
      * @return a collection of <code>RuleFailure</code>, maybe empty but not null
      * @throws ValidationException if anything goes wrong during the validation
      */
-    public static Collection<RuleFailure> validate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
-        _LOCK.readLock().lock();
+    public Collection<RuleFailure> validate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
+        _lock.readLock().lock();
         try {
             return internalValidate(validatable, vContext);
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -782,8 +836,8 @@ public final class ValidationEngine {
      * @return the created <code>Rule</code>
      * @throws ConstructionException if the rule contains an error
      */
-    public static Rule addRule(EditableRule editableRule) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public Rule addRule(EditableRule editableRule) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
 
             if (editableRule == null)
@@ -798,7 +852,7 @@ public final class ValidationEngine {
                 throw new ConstructionException("A message is required when adding a new edit");
             if (getRule(editableRule.getId()) != null)
                 throw new ConstructionException("Edit IDs must be unique within the edits engine, cannot add '" + editableRule.getId() + "'");
-            if (!_VALIDATORS.containsKey(editableRule.getValidatorId()))
+            if (!_validators.containsKey(editableRule.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableRule.getValidatorId());
             if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableRule.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableRule.getJavaPath());
@@ -839,25 +893,25 @@ public final class ValidationEngine {
             rule.setDescription(editableRule.getDescription());
             rule.setDependencies(editableRule.getDependencies());
             rule.setHistories(editableRule.getHistories());
-            rule.setValidator(_VALIDATORS.get(editableRule.getValidatorId()));
+            rule.setValidator(_validators.get(editableRule.getValidatorId()));
 
             // create an executable rule from it
             ExecutableRule execRule = new ExecutableRule(rule);
 
             // update the dependencies; make sure we don't leave the internal structures in a bad state if something goes wrong...
-            Map<Long, ExecutableRule> rules = new HashMap<>(_EXECUTABLE_RULES);
+            Map<Long, ExecutableRule> rules = new HashMap<>(_executableRules);
             rules.put(execRule.getInternalId(), execRule);
-            List<ExecutableRule> sortedRules = getRulesSortedByDependencies(rules, _EXECUTABLE_CONDITIONS); // this will validate the rule dependencies...
-            _EXECUTABLE_RULES.put(execRule.getInternalId(), execRule);
+            List<ExecutableRule> sortedRules = getRulesSortedByDependencies(rules, _executableConditions); // this will validate the rule dependencies...
+            _executableRules.put(execRule.getInternalId(), execRule);
 
             // update the processors after re-evaluating the rules order (if the new java path doesn't exist, re-populate all the processors)
-            if (!_PROCESSORS.containsKey(editableRule.getJavaPath()))
+            if (!_processors.containsKey(editableRule.getJavaPath()))
                 populateProcessors(sortedRules);
             else
                 updateProcessorsRules(sortedRules); // this is way less expensive than re-populating the processors...
 
             // update raw data
-            _VALIDATORS.get(editableRule.getValidatorId()).getRules().add(rule);
+            _validators.get(editableRule.getValidatorId()).getRules().add(rule);
 
             // update the inverted dependencies in the raw data
             if (editableRule.getDependencies() != null && !editableRule.getDependencies().isEmpty())
@@ -868,7 +922,7 @@ public final class ValidationEngine {
             return rule;
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -894,8 +948,8 @@ public final class ValidationEngine {
      * @param editableRule <code>EditableRule</code>, cannot be null
      * @throws ConstructionException if the rule contains an error
      */
-    public static void updateRule(EditableRule editableRule) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void updateRule(EditableRule editableRule) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             if (editableRule == null)
                 throw new ConstructionException("An editable rule is required for modifying an edit");
@@ -907,13 +961,13 @@ public final class ValidationEngine {
                 throw new ConstructionException("A group is required when modifying an edit");
             if (editableRule.getMessage() == null)
                 throw new ConstructionException("A message is required when modifying an edit");
-            if (!_VALIDATORS.containsKey(editableRule.getValidatorId()))
+            if (!_validators.containsKey(editableRule.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableRule.getValidatorId());
             if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableRule.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableRule.getJavaPath());
 
             // get original executable rule
-            ExecutableRule originalExecRule = _EXECUTABLE_RULES.get(editableRule.getRuleId());
+            ExecutableRule originalExecRule = _executableRules.get(editableRule.getRuleId());
             if (originalExecRule == null)
                 throw new ConstructionException("Validation Engine does not contain requested edit");
 
@@ -963,13 +1017,13 @@ public final class ValidationEngine {
             execRule.setJavaPath(editableRule.getJavaPath());
 
             // update the dependencies; make sure we don't leave the internal structures in a bad state if something goes wrong...
-            Map<Long, ExecutableRule> rules = new HashMap<>(_EXECUTABLE_RULES);
+            Map<Long, ExecutableRule> rules = new HashMap<>(_executableRules);
             rules.put(execRule.getInternalId(), execRule);
-            List<ExecutableRule> sortedRules = getRulesSortedByDependencies(rules, _EXECUTABLE_CONDITIONS); // this will validate the rule dependencies...
-            _EXECUTABLE_RULES.put(execRule.getInternalId(), execRule);
+            List<ExecutableRule> sortedRules = getRulesSortedByDependencies(rules, _executableConditions); // this will validate the rule dependencies...
+            _executableRules.put(execRule.getInternalId(), execRule);
 
             // update the processors after re-evaluating the rules order (if the new java path doesn't exist, re-populate all the processors)
-            if (!_PROCESSORS.containsKey(editableRule.getJavaPath()))
+            if (!_processors.containsKey(editableRule.getJavaPath()))
                 populateProcessors(sortedRules);
             else
                 updateProcessorsRules(sortedRules); // this is way less expensive than re-populating the processors...
@@ -1015,7 +1069,7 @@ public final class ValidationEngine {
             }
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1028,8 +1082,8 @@ public final class ValidationEngine {
      * @param ruleId rule ID to delete
      * @throws ConstructionException if the rule cannot be found
      */
-    public static void deleteRule(String ruleId) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void deleteRule(String ruleId) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Rule r = getRule(ruleId);
             if (r == null)
@@ -1037,7 +1091,7 @@ public final class ValidationEngine {
             deleteRule(new EditableRule(r));
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1055,8 +1109,8 @@ public final class ValidationEngine {
      * @param editableRule <code>EditableRule</code>, cannot be null
      * @throws ConstructionException
      */
-    public static void deleteRule(EditableRule editableRule) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void deleteRule(EditableRule editableRule) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             if (editableRule == null)
                 throw new ConstructionException("An editable rule is required for deleting an edit");
@@ -1066,10 +1120,10 @@ public final class ValidationEngine {
                 throw new ConstructionException("An edit ID is required when deleting an edit");
             if (editableRule.getValidatorId() == null)
                 throw new ConstructionException("A group is required when deleting an edit");
-            if (!_VALIDATORS.containsKey(editableRule.getValidatorId()))
+            if (!_validators.containsKey(editableRule.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableRule.getValidatorId());
 
-            for (Rule r : _VALIDATORS.get(editableRule.getValidatorId()).getRules())
+            for (Rule r : _validators.get(editableRule.getValidatorId()).getRules())
                 if (r.getDependencies().contains(editableRule.getId()))
                     throw new ConstructionException(editableRule.getId() + " cannot be deleted, " + r.getId() + " depends on it");
 
@@ -1079,13 +1133,13 @@ public final class ValidationEngine {
                 throw new ConstructionException("Validation Engine does not contain requested edit");
 
             // update the executable rule
-            _EXECUTABLE_RULES.remove(rule.getRuleId());
+            _executableRules.remove(rule.getRuleId());
 
             // update the processors after re-evaluating the rules order
-            updateProcessorsRules(getRulesSortedByDependencies(_EXECUTABLE_RULES, _EXECUTABLE_CONDITIONS));
+            updateProcessorsRules(getRulesSortedByDependencies(_executableRules, _executableConditions));
 
             // update raw data
-            _VALIDATORS.get(editableRule.getValidatorId()).getRules().remove(rule);
+            _validators.get(editableRule.getValidatorId()).getRules().remove(rule);
 
             // update the inverted dependencies in the raw data
             for (Rule r : rule.getValidator().getRules())
@@ -1093,7 +1147,7 @@ public final class ValidationEngine {
                     r.getInvertedDependencies().remove(rule.getId());
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1114,8 +1168,8 @@ public final class ValidationEngine {
      * @return the created <code>Condition</code>
      * @throws ConstructionException if the condition contains an error
      */
-    public static Condition addCondition(EditableCondition editableCondition) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public Condition addCondition(EditableCondition editableCondition) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             if (editableCondition == null)
                 throw new ConstructionException("An editable condition is required for adding a new condition");
@@ -1127,7 +1181,7 @@ public final class ValidationEngine {
                 throw new ConstructionException("A java-path is required when adding a new condition");
             if (getCondition(editableCondition.getId()) != null)
                 throw new ConstructionException("Condition IDs must be unique within the edits engine, cannot add '" + editableCondition.getId() + "'");
-            if (!_VALIDATORS.containsKey(editableCondition.getValidatorId()))
+            if (!_validators.containsKey(editableCondition.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableCondition.getValidatorId());
             if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableCondition.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableCondition.getJavaPath());
@@ -1143,27 +1197,27 @@ public final class ValidationEngine {
             condition.setDescription(editableCondition.getDescription());
             condition.setJavaPath(editableCondition.getJavaPath());
             condition.setExpression(editableCondition.getExpression());
-            condition.setValidator(_VALIDATORS.get(editableCondition.getValidatorId()));
+            condition.setValidator(_validators.get(editableCondition.getValidatorId()));
 
             // create the executable condition
             ExecutableCondition execCondition = new ExecutableCondition(condition);
 
             // update internal state
-            _EXECUTABLE_CONDITIONS.put(execCondition.getInternalId(), execCondition);
+            _executableConditions.put(execCondition.getInternalId(), execCondition);
 
             // update the processors (if the new java path doesn't exist, re-populate all the processors)
-            if (!_PROCESSORS.containsKey(editableCondition.getJavaPath()))
-                populateProcessors(getRulesSortedByDependencies(_EXECUTABLE_RULES, _EXECUTABLE_CONDITIONS));
+            if (!_processors.containsKey(editableCondition.getJavaPath()))
+                populateProcessors(getRulesSortedByDependencies(_executableRules, _executableConditions));
             else
-                updateProcessorsConditions(_EXECUTABLE_CONDITIONS.values()); // this is way less expensive than re-populating the processors...
+                updateProcessorsConditions(_executableConditions.values()); // this is way less expensive than re-populating the processors...
 
             // update the raw structure only if the state was successfully updated...
-            _VALIDATORS.get(editableCondition.getValidatorId()).getConditions().add(condition);
+            _validators.get(editableCondition.getValidatorId()).getConditions().add(condition);
 
             return condition;
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1186,8 +1240,8 @@ public final class ValidationEngine {
      * @param editableCondition <code>EditableCondition</code>, cannot be null
      * @throws ConstructionException if the condition contains an error
      */
-    public static void updateCondition(EditableCondition editableCondition) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void updateCondition(EditableCondition editableCondition) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             if (editableCondition == null)
                 throw new ConstructionException("An editable condition is required for modifying an condition");
@@ -1199,15 +1253,15 @@ public final class ValidationEngine {
                 throw new ConstructionException("A group is required when modifying a condition");
             if (editableCondition.getJavaPath() == null)
                 throw new ConstructionException("A java-path is required when adding a condition");
-            if (!_PROCESSOR_ROOTS.containsKey(StringUtils.split(editableCondition.getJavaPath(), '.')[0]))
+            if (!_processorRoots.containsKey(StringUtils.split(editableCondition.getJavaPath(), '.')[0]))
                 throw new ConstructionException("Invalid java-path");
-            if (!_VALIDATORS.containsKey(editableCondition.getValidatorId()))
+            if (!_validators.containsKey(editableCondition.getValidatorId()))
                 throw new ConstructionException("Unknown group: " + editableCondition.getValidatorId());
             if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableCondition.getJavaPath()))
                 throw new ConstructionException("Unknown java-path: " + editableCondition.getJavaPath());
 
             // get original executable condition
-            ExecutableCondition originalExecCondition = _EXECUTABLE_CONDITIONS.get(editableCondition.getConditionId());
+            ExecutableCondition originalExecCondition = _executableConditions.get(editableCondition.getConditionId());
             if (originalExecCondition == null)
                 throw new ConstructionException("Unknown condition: " + editableCondition.getId());
 
@@ -1224,31 +1278,31 @@ public final class ValidationEngine {
             // create the executable condition
             ExecutableCondition execCondition = new ExecutableCondition(originalExecCondition);
             execCondition.setId(editableCondition.getId());
-            execCondition.setInternalValidatorId(_VALIDATORS.get(editableCondition.getValidatorId()).getValidatorId());
+            execCondition.setInternalValidatorId(_validators.get(editableCondition.getValidatorId()).getValidatorId());
             execCondition.setJavaPath(editableCondition.getJavaPath());
             if ((condition.getExpression() == null && editableCondition.getExpression() != null) || (condition.getExpression() != null && !condition.getExpression().equals(
                     editableCondition.getExpression())))
                 execCondition.setExpression(editableCondition.getExpression());
 
             // update internal state
-            _EXECUTABLE_CONDITIONS.put(execCondition.getInternalId(), execCondition);
+            _executableConditions.put(execCondition.getInternalId(), execCondition);
 
             // update the processors (if the new java path doesn't exist, re-populate all the processors)
-            if (!_PROCESSORS.containsKey(editableCondition.getJavaPath()))
-                populateProcessors(getRulesSortedByDependencies(_EXECUTABLE_RULES, _EXECUTABLE_CONDITIONS));
+            if (!_processors.containsKey(editableCondition.getJavaPath()))
+                populateProcessors(getRulesSortedByDependencies(_executableRules, _executableConditions));
             else
-                updateProcessorsConditions(_EXECUTABLE_CONDITIONS.values()); // this is way less expensive than re-populating the processors...
+                updateProcessorsConditions(_executableConditions.values()); // this is way less expensive than re-populating the processors...
 
             // update the raw structure only if the state was successfully updated...
             condition.setId(editableCondition.getId());
-            condition.setValidator(_VALIDATORS.get(editableCondition.getValidatorId()));
+            condition.setValidator(_validators.get(editableCondition.getValidatorId()));
             condition.setName(editableCondition.getName());
             condition.setDescription(editableCondition.getDescription());
             condition.setJavaPath(editableCondition.getJavaPath());
             condition.setExpression(editableCondition.getExpression());
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1261,8 +1315,8 @@ public final class ValidationEngine {
      * @param conditionId condition ID to delete
      * @throws ConstructionException if the condition cannot be found
      */
-    public static void deleteCondition(String conditionId) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void deleteCondition(String conditionId) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Condition condition = getCondition(conditionId);
             if (condition == null)
@@ -1270,7 +1324,7 @@ public final class ValidationEngine {
             deleteCondition(new EditableCondition(condition));
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1288,8 +1342,8 @@ public final class ValidationEngine {
      * @param editableCondition <code>EditableCondition</code>, cannot be null
      * @throws ConstructionException
      */
-    public static void deleteCondition(EditableCondition editableCondition) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void deleteCondition(EditableCondition editableCondition) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             // get the condition
             Condition condition = getCondition(editableCondition.getId());
@@ -1297,14 +1351,14 @@ public final class ValidationEngine {
                 throw new ConstructionException("Unknown condition: " + editableCondition.getId());
 
             // update internal state
-            _EXECUTABLE_CONDITIONS.remove(editableCondition.getConditionId());
-            updateProcessorsConditions(_EXECUTABLE_CONDITIONS.values());
+            _executableConditions.remove(editableCondition.getConditionId());
+            updateProcessorsConditions(_executableConditions.values());
 
             // update the raw structure only if the state was successfully updated...
-            _VALIDATORS.get(editableCondition.getValidatorId()).getConditions().remove(condition);
+            _validators.get(editableCondition.getValidatorId()).getConditions().remove(condition);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1325,8 +1379,8 @@ public final class ValidationEngine {
      * @return the created <code>Validator</code>
      * @throws ConstructionException if the validator contains an error
      */
-    public static Validator addValidator(EditableValidator editableValidator) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public Validator addValidator(EditableValidator editableValidator) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             if (getValidator(editableValidator.getId()) != null)
                 throw new ConstructionException("Group IDs must be unique within the edits engine, cannot add '" + editableValidator.getId() + "'");
@@ -1353,25 +1407,25 @@ public final class ValidationEngine {
             internalizeValidator(v, conditions, rules, contexts, null);
 
             // add the existing rules and conditions
-            conditions.putAll(_EXECUTABLE_CONDITIONS);
-            rules.putAll(_EXECUTABLE_RULES);
+            conditions.putAll(_executableConditions);
+            rules.putAll(_executableRules);
 
             // sort the rules by dependencies (this could though a dependency exception)
             List<ExecutableRule> sortedRules = getRulesSortedByDependencies(rules, conditions);
 
             // at this point we checked everything, so let's update the internal state of the engine
-            _EXECUTABLE_CONDITIONS.putAll(conditions);
-            _EXECUTABLE_RULES.putAll(rules);
-            _CONTEXTS.put(v.getValidatorId(), contexts);
+            _executableConditions.putAll(conditions);
+            _executableRules.putAll(rules);
+            _contexts.put(v.getValidatorId(), contexts);
             populateProcessors(sortedRules);
 
             // update the raw structure only if the state was successfully updated...
-            _VALIDATORS.put(v.getId(), v);
+            _validators.put(v.getId(), v);
 
             return v;
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1394,12 +1448,12 @@ public final class ValidationEngine {
      * @param editableValidator <code>EditableValidator</code>, cannot be null
      * @throws ConstructionException if the validator contains an error
      */
-    public static void updateValidator(EditableValidator editableValidator) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void updateValidator(EditableValidator editableValidator) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             // get the validator
             Validator v = null;
-            for (Validator val : _VALIDATORS.values())
+            for (Validator val : _validators.values())
                 if (val.getValidatorId().equals(editableValidator.getValidatorId()))
                     v = val;
             if (v == null)
@@ -1410,7 +1464,7 @@ public final class ValidationEngine {
             addValidator(editableValidator);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1423,8 +1477,8 @@ public final class ValidationEngine {
      * @param validatorId validator ID to delete
      * @throws ConstructionException if the validator cannot be found
      */
-    public static void deleteValidator(String validatorId) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void deleteValidator(String validatorId) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Validator v = getValidator(validatorId);
             if (v == null)
@@ -1432,7 +1486,7 @@ public final class ValidationEngine {
             deleteValidator(new EditableValidator(v));
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1450,8 +1504,8 @@ public final class ValidationEngine {
      * @param editableValidator <code>EditableValidator</code>, cannot be null
      * @throws ConstructionException if the validator contains an error
      */
-    public static void deleteValidator(EditableValidator editableValidator) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void deleteValidator(EditableValidator editableValidator) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             // get the validator
             Validator v = getValidator(editableValidator.getId());
@@ -1459,22 +1513,22 @@ public final class ValidationEngine {
                 throw new ConstructionException("Unknown group: " + editableValidator.getId());
 
             for (Condition condition : v.getConditions())
-                _EXECUTABLE_CONDITIONS.remove(condition.getConditionId());
+                _executableConditions.remove(condition.getConditionId());
             for (Rule r : v.getRules())
-                _EXECUTABLE_RULES.remove(r.getRuleId());
-            _CONTEXTS.remove(editableValidator.getValidatorId());
+                _executableRules.remove(r.getRuleId());
+            _contexts.remove(editableValidator.getValidatorId());
 
             // sort the rules by dependencies (this could though a dependency exception)
-            List<ExecutableRule> sortedRules = getRulesSortedByDependencies(_EXECUTABLE_RULES, _EXECUTABLE_CONDITIONS);
+            List<ExecutableRule> sortedRules = getRulesSortedByDependencies(_executableRules, _executableConditions);
 
             // update the internal state of the engine
             populateProcessors(sortedRules);
 
             // update the raw structure only if the state was successfully updated...
-            _VALIDATORS.remove(editableValidator.getId());
+            _validators.remove(editableValidator.getId());
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1490,24 +1544,24 @@ public final class ValidationEngine {
      * @return the created <code>ContextEntry</code>
      * @throws ConstructionException if the context contains an error
      */
-    public static ContextEntry addContext(Long contextEntryId, String contextKey, String validatorId, String expression, String type) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public ContextEntry addContext(Long contextEntryId, String contextKey, String validatorId, String expression, String type) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Validator v = getValidator(validatorId);
             if (v == null)
                 throw new ConstructionException("Invalid group: " + validatorId);
 
             // check unicity
-            if (_CONTEXTS.get(v.getValidatorId()).containsKey(contextKey))
+            if (_contexts.get(v.getValidatorId()).containsKey(contextKey))
                 throw new ConstructionException("Context key '" + contextKey + "' already exists; context keys must be unique within a group");
 
-            Map<String, Object> contexts = _CONTEXTS.get(v.getValidatorId());
+            Map<String, Object> contexts = _contexts.get(v.getValidatorId());
             if (contexts == null)
                 throw new ConstructionException("Invalid group: " + validatorId);
 
             ValidationServices.getInstance().addContextExpression(expression, contexts, contextKey, type);
 
-            updateProcessorsContexts(_CONTEXTS);
+            updateProcessorsContexts(_contexts);
 
             ContextEntry entry = new ContextEntry();
             entry.setContextEntryId(contextEntryId);
@@ -1519,7 +1573,7 @@ public final class ValidationEngine {
             return entry;
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1533,8 +1587,8 @@ public final class ValidationEngine {
      * @param type type ("java", "groovy", "table", etc...)
      * @throws ConstructionException if the context contains an error or is not found
      */
-    public static void updateContext(String contextKey, String validatorId, String expression, String type) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void updateContext(String contextKey, String validatorId, String expression, String type) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Validator v = getValidator(validatorId);
             if (v == null)
@@ -1543,7 +1597,7 @@ public final class ValidationEngine {
             if (entry == null)
                 throw new ConstructionException("Invalid key: " + contextKey);
 
-            Map<String, Object> contexts = _CONTEXTS.get(v.getValidatorId());
+            Map<String, Object> contexts = _contexts.get(v.getValidatorId());
             if (contexts == null)
                 throw new ConstructionException("Invalid group: " + validatorId);
             if (!contexts.containsKey(contextKey))
@@ -1551,13 +1605,13 @@ public final class ValidationEngine {
 
             ValidationServices.getInstance().addContextExpression(expression, contexts, contextKey, type);
 
-            updateProcessorsContexts(_CONTEXTS);
+            updateProcessorsContexts(_contexts);
 
             entry.setExpression(expression);
             entry.setType(type);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1569,8 +1623,8 @@ public final class ValidationEngine {
      * @param validatorId validator ID
      * @throws ConstructionException if the context is not found
      */
-    public static void deleteContext(String contextKey, String validatorId) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void deleteContext(String contextKey, String validatorId) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Validator v = getValidator(validatorId);
             if (v == null)
@@ -1579,7 +1633,7 @@ public final class ValidationEngine {
             if (entry == null)
                 throw new ConstructionException("Invalid key: " + contextKey);
 
-            Map<String, Object> contexts = _CONTEXTS.get(v.getValidatorId());
+            Map<String, Object> contexts = _contexts.get(v.getValidatorId());
             if (contexts == null)
                 throw new ConstructionException("Invalid group: " + validatorId);
             if (!contexts.containsKey(contextKey))
@@ -1587,12 +1641,12 @@ public final class ValidationEngine {
 
             contexts.remove(contextKey);
 
-            updateProcessorsContexts(_CONTEXTS);
+            updateProcessorsContexts(_contexts);
 
             v.getRawContext().remove(entry);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1606,11 +1660,11 @@ public final class ValidationEngine {
      * @param idsToIgnore a collection of rule IDs that must be ignored, no rule will be set to ignore if the collection is null (or empty)
      * @param idsToStopIgnoring a collection of rule IDs that must not be ignored anymore, no rule will be set to not-ignore if the collection is null (or empty)
      */
-    public static void massUpdateIgnoreFlags(Collection<String> idsToIgnore, Collection<String> idsToStopIgnoring) {
-        _LOCK.writeLock().lock();
+    public void massUpdateIgnoreFlags(Collection<String> idsToIgnore, Collection<String> idsToStopIgnoring) {
+        _lock.writeLock().lock();
         try {
             // update the executable rules
-            for (ExecutableRule execRule : _EXECUTABLE_RULES.values()) {
+            for (ExecutableRule execRule : _executableRules.values()) {
                 String id = execRule.getId();
 
                 if (idsToIgnore != null && idsToIgnore.contains(id))
@@ -1621,14 +1675,14 @@ public final class ValidationEngine {
 
             // update the processors after re-evaluating the rules order
             try {
-                updateProcessorsRules(getRulesSortedByDependencies(_EXECUTABLE_RULES, _EXECUTABLE_CONDITIONS));
+                updateProcessorsRules(getRulesSortedByDependencies(_executableRules, _executableConditions));
             }
             catch (ConstructionException e) {
                 throw new RuntimeException("Internal state has not changed, this exception should not happen!", e);
             }
 
             // update the raw data
-            for (Validator v : _VALIDATORS.values()) {
+            for (Validator v : _validators.values()) {
                 for (Rule r : v.getRules()) {
                     String id = r.getId();
 
@@ -1640,7 +1694,7 @@ public final class ValidationEngine {
             }
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1650,8 +1704,8 @@ public final class ValidationEngine {
      * @param setId set ID
      * @throws ConstructionException if the set is not found
      */
-    public static void enableEmbeddedSet(String validatorId, String setId) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void enableEmbeddedSet(String validatorId, String setId) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Validator v = getValidator(validatorId);
             if (v == null)
@@ -1664,7 +1718,7 @@ public final class ValidationEngine {
             s.setIgnored(false);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1674,8 +1728,8 @@ public final class ValidationEngine {
      * @param setId set ID
      * @throws ConstructionException if the set is not found
      */
-    public static void disableEmbeddedSet(String validatorId, String setId) throws ConstructionException {
-        _LOCK.writeLock().lock();
+    public void disableEmbeddedSet(String validatorId, String setId) throws ConstructionException {
+        _lock.writeLock().lock();
         try {
             Validator v = getValidator(validatorId);
             if (v == null)
@@ -1688,7 +1742,7 @@ public final class ValidationEngine {
             s.setIgnored(true);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1696,7 +1750,7 @@ public final class ValidationEngine {
     //       OTHER PUBLIC METHODS (some lock required, depends on the method)
     // ********************************************************************************
 
-    public static String getEngineVersion() {
+    public String getEngineVersion() {
         return _ENGINE_VERSION;
     }
 
@@ -1706,13 +1760,13 @@ public final class ValidationEngine {
      * Created on Sep 30, 2010 by depryf
      * @return the root (first element) of the supported java-path
      */
-    public static Set<String> getSupportedJavaPathRoots() {
-        _LOCK.readLock().lock();
+    public Set<String> getSupportedJavaPathRoots() {
+        _lock.readLock().lock();
         try {
-            return Collections.unmodifiableSet(_PROCESSOR_ROOTS.keySet());
+            return Collections.unmodifiableSet(_processorRoots.keySet());
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -1721,14 +1775,14 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      */
-    public static void turnStatisticsOn() {
-        _LOCK.writeLock().lock();
+    public void turnStatisticsOn() {
+        _lock.writeLock().lock();
         try {
-            for (ValidatingProcessor processor : _PROCESSORS.values())
+            for (ValidatingProcessor processor : _processors.values())
                 processor.setStatisticsOn(true);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1737,14 +1791,14 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      */
-    public static void turnStatisticsOff() {
-        _LOCK.writeLock().lock();
+    public void turnStatisticsOff() {
+        _lock.writeLock().lock();
         try {
-            for (ValidatingProcessor processor : _PROCESSORS.values())
+            for (ValidatingProcessor processor : _processors.values())
                 processor.setStatisticsOn(false);
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1754,13 +1808,13 @@ public final class ValidationEngine {
      * Created on Nov 30, 2007 by depryf
      * @return a collection of <code>StatsDTO</code> object, possibly empty
      */
-    public static Map<String, EngineStats> getStats() {
-        _LOCK.readLock().lock();
+    public Map<String, EngineStats> getStats() {
+        _lock.readLock().lock();
         try {
             return ValidatingProcessor.getStats();
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -1769,13 +1823,13 @@ public final class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2009 by depryf
      */
-    public static void resetStats() {
-        _LOCK.writeLock().lock();
+    public void resetStats() {
+        _lock.writeLock().lock();
         try {
             ValidatingProcessor.resetStats();
         }
         finally {
-            _LOCK.writeLock().unlock();
+            _lock.writeLock().unlock();
         }
     }
 
@@ -1788,17 +1842,17 @@ public final class ValidationEngine {
      * Created on Jan 14, 2008 by depryf
      * @return a string representation of the engine's internal state
      */
-    public static String dumpInternalState() {
-        _LOCK.readLock().lock();
+    public String dumpInternalState() {
+        _lock.readLock().lock();
         try {
             StringBuilder result = new StringBuilder();
-            for (String key : new TreeSet<>(_PROCESSORS.keySet())) // let's display the processors from smallest java path to biggest one...
-                _PROCESSORS.get(key).dumpCache(result, key);
+            for (String key : new TreeSet<>(_processors.keySet())) // let's display the processors from smallest java path to biggest one...
+                _processors.get(key).dumpCache(result, key);
 
             return result.toString();
         }
         finally {
-            _LOCK.readLock().unlock();
+            _lock.readLock().unlock();
         }
     }
 
@@ -1806,17 +1860,17 @@ public final class ValidationEngine {
      * Enables multi-threaded compilation of the rules, using the provided number of threads (by default only one thread is used).
      * @param numThreads number of threads to use, must be between 1 and 32
      */
-    public static void enableMultiThreadedCompilation(int numThreads) {
+    public void enableMultiThreadedCompilation(int numThreads) {
         if (numThreads < 1 || numThreads > 32)
             throw new RuntimeException("Number of threads must be between 1 and 32!");
-        _NUM_COMPILER_THREADS = numThreads;
+        _numCompilerThreads = numThreads;
     }
 
     /**
      * Disables multi-threaded compilation of the rules, using a single thread; this is the default behavior of the engine.
      */
-    public static void disableMultiThreadedCompilation() {
-        _NUM_COMPILER_THREADS = 1;
+    public void disableMultiThreadedCompilation() {
+        _numCompilerThreads = 1;
     }
 
     /**
@@ -1825,45 +1879,45 @@ public final class ValidationEngine {
      * If set to a strictly positive value, and edit that runs for more than the value (in seconds) will be killed and will be seen as a failure.
      * @param timeoutInSeconds timeout value in seconds, use 0 for no timeout (the default)
      */
-    public static void enableEditExecutionTimeout(int timeoutInSeconds) {
+    public void enableEditExecutionTimeout(int timeoutInSeconds) {
         if (timeoutInSeconds < 0)
             throw new RuntimeException("Timeout in seconds must be 0 (to disable the timeout) or positive.");
-        _EDIT_EXECUTION_TIMEOUT = timeoutInSeconds;
+        _editExecutionTimeout = timeoutInSeconds;
     }
 
     /**
      * Disables edit (and condition) execution timeout; this is the default behavior of the engine.
      */
-    public static void disableEditExecutionTimeout() {
-        _EDIT_EXECUTION_TIMEOUT = 0;
+    public void disableEditExecutionTimeout() {
+        _editExecutionTimeout = 0;
     }
 
     /**
      * Enables the pre-compiling mechanism; this is the default behavior of the engine.
      */
-    public static void enablePreCompiledLookup() {
-        _PRE_COMPILED_LOOKUP_ENABLED = true;
+    public void enablePreCompiledLookup() {
+        _preCompiledLookupEnabled = true; // TODO FD can't do that without re-doing processors
     }
 
     /**
      * Disables the pre-compiling mechanism, which is on by default.  That mechanism tries to find a class of pre-compiles rules on the class path.
      */
-    public static void disablePreCompiledLookup() {
-        _PRE_COMPILED_LOOKUP_ENABLED = false;
+    public void disablePreCompiledLookup() {
+        _preCompiledLookupEnabled = false;
     }
 
     /**
      * Returns true if the pre-compiling mechanism is on, false otherwise.
      */
-    public static boolean isPreCompiledLookupEnabled() {
-        return _PRE_COMPILED_LOOKUP_ENABLED;
+    public boolean isPreCompiledLookupEnabled() {
+        return _preCompiledLookupEnabled;
     }
 
     // ********************************************************************************
     //                  INTERNAL METHODS (no lock required)
     // ********************************************************************************
 
-    private static void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, EngineInitStats stats) throws ConstructionException {
+    private  void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, InitializationStats stats) throws ConstructionException {
 
         if (validator.getValidatorId() == null)
             validator.setValidatorId(ValidationServices.getInstance().getNextValidatorSequence());
@@ -1875,10 +1929,10 @@ public final class ValidationEngine {
         if (isPreCompiledLookupEnabled())
             precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
         else if (stats != null)
-            stats.setReasonNotPreCompiled(validator.getId(), EngineInitStats.REASON_PRE_COMPILED_OFF);
+            stats.setReasonNotPreCompiled(validator.getId(), InitializationStats.REASON_PRE_COMPILED_OFF);
 
         // internalize the rules
-        ExecutorService service = Executors.newFixedThreadPool(_NUM_COMPILER_THREADS);
+        ExecutorService service = Executors.newFixedThreadPool(_numCompilerThreads);
         List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
         if (validator.getRules() != null) {
             for (Rule r : validator.getRules()) {
@@ -1968,7 +2022,7 @@ public final class ValidationEngine {
         }
     }
 
-    private static void checkValidatorConstraints(List<Validator> validators) throws ConstructionException {
+    private  void checkValidatorConstraints(List<Validator> validators) throws ConstructionException {
         Set<String> validatorIds = new HashSet<>(), conditionIds = new HashSet<>(), categoryIds = new HashSet<>(), ruleIds = new HashSet<>();
         for (Validator v : validators) {
             if (validatorIds.contains(v.getId()))
@@ -2001,14 +2055,14 @@ public final class ValidationEngine {
         }
     }
 
-    private static Collection<RuleFailure> internalValidate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
+    private  Collection<RuleFailure> internalValidate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
 
         // pre-condition: engine must be initialized
-        if (_STATUS == ValidationEngineStatus.NOT_INITIALIZED)
+        if (_status == ValidationEngineStatus.NOT_INITIALIZED)
             return new HashSet<>();
 
         // pre-condition: there must be a root processor for this validatable
-        Processor processor = _PROCESSORS.get(validatable.getRootLevel());
+        Processor processor = _processors.get(validatable.getRootLevel());
         if (processor == null)
             return new HashSet<>();
 
@@ -2020,31 +2074,31 @@ public final class ValidationEngine {
         return processor.process(validatable, vContext);
     }
 
-    private static void populateProcessors(List<ExecutableRule> sortedRules) {
+    private  void populateProcessors(List<ExecutableRule> sortedRules) {
 
-        _PROCESSORS.clear();
-        _PROCESSOR_ROOTS.clear();
+        _processors.clear();
+        _processorRoots.clear();
 
         // go through each java path and create/get the corresponding processors        
         for (String javaPath : ValidationServices.getInstance().getAllJavaPaths().keySet()) {
             String[] parts = StringUtils.split(javaPath, '.');
 
             // keep track of the roots (I couldn't find a concurrent implementation of a set, so I am using a map with dummy objects)
-            _PROCESSOR_ROOTS.put(parts[0], new Object());
+            _processorRoots.put(parts[0], new Object());
 
             // keep track of the current partial path
             StringBuilder partialPath = new StringBuilder(parts[0]);
 
             // first part correspond to a validating processor, the rest of the parts correspond to iterative processors...
-            ValidatingProcessor current = _PROCESSORS.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _EDIT_EXECUTION_TIMEOUT));
+            ValidatingProcessor current = _processors.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _preCompiledLookupEnabled, _editExecutionTimeout));
             for (int i = 1; i < parts.length; i++) {
                 partialPath.append(".").append(parts[i]);
 
-                ValidatingProcessor vProcessor = _PROCESSORS.get(partialPath.toString());
+                ValidatingProcessor vProcessor = _processors.get(partialPath.toString());
                 if (vProcessor == null) {
-                    vProcessor = new ValidatingProcessor(partialPath.toString(), _EDIT_EXECUTION_TIMEOUT);
+                    vProcessor = new ValidatingProcessor(partialPath.toString(), _preCompiledLookupEnabled, _editExecutionTimeout);
                     IterativeProcessor iProcessor = new IterativeProcessor(vProcessor, parts[i]);
-                    _PROCESSORS.put(partialPath.toString(), vProcessor);
+                    _processors.put(partialPath.toString(), vProcessor);
                     current.addNested(iProcessor);
                 }
 
@@ -2055,11 +2109,11 @@ public final class ValidationEngine {
         // update the processors
         if (sortedRules != null)
             updateProcessorsRules(sortedRules);
-        updateProcessorsConditions(_EXECUTABLE_CONDITIONS.values());
-        updateProcessorsContexts(_CONTEXTS);
+        updateProcessorsConditions(_executableConditions.values());
+        updateProcessorsContexts(_contexts);
     }
 
-    private static void updateProcessorsRules(List<ExecutableRule> sortedRules) {
+    private  void updateProcessorsRules(List<ExecutableRule> sortedRules) {
 
         // get the sorted rules by java-path
         Map<String, List<ExecutableRule>> rules = new HashMap<>();
@@ -2067,11 +2121,11 @@ public final class ValidationEngine {
             rules.computeIfAbsent(rule.getJavaPath(), k -> new ArrayList<>()).add(rule);
 
         // update all the processors
-        for (ValidatingProcessor p : _PROCESSORS.values())
-            p.setRules(rules.containsKey(p.getJavaPath()) ? rules.get(p.getJavaPath()) : Collections.emptyList());
+        for (ValidatingProcessor p : _processors.values())
+            p.setRules(rules.getOrDefault(p.getJavaPath(), Collections.emptyList()));
     }
 
-    private static void updateProcessorsConditions(Collection<ExecutableCondition> allConditions) {
+    private  void updateProcessorsConditions(Collection<ExecutableCondition> allConditions) {
 
         // get the conditions by java-path (there is no order needed for conditions)
         Map<String, List<ExecutableCondition>> conditions = new HashMap<>();
@@ -2079,19 +2133,19 @@ public final class ValidationEngine {
             conditions.computeIfAbsent(condition.getJavaPath(), k -> new ArrayList<>()).add(condition);
 
         // update all the processors
-        for (ValidatingProcessor p : _PROCESSORS.values())
-            p.setConditions(conditions.containsKey(p.getJavaPath()) ? conditions.get(p.getJavaPath()) : Collections.emptyList());
+        for (ValidatingProcessor p : _processors.values())
+            p.setConditions(conditions.getOrDefault(p.getJavaPath(), Collections.emptyList()));
     }
 
-    private static void updateProcessorsContexts(Map<Long, Map<String, Object>> allContexts) {
+    private  void updateProcessorsContexts(Map<Long, Map<String, Object>> allContexts) {
 
         // this code used to be smart about which validator was used at which java-path, and provide only the contexts for that particular
         // java-path to the processor; but that doesn't work in SEER*DMS where some edits are persisted but not registered to the engine!
-        for (ValidatingProcessor p : _PROCESSORS.values())
+        for (ValidatingProcessor p : _processors.values())
             p.setContexts(allContexts);
     }
 
-    private static List<ExecutableRule> getRulesSortedByDependencies(Map<Long, ExecutableRule> rules, Map<Long, ExecutableCondition> conditions) throws ConstructionException {
+    private  List<ExecutableRule> getRulesSortedByDependencies(Map<Long, ExecutableRule> rules, Map<Long, ExecutableCondition> conditions) throws ConstructionException {
         List<ExecutableRule> rulesQueue = new ArrayList<>();
 
         // cache all of our rules
@@ -2130,7 +2184,7 @@ public final class ValidationEngine {
         return rulesQueue;
     }
 
-    private static void addToRuleCache(Map<String, String> pathCache, Map<String, String> validatorCache, ExecutableRule rule, Map<String, ExecutableRule> ruleCache) throws ConstructionException {
+    private  void addToRuleCache(Map<String, String> pathCache, Map<String, String> validatorCache, ExecutableRule rule, Map<String, ExecutableRule> ruleCache) throws ConstructionException {
 
         String ruleId = rule.getId();
 
@@ -2144,7 +2198,7 @@ public final class ValidationEngine {
         ruleCache.put(ruleId, rule);
     }
 
-    private static void addToRuleQueue(ExecutableRule rule, Map<String, ExecutableRule> cache, Set<String> currents, List<ExecutableRule> queue, Map<String, String> pathCache, Map<String, String> validatorCache) throws ConstructionException {
+    private  void addToRuleQueue(ExecutableRule rule, Map<String, ExecutableRule> cache, Set<String> currents, List<ExecutableRule> queue, Map<String, String> pathCache, Map<String, String> validatorCache) throws ConstructionException {
 
         if (rule.getDependencies() != null && !rule.getDependencies().isEmpty()) {
             for (String id : rule.getDependencies()) {

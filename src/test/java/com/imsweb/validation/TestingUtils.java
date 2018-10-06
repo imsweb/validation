@@ -38,11 +38,11 @@ public final class TestingUtils {
             ValidationContextFunctions.initialize(new TestingValidationContextFunctions());
 
         // initialize engine
-        if (!ValidationEngine.isInitialized())
-            ValidationEngine.initialize();
+        if (!ValidationEngine.getInstance().isInitialized())
+            ValidationEngine.getInstance().initialize();
 
         // no edits should take more than one second (except the one tha tests the timeout)
-        ValidationEngine.enableEditExecutionTimeout(1);
+        ValidationEngine.getInstance().enableEditExecutionTimeout(1);
     }
 
     public static String getWorkingDirectory() {
@@ -50,11 +50,11 @@ public final class TestingUtils {
     }
 
     public static Validator loadValidator(String id) {
-        Validator v = ValidationEngine.getValidator(id);
+        Validator v = ValidationEngine.getInstance().getValidator(id);
 
         if (v == null) {
             try {
-                v = ValidationEngine.addValidator(new EditableValidator(ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
+                v = ValidationEngine.getInstance().addValidator(new EditableValidator(ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
             }
             catch (Exception e) {
                 throw new RuntimeException("Unable to load '" + id + "'", e);
@@ -66,7 +66,7 @@ public final class TestingUtils {
 
     public static void unloadValidator(String id) {
         try {
-            ValidationEngine.deleteValidator(id);
+            ValidationEngine.getInstance().deleteValidator(id);
         }
         catch (Exception e) {
             throw new RuntimeException("Unable to unload '" + id + "'", e);

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EngineInitStats {
+public class InitializationStats {
 
     public static final String REASON_PRE_COMPILED_OFF = "pre-compiled edits lookup is off";
     public static final String REASON_CLASS_NOT_FOUND = "pre-compiled class '{0}' not found";
@@ -27,7 +27,7 @@ public class EngineInitStats {
 
     private Map<String, String> _reasonNotPreCompiled;
 
-    public EngineInitStats() {
+    public InitializationStats() {
         _initializationDuration = 0L;
         _numEditsLoaded = new AtomicInteger();
         _numEditsCompiled = new AtomicInteger();
