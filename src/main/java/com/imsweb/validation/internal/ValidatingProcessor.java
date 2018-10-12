@@ -3,19 +3,6 @@
  */
 package com.imsweb.validation.internal;
 
-import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.EngineStats;
-import com.imsweb.validation.ValidationContextFunctions;
-import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.ValidationServices;
-import com.imsweb.validation.entities.RuleFailure;
-import com.imsweb.validation.entities.Validatable;
-import com.imsweb.validation.runtime.CompiledRules;
-import com.imsweb.validation.runtime.RuntimeUtils;
-import groovy.lang.Binding;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +21,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import org.apache.commons.lang3.StringUtils;
+
+import groovy.lang.Binding;
+
+import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.EngineStats;
+import com.imsweb.validation.ValidationContextFunctions;
+import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.ValidationServices;
+import com.imsweb.validation.entities.RuleFailure;
+import com.imsweb.validation.entities.Validatable;
+import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
  * A <code>ValidatingProcessor</code> is a <code>Processor</code> that runs edits on a particular level of a <code>Validatable</code>.
@@ -68,9 +69,6 @@ public class ValidatingProcessor implements Processor {
     // whether or not stats should be recorded
     private boolean _recordStats = false;
 
-    // whether the processor should be looking for pre-compiled rules
-    private boolean _preCompiledLookupEnabled;
-
     // time out in seconds when executing an edit or a condition
     private int _timeout;
 
@@ -82,12 +80,10 @@ public class ValidatingProcessor implements Processor {
      * <p/>
      * Created on Aug 15, 2011 by depryf
      * @param javaPath current java path for this validating processor
-     * @param preCompiledLookupEnabled whether or not pre-compiled rules should be looked up
      * @param editExecutionTimeout timeout for edits (0 or negative means no timeout)
      */
-    public ValidatingProcessor(String javaPath, boolean preCompiledLookupEnabled, int editExecutionTimeout) {
+    public ValidatingProcessor(String javaPath, int editExecutionTimeout) {
         _currentJavaPath = javaPath;
-        _preCompiledLookupEnabled = preCompiledLookupEnabled;
         _timeout = editExecutionTimeout;
         if (editExecutionTimeout > 0)
             _executor = Executors.newSingleThreadExecutor();
@@ -106,10 +102,7 @@ public class ValidatingProcessor implements Processor {
                 String key = vContext.getToForce().getId() + "|" + vContext.getToForce().getExpression().hashCode();
                 toForce = _cachedForcedRules.get(key);
                 if (toForce == null) {
-                    CompiledRules precompiledRules = null;
-                    if (_preCompiledLookupEnabled && vContext.getToForce().getValidator() != null)
-                        precompiledRules = RuntimeUtils.findCompileRules(vContext.getToForce().getValidator().getId(), vContext.getToForce().getValidator().getVersion(), null);
-                    toForce = new ExecutableRule(vContext.getToForce(), precompiledRules, null);
+                    toForce = new ExecutableRule(vContext.getToForce(), RuntimeUtils.findCompileRules(vContext.getToForce().getValidator(), null), null);
                     _cachedForcedRules.put(key, toForce);
                 }
             }

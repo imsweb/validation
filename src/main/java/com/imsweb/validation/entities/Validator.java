@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.imsweb.validation.runtime.CompiledRules;
+
 /**
  * A <code>Validator</code> is a wrapper for a set of {@link Condition}.
  * <p/>
@@ -37,7 +39,7 @@ public class Validator {
     protected String _version;
 
     /**
-     * Minimum version of the validation engine (using the SEER*Utils version since the engine itself is not versioned)
+     * Minimum version of the validation engine
      */
     protected String _minEngineVersion;
 
@@ -47,7 +49,7 @@ public class Validator {
     protected String _translatedFrom;
 
     /**
-     * Releases for this vaildator, sorted from first release (oldest) to last one (newest)
+     * Releases for this validator, sorted from first release (oldest) to last one (newest)
      */
     protected NavigableSet<ValidatorRelease> _releases;
 
@@ -85,6 +87,11 @@ public class Validator {
      * Set of <code>EmbeddedSet</code> registered with this validator
      */
     protected Set<EmbeddedSet> _sets;
+
+    /**
+     * If provided, compiled rules are used instead of the Groovy script for the rule expressions.
+     */
+    private CompiledRules _compiledRules;
 
     /**
      * Constructor.
@@ -469,6 +476,14 @@ public class Validator {
                 return set;
 
         return null;
+    }
+
+    public CompiledRules getCompiledRules() {
+        return _compiledRules;
+    }
+
+    public void setCompiledRules(CompiledRules compiledRules) {
+        _compiledRules = compiledRules;
     }
 
     @Override

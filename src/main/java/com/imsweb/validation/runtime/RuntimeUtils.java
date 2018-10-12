@@ -3,21 +3,19 @@
  */
 package com.imsweb.validation.runtime;
 
-import com.imsweb.validation.InitializationStats;
-import org.apache.commons.lang3.StringUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.imsweb.validation.InitializationStats.REASON_CLASS_ACCESS_ERROR;
-import static com.imsweb.validation.InitializationStats.REASON_CLASS_CAST_ERROR;
-import static com.imsweb.validation.InitializationStats.REASON_CLASS_INSTANCIATION_ERROR;
-import static com.imsweb.validation.InitializationStats.REASON_CLASS_NOT_FOUND;
-import static com.imsweb.validation.InitializationStats.REASON_CONSTRUCTOR_NOT_FOUND;
+import org.apache.commons.lang3.StringUtils;
+
+import com.imsweb.validation.InitializationStats;
+import com.imsweb.validation.entities.Validator;
+
 import static com.imsweb.validation.InitializationStats.REASON_DIFFERENT_VERSION;
+import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
 
 /**
  * This class is used by the engine to support pre-parsed and pre-compiled edits.
@@ -73,45 +71,17 @@ public class RuntimeUtils {
         return result.toString() + "CompiledRules";
     }
 
-    public static CompiledRules findCompileRules(String validatorId, String version, InitializationStats stats) {
-        CompiledRules compiledRules;
-
-        String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);
-        try {
-            compiledRules = (CompiledRules)(Class.forName(classPath).getDeclaredConstructor().newInstance());
+    public static CompiledRules findCompileRules(Validator validator, InitializationStats stats) {
+        CompiledRules compiledRules = validator.getCompiledRules();
+        if (compiledRules != null) {
+            if (!StringUtils.isBlank(validator.getVersion()) && !validator.getVersion().equals(compiledRules.getValidatorVersion())) {
+                if (stats != null)
+                    stats.setReasonNotPreCompiled(validator.getId(), REASON_DIFFERENT_VERSION.replace("{0}", compiledRules.getValidatorVersion()).replace("{1}", validator.getVersion()));
+                compiledRules = null;
+            }
         }
-        catch (ClassNotFoundException e) {
-            if (stats != null)
-                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_NOT_FOUND.replace("{0}", classPath));
-            compiledRules = null;
-        }
-        catch (InstantiationException e) {
-            if (stats != null)
-                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_INSTANCIATION_ERROR.replace("{0}", classPath));
-            compiledRules = null;
-        }
-        catch (IllegalAccessException e) {
-            if (stats != null)
-                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_ACCESS_ERROR.replace("{0}", classPath));
-            compiledRules = null;
-        }
-        catch (ClassCastException e) {
-            if (stats != null)
-                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_CAST_ERROR.replace("{0}", classPath));
-            compiledRules = null;
-        }
-        catch (NoSuchMethodException | InvocationTargetException e) {
-            if (stats != null)
-                stats.setReasonNotPreCompiled(validatorId, REASON_CONSTRUCTOR_NOT_FOUND.replace("{0}", classPath));
-            compiledRules = null;
-        }
-
-        if (compiledRules != null && !StringUtils.isBlank(version) && !version.equals(compiledRules.getValidatorVersion())) {
-            if (stats != null)
-                stats.setReasonNotPreCompiled(validatorId, REASON_DIFFERENT_VERSION.replace("{0}", compiledRules.getValidatorVersion()).replace("{1}", version));
-            compiledRules = null;
-        }
-
+        else if (stats != null)
+            stats.setReasonNotPreCompiled(validator.getId(), REASON_NOT_PROVIDED);
         return compiledRules;
     }
 

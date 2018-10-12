@@ -3,6 +3,25 @@
  */
 package com.imsweb.validation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.imsweb.validation.entities.Category;
 import com.imsweb.validation.entities.Condition;
 import com.imsweb.validation.entities.ContextEntry;
@@ -24,24 +43,6 @@ import com.imsweb.validation.internal.ValidatingProcessor;
 import com.imsweb.validation.internal.callable.RuleCompilingCallable;
 import com.imsweb.validation.runtime.CompiledRules;
 import com.imsweb.validation.runtime.RuntimeUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 // TODO FD review this documentation
 
@@ -239,11 +240,6 @@ public final class ValidationEngine {
      * The timeout (in seconds) for running edits (or conditions); if an edit runs for longer than the value, it will automatically be killed and fail. Use 0 for no timeout (the default).
      */
     private int _editExecutionTimeout = 0;
-
-    /**
-     * Whether or not the pre-compiling mechanism should be used (enabled by default).
-     */
-    private boolean _preCompiledLookupEnabled = true;
 
     /**
      * Private lock controlling access to the state of the engine; all methods using the state of the engine (including the validate methods) need to acquire a read lock;
@@ -1892,44 +1888,19 @@ public final class ValidationEngine {
         _editExecutionTimeout = 0;
     }
 
-    /**
-     * Enables the pre-compiling mechanism; this is the default behavior of the engine.
-     */
-    public void enablePreCompiledLookup() {
-        _preCompiledLookupEnabled = true; // TODO FD can't do that without re-doing processors
-    }
-
-    /**
-     * Disables the pre-compiling mechanism, which is on by default.  That mechanism tries to find a class of pre-compiles rules on the class path.
-     */
-    public void disablePreCompiledLookup() {
-        _preCompiledLookupEnabled = false;
-    }
-
-    /**
-     * Returns true if the pre-compiling mechanism is on, false otherwise.
-     */
-    public boolean isPreCompiledLookupEnabled() {
-        return _preCompiledLookupEnabled;
-    }
-
     // ********************************************************************************
     //                  INTERNAL METHODS (no lock required)
     // ********************************************************************************
 
-    private  void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, InitializationStats stats) throws ConstructionException {
+    private void internalizeValidator(Validator validator, Map<Long, ExecutableCondition> conditions, Map<Long, ExecutableRule> rules, Map<String, Object> contexts, InitializationStats stats) throws ConstructionException {
 
         if (validator.getValidatorId() == null)
             validator.setValidatorId(ValidationServices.getInstance().getNextValidatorSequence());
         if (validator.getValidatorId() == null)
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
 
-        // try to find pre-compiled rules on the class path
-        CompiledRules precompiledRules = null;
-        if (isPreCompiledLookupEnabled())
-            precompiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
-        else if (stats != null)
-            stats.setReasonNotPreCompiled(validator.getId(), InitializationStats.REASON_PRE_COMPILED_OFF);
+        // try to find pre-compiled rules
+        CompiledRules compiledRules = RuntimeUtils.findCompileRules(validator, stats);
 
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_numCompilerThreads);
@@ -1940,7 +1911,7 @@ public final class ValidationEngine {
                     r.setRuleId(ValidationServices.getInstance().getNextRuleSequence());
                 if (r.getRuleId() == null)
                     throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
-                results.add(service.submit(new RuleCompilingCallable(r, rules, precompiledRules, stats)));
+                results.add(service.submit(new RuleCompilingCallable(r, rules, compiledRules, stats)));
             }
             validator.setRules(new HashSet<>(validator.getRules())); // since internal IDs might have changed
         }
@@ -2022,7 +1993,7 @@ public final class ValidationEngine {
         }
     }
 
-    private  void checkValidatorConstraints(List<Validator> validators) throws ConstructionException {
+    private void checkValidatorConstraints(List<Validator> validators) throws ConstructionException {
         Set<String> validatorIds = new HashSet<>(), conditionIds = new HashSet<>(), categoryIds = new HashSet<>(), ruleIds = new HashSet<>();
         for (Validator v : validators) {
             if (validatorIds.contains(v.getId()))
@@ -2055,7 +2026,7 @@ public final class ValidationEngine {
         }
     }
 
-    private  Collection<RuleFailure> internalValidate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
+    private Collection<RuleFailure> internalValidate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
 
         // pre-condition: engine must be initialized
         if (_status == ValidationEngineStatus.NOT_INITIALIZED)
@@ -2074,7 +2045,7 @@ public final class ValidationEngine {
         return processor.process(validatable, vContext);
     }
 
-    private  void populateProcessors(List<ExecutableRule> sortedRules) {
+    private void populateProcessors(List<ExecutableRule> sortedRules) {
 
         _processors.clear();
         _processorRoots.clear();
@@ -2090,13 +2061,13 @@ public final class ValidationEngine {
             StringBuilder partialPath = new StringBuilder(parts[0]);
 
             // first part correspond to a validating processor, the rest of the parts correspond to iterative processors...
-            ValidatingProcessor current = _processors.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _preCompiledLookupEnabled, _editExecutionTimeout));
+            ValidatingProcessor current = _processors.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _editExecutionTimeout));
             for (int i = 1; i < parts.length; i++) {
                 partialPath.append(".").append(parts[i]);
 
                 ValidatingProcessor vProcessor = _processors.get(partialPath.toString());
                 if (vProcessor == null) {
-                    vProcessor = new ValidatingProcessor(partialPath.toString(), _preCompiledLookupEnabled, _editExecutionTimeout);
+                    vProcessor = new ValidatingProcessor(partialPath.toString(), _editExecutionTimeout);
                     IterativeProcessor iProcessor = new IterativeProcessor(vProcessor, parts[i]);
                     _processors.put(partialPath.toString(), vProcessor);
                     current.addNested(iProcessor);
@@ -2113,7 +2084,7 @@ public final class ValidationEngine {
         updateProcessorsContexts(_contexts);
     }
 
-    private  void updateProcessorsRules(List<ExecutableRule> sortedRules) {
+    private void updateProcessorsRules(List<ExecutableRule> sortedRules) {
 
         // get the sorted rules by java-path
         Map<String, List<ExecutableRule>> rules = new HashMap<>();
@@ -2125,7 +2096,7 @@ public final class ValidationEngine {
             p.setRules(rules.getOrDefault(p.getJavaPath(), Collections.emptyList()));
     }
 
-    private  void updateProcessorsConditions(Collection<ExecutableCondition> allConditions) {
+    private void updateProcessorsConditions(Collection<ExecutableCondition> allConditions) {
 
         // get the conditions by java-path (there is no order needed for conditions)
         Map<String, List<ExecutableCondition>> conditions = new HashMap<>();
@@ -2137,7 +2108,7 @@ public final class ValidationEngine {
             p.setConditions(conditions.getOrDefault(p.getJavaPath(), Collections.emptyList()));
     }
 
-    private  void updateProcessorsContexts(Map<Long, Map<String, Object>> allContexts) {
+    private void updateProcessorsContexts(Map<Long, Map<String, Object>> allContexts) {
 
         // this code used to be smart about which validator was used at which java-path, and provide only the contexts for that particular
         // java-path to the processor; but that doesn't work in SEER*DMS where some edits are persisted but not registered to the engine!
@@ -2145,7 +2116,7 @@ public final class ValidationEngine {
             p.setContexts(allContexts);
     }
 
-    private  List<ExecutableRule> getRulesSortedByDependencies(Map<Long, ExecutableRule> rules, Map<Long, ExecutableCondition> conditions) throws ConstructionException {
+    private List<ExecutableRule> getRulesSortedByDependencies(Map<Long, ExecutableRule> rules, Map<Long, ExecutableCondition> conditions) throws ConstructionException {
         List<ExecutableRule> rulesQueue = new ArrayList<>();
 
         // cache all of our rules
@@ -2184,7 +2155,7 @@ public final class ValidationEngine {
         return rulesQueue;
     }
 
-    private  void addToRuleCache(Map<String, String> pathCache, Map<String, String> validatorCache, ExecutableRule rule, Map<String, ExecutableRule> ruleCache) throws ConstructionException {
+    private void addToRuleCache(Map<String, String> pathCache, Map<String, String> validatorCache, ExecutableRule rule, Map<String, ExecutableRule> ruleCache) throws ConstructionException {
 
         String ruleId = rule.getId();
 
@@ -2198,7 +2169,7 @@ public final class ValidationEngine {
         ruleCache.put(ruleId, rule);
     }
 
-    private  void addToRuleQueue(ExecutableRule rule, Map<String, ExecutableRule> cache, Set<String> currents, List<ExecutableRule> queue, Map<String, String> pathCache, Map<String, String> validatorCache) throws ConstructionException {
+    private void addToRuleQueue(ExecutableRule rule, Map<String, ExecutableRule> cache, Set<String> currents, List<ExecutableRule> queue, Map<String, String> pathCache, Map<String, String> validatorCache) throws ConstructionException {
 
         if (rule.getDependencies() != null && !rule.getDependencies().isEmpty()) {
             for (String id : rule.getDependencies()) {

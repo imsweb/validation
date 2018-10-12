@@ -12,7 +12,7 @@ description = 'This framework allows edits to be defined in Groovy and to be exe
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-println "Starting build using JDK ${Runtime.version().feature()}"
+//println "Starting build using JDK ${Runtime.version().feature()}"
 
 repositories {
     mavenCentral()
