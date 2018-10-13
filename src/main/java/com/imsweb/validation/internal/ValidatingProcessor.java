@@ -217,7 +217,7 @@ public class ValidatingProcessor implements Processor {
                 catch (ValidationException e) {
                     results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause()));
                 }
-                catch (Exception e) {
+                catch (Throwable e) {
                     results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e));
                 }
                 finally {
