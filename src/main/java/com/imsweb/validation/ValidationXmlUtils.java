@@ -137,7 +137,7 @@ public final class ValidationXmlUtils {
     /**
      * Whether or not the expressions, descriptions, messages, etc... should be re-aligned (disabled by default).
      */
-    private static boolean _REALIGNMENT_ENABLED = false; // TODO I am leaving this as-is but I changed the default value to be false
+    private static boolean _REALIGNMENT_ENABLED = false;
 
     /**
      * Private constructor, no instanciation.

@@ -1,5 +1,14 @@
 ## Validation Framework Version History
 
+**Version 2.0**
+
+- Increased the engine version to 6.0.
+- Engine is not a static singleton class anymore and can now be created via a public constructor.
+- Added support for initialization options.
+- Pre-compiled edits need to be provided explicitly instead of of the engine looking them up on the classpath.
+- Removed edit timeout feature which has never worked properly.
+- Changed realignment option in XML utility to false instead of true.
+
 **Version 1.23**
 
 - Fixed dynamic error messages reported by translated edits.

@@ -20,7 +20,9 @@ import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
 /**
  * This class is used by the engine to support pre-parsed and pre-compiled edits.
  * <br/>
- * The engine will used pre-parsed and/or pre-compiled edits if it finds them on the classpath, otherwise it will default back to the regular edits.
+ * The engine will used pre-parsed and/or pre-compiled edits if they are provided during initialization, otherwise it will default back to the regular edits.
+ * <br/><br/>
+ * Pre-parsed and pre-compiled edits need to be provided via a class implementing the <code>RuntimeEdits</code> interface.
  * <br/>
  * Pre-parsed edits need to be included in three files implementing a specific interface:
  * <ul>
@@ -32,7 +34,7 @@ import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
  * <ul>
  * <li>CompiledRules: used to find pre-compiled edit expressions</li>
  * </ul>
- * The classes and methods must follow strict naming conventions to be found by the engine on the classpath; see the code for the conventions.
+ * The methods in those classes must follow strict naming conventions to be found by the engine; see the code for the conventions.
  * <br/>
  * Typically a caller will use the "create" methods in this class instead of trying to implement the conventions; that's by far the safest way.
  */

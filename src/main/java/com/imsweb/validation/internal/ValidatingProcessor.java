@@ -15,12 +15,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,6 +23,7 @@ import groovy.lang.Binding;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.EngineStats;
+import com.imsweb.validation.InitializationOptions;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
@@ -67,26 +63,18 @@ public class ValidatingProcessor implements Processor {
     private ValidationLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidationLRUCache<>(10);
 
     // whether or not stats should be recorded
-    private boolean _recordStats = false;
-
-    // time out in seconds when executing an edit or a condition
-    private int _timeout;
-
-    // thread executor to be able to time out an edit
-    private ExecutorService _executor;
+    private InitializationOptions _options;
 
     /**
      * Constructor.
      * <p/>
      * Created on Aug 15, 2011 by depryf
      * @param javaPath current java path for this validating processor
-     * @param editExecutionTimeout timeout for edits (0 or negative means no timeout)
+     * @param options engine initialization options
      */
-    public ValidatingProcessor(String javaPath, int editExecutionTimeout) {
+    public ValidatingProcessor(String javaPath, InitializationOptions options) {
         _currentJavaPath = javaPath;
-        _timeout = editExecutionTimeout;
-        if (editExecutionTimeout > 0)
-            _executor = Executors.newSingleThreadExecutor();
+        _options = options;
     }
 
     @Override
@@ -118,31 +106,8 @@ public class ValidatingProcessor implements Processor {
             Set<String> currentConditionFailures = new HashSet<>();
             vContext.getFailedConditionIds().put(validatable.getCurrentLevel(), currentConditionFailures);
             for (ExecutableCondition condition : _conditions) {
-
-                boolean success;
-                if (_timeout > 0) {
-                    Future<Boolean> future = _executor.submit(new ExecutorCallable(condition, validatable, binding));
-                    try {
-                        success = future.get(_timeout, TimeUnit.SECONDS);
-                    }
-                    catch (InterruptedException e) {
-                        throw new ValidationException(condition.getId() + ": " + ValidationEngine.INTERRUPTED_MSG);
-                    }
-                    catch (TimeoutException e) {
-                        throw new ValidationException(condition.getId() + ": " + ValidationEngine.TIMEOUT_MSG);
-                    }
-                    catch (ExecutionException e) {
-                        if (e.getCause() instanceof ValidationException)
-                            throw (ValidationException)e.getCause();
-                        throw new ValidationException(condition.getId() + ": " + ValidationEngine.EXCEPTION_MSG);
-                    }
-                }
-                else
-                    success = condition.check(validatable, binding);
-
-                if (!success) {
+                if (!condition.check(validatable, binding))
                     currentConditionFailures.add(condition.getId());
-                }
             }
         }
 
@@ -213,17 +178,11 @@ public class ValidatingProcessor implements Processor {
                 Future<Boolean> future = null;
                 try {
                     long startTime = System.currentTimeMillis();
-                    boolean success;
-                    if (_timeout > 0) {
-                        future = _executor.submit(new ExecutorCallable(rule, validatable, binding));
-                        success = future.get(_timeout, TimeUnit.SECONDS);
-                    }
-                    else
-                        success = rule.validate(validatable, binding);
+                    boolean success = rule.validate(validatable, binding);
                     long endTime = System.currentTimeMillis();
 
                     // keep track of the stats...
-                    if (_recordStats && id != null && !id.trim().isEmpty()) {
+                    if (_options.isEngineStatsEnabled() && id != null && !id.trim().isEmpty()) {
                         synchronized (_STATS) {
                             if (_STATS.containsKey(id))
                                 EngineStats.reportRun(_STATS.get(id), endTime - startTime);
@@ -248,29 +207,18 @@ public class ValidatingProcessor implements Processor {
 
                         RuleFailure failure = new RuleFailure(rule.getRule(), message, validatable);
                         failure.setExtraErrorMessages(extraErrors);
-                        failure.setInformationMessages(ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
+                        failure.setInformationMessages(
+                                ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
                         failure.setOriginalResult((Boolean)binding.getVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT));
                         results.add(failure);
                         currentRuleFailures.add(id);
                     }
                 }
-                catch (TimeoutException e) {
-                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.TIMEOUT_MSG, validatable, null));
-                }
-                catch (InterruptedException e) {
-                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.INTERRUPTED_MSG, validatable, null));
-                }
-                catch (ExecutionException e) {
-                    if (e.getCause() instanceof ValidationException)
-                        results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause().getCause()));
-                    else
-                        results.add(new RuleFailure(rule.getRule(), "Edit generated an unexpected error: " + e.getCause().getMessage(), validatable, null));
-                }
                 catch (ValidationException e) {
                     results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause()));
                 }
                 catch (Exception e) {
-                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, null));
+                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e));
                 }
                 finally {
                     validatable.clearPropertiesWithError();
@@ -355,19 +303,6 @@ public class ValidatingProcessor implements Processor {
         if (allContexts != null)
             for (Entry<Long, Map<String, Object>> entry : allContexts.entrySet())
                 _contexts.putAll(entry.getValue());
-    }
-
-    /**
-     * Turns on or off the statistics.
-     * <p/>
-     * Created on Jun 29, 2011 by depryf
-     * @param on if true the stats will be on, otherwise they will be off
-     */
-    public void setStatisticsOn(boolean on) {
-        synchronized (_STATS) {
-            _STATS.clear();
-        }
-        _recordStats = on;
     }
 
     /**

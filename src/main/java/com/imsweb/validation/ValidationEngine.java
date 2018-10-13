@@ -44,27 +44,33 @@ import com.imsweb.validation.internal.callable.RuleCompilingCallable;
 import com.imsweb.validation.runtime.CompiledRules;
 import com.imsweb.validation.runtime.RuntimeUtils;
 
-// TODO FD review this documentation
-
 /**
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
  * <br/><br/>
  * The first thing that needs to happen before using the engine for validation is to initialize the services and the context methods. This is accomplished
  * by calling the initialize method of the {@link ValidationServices} and {@link ValidationContextFunctions} classes. That method takes as an argument
- * an instance of those classes; to use the default implementation, just instanciate those classes themselves:
+ * an instance of those classes; to use the default implementation, you can instanciate those classes themselves:
  * <pre>
  *     ValidationServices.initialize(new ValidationServices());
  *     ValidationContextFunctions.initialize(new ValidationContextFunctions());
  * </pre>
- * But a more complex application might need more customize services and extra context functions available to the Groovy edits; in that case those classes
- * should be extended and initialized with the customized versions:
+ * But that is not required since those classes will be automatically initialized with those default classes the first time the getInstance() method is called
+ * (if they have not been explicitly initialized yet).
+ * <br/><br/>
+ * More complex applications might need more customized services and extra context functions available to the Groovy edits; in that case those classes
+ * should be extended and initialized with the customized versions (before any code tries to get their instance):
  * <pre>
  *     ValidationServices.initialize(new MyCustomValidatorServices());
  *     ValidationContextFunctions.initialize(new MyCustomValidatorContextFunctions());
  * </pre>
- * The second thing to do is to initialize the engine using one of its <b>initialize()</b> methods. Those methods take as argument one or several
- * {@link Validator} objects, which represent a logical group of {@link Rule} (edits); usually in a file. The {@link Validator} object can be built programmatically,
- * or parsed from XML using the utility methods from the {@link ValidationXmlUtils} class.
+ * The second thing to do is to initialize the engine using one of its <b>initialize()</b> methods. Those methods take as argument an optional options object and one
+ * or several {@link Validator} objects, which represent a logical group of {@link Rule} (edits); usually in a file. The {@link Validator} object can be built
+ * programmatically or parsed from XML using the utility methods from the {@link ValidationXmlUtils} class.
+ * <br/><br/>
+ * Prior to version 2.0 of the library, the engine was a singleton class with static methods. As of 2.0, the engine is not static anymore and can be created via its
+ * public constructor. A big advantages of that approach is to allow multiple engines to run concurrently in a given application. To be compatible with prior versions
+ * and because most applications only need one instance of an engine, this class has a cached static engine available. It can always be called via the getInstance()
+ * method and that instance is never null (but it does need to be initialized like any other instance).
  * <br/><br/>
  * After initializing the engine, the <b>validate()</b> methods can be called. They take as argument a {@link Validatable} object. Those objects are
  * application-dependent; the validation module only defines an interface (and a few simple implementations, like {@link com.imsweb.validation.entities.SimpleMapValidatable}
@@ -76,12 +82,12 @@ import com.imsweb.validation.runtime.RuntimeUtils;
  * <p/>
  * Created on Apr 26, 2008 by Fabian Depry
  */
-public final class ValidationEngine {
+public class ValidationEngine {
 
     /**
      * Engine version (used to check compatibility with the edits)
      */
-    private static final String _ENGINE_VERSION = "5.11";
+    private static final String _ENGINE_VERSION = "6.0";
 
     /**
      * The different context types supported by the engine
@@ -152,16 +158,6 @@ public final class ValidationEngine {
     public static final String EXCEPTION_MSG = "Edit failed with exception.";
 
     /**
-     * Message used when a timeout happened while executing a rule.
-     */
-    public static final String TIMEOUT_MSG = "Edit execution took too long.";
-
-    /**
-     * Message used when a timeout happened while executing a rule.
-     */
-    public static final String INTERRUPTED_MSG = "Edit execution was interrupted.";
-
-    /**
      * Message used when a rule doesn't define an error message.
      */
     public static final String NO_MESSAGE_DEFINED_MSG = "No default error message defined.";
@@ -181,32 +177,32 @@ public final class ValidationEngine {
     /**
      * Map of <code>Validator</code>s, keyed by validator ID
      */
-    private Map<String, Validator> _validators = new ConcurrentHashMap<>();
+    protected Map<String, Validator> _validators = new ConcurrentHashMap<>();
 
     /**
      * Map of <code>Processor</code>s, keyed by java-path root
      */
-    private Map<String, ValidatingProcessor> _processors = new ConcurrentHashMap<>();
+    protected Map<String, ValidatingProcessor> _processors = new ConcurrentHashMap<>();
 
     /**
      * Currently used processor roots (for SEER, that would be "lines", for DMS it would be "patient", etc...)
      */
-    private Map<String, Object> _processorRoots = new ConcurrentHashMap<>();
+    protected Map<String, Object> _processorRoots = new ConcurrentHashMap<>();
 
     /**
      * Map of <code>ExecutableRule</code>s, keyed by rule internal ID
      */
-    private Map<Long, ExecutableRule> _executableRules = new ConcurrentHashMap<>();
+    protected Map<Long, ExecutableRule> _executableRules = new ConcurrentHashMap<>();
 
     /**
      * Map of <code>ExecutableCondition</code>s, keyed by condition internal ID
      */
-    private Map<Long, ExecutableCondition> _executableConditions = new ConcurrentHashMap<>();
+    protected Map<Long, ExecutableCondition> _executableConditions = new ConcurrentHashMap<>();
 
     /**
      * Compiled contexts, keyed by validator internal ID and context ID
      */
-    private Map<Long, Map<String, Object>> _contexts = new ConcurrentHashMap<>();
+    protected Map<Long, Map<String, Object>> _contexts = new ConcurrentHashMap<>();
 
     /**
      * Possible statuses for the engine
@@ -231,17 +227,10 @@ public final class ValidationEngine {
      */
     private ValidationEngineStatus _status = ValidationEngineStatus.NOT_INITIALIZED;
 
-    // TODO if those are passed as options, do I really need to keep them as class variables?
-
     /**
-     * The number of threads to use to compile the rules (see enableMultiThreadedCompilation() method)
+     * Initialization options
      */
-    private int _numCompilerThreads = 1; // TODO default that to 2
-
-    /**
-     * The timeout (in seconds) for running edits (or conditions); if an edit runs for longer than the value, it will automatically be killed and fail. Use 0 for no timeout (the default).
-     */
-    private int _editExecutionTimeout = 0; // TODO deprecate/remove this
+    protected InitializationOptions _options;
 
     /**
      * Private lock controlling access to the state of the engine; all methods using the state of the engine (including the validate methods) need to acquire a read lock;
@@ -264,7 +253,7 @@ public final class ValidationEngine {
     }
 
     /**
-     * Initializes thisvalidation engine.
+     * Initializes this validation engine.
      * <p/>
      * Created on Mar 6, 2008 by depryf
      */
@@ -342,19 +331,15 @@ public final class ValidationEngine {
     public InitializationStats initialize(InitializationOptions options, List<Validator> validators) throws ConstructionException {
         _status = ValidationEngineStatus.INITIALIZING;
 
-        // TODO finalize init options and use them here...
-        if (options == null)
-            options = new InitializationOptions();
-
         InitializationStats stats = new InitializationStats();
+
         long start = System.currentTimeMillis();
 
         _lock.writeLock().lock();
         try {
             uninitialize();
 
-            // TODO use the options
-            //turnStatisticsOn(options.enableEngineStats());
+            _options = options == null ? new InitializationOptions() : options;
 
             if (validators != null) {
                 checkValidatorConstraints(validators);
@@ -1770,38 +1755,6 @@ public final class ValidationEngine {
     }
 
     /**
-     * Turns the statistics on.
-     * <p/>
-     * Created on Jun 29, 2011 by depryf
-     */
-    public void turnStatisticsOn() {
-        _lock.writeLock().lock();
-        try {
-            for (ValidatingProcessor processor : _processors.values())
-                processor.setStatisticsOn(true);
-        }
-        finally {
-            _lock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * Turns the statistics off.
-     * <p/>
-     * Created on Jun 29, 2011 by depryf
-     */
-    public void turnStatisticsOff() {
-        _lock.writeLock().lock();
-        try {
-            for (ValidatingProcessor processor : _processors.values())
-                processor.setStatisticsOn(false);
-        }
-        finally {
-            _lock.writeLock().unlock();
-        }
-    }
-
-    /**
      * Returns the statistics gathered so far...
      * <p/>
      * Created on Nov 30, 2007 by depryf
@@ -1855,42 +1808,6 @@ public final class ValidationEngine {
         }
     }
 
-    /**
-     * Enables multi-threaded compilation of the rules, using the provided number of threads (by default only one thread is used).
-     * @param numThreads number of threads to use, must be between 1 and 32
-     */
-    public void enableMultiThreadedCompilation(int numThreads) {
-        if (numThreads < 1 || numThreads > 32)
-            throw new RuntimeException("Number of threads must be between 1 and 32!");
-        _numCompilerThreads = numThreads;
-    }
-
-    /**
-     * Disables multi-threaded compilation of the rules, using a single thread; this is the default behavior of the engine.
-     */
-    public void disableMultiThreadedCompilation() {
-        _numCompilerThreads = 1;
-    }
-
-    /**
-     * Enables edit (and condition) execution timeout.
-     * <br/><br/>
-     * If set to a strictly positive value, and edit that runs for more than the value (in seconds) will be killed and will be seen as a failure.
-     * @param timeoutInSeconds timeout value in seconds, use 0 for no timeout (the default)
-     */
-    public void enableEditExecutionTimeout(int timeoutInSeconds) {
-        if (timeoutInSeconds < 0)
-            throw new RuntimeException("Timeout in seconds must be 0 (to disable the timeout) or positive.");
-        _editExecutionTimeout = timeoutInSeconds;
-    }
-
-    /**
-     * Disables edit (and condition) execution timeout; this is the default behavior of the engine.
-     */
-    public void disableEditExecutionTimeout() {
-        _editExecutionTimeout = 0;
-    }
-
     // ********************************************************************************
     //                  INTERNAL METHODS (no lock required)
     // ********************************************************************************
@@ -1906,7 +1823,7 @@ public final class ValidationEngine {
         CompiledRules compiledRules = RuntimeUtils.findCompileRules(validator, stats);
 
         // internalize the rules
-        ExecutorService service = Executors.newFixedThreadPool(_numCompilerThreads);
+        ExecutorService service = Executors.newFixedThreadPool(_options.getNumCompilationThreads());
         List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
         if (validator.getRules() != null) {
             for (Rule r : validator.getRules()) {
@@ -2064,13 +1981,13 @@ public final class ValidationEngine {
             StringBuilder partialPath = new StringBuilder(parts[0]);
 
             // first part correspond to a validating processor, the rest of the parts correspond to iterative processors...
-            ValidatingProcessor current = _processors.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _editExecutionTimeout));
+            ValidatingProcessor current = _processors.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _options));
             for (int i = 1; i < parts.length; i++) {
                 partialPath.append(".").append(parts[i]);
 
                 ValidatingProcessor vProcessor = _processors.get(partialPath.toString());
                 if (vProcessor == null) {
-                    vProcessor = new ValidatingProcessor(partialPath.toString(), _editExecutionTimeout);
+                    vProcessor = new ValidatingProcessor(partialPath.toString(), _options);
                     IterativeProcessor iProcessor = new IterativeProcessor(vProcessor, parts[i]);
                     _processors.put(partialPath.toString(), vProcessor);
                     current.addNested(iProcessor);
