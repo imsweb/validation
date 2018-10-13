@@ -135,9 +135,9 @@ public final class ValidationXmlUtils {
     private static final Pattern _PATTERN_RULE_ID = Pattern.compile("^(.+?)(\\d+)(.+)?$");
 
     /**
-     * Whether or not the expressions, descriptions, messages, etc... should be re-aligned (enabled by default).
+     * Whether or not the expressions, descriptions, messages, etc... should be re-aligned (disabled by default).
      */
-    private static boolean _REALIGNMENT_ENABLED = true;
+    private static boolean _REALIGNMENT_ENABLED = false; // TODO I am leaving this as-is but I changed the default value to be false
 
     /**
      * Private constructor, no instanciation.

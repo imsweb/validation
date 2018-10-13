@@ -3,12 +3,6 @@
  */
 package com.imsweb.validation;
 
-import com.imsweb.validation.entities.EditableValidator;
-import com.imsweb.validation.entities.RuleFailure;
-import com.imsweb.validation.entities.Validator;
-import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+
+import com.imsweb.validation.entities.EditableValidator;
+import com.imsweb.validation.entities.RuleFailure;
+import com.imsweb.validation.entities.Validator;
 
 public final class TestingUtils {
 
@@ -175,7 +176,8 @@ public final class TestingUtils {
             _EXTRA_ALIASES.put("level1.level2.level3", "level3");
 
             _EXTRA_ALIASES.put("level", "level");
-            _EXTRA_ALIASES.put("level-runtime", "level-runtime");
+
+            _EXTRA_ALIASES.put("runtime", "runtime");
 
             _EXTRA_ALIASES.put("root", "root");
             _EXTRA_ALIASES.put("root.repeatedObjects", "repeatedObject");

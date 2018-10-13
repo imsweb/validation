@@ -3,6 +3,7 @@
  */
 package com.imsweb.validation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,7 +56,6 @@ public class ValidationEngineTest {
 
         InitializationOptions options = new InitializationOptions();
         options.enableEngineStats();
-
 
         // initialize with a no validator but some options
         ValidationEngine.getInstance().initialize(options);
@@ -325,29 +325,38 @@ public class ValidationEngineTest {
     }
 
     @Test
-    public void testRuntimeValidation() throws ConstructionException, ValidationException {
-        Assert.assertNull(ValidationEngine.getInstance().getValidator("fake-validator-runtime"));
+    public void testRuntimeValidation() throws IOException, ConstructionException, ValidationException {
 
         // the logic in the XML doesn't reference any lookup, but the runtime Java class returns one; that's how we can assert the runtime stuff
-        Validator v = FakeValidatorRuntime.validator();
-        Assert.assertTrue(v.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
 
-        Map<String, Object> data = new HashMap<>();
-        Validatable validatable = new SimpleMapValidatable("level-runtime", data);
+        Validator normalValidator = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-runtime.xml"));
+        Assert.assertFalse(normalValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
+        ValidationEngine normalEngine = new ValidationEngine();
+        InitializationStats stats = normalEngine.initialize(normalValidator);
+        Assert.assertEquals(1, stats.getNumEditsLoaded());
+        Assert.assertEquals(0, stats.getNumEditsPreCompiled());
+        Assert.assertEquals(1, stats.getNumEditsCompiled());
 
-        InitializationStats stats = ValidationEngine.getInstance().initialize(v);
+        Validator runtimeValidator = FakeValidatorRuntime.validator();
+        Assert.assertTrue(runtimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
+        ValidationEngine runtimeEngine = new ValidationEngine();
+        stats = runtimeEngine.initialize(runtimeValidator);
         Assert.assertEquals(1, stats.getNumEditsLoaded());
         Assert.assertEquals(1, stats.getNumEditsPreCompiled());
         Assert.assertEquals(0, stats.getNumEditsCompiled());
-        try {
-            data.put("key", "value");
-            TestingUtils.assertNoEditFailure(ValidationEngine.getInstance().validate(validatable), "fvrt-rule1");
-            data.put("key", "other");
-            TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(validatable), "fvrt-rule1");
-        }
-        finally {
-            ValidationEngine.getInstance().uninitialize();
-        }
+
+        // the global cached engine should not now about these validators
+        Assert.assertNull(ValidationEngine.getInstance().getValidator("fake-validator-runtime"));
+
+        // both engine should validate the same way (since the fake lookup is not actually used in the edit logic)
+        Map<String, Object> data = new HashMap<>();
+        Validatable validatable = new SimpleMapValidatable("runtime", data);
+        data.put("key", "value");
+        TestingUtils.assertNoEditFailure(normalEngine.validate(validatable), "fvrt-rule1");
+        TestingUtils.assertNoEditFailure(runtimeEngine.validate(validatable), "fvrt-rule1");
+        data.put("key", "other");
+        TestingUtils.assertEditFailure(normalEngine.validate(validatable), "fvrt-rule1");
+        TestingUtils.assertEditFailure(runtimeEngine.validate(validatable), "fvrt-rule1");
     }
 
     @Test

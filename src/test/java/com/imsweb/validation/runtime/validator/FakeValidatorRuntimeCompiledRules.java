@@ -32,10 +32,10 @@ public class FakeValidatorRuntimeCompiledRules implements CompiledRules {
         parameters.add(Map.class);
         parameters.add(ValidationContextFunctions.class);
         parameters.add(Map.class);
-        return Collections.singletonMap("level-runtime", parameters);
+        return Collections.singletonMap("runtime", parameters);
     }
 
-    public boolean fvrtRule1(Binding binding, Map<String, Object> context, ValidationContextFunctions functions, Map<String, Object> data) {
-        return "value".equals(data.get("key"));
+    public boolean fvrtRule1(Binding binding, Map<String, Object> context, ValidationContextFunctions functions, Map<String, Object> runtime) {
+        return "value".equals(runtime.get("key"));
     }
 }

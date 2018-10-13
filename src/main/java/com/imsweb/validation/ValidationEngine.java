@@ -167,7 +167,7 @@ public final class ValidationEngine {
     public static final String NO_MESSAGE_DEFINED_MSG = "No default error message defined.";
 
     /**
-     * Cached instance of an engine.
+     * Cached instance of an engine; most applications should use this instance but some advance use of this framework might require multiple engine to run concurrently...
      */
     private static ValidationEngine _INSTANCE = new ValidationEngine();
 
@@ -231,15 +231,17 @@ public final class ValidationEngine {
      */
     private ValidationEngineStatus _status = ValidationEngineStatus.NOT_INITIALIZED;
 
+    // TODO if those are passed as options, do I really need to keep them as class variables?
+
     /**
      * The number of threads to use to compile the rules (see enableMultiThreadedCompilation() method)
      */
-    private int _numCompilerThreads = 1;
+    private int _numCompilerThreads = 1; // TODO default that to 2
 
     /**
      * The timeout (in seconds) for running edits (or conditions); if an edit runs for longer than the value, it will automatically be killed and fail. Use 0 for no timeout (the default).
      */
-    private int _editExecutionTimeout = 0;
+    private int _editExecutionTimeout = 0; // TODO deprecate/remove this
 
     /**
      * Private lock controlling access to the state of the engine; all methods using the state of the engine (including the validate methods) need to acquire a read lock;
@@ -340,6 +342,7 @@ public final class ValidationEngine {
     public InitializationStats initialize(InitializationOptions options, List<Validator> validators) throws ConstructionException {
         _status = ValidationEngineStatus.INITIALIZING;
 
+        // TODO finalize init options and use them here...
         if (options == null)
             options = new InitializationOptions();
 
