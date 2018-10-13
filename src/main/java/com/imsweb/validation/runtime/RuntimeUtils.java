@@ -72,6 +72,8 @@ public class RuntimeUtils {
     }
 
     public static CompiledRules findCompileRules(Validator validator, InitializationStats stats) {
+        if (validator == null)
+            return null;
         CompiledRules compiledRules = validator.getCompiledRules();
         if (compiledRules != null) {
             if (!StringUtils.isBlank(validator.getVersion()) && !validator.getVersion().equals(compiledRules.getValidatorVersion())) {
