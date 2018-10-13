@@ -1,6 +1,5 @@
 # Java Validation Framework
 
-[![Build Status](https://travis-ci.org/imsweb/validation.svg?branch=master)](https://travis-ci.org/imsweb/validation)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation)
 
 This framework allows edits to be defined in [Groovy](http://www.groovy-lang.org/) and to be executed on various data types.
