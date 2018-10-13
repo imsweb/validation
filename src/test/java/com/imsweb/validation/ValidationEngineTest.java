@@ -3,6 +3,20 @@
  */
 package com.imsweb.validation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.imsweb.validation.entities.Condition;
 import com.imsweb.validation.entities.EditableCondition;
 import com.imsweb.validation.entities.EditableRule;
@@ -14,21 +28,7 @@ import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.internal.ValidatingContext;
-import com.imsweb.validation.runtime.FakeValidatorRuntimeUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.imsweb.validation.runtime.validator.FakeValidatorRuntime;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ValidationEngineTest {
@@ -325,17 +325,11 @@ public class ValidationEngineTest {
     }
 
     @Test
-    public void testRuntimeValidation() throws IOException, ConstructionException, ValidationException {
+    public void testRuntimeValidation() throws ConstructionException, ValidationException {
         Assert.assertNull(ValidationEngine.getInstance().getValidator("fake-validator-runtime"));
 
-        // the logic in the XML doesn't reference any lookup, but the runtime Java class returns one; that's how we can assert pre-compilation...
-
-        // old way to load a pre-compiled validator (expect to find it on the classpath)
-        Validator v = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-runtime.xml"));
-        Assert.assertTrue(v.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
-
-        // new way to load a pre-compiled validator (provided by the pre-compiled framework itself)
-        v = FakeValidatorRuntimeUtils.getValidator();
+        // the logic in the XML doesn't reference any lookup, but the runtime Java class returns one; that's how we can assert the runtime stuff
+        Validator v = FakeValidatorRuntime.validator();
         Assert.assertTrue(v.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
 
         Map<String, Object> data = new HashMap<>();

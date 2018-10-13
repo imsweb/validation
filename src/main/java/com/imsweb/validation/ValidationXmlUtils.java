@@ -3,51 +3,6 @@
  */
 package com.imsweb.validation;
 
-import com.imsweb.validation.entities.Category;
-import com.imsweb.validation.entities.Condition;
-import com.imsweb.validation.entities.ContextEntry;
-import com.imsweb.validation.entities.DeletedRuleHistory;
-import com.imsweb.validation.entities.EmbeddedSet;
-import com.imsweb.validation.entities.Rule;
-import com.imsweb.validation.entities.RuleHistory;
-import com.imsweb.validation.entities.RuleTest;
-import com.imsweb.validation.entities.StandaloneSet;
-import com.imsweb.validation.entities.Validator;
-import com.imsweb.validation.entities.ValidatorRelease;
-import com.imsweb.validation.entities.ValidatorTests;
-import com.imsweb.validation.entities.ValidatorVersion;
-import com.imsweb.validation.entities.xml.CategoryXmlDto;
-import com.imsweb.validation.entities.xml.ConditionXmlDto;
-import com.imsweb.validation.entities.xml.ContextEntryXmlDto;
-import com.imsweb.validation.entities.xml.DeletedRuleXmlDto;
-import com.imsweb.validation.entities.xml.HistoryEventXmlDto;
-import com.imsweb.validation.entities.xml.ReleaseXmlDto;
-import com.imsweb.validation.entities.xml.RuleXmlDto;
-import com.imsweb.validation.entities.xml.SetXmlDto;
-import com.imsweb.validation.entities.xml.StandaloneSetValidatorXmlDto;
-import com.imsweb.validation.entities.xml.StandaloneSetXmlDto;
-import com.imsweb.validation.entities.xml.TestXmlDto;
-import com.imsweb.validation.entities.xml.TestedValidatorXmlDto;
-import com.imsweb.validation.entities.xml.ValidatorXmlDto;
-import com.imsweb.validation.internal.callable.RuleParsingCallable;
-import com.imsweb.validation.runtime.ParsedContexts;
-import com.imsweb.validation.runtime.ParsedLookups;
-import com.imsweb.validation.runtime.ParsedProperties;
-import com.imsweb.validation.runtime.RuntimeUtils;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.ConversionException;
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
-import com.thoughtworks.xstream.core.util.QuickWriter;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import com.thoughtworks.xstream.io.xml.Xpp3Driver;
-import com.thoughtworks.xstream.security.NoTypePermission;
-import com.thoughtworks.xstream.security.WildcardTypePermission;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.codec.digest.MessageDigestAlgorithms;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -85,6 +40,53 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.MessageDigestAlgorithms;
+import org.apache.commons.lang3.StringUtils;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import com.thoughtworks.xstream.core.util.QuickWriter;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+import com.thoughtworks.xstream.io.xml.Xpp3Driver;
+import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
+
+import com.imsweb.validation.entities.Category;
+import com.imsweb.validation.entities.Condition;
+import com.imsweb.validation.entities.ContextEntry;
+import com.imsweb.validation.entities.DeletedRuleHistory;
+import com.imsweb.validation.entities.EmbeddedSet;
+import com.imsweb.validation.entities.Rule;
+import com.imsweb.validation.entities.RuleHistory;
+import com.imsweb.validation.entities.RuleTest;
+import com.imsweb.validation.entities.StandaloneSet;
+import com.imsweb.validation.entities.Validator;
+import com.imsweb.validation.entities.ValidatorRelease;
+import com.imsweb.validation.entities.ValidatorTests;
+import com.imsweb.validation.entities.ValidatorVersion;
+import com.imsweb.validation.entities.xml.CategoryXmlDto;
+import com.imsweb.validation.entities.xml.ConditionXmlDto;
+import com.imsweb.validation.entities.xml.ContextEntryXmlDto;
+import com.imsweb.validation.entities.xml.DeletedRuleXmlDto;
+import com.imsweb.validation.entities.xml.HistoryEventXmlDto;
+import com.imsweb.validation.entities.xml.ReleaseXmlDto;
+import com.imsweb.validation.entities.xml.RuleXmlDto;
+import com.imsweb.validation.entities.xml.SetXmlDto;
+import com.imsweb.validation.entities.xml.StandaloneSetValidatorXmlDto;
+import com.imsweb.validation.entities.xml.StandaloneSetXmlDto;
+import com.imsweb.validation.entities.xml.TestXmlDto;
+import com.imsweb.validation.entities.xml.TestedValidatorXmlDto;
+import com.imsweb.validation.entities.xml.ValidatorXmlDto;
+import com.imsweb.validation.internal.callable.RuleParsingCallable;
+import com.imsweb.validation.runtime.ParsedContexts;
+import com.imsweb.validation.runtime.ParsedLookups;
+import com.imsweb.validation.runtime.ParsedProperties;
+import com.imsweb.validation.runtime.RuntimeEdits;
 
 import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_GROOVY;
 import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_JAVA;
@@ -131,16 +133,6 @@ public final class ValidationXmlUtils {
      * Compiled <code>Pattern</code> for sorting the rule by ID
      */
     private static final Pattern _PATTERN_RULE_ID = Pattern.compile("^(.+?)(\\d+)(.+)?$");
-
-    /**
-     * The number of threads to use to parse the rules (see enableMultiThreadedParsing() method)
-     */
-    private static int _NUM_PARSER_THREADS = 1;
-
-    /**
-     * Whether or not the pre-parsing mechanism should be used (enabled by default).
-     */
-    private static boolean _PRE_PARSED_LOOKUP_ENABLED = true;
 
     /**
      * Whether or not the expressions, descriptions, messages, etc... should be re-aligned (enabled by default).
@@ -233,13 +225,30 @@ public final class ValidationXmlUtils {
      * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(File file) throws IOException {
+        return loadValidatorFromXml(file, null);
+    }
+
+    /**
+     * Creates a new <code>Validator</code> object by reading the passed XML file.
+     * <br/><br/>
+     * If the filename ends with 'gz', a compressed file will be assumed; zipped files
+     * are not supported (that doesn't mean they cannot be handled, it just means the caller has
+     * to provide a stream to the zip entry).
+     * <p/>
+     * Created on Feb 5, 2008 by depryf
+     * @param file <code>File</code> to XML file to load (cannot be null, must exist)
+     * @param runtime <code>RuntimeEdits</code> optional pre-parsed classes
+     * @return a new <code>Validator</code>
+     * @throws IOException if unable to properly read/write the entity
+     */
+    public static Validator loadValidatorFromXml(File file, RuntimeEdits runtime) throws IOException {
         if (file == null)
             throw new IOException("Unable to load validator, target file is null");
         if (!file.exists())
             throw new IOException("Unable to load validator, target file doesn't exist");
 
         try (InputStream is = file.getName().toLowerCase().endsWith(".gz") ? new GZIPInputStream(new FileInputStream(file)) : new FileInputStream(file)) {
-            return loadValidatorFromXml(is);
+            return loadValidatorFromXml(is, runtime);
         }
     }
 
@@ -255,11 +264,27 @@ public final class ValidationXmlUtils {
      * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(URL url) throws IOException {
+        return loadValidatorFromXml(url, null);
+    }
+
+    /**
+     * Creates a new <code>Validator</code> object by reading the passed <code>URL</code> to an XML file.
+     * <br/><br/>
+     * This method supports a gzipped compressed resource (if the URL path ends with gz or gzip); otherwise
+     * it assumes the resource is not compressed.
+     * <p/>
+     * Created on Feb 5, 2008 by depryf
+     * @param url <code>URL</code> to XML file to load (if null or if a stream cannot be opened from it, an exception will be raised)
+     * @param runtime <code>RuntimeEdits</code> optional pre-parsed classes
+     * @return a new <code>Validator</code>
+     * @throws IOException if unable to properly read/write the entity
+     */
+    public static Validator loadValidatorFromXml(URL url, RuntimeEdits runtime) throws IOException {
         if (url == null)
             throw new IOException("Unable to load validator, target URL is null");
 
         try (InputStream is = url.getPath().toLowerCase().endsWith(".gz") ? new GZIPInputStream(url.openStream()) : url.openStream()) {
-            return loadValidatorFromXml(is);
+            return loadValidatorFromXml(is, runtime);
         }
     }
 
@@ -276,11 +301,28 @@ public final class ValidationXmlUtils {
      * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(InputStream is) throws IOException {
+        return loadValidatorFromXml(is, null);
+    }
+
+    /**
+     * Creates a new <code>Validator</code> object by reading the provided input stream.
+     * <br/><br/>
+     * The passed stream will NOT be closed when this method returns.
+     * <br/><br/>
+     * This methods makes no assumptions on the compression of the stream.
+     * <p/>
+     * Created on Feb 5, 2008 by depryf
+     * @param is <code>InputStream</code> to validator file to load (if null an exception will be raised)
+     * @param runtime <code>RuntimeEdits</code> optional pre-parsed classes
+     * @return a new <code>Validator</code>
+     * @throws IOException if unable to properly read/write the entity
+     */
+    public static Validator loadValidatorFromXml(InputStream is, RuntimeEdits runtime) throws IOException {
         if (is == null)
             throw new IOException("Unable to load validator, target input stream is null");
 
         try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            return loadValidatorFromXml(reader);
+            return loadValidatorFromXml(reader, runtime);
         }
     }
 
@@ -295,6 +337,21 @@ public final class ValidationXmlUtils {
      * @throws IOException if unable to properly read/write the entity
      */
     public static Validator loadValidatorFromXml(Reader reader) throws IOException {
+        return loadValidatorFromXml(reader, null);
+    }
+
+    /**
+     * Creates a new <code>Validator</code> object by reading the passed XML.
+     * <p/>
+     * The passed reader will NOT be closed when this method returns.
+     * <p/>
+     * Created on Feb 5, 2008 by depryf
+     * @param reader <code>Reader</code> to XML (if null an exception will be raised)
+     * @param runtime <code>RuntimeEdits</code> optional pre-parsed classes
+     * @return a new <code>Validator</code>
+     * @throws IOException if unable to properly read/write the entity
+     */
+    public static Validator loadValidatorFromXml(Reader reader, RuntimeEdits runtime) throws IOException {
         if (reader == null)
             throw new IOException("Unable to load validator, target reader is null");
 
@@ -315,7 +372,7 @@ public final class ValidationXmlUtils {
             readValidatorContext(validator, validatorType.getContextEntries());
             readValidatorCategories(validator, validatorType.getCategories());
             readValidatorConditions(validator, validatorType.getConditions());
-            readValidatorRules(validator, validatorType.getRules());
+            readValidatorRules(validator, validatorType.getRules(), runtime);
             readValidatorSets(validator, validatorType.getSets());
 
             // and finally calculate the inverted dependencies - this requires two passes over the edits; maybe somebody smarter will make it faster ;-)
@@ -326,6 +383,9 @@ public final class ValidationXmlUtils {
             }
             for (Rule r : validator.getRules())
                 r.setInvertedDependencies(invertedDependencies.get(r.getId()));
+
+            if (runtime != null)
+                validator.setCompiledRules(runtime.getCompiledRules());
 
             return validator;
         }
@@ -567,7 +627,7 @@ public final class ValidationXmlUtils {
         validator.setConditions(conditions);
     }
 
-    private static void readValidatorRules(Validator validator, List<RuleXmlDto> rulesType) throws IOException {
+    private static void readValidatorRules(Validator validator, List<RuleXmlDto> rulesType, RuntimeEdits runtime) throws IOException {
         Map<String, Rule> rules = new ConcurrentHashMap<>();
 
         if (rulesType != null && !rulesType.isEmpty()) {
@@ -579,12 +639,12 @@ public final class ValidationXmlUtils {
                     versions.put(release.getVersion().getRawString(), release.getVersion());
 
             // try to find pre-parsed information on the classpath
-            ParsedProperties props = _PRE_PARSED_LOOKUP_ENABLED ? RuntimeUtils.findParsedProperties(validator.getId()) : null;
-            ParsedContexts contexts = _PRE_PARSED_LOOKUP_ENABLED ? RuntimeUtils.findParsedContexts(validator.getId()) : null;
-            ParsedLookups lookups = _PRE_PARSED_LOOKUP_ENABLED ? RuntimeUtils.findParsedLookups(validator.getId()) : null;
+            ParsedProperties props = runtime == null ? null : runtime.getParsedProperties();
+            ParsedContexts contexts = runtime == null ? null : runtime.getParsedContexts();
+            ParsedLookups lookups = runtime == null ? null : runtime.getParsedLookups();
 
             // go through each rule (we multi-thread this part since it can be a bit slow
-            ExecutorService service = Executors.newFixedThreadPool(_NUM_PARSER_THREADS);
+            ExecutorService service = Executors.newFixedThreadPool(2);
             List<Future<Void>> results = new ArrayList<>(rulesType.size());
             for (RuleXmlDto type : rulesType) {
 
@@ -1470,37 +1530,6 @@ public final class ValidationXmlUtils {
     // ****************************************************************************************************
     //                                      MISCELLANEOUS METHODS
     // ****************************************************************************************************
-
-    /**
-     * Enables multi-threaded parsing of the rules, using the provided number of threads (by default only one thread is used)
-     * @param numThreads number of threads to use, must be between 1 and 32
-     */
-    public static void enableMultiThreadedParsing(int numThreads) {
-        if (numThreads < 1 || numThreads > 32)
-            throw new RuntimeException("Number of threads must be between 1 and 32!");
-        _NUM_PARSER_THREADS = numThreads;
-    }
-
-    /**
-     * Disables multi-threaded parsing of the rules, using a single thread; this is the default behavior of the engine.
-     */
-    public static void disableMultiThreadedCompilation() {
-        _NUM_PARSER_THREADS = 1;
-    }
-
-    /**
-     * Enables the pre-parsing mechanism; this is the default behavior of the engine.
-     */
-    public static void enablePreParseLookup() {
-        _PRE_PARSED_LOOKUP_ENABLED = true;
-    }
-
-    /**
-     * Disables the pre-parsing mechanism, which is on by default.  That mechanism tries to find a class of pre-parsed properties, lookups, etc... on the class path.
-     */
-    public static void disablePreParseLookup() {
-        _PRE_PARSED_LOOKUP_ENABLED = false;
-    }
 
     /**
      * Enables the re-alignment mechanism when reading expressions, descriptions, messages, etc... This is the default behavior of the engine.

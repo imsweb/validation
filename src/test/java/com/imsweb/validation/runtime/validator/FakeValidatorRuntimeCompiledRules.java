@@ -1,15 +1,17 @@
 /*
  * Copyright (C) 2017 Information Management Services, Inc.
  */
-package com.imsweb.validation.runtime;
-
-import com.imsweb.validation.ValidationContextFunctions;
-import groovy.lang.Binding;
+package com.imsweb.validation.runtime.validator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import groovy.lang.Binding;
+
+import com.imsweb.validation.ValidationContextFunctions;
+import com.imsweb.validation.runtime.CompiledRules;
 
 public class FakeValidatorRuntimeCompiledRules implements CompiledRules {
 

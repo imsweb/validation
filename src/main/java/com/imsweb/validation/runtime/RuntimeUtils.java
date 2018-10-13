@@ -38,8 +38,6 @@ import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
  */
 public class RuntimeUtils {
 
-    public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
-
     private static Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
     private static Pattern _P2 = Pattern.compile("[()]");
     private static Pattern _P3 = Pattern.compile("[\\W&&[^\\s]]");
@@ -106,17 +104,6 @@ public class RuntimeUtils {
 
     }
 
-    public static ParsedProperties findParsedProperties(String validatorId) {
-        ParsedProperties parsedProperties;
-        try {
-            parsedProperties = (ParsedProperties)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).getDeclaredConstructor().newInstance());
-        }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-            parsedProperties = null;
-        }
-        return parsedProperties;
-    }
-
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedProperties(ParsedProperties properties, String ruleId) {
         if (properties == null || ruleId == null)
@@ -136,17 +123,6 @@ public class RuntimeUtils {
         return result.toString() + "ParsedContexts";
     }
 
-    public static ParsedContexts findParsedContexts(String validatorId) {
-        ParsedContexts parsedContexts;
-        try {
-            parsedContexts = (ParsedContexts)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).getDeclaredConstructor().newInstance());
-        }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-            parsedContexts = null;
-        }
-        return parsedContexts;
-    }
-
     @SuppressWarnings("unchecked")
     public static Set<String> getParsedContexts(ParsedContexts contexts, String ruleId) {
         if (contexts == null || ruleId == null)
@@ -164,17 +140,6 @@ public class RuntimeUtils {
         for (String s : StringUtils.split(validatorId, "-"))
             result.append(StringUtils.capitalize(s));
         return result.toString() + "ParsedLookups";
-    }
-
-    public static ParsedLookups findParsedLookups(String validatorId) {
-        ParsedLookups parsedLookups;
-        try {
-            parsedLookups = (ParsedLookups)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).getDeclaredConstructor().newInstance());
-        }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-            parsedLookups = null;
-        }
-        return parsedLookups;
     }
 
     @SuppressWarnings("unchecked")

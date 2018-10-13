@@ -3,22 +3,6 @@
  */
 package com.imsweb.validation;
 
-import com.imsweb.validation.entities.Category;
-import com.imsweb.validation.entities.Condition;
-import com.imsweb.validation.entities.DeletedRuleHistory;
-import com.imsweb.validation.entities.EditableValidator;
-import com.imsweb.validation.entities.EmbeddedSet;
-import com.imsweb.validation.entities.Rule;
-import com.imsweb.validation.entities.RuleHistory;
-import com.imsweb.validation.entities.RuleTest;
-import com.imsweb.validation.entities.StandaloneSet;
-import com.imsweb.validation.entities.Validator;
-import com.imsweb.validation.entities.ValidatorTests;
-import org.apache.commons.lang3.SystemUtils;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -33,6 +17,23 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.imsweb.validation.entities.Category;
+import com.imsweb.validation.entities.Condition;
+import com.imsweb.validation.entities.DeletedRuleHistory;
+import com.imsweb.validation.entities.EditableValidator;
+import com.imsweb.validation.entities.EmbeddedSet;
+import com.imsweb.validation.entities.Rule;
+import com.imsweb.validation.entities.RuleHistory;
+import com.imsweb.validation.entities.RuleTest;
+import com.imsweb.validation.entities.StandaloneSet;
+import com.imsweb.validation.entities.Validator;
+import com.imsweb.validation.entities.ValidatorTests;
 
 /**
  * Created on Feb 23, 2011 by depryf
@@ -71,18 +72,12 @@ public class ValidationXmlUtilsTest {
             assertFakeValidator(v);
         }
 
-        // read gzipped file using multi-threading parsing
+        // read gzipped file
         file = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/fake-validator.xml.gz");
         if (!file.exists())
             Assert.fail("This test requires the file 'fake-validator.xml.gz'");
-        ValidationXmlUtils.enableMultiThreadedParsing(2);
-        try {
-            v = ValidationXmlUtils.loadValidatorFromXml(file);
-            assertFakeValidator(v);
-        }
-        finally {
-            ValidationXmlUtils.enableMultiThreadedParsing(1);
-        }
+        v = ValidationXmlUtils.loadValidatorFromXml(file);
+        assertFakeValidator(v);
     }
 
     @Test
@@ -110,16 +105,10 @@ public class ValidationXmlUtilsTest {
         }
         assertFakeValidator(targetFile);
 
-        // write gzipped file using multi-threading parsing
+        // write gzipped file
         targetFile = new File(TestingUtils.TMP_DIR, "xml-validator-test.xml.gz");
-        ValidationXmlUtils.enableMultiThreadedParsing(2);
-        try {
-            ValidationXmlUtils.writeValidatorToXml(v, targetFile);
-            assertFakeValidator(targetFile);
-        }
-        finally {
-            ValidationXmlUtils.enableMultiThreadedParsing(1);
-        }
+        ValidationXmlUtils.writeValidatorToXml(v, targetFile);
+        assertFakeValidator(targetFile);
     }
 
     @Test(expected = IOException.class)
@@ -134,13 +123,7 @@ public class ValidationXmlUtilsTest {
 
     @Test(expected = IOException.class)
     public void testValidatorErrorBadExpression() throws IOException {
-        ValidationXmlUtils.enableMultiThreadedParsing(2);
-        try {
-            ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-bad-groovy.xml"));
-        }
-        finally {
-            ValidationXmlUtils.enableMultiThreadedParsing(1);
-        }
+        ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-bad-groovy.xml"));
     }
 
     @Test(expected = IOException.class)

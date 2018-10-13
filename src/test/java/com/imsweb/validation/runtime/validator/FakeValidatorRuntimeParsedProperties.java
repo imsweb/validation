@@ -1,10 +1,12 @@
 /*
  * Copyright (C) 2017 Information Management Services, Inc.
  */
-package com.imsweb.validation.runtime;
+package com.imsweb.validation.runtime.validator;
 
 import java.util.Collections;
 import java.util.Set;
+
+import com.imsweb.validation.runtime.ParsedProperties;
 
 public class FakeValidatorRuntimeParsedProperties implements ParsedProperties {
 
