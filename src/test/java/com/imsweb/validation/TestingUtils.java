@@ -39,11 +39,11 @@ public final class TestingUtils {
             ValidationContextFunctions.initialize(new TestingValidationContextFunctions());
 
         // initialize engine
-        if (!ValidationEngine.getInstance().isInitialized())
-            ValidationEngine.getInstance().initialize();
-
-        // no edits should take more than one second (except the one tha tests the timeout)
-        ValidationEngine.getInstance().enableEditExecutionTimeout(1);
+        if (!ValidationEngine.getInstance().isInitialized()) {
+            InitializationOptions options = new InitializationOptions();
+            options.enableEngineStats();
+            ValidationEngine.getInstance().initialize(options);
+        }
     }
 
     public static String getWorkingDirectory() {

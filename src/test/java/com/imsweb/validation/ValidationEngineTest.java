@@ -91,14 +91,13 @@ public class ValidationEngineTest {
         ValidationEngine.getInstance().uninitialize();
         Assert.assertFalse(ValidationEngine.getInstance().isInitialized());
 
-        // initialize with a collection of validator, using multi-threaded compilation
-        ValidationEngine.getInstance().enableMultiThreadedCompilation(2);
+        // initialize with a collection of validator, using single-threaded compilation (default is 2)
+        options.setNumCompilationThreads(1);
         ValidationEngine.getInstance().initialize(Collections.singletonList(v));
         Assert.assertTrue(ValidationEngine.getInstance().isInitialized());
         Assert.assertFalse(ValidationEngine.getInstance().getValidators().isEmpty());
         ValidationEngine.getInstance().uninitialize();
         Assert.assertFalse(ValidationEngine.getInstance().isInitialized());
-        ValidationEngine.getInstance().enableMultiThreadedCompilation(1);
 
         // initialize with a bad validator
         boolean exception = false;
@@ -112,20 +111,6 @@ public class ValidationEngineTest {
         if (!exception)
             Assert.fail("Was excpecting an exception but didn't get it");
         ValidationEngine.getInstance().uninitialize();
-
-        // initialize with a bad validator using multi-threaded compilation
-        ValidationEngine.getInstance().enableMultiThreadedCompilation(2);
-        exception = false;
-        try {
-            ValidationEngine.getInstance().initialize(Collections.singletonList(v));
-        }
-        catch (Exception e) {
-            exception = true;
-        }
-        if (!exception)
-            Assert.fail("Was expecting an exception but didn't get it");
-        ValidationEngine.getInstance().uninitialize();
-        ValidationEngine.getInstance().enableMultiThreadedCompilation(1);
     }
 
     @Test
@@ -179,7 +164,6 @@ public class ValidationEngineTest {
     @SuppressWarnings("unchecked")
     public void testValidate() throws Exception {
         TestingUtils.loadValidator("fake-validator");
-        ValidationEngine.getInstance().turnStatisticsOn();
 
         Map<String, Object> entity = new HashMap<>();
         List<Map<String, Object>> level2List = new ArrayList<>();
@@ -270,15 +254,6 @@ public class ValidationEngineTest {
         Assert.assertEquals("TEST", rf.getGroovyException().getMessage());
         TestingUtils.unloadValidator("fake-validator-exception-groovy");
 
-        // test a timeout
-        TestingUtils.loadValidator("fake-validator-exception-timeout");
-        entity.clear();
-        entity.put("prop", "1");
-        rf = ValidationEngine.getInstance().validate(new SimpleMapValidatable("ID", "level1", entity)).iterator().next();
-        Assert.assertEquals(ValidationEngine.TIMEOUT_MSG, rf.getMessage());
-        Assert.assertNull(rf.getGroovyException());
-        TestingUtils.unloadValidator("fake-validator-exception-timeout");
-
         // test a rule based on a condition defined on a higher level (rule on 'level1.level2' depends on a condition defined on 'level1')
         TestingUtils.loadValidator("fake-validator-parent-condition");
         entity.clear();
@@ -321,7 +296,6 @@ public class ValidationEngineTest {
         Assert.assertFalse(ValidationEngine.getInstance().getStats().isEmpty());
         ValidationEngine.getInstance().resetStats();
         Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
-        ValidationEngine.getInstance().turnStatisticsOff();
     }
 
     @Test
