@@ -138,7 +138,10 @@ public class ValidatingProcessor implements Processor {
                     catch (ExecutionException e) {
                         if (e.getCause() instanceof ValidationException)
                             throw (ValidationException)e.getCause();
-                        throw new ValidationException(condition.getId() + ": " + ValidationEngine.EXCEPTION_MSG);
+                        throw new ValidationException(condition.getId() + ": " + e.getMessage());
+                    }
+                    catch (Throwable e) {
+                        throw new ValidationException(condition.getId() + ": " + e.getMessage());
                     }
                 }
                 else
@@ -268,13 +271,13 @@ public class ValidatingProcessor implements Processor {
                     if (e.getCause() instanceof ValidationException)
                         results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause().getCause()));
                     else
-                        results.add(new RuleFailure(rule.getRule(), "Edit generated an unexpected error: " + e.getCause().getMessage(), validatable, null));
+                        results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause()));
                 }
                 catch (ValidationException e) {
                     results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause()));
                 }
-                catch (Exception e) {
-                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, null));
+                catch (Throwable e) {
+                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e));
                 }
                 finally {
                     validatable.clearPropertiesWithError();
