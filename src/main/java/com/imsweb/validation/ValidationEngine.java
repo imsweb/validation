@@ -46,6 +46,7 @@ import com.imsweb.validation.runtime.RuntimeUtils;
 
 // TODO FD test blocking feature while engine is getting initialized
 // TODO FD update Groovy to 2.5.3 (https://issues.apache.org/jira/browse/GROOVY-8727); but maybe that should be done on one last version of the old engine...
+// TODO FD switch README to new version when the changes are released...
 
 /**
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
