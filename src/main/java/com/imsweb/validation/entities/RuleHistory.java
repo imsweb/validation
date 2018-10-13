@@ -49,12 +49,12 @@ public class RuleHistory {
     protected Rule _rule;
 
     /**
-     * String representation of the old value(s) of the rule (before the changes); not used by the framework itself
+     * A String representation of the old rule values for this history entry; not used by the framework
      */
     protected String _oldRule;
 
     /**
-     * String representation of the new value(s) of the rule (after the changes); not used by the framework itself
+     * A String representation of the new rule values for this history entry; not used by the framework
      */
     protected String _newRule;
 
@@ -196,6 +196,22 @@ public class RuleHistory {
      */
     public void setReference(String reference) {
         _reference = reference;
+    }
+
+    public String getOldRule() {
+        return _oldRule;
+    }
+
+    public void setOldRule(String oldRule) {
+        _oldRule = oldRule;
+    }
+
+    public String getNewRule() {
+        return _newRule;
+    }
+
+    public void setNewRule(String newRule) {
+        _newRule = newRule;
     }
 
     @Override
