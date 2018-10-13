@@ -12,6 +12,13 @@ public class InitializationStats {
     public static final String REASON_NOT_PROVIDED = "pre-compiled edits not provided";
     public static final String REASON_DIFFERENT_VERSION = "pre-compiled validator has version {1} but application expected {2}";
 
+    // following reasons are deprecated and will be removed in a future version
+    public static final String REASON_CLASS_NOT_FOUND = "pre-compiled class '{0}' not found";
+    public static final String REASON_CLASS_INSTANCIATION_ERROR = "unable to create instance of pre-compiled class '{0}'";
+    public static final String REASON_CLASS_ACCESS_ERROR = "pre-compiled class '{0}' can't be accessed";
+    public static final String REASON_CLASS_CAST_ERROR = "pre-compiled class '{0}' was not of type 'CompiledRules'";
+    public static final String REASON_CONSTRUCTOR_NOT_FOUND = "pre-compiled class '{0}' doesn't define a default constructor";
+
     private long _initializationDuration;
 
     private AtomicInteger _numEditsLoaded;

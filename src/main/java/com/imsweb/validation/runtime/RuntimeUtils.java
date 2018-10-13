@@ -14,6 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.imsweb.validation.InitializationStats;
 import com.imsweb.validation.entities.Validator;
 
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_ACCESS_ERROR;
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_CAST_ERROR;
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_INSTANCIATION_ERROR;
+import static com.imsweb.validation.InitializationStats.REASON_CLASS_NOT_FOUND;
+import static com.imsweb.validation.InitializationStats.REASON_CONSTRUCTOR_NOT_FOUND;
 import static com.imsweb.validation.InitializationStats.REASON_DIFFERENT_VERSION;
 import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
 
@@ -39,6 +44,8 @@ import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
  * Typically a caller will use the "create" methods in this class instead of trying to implement the conventions; that's by far the safest way.
  */
 public class RuntimeUtils {
+
+    public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
 
     private static Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
     private static Pattern _P2 = Pattern.compile("[()]");
@@ -155,4 +162,83 @@ public class RuntimeUtils {
             return null;
         }
     }
+
+    // **************************************************************************************
+    //        Methods under here are deprecated and will be removed in a future version
+    // **************************************************************************************
+
+    public static CompiledRules findCompileRules(String validatorId, String version, InitializationStats stats) {
+        CompiledRules compiledRules;
+
+        String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);
+        try {
+            compiledRules = (CompiledRules)(Class.forName(classPath).getDeclaredConstructor().newInstance());
+        }
+        catch (ClassNotFoundException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_NOT_FOUND.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (InstantiationException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_INSTANCIATION_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (IllegalAccessException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_ACCESS_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (ClassCastException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CLASS_CAST_ERROR.replace("{0}", classPath));
+            compiledRules = null;
+        }
+        catch (NoSuchMethodException | InvocationTargetException e) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_CONSTRUCTOR_NOT_FOUND.replace("{0}", classPath));
+            compiledRules = null;
+        }
+
+        if (compiledRules != null && !StringUtils.isBlank(version) && !version.equals(compiledRules.getValidatorVersion())) {
+            if (stats != null)
+                stats.setReasonNotPreCompiled(validatorId, REASON_DIFFERENT_VERSION.replace("{0}", compiledRules.getValidatorVersion()).replace("{1}", version));
+            compiledRules = null;
+        }
+
+        return compiledRules;
+    }
+
+    public static ParsedProperties findParsedProperties(String validatorId) {
+        ParsedProperties parsedProperties;
+        try {
+            parsedProperties = (ParsedProperties)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).getDeclaredConstructor().newInstance());
+        }
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+            parsedProperties = null;
+        }
+        return parsedProperties;
+    }
+    public static ParsedContexts findParsedContexts(String validatorId) {
+        ParsedContexts parsedContexts;
+        try {
+            parsedContexts = (ParsedContexts)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).getDeclaredConstructor().newInstance());
+        }
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+            parsedContexts = null;
+        }
+        return parsedContexts;
+    }
+
+    public static ParsedLookups findParsedLookups(String validatorId) {
+        ParsedLookups parsedLookups;
+        try {
+            parsedLookups = (ParsedLookups)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).getDeclaredConstructor().newInstance());
+        }
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+            parsedLookups = null;
+        }
+        return parsedLookups;
+    }
+
 }

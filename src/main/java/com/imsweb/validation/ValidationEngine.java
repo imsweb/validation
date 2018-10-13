@@ -44,6 +44,8 @@ import com.imsweb.validation.internal.callable.RuleCompilingCallable;
 import com.imsweb.validation.runtime.CompiledRules;
 import com.imsweb.validation.runtime.RuntimeUtils;
 
+// TODO FD test blocking feature while engine is getting initialized
+
 /**
  * This class is responsible for running loaded rules (edits) on {@link Validatable} objects and returning a collection of {@link RuleFailure} objects.
  * <br/><br/>
@@ -1819,8 +1821,12 @@ public class ValidationEngine {
         if (validator.getValidatorId() == null)
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
 
-        // try to find pre-compiled rules
+        // get pre-compiled rules
         CompiledRules compiledRules = RuntimeUtils.findCompileRules(validator, stats);
+
+        // also look for the pre-compiled rules on the classpath (old way); that way is deprecated and will be removed soon
+        if (compiledRules == null)
+            compiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
 
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_options.getNumCompilationThreads());

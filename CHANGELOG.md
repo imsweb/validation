@@ -5,7 +5,8 @@
 - Increased the engine version to 6.0.
 - Engine is not a static singleton class anymore and can now be created via a public constructor.
 - Added support for initialization options.
-- Pre-compiled edits need to be provided explicitly instead of of the engine looking them up on the classpath.
+- Renamed some classes, restructure a few packages; this work is done in preparation of the library being fully modularized.
+- Pre-compiled/pre-parsed edits can now be provided explicitly to the engine; classpath lookup is still happening for now but has been deprecated.
 - Removed edit timeout feature which has never worked properly.
 - Changed realignment option in XML utility to false instead of true.
 
