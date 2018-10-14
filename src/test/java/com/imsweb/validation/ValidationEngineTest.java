@@ -77,7 +77,12 @@ public class ValidationEngineTest {
         Assert.assertTrue(ValidationEngine.getInstance().isInitialized());
         Assert.assertFalse(ValidationEngine.getInstance().getValidators().isEmpty());
         Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots().size() > 0); // the roots come from the services...
+        // level is defined as a root but doesn't have any edit under it
+        Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots().contains("level"));
+        Assert.assertFalse(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("level"));
+        // level1 is defined as a root and has an edit under it
         Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots().contains("level1"));
+        Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("level1"));
         Rule r1 = ValidationEngine.getInstance().getValidators().get("fake-validator").getRule("fv-rule1");
         Assert.assertTrue(r1.getDependencies().isEmpty());
         Assert.assertEquals(Collections.singleton("fv-rule2"), r1.getInvertedDependencies());
@@ -355,7 +360,9 @@ public class ValidationEngineTest {
         r.setExpression("return repeatedObject.prop != 'A'");
         r.setMessage("message");
         r.setValidatorId(v.getId());
+        Assert.assertFalse(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("root"));
         ValidationEngine.getInstance().addRule(r);
+        Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("root"));
 
         Map<String, Object> root = new HashMap<>();
         List<Map<String, Object>> repeatedObjects = new ArrayList<>();
@@ -421,7 +428,9 @@ public class ValidationEngineTest {
         specialContext.resetFailures();
         results.clear();
 
+        Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("root"));
         ValidationEngine.getInstance().deleteValidator("fvcr");
+        Assert.assertFalse(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("root"));
     }
 
     @Test

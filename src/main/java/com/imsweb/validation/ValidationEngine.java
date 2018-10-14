@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +19,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -189,9 +192,9 @@ public class ValidationEngine {
     protected Map<String, ValidatingProcessor> _processors = new ConcurrentHashMap<>();
 
     /**
-     * Currently used processor roots (for SEER, that would be "lines", for DMS it would be "patient", etc...)
+     * Currently used processor roots (for SEER, that would be "lines", for DMS it would be "patient", etc...); values are number of edits under that root
      */
-    protected Map<String, Object> _processorRoots = new ConcurrentHashMap<>();
+    protected Map<String, AtomicInteger> _processorRoots = new ConcurrentHashMap<>();
 
     /**
      * Map of <code>ExecutableRule</code>s, keyed by rule internal ID
@@ -1749,9 +1752,23 @@ public class ValidationEngine {
      * @return the root (first element) of the supported java-path
      */
     public Set<String> getSupportedJavaPathRoots() {
+        return getSupportedJavaPathRoots(false);
+    }
+
+    /**
+     * Returns the root (first element) of the supported java-path.
+     * <p/>
+     * Created on Sep 30, 2010 by depryf
+     * @param filterEmptyPaths if set to true then a root java path that doesn't have any edit under it will be excluded
+     * @return the root (first element) of the supported java-path
+     */
+    public Set<String> getSupportedJavaPathRoots(boolean filterEmptyPaths) {
         _lock.readLock().lock();
         try {
-            return Collections.unmodifiableSet(_processorRoots.keySet());
+            if (filterEmptyPaths)
+                return _processorRoots.entrySet().stream().filter(e -> e.getValue().get() > 0).map(Entry::getKey).collect(Collectors.toSet());
+            else
+                return Collections.unmodifiableSet(_processorRoots.keySet());
         }
         finally {
             _lock.readLock().unlock();
@@ -1983,7 +2000,7 @@ public class ValidationEngine {
             String[] parts = StringUtils.split(javaPath, '.');
 
             // keep track of the roots (I couldn't find a concurrent implementation of a set, so I am using a map with dummy objects)
-            _processorRoots.put(parts[0], new Object());
+            _processorRoots.put(parts[0], new AtomicInteger());
 
             // keep track of the current partial path
             StringBuilder partialPath = new StringBuilder(parts[0]);
@@ -2019,9 +2036,15 @@ public class ValidationEngine {
         for (ExecutableRule rule : sortedRules)
             rules.computeIfAbsent(rule.getJavaPath(), k -> new ArrayList<>()).add(rule);
 
+        // since we are about to reset all the rules in every processor, let's reset the rule counts as well
+        _processorRoots.values().forEach(i -> i.set(0));
+
         // update all the processors
-        for (ValidatingProcessor p : _processors.values())
-            p.setRules(rules.getOrDefault(p.getJavaPath(), Collections.emptyList()));
+        for (ValidatingProcessor p : _processors.values()) {
+            List<ExecutableRule> rulesForCurrentProcessor = rules.getOrDefault(p.getJavaPath(), Collections.emptyList());
+            p.setRules(rulesForCurrentProcessor);
+            _processorRoots.get(StringUtils.split(p.getJavaPath(), '.')[0]).addAndGet(rulesForCurrentProcessor.size());
+        }
     }
 
     private void updateProcessorsConditions(Collection<ExecutableCondition> allConditions) {
