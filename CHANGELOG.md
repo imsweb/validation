@@ -9,6 +9,7 @@
 - Pre-compiled/pre-parsed edits can now be provided explicitly to the engine; classpath lookup is still happening for now but has been deprecated.
 - Removed edit timeout feature which has never worked properly.
 - Changed realignment option in XML utility to false instead of true.
+- Removed support for accessing context entries without the Context prefix.
 - Added optional parameter to getSupportedJavaPathRoots to exclude path roots that don't have any edit register under them.
 
 **Version 1.24**

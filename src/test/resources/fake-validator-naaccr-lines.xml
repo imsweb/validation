@@ -16,7 +16,7 @@
             <message>message2</message>
         </rule>
         <rule id="fvnl-rule3" name="Rule 3" java-path="lines.line">
-            <expression>return line.prop3 != FVNL_CONTEXT1</expression>
+            <expression>return line.prop3 != Context.FVNL_CONTEXT1</expression>
             <message>message3</message>
         </rule>
     </rules>

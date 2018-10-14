@@ -247,9 +247,7 @@ public class ValidatingProcessor implements Processor {
 
         // add static context
         binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidationContextFunctions.getInstance());
-        binding.setVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY, _contexts); // new way of referencing contexts (using a prefix)
-        for (Entry<String, Object> entry : _contexts.entrySet()) // old way of using the contexts (without a prefix); for now we still support it...
-            binding.setVariable(entry.getKey(), entry.getValue());
+        binding.setVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY, _contexts);
 
         // add dynamic context
         for (Entry<String, Object> entry : validatable.getScope().entrySet())

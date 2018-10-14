@@ -1118,19 +1118,6 @@ public class ValidationEngineTest {
 
     @Test
     public void testContextPrefix() throws ValidationException {
-
-        // test old syntax (no prefix)
-        TestingUtils.loadValidator("fake-validator-context-in-context-old-syntax");
-        try {
-            Assert.assertEquals(3, ValidationEngine.getInstance().getValidator("fake-validator-context-in-context-old-syntax").getRawContext().size());
-            Validatable validatable = new SimpleMapValidatable("ID", "level1", new HashMap<>());
-            TestingUtils.assertNoEditFailure(ValidationEngine.getInstance().validate(validatable), "fvcc-rule1");
-        }
-        finally {
-            TestingUtils.unloadValidator("fake-validator-context-in-context-old-syntax");
-        }
-
-        // test new syntax (prefix)
         TestingUtils.loadValidator("fake-validator-context-in-context");
         try {
             Assert.assertEquals(3, ValidationEngine.getInstance().getValidator("fake-validator-context-in-context").getRawContext().size());
