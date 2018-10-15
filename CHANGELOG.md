@@ -2,7 +2,7 @@
 
 **Version 1.24**
 
-- Updated Groovy library from version 2.5.1 (indy) to version 2.5.3 (indy).
+- Updated Groovy library from version 2.5.1 (indy) to version 2.5.2 (indy).
 - Updated CS algorithm library from version 02.05.50 to version 02.05.50.1.
 - Added two new fields to the RuleHistory class to keep track of the before/after changes; those fields are not used directly by the framework.
 - Now catching Error in addition to Exception when executing edits.
