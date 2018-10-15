@@ -163,7 +163,7 @@ public class Category {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Category)) return false;
         Category category = (Category)o;
         if (_categoryId != null && category._categoryId != null)
             return Objects.equals(_categoryId, category._categoryId);

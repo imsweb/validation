@@ -239,7 +239,7 @@ public class DeletedRuleHistory {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof DeletedRuleHistory)) return false;
         DeletedRuleHistory that = (DeletedRuleHistory)o;
         if (_ruleHistoryId != null && that._ruleHistoryId != null)
             return Objects.equals(_ruleHistoryId, that._ruleHistoryId);

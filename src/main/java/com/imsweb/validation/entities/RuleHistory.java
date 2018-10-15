@@ -217,7 +217,7 @@ public class RuleHistory {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof RuleHistory)) return false;
         RuleHistory that = (RuleHistory)o;
         if (_ruleHistoryId != null && that._ruleHistoryId != null)
             return Objects.equals(_ruleHistoryId, that._ruleHistoryId);

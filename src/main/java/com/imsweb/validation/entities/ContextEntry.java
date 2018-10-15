@@ -153,7 +153,7 @@ public class ContextEntry {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ContextEntry)) return false;
         ContextEntry that = (ContextEntry)o;
         if (_contextEntryId != null && that._contextEntryId != null)
             return Objects.equals(_contextEntryId, that._contextEntryId);

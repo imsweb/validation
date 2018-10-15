@@ -494,7 +494,7 @@ public class Validator {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Validator)) return false;
         Validator validator = (Validator)o;
         if (_validatorId != null && validator._validatorId != null)
             return Objects.equals(_validatorId, validator._validatorId);

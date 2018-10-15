@@ -3,13 +3,14 @@
  */
 package com.imsweb.validation.entities;
 
-import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.functions.TestingContextFunctions.AssertionType;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.functions.TestingContextFunctions.AssertionType;
 
 /**
  * A rule test result.
@@ -201,33 +202,14 @@ public class RuleTestResult {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (!(obj instanceof RuleTestResult)) return false;
         RuleTestResult other = (RuleTestResult)obj;
-        if (_assertionIndex == null) {
-            if (other._assertionIndex != null)
-                return false;
-        }
-        else if (!_assertionIndex.equals(other._assertionIndex))
-            return false;
-        if (_lineNumber == null) {
-            if (other._lineNumber != null)
-                return false;
-        }
-        else if (!_lineNumber.equals(other._lineNumber))
-            return false;
-        return true;
+        return Objects.equals(_assertionIndex, other.getAssertionIndex()) && Objects.equals(_lineNumber, other.getLineNumber());
     }
 
     @Override
     public int hashCode() {
-        int prime = 31;
-        int result = 1;
-        result = prime * result + ((_assertionIndex == null) ? 0 : _assertionIndex.hashCode());
-        result = prime * result + ((_lineNumber == null) ? 0 : _lineNumber.hashCode());
-        return result;
+        return Objects.hash(_assertionIndex, _lineNumber);
     }
 
     @Override

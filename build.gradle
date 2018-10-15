@@ -32,7 +32,7 @@ dependencies {
     testImplementation 'com.imsweb:staging-algorithm-tnm:1.9'
     testImplementation 'com.imsweb:staging-algorithm-eod-public:1.4'
 
-    errorprone 'com.google.errorprone:error_prone_core:2.3.1'
+    errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 }
 
 // enforce UTF-8, display the compilation warnings
@@ -119,7 +119,7 @@ if (version.endsWith('-SNAPSHOT'))
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '4.9'
+    gradleVersion = '4.10'
 }
 
 

@@ -8,10 +8,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.imsweb.validation.ValidationServices;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import com.imsweb.validation.ConstructionException;
+import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.runtime.ParsedContexts;
 import com.imsweb.validation.runtime.ParsedLookups;
 import com.imsweb.validation.runtime.ParsedProperties;
@@ -643,7 +643,7 @@ public class Rule {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Rule)) return false;
         Rule rule = (Rule)o;
         if (_ruleId != null && rule._ruleId != null)
             return Objects.equals(_ruleId, rule._ruleId);

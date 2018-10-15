@@ -280,7 +280,7 @@ public class Condition {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Condition)) return false;
         Condition condition = (Condition)o;
         if (_conditionId != null && condition._conditionId != null)
             return Objects.equals(_conditionId, condition._conditionId);

@@ -127,7 +127,7 @@ public class ValidatorVersion implements Comparable<ValidatorVersion> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ValidatorVersion)) return false;
         ValidatorVersion that = (ValidatorVersion)o;
         return Objects.equals(_major, that._major) &&
                 Objects.equals(_minor, that._minor) &&

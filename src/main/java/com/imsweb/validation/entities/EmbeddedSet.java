@@ -312,7 +312,7 @@ public class EmbeddedSet {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof EmbeddedSet)) return false;
         EmbeddedSet that = (EmbeddedSet)o;
         if (_setId != null && that._setId != null)
             return Objects.equals(_setId, that._setId);

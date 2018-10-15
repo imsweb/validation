@@ -84,7 +84,7 @@ public class ValidatorRelease implements Comparable<ValidatorRelease> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ValidatorRelease)) return false;
         ValidatorRelease that = (ValidatorRelease)o;
         return Objects.equals(_version, that._version);
     }

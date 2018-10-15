@@ -63,7 +63,7 @@ public class ContextTable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ContextTable)) return false;
         ContextTable that = (ContextTable)o;
         return Objects.equals(_name, that._name);
     }

@@ -172,7 +172,7 @@ public class RuntimeUtils {
 
         String classPath = RUNTIME_PACKAGE_PREFIX + createCompiledRulesClassName(validatorId);
         try {
-            compiledRules = (CompiledRules)(Class.forName(classPath).getDeclaredConstructor().newInstance());
+            compiledRules = Class.forName(classPath).asSubclass(CompiledRules.class).getDeclaredConstructor().newInstance();
         }
         catch (ClassNotFoundException e) {
             if (stats != null)
@@ -212,7 +212,7 @@ public class RuntimeUtils {
     public static ParsedProperties findParsedProperties(String validatorId) {
         ParsedProperties parsedProperties;
         try {
-            parsedProperties = (ParsedProperties)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).getDeclaredConstructor().newInstance());
+            parsedProperties = Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedPropertiesClassName(validatorId)).asSubclass(ParsedProperties.class).getDeclaredConstructor().newInstance();
         }
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedProperties = null;
@@ -222,7 +222,7 @@ public class RuntimeUtils {
     public static ParsedContexts findParsedContexts(String validatorId) {
         ParsedContexts parsedContexts;
         try {
-            parsedContexts = (ParsedContexts)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).getDeclaredConstructor().newInstance());
+            parsedContexts = Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedContextsClassName(validatorId)).asSubclass(ParsedContexts.class).getDeclaredConstructor().newInstance();
         }
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedContexts = null;
@@ -233,7 +233,7 @@ public class RuntimeUtils {
     public static ParsedLookups findParsedLookups(String validatorId) {
         ParsedLookups parsedLookups;
         try {
-            parsedLookups = (ParsedLookups)(Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).getDeclaredConstructor().newInstance());
+            parsedLookups = Class.forName(RUNTIME_PACKAGE_PREFIX + createParsedLookupsClassName(validatorId)).asSubclass(ParsedLookups.class).getDeclaredConstructor().newInstance();
         }
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
             parsedLookups = null;

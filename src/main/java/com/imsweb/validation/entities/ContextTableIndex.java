@@ -164,7 +164,7 @@ public class ContextTableIndex {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ContextTableIndex)) return false;
         ContextTableIndex that = (ContextTableIndex)o;
         return Objects.equals(_name, that._name);
     }

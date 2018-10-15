@@ -201,7 +201,7 @@ public class StandaloneSet {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof StandaloneSet)) return false;
         StandaloneSet that = (StandaloneSet)o;
         return Objects.equals(_id, that._id);
     }
