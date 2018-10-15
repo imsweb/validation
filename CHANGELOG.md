@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 1.25**
+
+- Updated Groovy library from version 2.5.2 (indy) to version 2.5.3 (indy).
+
 **Version 1.24**
 
 - Updated Groovy library from version 2.5.1 (indy) to version 2.5.2 (indy).
