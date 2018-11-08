@@ -199,7 +199,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         String val = value == null ? "" : GEN_TO_STRING(value).trim();
         Matcher match = _GEN_VAL_P1.matcher(val);
         if (match.matches())
-            result = Integer.valueOf(match.group(1));
+            result = Integer.parseInt(match.group(1));
 
         return result;
     }
@@ -233,20 +233,20 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         if (futureYears != null)
             maxYear += futureYears;
 
-        int year = Integer.valueOf(val.substring(0, 4));
+        int year = Integer.parseInt(val.substring(0, 4));
         if (year < 1850 || year > maxYear) {
             binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to year");
             return false;
         }
 
-        int month = val.trim().length() >= 6 ? Integer.valueOf(val.substring(4, 6)) : 1;
+        int month = val.trim().length() >= 6 ? Integer.parseInt(val.substring(4, 6)) : 1;
         if (month <= 0 || month > 12) {
             binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to month");
             return false;
         }
 
         try {
-            int day = val.trim().length() == 8 ? Integer.valueOf(val.substring(6, 8)) : 1;
+            int day = val.trim().length() == 8 ? Integer.parseInt(val.substring(6, 8)) : 1;
             LocalDate toCheck = LocalDate.of(year, month, day);
             int actualMaxDay = YearMonth.of(year, month).lengthOfMonth();
             if (day <= 0 || day > actualMaxDay) {
@@ -296,7 +296,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         if (!GEN_VALID_DATE_IOP(binding, value))
             return DT_ERROR;
 
-        return Integer.valueOf(val.substring(0, 4));
+        return Integer.parseInt(val.substring(0, 4));
     }
 
     /**
@@ -316,7 +316,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         if (!GEN_VALID_DATE_IOP(binding, value))
             return DT_ERROR;
 
-        return Integer.valueOf(val.substring(4, 6));
+        return Integer.parseInt(val.substring(4, 6));
     }
 
     /**
@@ -330,13 +330,13 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     public int GEN_DATE_DAY_IOP(Binding binding, Object value) {
         String val = GEN_TO_STRING(value);
 
-        if (val == null || val.length() < 7 || (val.length() >= 6 && val.substring(6).trim().isEmpty()))
+        if (val == null || val.length() < 7 || val.substring(6).trim().isEmpty())
             return DT_DAY_EMPTY;
 
         if (!GEN_VALID_DATE_IOP(binding, value))
             return DT_ERROR;
 
-        return Integer.valueOf(val.substring(6));
+        return Integer.parseInt(val.substring(6));
     }
 
     /**
@@ -1772,7 +1772,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
          */
 
         if (_failWarnings)
-            return GEN_SAVE_WARNING_TEXT(binding, texts);
+            return GEN_SAVE_ERROR_TEXT(binding, texts);
 
         return true;
     }

@@ -45,7 +45,7 @@ import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
  */
 public class RuntimeUtils {
 
-    public static String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
+    public static final String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
 
     private static Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
     private static Pattern _P2 = Pattern.compile("[()]");

@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'checkstyle'
-    id 'net.ltgt.errorprone' version '0.0.16'
+    id 'com.github.spotbugs' version '1.6.5'
     id 'com.bmuschko.nexus' version '2.3.1'
     id 'io.codearte.nexus-staging' version '0.8.0'
 }
@@ -20,8 +20,8 @@ repositories {
 
 dependencies {
     api 'com.imsweb:staging-client-java:4.1'
-    api 'org.codehaus.groovy:groovy:2.5.2:indy'
-    api 'com.thoughtworks.xstream:xstream:1.4.10'
+    api 'org.codehaus.groovy:groovy:2.5.3:indy'
+    api 'com.thoughtworks.xstream:xstream:1.4.11.1'
 
     implementation 'commons-codec:commons-codec:1.11'
     implementation 'org.apache.commons:commons-lang3:3.7'
@@ -31,8 +31,6 @@ dependencies {
     testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.1'
     testImplementation 'com.imsweb:staging-algorithm-tnm:1.9'
     testImplementation 'com.imsweb:staging-algorithm-eod-public:1.4'
-
-    errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 }
 
 // enforce UTF-8, display the compilation warnings
@@ -65,6 +63,12 @@ jar {
 checkstyle {
     ignoreFailures = true
     configFile = file('config/checkstyle/checkstyle.xml')
+}
+
+// spotbugs plugin settings
+spotbugs {
+    ignoreFailures = true
+    excludeFilter = file('config/spotbugs/spotbugs-exclude.xml')
 }
 
 // use this task to generate the regex parser
@@ -119,7 +123,7 @@ if (version.endsWith('-SNAPSHOT'))
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '4.10'
+    gradleVersion = '4.10.2'
 }
 
 

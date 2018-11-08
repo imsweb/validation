@@ -3,22 +3,14 @@
  */
 package com.imsweb.validation.entities;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * An <code>EditableRule</code> is a wrapper for a <code>Rule<code> that needs to be added/updated/deleted.
- * <p/>
- * Note that this class was made serializable for SEER*DMS, but this will be removed eventually...
  * Created on Jun 29, 2011 by depryf
  */
-public class EditableRule implements Serializable {
-
-    /**
-     * Class UID
-     */
-    private static final long serialVersionUID = 1L;
+public class EditableRule {
 
     protected Long _ruleId;
 
@@ -48,7 +40,7 @@ public class EditableRule implements Serializable {
 
     protected Set<String> _dependencies;
 
-    protected transient Set<RuleHistory> _histories;
+    protected Set<RuleHistory> _histories;
 
     /**
      * Created on Jun 29, 2011 by depryf
