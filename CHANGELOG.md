@@ -11,6 +11,8 @@
 - Changed realignment option in XML utility to false instead of true.
 - Removed support for accessing context entries without the Context prefix.
 - Added optional parameter to getSupportedJavaPathRoots to exclude path roots that don't have any edit register under them.
+- Updated XStream library from version 1.4.10 to version 1.4.11.1.
+- Fixed warnings in the console about unsafe access to private fields.
 
 **Version 1.25**
 

@@ -49,6 +49,18 @@ import org.apache.commons.lang3.StringUtils;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import com.thoughtworks.xstream.converters.basic.BooleanConverter;
+import com.thoughtworks.xstream.converters.basic.ByteConverter;
+import com.thoughtworks.xstream.converters.basic.DateConverter;
+import com.thoughtworks.xstream.converters.basic.DoubleConverter;
+import com.thoughtworks.xstream.converters.basic.FloatConverter;
+import com.thoughtworks.xstream.converters.basic.IntConverter;
+import com.thoughtworks.xstream.converters.basic.LongConverter;
+import com.thoughtworks.xstream.converters.basic.NullConverter;
+import com.thoughtworks.xstream.converters.basic.ShortConverter;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
+import com.thoughtworks.xstream.converters.collections.CollectionConverter;
+import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
@@ -181,7 +193,24 @@ public final class ValidationXmlUtils {
                     }
                 };
             }
-        });
+        }) {
+            // only register the converters we need; other converters generate a private access warning in the console on Java9+...
+            @Override
+            protected void setupConverters() {
+                registerConverter(new NullConverter(), PRIORITY_VERY_HIGH);
+                registerConverter(new IntConverter(), PRIORITY_NORMAL);
+                registerConverter(new FloatConverter(), PRIORITY_NORMAL);
+                registerConverter(new DoubleConverter(), PRIORITY_NORMAL);
+                registerConverter(new LongConverter(), PRIORITY_NORMAL);
+                registerConverter(new ShortConverter(), PRIORITY_NORMAL);
+                registerConverter(new BooleanConverter(), PRIORITY_NORMAL);
+                registerConverter(new ByteConverter(), PRIORITY_NORMAL);
+                registerConverter(new StringConverter(), PRIORITY_NORMAL);
+                registerConverter(new DateConverter(), PRIORITY_NORMAL);
+                registerConverter(new CollectionConverter(getMapper()), PRIORITY_NORMAL);
+                registerConverter(new ReflectionConverter(getMapper(), getReflectionProvider()), PRIORITY_VERY_LOW);
+            }
+        };
         xstream.autodetectAnnotations(true);
         xstream.alias("validator", ValidatorXmlDto.class);
         xstream.registerConverter(new AbstractSingleValueConverter() {
@@ -1042,7 +1071,24 @@ public final class ValidationXmlUtils {
             public HierarchicalStreamWriter createWriter(Writer out) {
                 return new PrettyPrintWriter(out, "    ");
             }
-        });
+        }) {
+            // only register the converters we need; other converters generate a private access warning in the console on Java9+...
+            @Override
+            protected void setupConverters() {
+                registerConverter(new NullConverter(), PRIORITY_VERY_HIGH);
+                registerConverter(new IntConverter(), PRIORITY_NORMAL);
+                registerConverter(new FloatConverter(), PRIORITY_NORMAL);
+                registerConverter(new DoubleConverter(), PRIORITY_NORMAL);
+                registerConverter(new LongConverter(), PRIORITY_NORMAL);
+                registerConverter(new ShortConverter(), PRIORITY_NORMAL);
+                registerConverter(new BooleanConverter(), PRIORITY_NORMAL);
+                registerConverter(new ByteConverter(), PRIORITY_NORMAL);
+                registerConverter(new StringConverter(), PRIORITY_NORMAL);
+                registerConverter(new DateConverter(), PRIORITY_NORMAL);
+                registerConverter(new CollectionConverter(getMapper()), PRIORITY_NORMAL);
+                registerConverter(new ReflectionConverter(getMapper(), getReflectionProvider()), PRIORITY_VERY_LOW);
+            }
+        };
         xstream.autodetectAnnotations(true);
         xstream.alias("set", StandaloneSetXmlDto.class);
 
@@ -1308,7 +1354,24 @@ public final class ValidationXmlUtils {
                     }
                 };
             }
-        });
+        }) {
+            // only register the converters we need; other converters generate a private access warning in the console on Java9+...
+            @Override
+            protected void setupConverters() {
+                registerConverter(new NullConverter(), PRIORITY_VERY_HIGH);
+                registerConverter(new IntConverter(), PRIORITY_NORMAL);
+                registerConverter(new FloatConverter(), PRIORITY_NORMAL);
+                registerConverter(new DoubleConverter(), PRIORITY_NORMAL);
+                registerConverter(new LongConverter(), PRIORITY_NORMAL);
+                registerConverter(new ShortConverter(), PRIORITY_NORMAL);
+                registerConverter(new BooleanConverter(), PRIORITY_NORMAL);
+                registerConverter(new ByteConverter(), PRIORITY_NORMAL);
+                registerConverter(new StringConverter(), PRIORITY_NORMAL);
+                registerConverter(new DateConverter(), PRIORITY_NORMAL);
+                registerConverter(new CollectionConverter(getMapper()), PRIORITY_NORMAL);
+                registerConverter(new ReflectionConverter(getMapper(), getReflectionProvider()), PRIORITY_VERY_LOW);
+            }
+        };
         xstream.autodetectAnnotations(true);
         xstream.alias("tested-validator", TestedValidatorXmlDto.class);
 
