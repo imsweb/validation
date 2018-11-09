@@ -113,7 +113,7 @@ And here is the code that can be used to initialize the validation engine from t
 
 ```java
 File file = new File("my-edits.xml")
-Validator v = XmlValidatorFactory.loadValidatorFromXml(file);
+Validator v = ValidationXmlUtils.loadValidatorFromXml(file);
 ValidationEngine.initialize(v);
 ```
 
@@ -138,24 +138,25 @@ v.getRules().add(r);
 r.setValidator(v);
 
 // initialize the engine
-ValidationEngine.initialize(v);
+ValidationEngine.getInstance().initialize(v);
 ```
 
 ### Executing edits on a data file
 
 This example shows how to validate a data file and print the edit failures; it uses the [layout](https://github.com/imsweb/layout)
-framework to read a NAACCR file and translate it into a map of properties that the validation engine can handle.
+framework to read a NAACCR file and translate it into a map of properties that the validation engine can handle. This example assumes
+the engine has already been initialized with specific edits.
 
 ```java
 File dataFile = new File("my-data.txd.gz");
-Layout layout = LayoutFactory.getLayout(LayoutFactory.LAYOUT_ID_NAACCR_16_ABSTRACT);
-for (<Map<String, String> rec : (RecordLayout)layout.readAllRecords(dataFile)) {
+NaaccrLayout layout = (NaaccrLayout)LayoutFactory.getLayout(LayoutFactory.LAYOUT_ID_NAACCR_16_ABSTRACT);
+for (<Map<String, String> rec : layout.readAllRecords(dataFile)) {
 
     // this is how the engine knows how to validate the provided object
     Validatable validatable = new SimpleNaaccrLinesValidatable(rec)
 
     // go through the failures and display them
-    Collection<RuleFailure> failures = ValidationEngine.validate(validatable);
+    Collection<RuleFailure> failures = ValidationEngine.getInstance().validate(validatable);
     for (RuleFailure failure : failures)
         System.out.println(failure.getMessage());
 }
@@ -163,43 +164,27 @@ for (<Map<String, String> rec : (RecordLayout)layout.readAllRecords(dataFile)) {
 
 ## Optimizing loading an executing edits
 
-Several mechanisms are in place to speed up the initialization and the execution of the edits; most of those mechanisms are turned OFF by default.
-
-### Speed up the initialization by enabling multi-threaded parsing
-
-Groovy edits need to be parsed to be validated and to gather the used properties. That step can be slow for big edits, 
-but it can be optimized by enabling multi-threaded parsing:
-```java
-XmlValidatorFactory.enableMultiThreadedParsing(2);
-```
-The parameter is the number of threads to use; a value of 2 will usually work well for this mechanism. The default is 1.
+Several mechanisms are in place to speed up the initialization and the execution of the edits.
 
 ### Speed up the initialization by enabling multi-threaded compilation
 
-Groovy edits need to be compiled before being executed by the engine. Again, that step can be slow for big edits, 
-but it can be optimized by enabling multi-threaded compilation:
+Groovy edits need to be compiled before being executed by the engine. That step can be slow for big edits files,
+but it can be optimized by using multi-threaded compilation:
 ```java
-ValidationEngine.enableMultiThreadedCompilation(4);
+InitializationOptions options = new InitializationOptions();
+options.setNumCompilationThreads(4);
+ValidationEngine.getInstance().initialize(options, myValidator);
 ```
-The parameter is the number of threads to use; a value of 4 will usually work well for this mechanism although it depends on the available resources. The default is 1.
+A value of 4 will usually work well for optimizing the compilation although it depends on the available resources. The default is to use 2 threads.
 
-### Speed up the initialization by disabling the re-alignment of the expressions and descriptions
-
-By default the engine will re-align the expressions and descriptions so they look nice in an editor. If you do not intend to display the expressions 
-and/or descriptions, you can turn that feature off: 
-
-```java
-XmlValidatorFactory.disableRealignment();
-```
-By default the feature is ON.
-
-### Speed up the initialization and exuction by using pre-compiled edits
+### Speed up the initialization and execution by using pre-compiled/pre-parsed edits
 
 The engine supports registering pre-compiled edits; those edits will completely bypass the parsing and compilation steps. The edits will also need to be strongly typed in their 
 syntax, allowing them to run much faster than regular Groovy edits.
 
-Pre-compiled edits is an advanced features; the engine supports it by default but creating the edits is much more work than maintaining them in an XML file. 
-See the "runtime" package for more information, in particular the RuntimeUtils class.
+Pre-compiled edits is an advanced feature; the engine supports it by default but creating the edits is much more work than maintaining them in an XML file.
+See the "runtime" package for more information, in particular the RuntimeEdits and RuntimeUtils classes.
+
 ## About SEER
 
 This library was developed through the [SEER](http://seer.cancer.gov/) program.
