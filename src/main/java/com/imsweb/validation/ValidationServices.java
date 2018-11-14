@@ -3,22 +3,6 @@
  */
 package com.imsweb.validation;
 
-import com.imsweb.validation.entities.ContextTable;
-import com.imsweb.validation.entities.ContextTableIndex;
-import com.imsweb.validation.entities.SimpleMapValidatable;
-import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
-import com.imsweb.validation.entities.Validatable;
-import com.imsweb.validation.internal.context.JavaContextParser;
-import groovy.lang.Binding;
-import groovy.lang.Closure;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.groovy.ast.MethodNode;
-import org.codehaus.groovy.ast.ModuleNode;
-import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.control.SourceUnit;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +15,24 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.groovy.ast.MethodNode;
+import org.codehaus.groovy.ast.ModuleNode;
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.control.SourceUnit;
+
+import groovy.lang.Binding;
+import groovy.lang.Closure;
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
+
+import com.imsweb.validation.entities.ContextTable;
+import com.imsweb.validation.entities.ContextTableIndex;
+import com.imsweb.validation.entities.SimpleMapValidatable;
+import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
+import com.imsweb.validation.entities.Validatable;
+import com.imsweb.validation.internal.context.JavaContextParser;
 
 /**
  * This class provides basic utility services to the validation engine.
@@ -363,7 +365,7 @@ public class ValidationServices {
             // make sure that closures use 'def' keyword for any new variable (#66487)
             if (result instanceof Closure) {
                 try {
-                    parseExpression(entryId, expression, null, null, null, true);
+                    parseExpression(entryId, expression, null, null, null);
                 }
                 catch (Exception e) {
                     throw new ConstructionException("Error in context '" + entryId + "': " + e.getMessage());
@@ -476,24 +478,6 @@ public class ValidationServices {
      * @throws CompilationFailedException if anything goes wrong
      */
     public void parseExpression(String id, String expression, Set<String> properties, Set<String> contextEntries, Set<String> lookups) throws CompilationFailedException {
-        parseExpression(id, expression, properties, contextEntries, lookups, false);
-    }
-
-    /**
-     * Parses the given groovy expression and creates the corresponding <code>Script</code> that
-     * will be used when executing the rule. The passed set of properties and context entries will
-     * be filled in during this process.
-     * <p/>
-     * Created on Jan 17, 2008 by depryf
-     * @param id identifier of the script being parsed
-     * @param expression expression to parse.
-     * @param properties properties used in the expression (if null, they will not be gathered)
-     * @param contextEntries context entries used in the expression (if null, they will not be gathered)
-     * @param lookups lookup IDs used in the expression (if null, they will not be gathered)
-     * @param forceDefKeyword if true and a variable is defined without the def keyword, then an exception will be raised
-     * @throws CompilationFailedException if anything goes wrong
-     */
-    public void parseExpression(String id, String expression, Set<String> properties, Set<String> contextEntries, Set<String> lookups, boolean forceDefKeyword) throws CompilationFailedException {
         if (expression == null || expression.trim().isEmpty())
             expression = "return true";
 
@@ -502,7 +486,7 @@ public class ValidationServices {
         su.completePhase();
         su.convert();
         ModuleNode tree = su.getAST();
-        EditCodeVisitor visitor = new EditCodeVisitor(properties, contextEntries, lookups, forceDefKeyword);
+        EditCodeVisitor visitor = new EditCodeVisitor(properties, contextEntries, lookups);
         tree.getStatementBlock().visit(visitor);
         for (MethodNode method : tree.getMethods())
             method.getCode().visit(visitor);
