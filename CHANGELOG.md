@@ -2,6 +2,10 @@
 
 **Version 2.0**
 
+- Removed option to check for def keyword in edits code visitor.
+
+**Version 2.0**
+
 - Increased the engine version to 6.0.
 - Engine is not a static singleton class anymore and can now be created via a public constructor.
 - Added support for initialization options.
