@@ -2,6 +2,7 @@
 
 **Version 2.1**
 
+- Changed implementation of MATCH metafile context function.
 - Fixed behavior of AT metafile context function.
 - Updated Groovy library from version 2.5.3 (indy) to version 2.5.4 (indy).
 - Re-added a way to disable pre-compiled edits lookup, it was removed by mistake in the previous release.

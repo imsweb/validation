@@ -910,44 +910,46 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     public boolean GEN_MATCH(Object value, Object regex) {
-        if (value == null)
-            return false;
+        return matches(value, regex);
 
-        String val = GEN_TO_STRING(value);
-        String reg = GEN_TO_STRING(regex);
-
-        // apparently Genedits right-trim the incoming value
-        val = trimRight(val);
-
-        // there isn't supposed to be any spaces in the regex but it looks like it does happen...
-        reg = _GEN_MATCH_P1.matcher(reg).replaceAll("\\\\s");
-
-        // looks like Genedits considers a regex for a single space to match an empty string...
-        if (val.isEmpty()) {
-            String tmp = _GEN_MATCH_P2.matcher(reg).replaceAll("\\\\s"); // let's deal only with single spaces, since they seem to do the same in the Genedits language
-            boolean noParenthesisCondition = tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s");
-            boolean oneParenthesisCondition = tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)");
-            boolean twoParenthesisCondition = tmp.equals("(\\s)") || tmp.startsWith("(\\s)|") || tmp.endsWith("|(\\s)");
-            if (noParenthesisCondition || oneParenthesisCondition || twoParenthesisCondition)
-                return true;
-        }
-
-        // deal with the right spaces
-        reg = _GEN_MATCH_P3.matcher(reg).replaceAll(")");
-
-        // and again, right spaces stuff...
-        reg = _GEN_MATCH_P4.matcher(reg).replaceAll("");
-
-        // this is a short term fix for a specific problem, but I am now convinced my implementation of the MATCH method is wrong, I don't think it should
-        // right-trim values; I will submit an issue in GitHub to look more into it (I need to run more tests against GENEDITS)
-        if ("(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))".equals(regex) || "(((\\s\\s)|(\\d\\d))((\\s)|(\\d))((\\s)|(\\d)))".equals(regex)) {
-            if (val.isEmpty())
-                return true;
-            reg = "(\\s\\s|\\d\\d)(\\s|\\d)?(\\s|\\d)?";
-        }
-
-        // calling this base method so the regex can be cached (if regex caching is turned on)
-        return matches(val, reg);
+//        if (value == null)
+//            return false;
+//
+//        String val = GEN_TO_STRING(value);
+//        String reg = GEN_TO_STRING(regex);
+//
+//        // apparently Genedits right-trim the incoming value
+//        val = trimRight(val);
+//
+//        // there isn't supposed to be any spaces in the regex but it looks like it does happen...
+//        reg = _GEN_MATCH_P1.matcher(reg).replaceAll("\\\\s");
+//
+//        // looks like Genedits considers a regex for a single space to match an empty string...
+//        if (val.isEmpty()) {
+//            String tmp = _GEN_MATCH_P2.matcher(reg).replaceAll("\\\\s"); // let's deal only with single spaces, since they seem to do the same in the Genedits language
+//            boolean noParenthesisCondition = tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s");
+//            boolean oneParenthesisCondition = tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)");
+//            boolean twoParenthesisCondition = tmp.equals("(\\s)") || tmp.startsWith("(\\s)|") || tmp.endsWith("|(\\s)");
+//            if (noParenthesisCondition || oneParenthesisCondition || twoParenthesisCondition)
+//                return true;
+//        }
+//
+//        // deal with the right spaces
+//        reg = _GEN_MATCH_P3.matcher(reg).replaceAll(")");
+//
+//        // and again, right spaces stuff...
+//        reg = _GEN_MATCH_P4.matcher(reg).replaceAll("");
+//
+//        // this is a short term fix for a specific problem, but I am now convinced my implementation of the MATCH method is wrong, I don't think it should
+//        // right-trim values; I will submit an issue in GitHub to look more into it (I need to run more tests against GENEDITS)
+//        if ("(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))".equals(regex) || "(((\\s\\s)|(\\d\\d))((\\s)|(\\d))((\\s)|(\\d)))".equals(regex)) {
+//            if (val.isEmpty())
+//                return true;
+//            reg = "(\\s\\s|\\d\\d)(\\s|\\d)?(\\s|\\d)?";
+//        }
+//
+//        // calling this base method so the regex can be cached (if regex caching is turned on)
+//        return matches(val, reg);
     }
 
     @SuppressWarnings("unchecked")

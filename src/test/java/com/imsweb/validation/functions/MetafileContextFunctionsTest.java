@@ -272,82 +272,38 @@ public class MetafileContextFunctionsTest {
 
     @Test
     public void testGEN_MATCH() {
-        Assert.assertFalse(_functions.GEN_MATCH(null, "(\\d\\d\\d)"));
-        Assert.assertFalse(_functions.GEN_MATCH("", "(\\d\\d\\d)"));
-        Assert.assertFalse(_functions.GEN_MATCH("   ", "(\\d\\d\\d)"));
-        Assert.assertFalse(_functions.GEN_MATCH("1234", "(\\d\\d\\d)"));
-        Assert.assertTrue(_functions.GEN_MATCH("123", "(\\d\\d\\d)"));
-
-        // it looks like they right-trim the incoming value
-        Assert.assertTrue(_functions.GEN_MATCH("123 ", "(\\d\\d\\d)"));
-        Assert.assertTrue(_functions.GEN_MATCH("123     ", "(\\d\\d\\d)"));
-
-        // it also ignores any trailing spaces in the regex itself  -  FPD no it doesn't; it ignores single space regex, not trailing spaces!
-        Assert.assertTrue(_functions.GEN_MATCH("123", "(\\d\\d\\d\\s)"));
-        Assert.assertTrue(_functions.GEN_MATCH("123", "(\\d\\d\\d\\s\\s\\s)"));
-        Assert.assertTrue(_functions.GEN_MATCH("123", "\\d\\d\\d\\s\\s\\s"));
-
-        // It appears that an empty string (which means any blank string since they right-trim) matches to any number of spaces...
-        Assert.assertTrue(_functions.GEN_MATCH("", "\\s"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "\\s\\s"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "\\s\\s\\s"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "(\\s\\s\\s)"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "(\\s)"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "(\\s|")); // following are not valid regex, but I am just testing the pre-condition...
-        Assert.assertTrue(_functions.GEN_MATCH("", "|\\s)"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "|\\s|"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "|\\s"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "\\s|"));
-
-        // apparently, they deal with an actual space the same way as a 'b' in the regex (which is totally un-documented)
-        Assert.assertTrue(_functions.GEN_MATCH("", " "));
-        Assert.assertTrue(_functions.GEN_MATCH("", "  "));
-        Assert.assertTrue(_functions.GEN_MATCH("", "   "));
-        Assert.assertTrue(_functions.GEN_MATCH("", "(   )"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "( )"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "( |")); // following are not valid regex, but I am just testing the pre-condition...
-        Assert.assertTrue(_functions.GEN_MATCH("", "| )"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "| |"));
-        Assert.assertTrue(_functions.GEN_MATCH("", "| "));
-        Assert.assertTrue(_functions.GEN_MATCH("", " |"));
-
-        Assert.assertTrue(_functions.GEN_MATCH("0000", "0000 "));
-        Assert.assertTrue(_functions.GEN_MATCH("0000", "(0000 )"));
-
-        Assert.assertTrue(_functions.GEN_MATCH("00  00", "(\\d\\d  \\d\\d)"));
-
-        Assert.assertTrue(_functions.GEN_MATCH("1", "(1)|(\\s)"));
-        Assert.assertTrue(_functions.GEN_MATCH(" ", "(1)|(\\s)"));
 
         // this is from a real edit for street name to make sure it's left justified
         //     original regex: @{?}*
         // following testing values have been tested within Genedits...
         String regex = "([^ \\t\\r\\n\\v\\f]((.))*)";
-        Assert.assertTrue(_functions.GEN_MATCH("ABC", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("ABC ", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("ABC   ", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("A B C ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" ABC", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("  ABC", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" ABC ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" A B C ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
         Assert.assertFalse(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("A", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("  ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("AB", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("A ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" A", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("ABC", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("AB ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" AB", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("A B", regex));
 
         // this is from a real edit for postal code (Can't be blank, must be alphanumeric, left-justified, and blank-filled. Mixed case is allowed. Special characters are not allowed).
         //     original regex: x{b,x}*
         // following testing values have been tested within Genedits...
         regex = "[A-Za-z0-9](\\s|[A-Za-z0-9])*";
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("12345", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("12345    ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("12345 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" 12345", regex));
         Assert.assertTrue(_functions.GEN_MATCH("A1234", regex));
         Assert.assertTrue(_functions.GEN_MATCH("1234Z", regex));
         Assert.assertTrue(_functions.GEN_MATCH("abcABC", regex));
         Assert.assertTrue(_functions.GEN_MATCH("123 456", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("1 23456   ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
         Assert.assertFalse(_functions.GEN_MATCH(" 123456", regex));
         Assert.assertFalse(_functions.GEN_MATCH("1234!", regex));
         Assert.assertFalse(_functions.GEN_MATCH("12;34;56", regex));
@@ -357,16 +313,16 @@ public class MetafileContextFunctionsTest {
         //     original regex: x{x}*{b}*
         // following testing values have been tested within Genedits...
         regex = "([A-Za-z0-9](([A-Za-z0-9]))*((\\s))*)";
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("12345", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("12345    ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("12345 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" 12345", regex));
         Assert.assertTrue(_functions.GEN_MATCH("A1234", regex));
         Assert.assertTrue(_functions.GEN_MATCH("1234Z", regex));
         Assert.assertTrue(_functions.GEN_MATCH("abcABC", regex));
         Assert.assertFalse(_functions.GEN_MATCH("123 456", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("1 23456   ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
         Assert.assertFalse(_functions.GEN_MATCH(" 123456", regex));
         Assert.assertFalse(_functions.GEN_MATCH("1234!", regex));
         Assert.assertFalse(_functions.GEN_MATCH("12;34;56", regex));
@@ -376,92 +332,99 @@ public class MetafileContextFunctionsTest {
         //    original regex: a{a,b,-,'}*
         // following testing values have been tested within Genedits...
         regex = "([A-Za-z](([A-Za-z])|(\\s)|(\\-)|('))*)";
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("abc", regex));
         Assert.assertTrue(_functions.GEN_MATCH("ABC", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("AB ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" AB", regex));
         Assert.assertTrue(_functions.GEN_MATCH("A BC", regex));
         Assert.assertTrue(_functions.GEN_MATCH("A'BC", regex));
         Assert.assertTrue(_functions.GEN_MATCH("A-BC", regex));
         Assert.assertTrue(_functions.GEN_MATCH("ABC ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("    ", regex));
         Assert.assertFalse(_functions.GEN_MATCH(" ABC", regex));
         Assert.assertFalse(_functions.GEN_MATCH("'ABC", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("AB<C>", regex));
         Assert.assertFalse(_functions.GEN_MATCH("AB_C", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("AB<C>", regex));
 
         // this one was taken from "Secondary Diagnosis 1 (COC)"
         //    original regex: uxx{x}*{b}*
         // following testing values have been tested within Genedits...
         regex = "([A-Z][A-Za-z0-9][A-Za-z0-9](([A-Za-z0-9]))*((\\s))*)";
-        Assert.assertTrue(_functions.GEN_MATCH("ABC", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("Abc", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("A12", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("Abc ", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("Abc    ", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("Abc123", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("Abc123 ", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("X12", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("X12 ", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("Xab", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("Xab ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("abc", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("aBC", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("123", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("a      ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("x", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("x      ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("1", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("1      ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
         Assert.assertFalse(_functions.GEN_MATCH("A", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("x", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("1", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("a ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" a", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("x ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("1 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("A ", regex));
         Assert.assertFalse(_functions.GEN_MATCH("A1", regex));
         Assert.assertFalse(_functions.GEN_MATCH("Aa", regex));
         Assert.assertFalse(_functions.GEN_MATCH("A ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("A  ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("ABC", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("Abc", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("A12", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("X12", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("Xab", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("abc", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("aBC", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("123", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("Abc ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("Xab ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("X12 ", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("ABCD", regex));
         Assert.assertFalse(_functions.GEN_MATCH("ABC'", regex));
         Assert.assertFalse(_functions.GEN_MATCH("ABC-2", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("Abc123", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("Abc123 ", regex));
         Assert.assertFalse(_functions.GEN_MATCH("ABC abc", regex));
 
         // this one was also taken from "Secondary Diagnosis 1 (COC)"
         //    original regex: {A,B,E,G:P,R,S}xx{x}*{b}*
         // following testing values have been tested within Genedits...
         regex = "(((A)|(B)|(E)|([G-P])|(R)|(S))[A-Za-z0-9][A-Za-z0-9](([A-Za-z0-9]))*((\\s))*)";
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("A", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("Aa", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("A1", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("C1", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("Aa ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("A a", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("A1 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("A 1", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("abc", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("a12", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("C12", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("Cab", regex));
         Assert.assertTrue(_functions.GEN_MATCH("A12", regex));
         Assert.assertTrue(_functions.GEN_MATCH("B12", regex));
         Assert.assertTrue(_functions.GEN_MATCH("G12", regex));
         Assert.assertTrue(_functions.GEN_MATCH("I12", regex));
         Assert.assertTrue(_functions.GEN_MATCH("R12", regex));
         Assert.assertTrue(_functions.GEN_MATCH("S12", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("X12", regex));
         Assert.assertTrue(_functions.GEN_MATCH("Sab", regex));
         Assert.assertTrue(_functions.GEN_MATCH("SAB", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("123", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("C1  ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("123 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("a12 ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("SAB  ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("SAB123", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("SAB123 ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("SABabc", regex));
+        Assert.assertTrue(_functions.GEN_MATCH("SAB123 ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("SABabc ", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("SAB", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("A", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("Aa", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("Aa ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("A a", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("A1", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("A1 ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("A 1", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("abc", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("a12", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("a12 ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("C12", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("Cab", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("C1", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("C1  ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("123", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("123 ", regex));
 
         // this one was taken from "Edit Over-rides (SEER REVIEWFL)" in NAACCR Call for Data metafile
         //    original regex: 1,b
         // following testing values have been tested within Genedits...
         regex = "(1)|(\\s)";
-        Assert.assertTrue(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
         Assert.assertTrue(_functions.GEN_MATCH(" ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("1", regex));
         Assert.assertFalse(_functions.GEN_MATCH("2", regex));
@@ -470,7 +433,7 @@ public class MetafileContextFunctionsTest {
         //    original regex: 1:3,b
         // following testing values have been tested within Genedits...
         regex = "([1-3])|(\\s)";
-        Assert.assertTrue(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
         Assert.assertTrue(_functions.GEN_MATCH(" ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("1", regex));
         Assert.assertTrue(_functions.GEN_MATCH("2", regex));
@@ -479,7 +442,22 @@ public class MetafileContextFunctionsTest {
         // this one was taken from "EOD--Old 4 digit (SEER IF264DIG_P1)"
         //    original regex: [bb,dd]{b,d}{b,d}
         // following testing values have been tested within Genedits...
-        regex = "(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))"; // note that the translation seems wrong; there shouldn't be a question mark!
+        regex = "(((\\\\s\\\\s)|(\\\\d\\\\d))((\\\\s)|(\\\\d))((\\\\s)|(\\\\d)))";
+        //regex = "(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))"; // note that the translation is wrong; there shouldn't be a question mark!
+        Assert.assertFalse(_functions.GEN_MATCH("", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("0", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("  ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("00", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("0 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" 0", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("000", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("00 ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH(" 00", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("0  ", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("  0", regex));
+        Assert.assertFalse(_functions.GEN_MATCH("   ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("0000", regex));
         Assert.assertTrue(_functions.GEN_MATCH("000 ", regex));
         Assert.assertTrue(_functions.GEN_MATCH("00  ", regex));
@@ -487,15 +465,6 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_MATCH(" 000", regex));
         Assert.assertTrue(_functions.GEN_MATCH("  00", regex));
         Assert.assertTrue(_functions.GEN_MATCH("   0", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("000", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("00", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("0", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("00 ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" 00", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("0 ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH("0  ", regex));
-        Assert.assertFalse(_functions.GEN_MATCH(" 0", regex));
-        Assert.assertTrue(_functions.GEN_MATCH("  0", regex));
     }
 
     @Test
@@ -2001,6 +1970,7 @@ public class MetafileContextFunctionsTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void testGEN_TO_STRING() {
 
         Assert.assertEquals("ABC", _functions.GEN_TO_STRING("ABC"));
