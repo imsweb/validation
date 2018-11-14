@@ -3,19 +3,6 @@
  */
 package com.imsweb.validation;
 
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.groovy.ast.CodeVisitorSupport;
-import org.codehaus.groovy.ast.expr.ArgumentListExpression;
-import org.codehaus.groovy.ast.expr.BinaryExpression;
-import org.codehaus.groovy.ast.expr.ClosureExpression;
-import org.codehaus.groovy.ast.expr.ConstantExpression;
-import org.codehaus.groovy.ast.expr.DeclarationExpression;
-import org.codehaus.groovy.ast.expr.Expression;
-import org.codehaus.groovy.ast.expr.MethodCallExpression;
-import org.codehaus.groovy.ast.expr.PropertyExpression;
-import org.codehaus.groovy.ast.expr.VariableExpression;
-import org.codehaus.groovy.ast.stmt.ForStatement;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +11,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.groovy.ast.CodeVisitorSupport;
+import org.codehaus.groovy.ast.expr.ArgumentListExpression;
+import org.codehaus.groovy.ast.expr.BinaryExpression;
+import org.codehaus.groovy.ast.expr.ClosureExpression;
+import org.codehaus.groovy.ast.expr.ConstantExpression;
+import org.codehaus.groovy.ast.expr.DeclarationExpression;
+import org.codehaus.groovy.ast.expr.MethodCallExpression;
+import org.codehaus.groovy.ast.expr.PropertyExpression;
+import org.codehaus.groovy.ast.expr.VariableExpression;
+import org.codehaus.groovy.ast.stmt.ForStatement;
 
 /**
  * Parses groovy edits to gather used properties...
@@ -68,24 +67,17 @@ public class EditCodeVisitor extends CodeVisitorSupport {
     protected List<String> _defVariables;
 
     /**
-     * Do we need to ensure the 'def' keyword is properly used?
-     */
-    protected boolean _forceDefKeyword;
-
-    /**
      * Constructor
      * <p/>
      * Created on Jan 15, 2008 by depryf
      * @param properties place holder for gathered properties (can be null)
      * @param contextEntries place holder for gathered context entries  (can be null)
      * @param lookups place holder for gathered lookups (can be null)
-     * @param forceDefKeyword if true and a variable is defined without the def keyword, then an exception will be raised
      */
-    public EditCodeVisitor(Set<String> properties, Set<String> contextEntries, Set<String> lookups, boolean forceDefKeyword) {
+    public EditCodeVisitor(Set<String> properties, Set<String> contextEntries, Set<String> lookups) {
         _properties = properties == null ? new HashSet<>() : properties;
         _contextEntries = contextEntries == null ? new HashSet<>() : contextEntries;
         _lookups = lookups == null ? new HashSet<>() : lookups;
-        _forceDefKeyword = forceDefKeyword;
 
         _variableAliases = new HashMap<>();
         _defVariables = new ArrayList<>();
@@ -247,12 +239,6 @@ public class EditCodeVisitor extends CodeVisitorSupport {
 
     @Override
     public void visitBinaryExpression(BinaryExpression expression) {
-        if (_forceDefKeyword) {
-            Expression left = expression.getLeftExpression();
-            if (!_defVariables.contains(left.getText()) && left instanceof VariableExpression && expression.getOperation().getText().equals("="))
-                throw new RuntimeException("Variable '" + expression.getLeftExpression().getText() + "' is not defined using the 'def' keyword");
-        }
-
         // def line1 = lines[index]
         // def ctc1 = patient.ctcs[index]
         if (expression.getOperation() != null && expression.getOperation().getText().equals("[")) {
