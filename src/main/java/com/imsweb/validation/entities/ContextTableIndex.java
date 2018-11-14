@@ -84,6 +84,9 @@ public class ContextTableIndex {
      * @return corresponding row number in the parent table, -1 if not found
      */
     public int find(String value) {
+        if (value == null)
+            return -1;
+
         int result = -1;
 
         if (_uniqueKeysData != null)
@@ -109,6 +112,9 @@ public class ContextTableIndex {
      * @return corresponding row number in the parent table, -1 if not found
      */
     public int findFloor(String value) {
+        if (value == null)
+            return -1;
+
         int result = -1;
 
         // if the value is smaller than the smaller index key, return not found (-1)

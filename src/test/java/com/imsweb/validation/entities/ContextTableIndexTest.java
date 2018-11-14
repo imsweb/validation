@@ -25,6 +25,7 @@ public class ContextTableIndexTest {
 
         ContextTableIndex idx1 = new ContextTableIndex("idx1", table, Collections.singletonList("header1"));
         Assert.assertTrue(idx1.hasUniqueKeys());
+        Assert.assertEquals(-1, idx1.find(null));
         Assert.assertEquals(-1, idx1.find("?"));
         Assert.assertEquals(-1, idx1.find("1"));
         Assert.assertEquals(2, idx1.find("v")); // I think the index columns are trimmed...
@@ -77,6 +78,7 @@ public class ContextTableIndexTest {
 
         ContextTableIndex idx1 = new ContextTableIndex("idx1", table, Collections.singletonList("header1"));
         Assert.assertTrue(idx1.hasUniqueKeys());
+        Assert.assertEquals(-1, idx1.findFloor(null));
         Assert.assertEquals(-1, idx1.findFloor("a1"));
         Assert.assertEquals(-1, idx1.findFloor("b0"));
         Assert.assertEquals(0, idx1.findFloor("b1"));
