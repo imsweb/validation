@@ -1546,12 +1546,26 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         String val = GEN_TO_STRING(value);
         String txt = GEN_TO_STRING(text);
+        int w = width == null ? 1 : Math.max(1, width.intValue());
 
-        int idx = txt.indexOf(val);
-        while (idx != -1 && idx % width != 0)
-            idx = txt.indexOf(val, idx + 1);
+        // special case, if the width is 1, don't bother splitting each character into its own string!
+        if (w == 1)
+            return txt.indexOf(val) + 1;
 
-        return idx + 1;
+        // handle text by block of size "width"
+        int loopCounter = 1, i;
+        for (i = width; i < txt.length(); i += width) {
+            System.out.println("  > split: " + txt.substring(i - width, i));
+            if (txt.substring(i - width, i).indexOf(val) > -1)
+                return loopCounter;
+            loopCounter++;
+        }
+
+        // handle last block if we have to
+        if (i - width < txt.length() && txt.substring(i - width, Math.min(i, txt.length())).indexOf(val) > -1)
+            return loopCounter;
+
+        return 0;
     }
 
     /**

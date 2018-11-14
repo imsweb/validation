@@ -2032,5 +2032,33 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals(0, _functions.GEN_AT("08", "00"));
         Assert.assertEquals(0, _functions.GEN_AT("00", "08"));
         Assert.assertEquals(1, _functions.GEN_AT("00", "00"));
+
+        // passing a value of 0 crashes EditsWriter, so I don't really care how this behaves here (obviously it shouldn't crash LOL)
+        Assert.assertEquals(1, _functions.GEN_AT("0", "01789", 0));
+        Assert.assertEquals(2, _functions.GEN_AT("1", "01789", 0));
+        Assert.assertEquals(0, _functions.GEN_AT("2", "01789", 0));
+        Assert.assertEquals(4, _functions.GEN_AT("8", "01789", 0));
+        Assert.assertEquals(5, _functions.GEN_AT("9", "01789", 0));
+
+        // the regular way to use the method with a width (checked with EditsWriter)
+        Assert.assertEquals(1, _functions.GEN_AT("0", "01789", 1));
+        Assert.assertEquals(2, _functions.GEN_AT("1", "01789", 1));
+        Assert.assertEquals(0, _functions.GEN_AT("2", "01789", 1));
+        Assert.assertEquals(4, _functions.GEN_AT("8", "01789", 1));
+        Assert.assertEquals(5, _functions.GEN_AT("9", "01789", 1));
+
+        // the index is longer than the actual value of the field (checked with EditsWriter)
+        Assert.assertEquals(1, _functions.GEN_AT("0", "01789", 2));
+        Assert.assertEquals(1, _functions.GEN_AT("1", "01789", 2));
+        Assert.assertEquals(0, _functions.GEN_AT("2", "01789", 2));
+        Assert.assertEquals(2, _functions.GEN_AT("8", "01789", 2));
+        Assert.assertEquals(3, _functions.GEN_AT("9", "01789", 2));
+
+        // other real examples (from the EditsWriter help)
+        Assert.assertEquals(5, _functions.GEN_AT("GA", "AKALGANYTX"));
+        Assert.assertEquals(5, _functions.GEN_AT("GA", "AKALGANYTX", 1));
+        Assert.assertEquals(3, _functions.GEN_AT("GA", "AKALGANYTX", 2));
+        // so the Genedits help says that this call should return 0, but EditsWriter returns 2...
+        Assert.assertEquals(2, _functions.GEN_AT("GA", "AKALGANYTX", 3));
     }
 }
