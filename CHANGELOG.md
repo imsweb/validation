@@ -1,7 +1,8 @@
 ## Validation Framework Version History
 
-**Version 2.0**
+**Version 2.1**
 
+- Re-added a way to disable pre-compiled edits lookup, it was removed by mistake in the previous release.
 - Removed option to check for def keyword in edits code visitor.
 
 **Version 2.0**

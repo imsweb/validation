@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.imsweb.validation.runtime.ParsedProperties;
 
-public class FakeValidatorRuntimeParsedProperties implements ParsedProperties {
+public class FakeRuntimeEditsParsedProperties implements ParsedProperties {
 
     @Override
     public String getValidatorId() {

@@ -1844,7 +1844,7 @@ public class ValidationEngine {
         CompiledRules compiledRules = RuntimeUtils.findCompileRules(validator, stats);
 
         // also look for the pre-compiled rules on the classpath (old way); that way is deprecated and will be removed soon
-        if (compiledRules == null)
+        if (compiledRules == null && validator.getCompiledRules() == null)
             compiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
 
         // internalize the rules

@@ -669,17 +669,19 @@ public final class ValidationXmlUtils {
                     versions.put(release.getVersion().getRawString(), release.getVersion());
 
             // get pre-parsed information
-            ParsedProperties props = runtime == null ? null : runtime.getParsedProperties();
-            ParsedContexts contexts = runtime == null ? null : runtime.getParsedContexts();
-            ParsedLookups lookups = runtime == null ? null : runtime.getParsedLookups();
-
-            // also look on the classpath (old way); this way is deprecated and will be removed soon
-            if (props == null)
+            ParsedProperties props;
+            ParsedContexts contexts;
+            ParsedLookups lookups;
+            if (runtime != null) {
+                props = runtime.getParsedProperties();
+                contexts = runtime.getParsedContexts();
+                lookups = runtime.getParsedLookups();
+            }
+            else { // also look on the classpath (old way); this way is deprecated and will be removed soon
                 props = RuntimeUtils.findParsedProperties(validator.getId());
-            if (contexts == null)
                 contexts = RuntimeUtils.findParsedContexts(validator.getId());
-            if (lookups == null)
                 lookups = RuntimeUtils.findParsedLookups(validator.getId());
+            }
 
             // go through each rule (we multi-thread this part since it can be a bit slow
             ExecutorService service = Executors.newFixedThreadPool(2);

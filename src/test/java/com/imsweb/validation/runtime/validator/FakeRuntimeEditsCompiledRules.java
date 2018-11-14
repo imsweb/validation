@@ -13,7 +13,7 @@ import groovy.lang.Binding;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.runtime.CompiledRules;
 
-public class FakeValidatorRuntimeCompiledRules implements CompiledRules {
+public class FakeRuntimeEditsCompiledRules implements CompiledRules {
 
     @Override
     public String getValidatorId() {

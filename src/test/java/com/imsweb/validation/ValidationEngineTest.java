@@ -29,7 +29,11 @@ import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.internal.ValidatingContext;
-import com.imsweb.validation.runtime.validator.FakeValidatorRuntime;
+import com.imsweb.validation.runtime.CompiledRules;
+import com.imsweb.validation.runtime.ParsedContexts;
+import com.imsweb.validation.runtime.ParsedLookups;
+import com.imsweb.validation.runtime.ParsedProperties;
+import com.imsweb.validation.runtime.validator.FakeRuntimeEdits;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ValidationEngineTest {
@@ -308,7 +312,8 @@ public class ValidationEngineTest {
 
         // the logic in the XML doesn't reference any lookup, but the runtime Java class returns one; that's how we can assert the runtime stuff
 
-        Validator normalValidator = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-runtime.xml"));
+        // load the validator from XML, no runtime involved
+        Validator normalValidator = ValidationXmlUtils.loadValidatorFromXml(FakeRuntimeEdits.getXmlUrl());
         Assert.assertFalse(normalValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine normalEngine = new ValidationEngine();
         InitializationStats stats = normalEngine.initialize(normalValidator);
@@ -316,13 +321,43 @@ public class ValidationEngineTest {
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
         Assert.assertEquals(1, stats.getNumEditsCompiled());
 
-        Validator runtimeValidator = FakeValidatorRuntime.validator();
+        // load the validator using the standard runtime mechanism
+        Validator runtimeValidator = FakeRuntimeEdits.validator();
         Assert.assertTrue(runtimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine runtimeEngine = new ValidationEngine();
         stats = runtimeEngine.initialize(runtimeValidator);
         Assert.assertEquals(1, stats.getNumEditsLoaded());
         Assert.assertEquals(1, stats.getNumEditsPreCompiled());
         Assert.assertEquals(0, stats.getNumEditsCompiled());
+
+        // load the validator using the runtime mechanism but forcing the mechanism to be disabled
+        Validator noRuntimeValidator = ValidationXmlUtils.loadValidatorFromXml(FakeRuntimeEdits.getXmlUrl(), new FakeRuntimeEdits() {
+            @Override
+            public CompiledRules getCompiledRules() {
+                return null;
+            }
+
+            @Override
+            public ParsedProperties getParsedProperties() {
+                return null;
+            }
+
+            @Override
+            public ParsedContexts getParsedContexts() {
+                return null;
+            }
+
+            @Override
+            public ParsedLookups getParsedLookups() {
+                return null;
+            }
+        });
+        Assert.assertFalse(noRuntimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
+        ValidationEngine noRuntimeEngine = new ValidationEngine();
+        stats = noRuntimeEngine.initialize(noRuntimeValidator);
+        Assert.assertEquals(1, stats.getNumEditsLoaded());
+        Assert.assertEquals(0, stats.getNumEditsPreCompiled());
+        Assert.assertEquals(1, stats.getNumEditsCompiled());
 
         // the global cached engine should not now about these validators
         Assert.assertNull(ValidationEngine.getInstance().getValidator("fake-validator-runtime"));

@@ -6,9 +6,9 @@ package com.imsweb.validation.runtime.validator;
 import java.util.Collections;
 import java.util.Set;
 
-import com.imsweb.validation.runtime.ParsedLookups;
+import com.imsweb.validation.runtime.ParsedContexts;
 
-public class FakeValidatorRuntimeParsedLookups implements ParsedLookups {
+public class FakeRuntimeEditsParsedContexts implements ParsedContexts {
 
     @Override
     public String getValidatorId() {
@@ -21,6 +21,6 @@ public class FakeValidatorRuntimeParsedLookups implements ParsedLookups {
     }
 
     public Set<String> fvrtRule1() {
-        return Collections.singleton("fake-lookup");
+        return Collections.emptySet();
     }
 }
