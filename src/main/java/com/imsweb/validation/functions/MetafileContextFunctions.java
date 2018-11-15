@@ -758,9 +758,12 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     // helper
-    private boolean isValInList(String val, String list) {
+    private boolean isValInList2(String val, String list) {
         // if the value has trailing non-numeric values, trim off those non-numeric values first
         String numericVal = removeTrailingNonNumerics(val);
+
+        if (" ".equals(list))
+            return " ".equals(val);
 
         for (String term : StringUtils.split(list, ',')) {
             String[] parts = StringUtils.split(term, '-');
@@ -826,22 +829,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_INLIST(Object value, Object list) {
-        String val = GEN_TO_STRING(value);
-        String l = GEN_TO_STRING(list);
-
-        // special case for the list
-        if (l == null || l.isEmpty())
-            return false;
-
-        // apparently Genedits trim the incoming value (see SEER*Utils Squish issue #49)
-        if (val != null)
-            val = val.trim();
-
-        // this make the assumption that the empty value in the list will always be at the end...
-        if (val == null || val.isEmpty())
-            return l.trim().isEmpty() || l.trim().endsWith(",");
-
-        return isValInList(val, l);
+        return GEN_INLIST(value, list, null, null, null);
     }
 
     /**
@@ -854,22 +842,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_INLIST(Object value, Object list, Object regex) {
-        if (value == null)
-            return false;
-
-        String l = GEN_TO_STRING(list);
-        if (l.isEmpty())
-            return false;
-
-        if (!GEN_MATCH(value, regex))
-            return false;
-
-        // apparently Genedits right-trim the incoming value in their MATCH method, in C++ the value is a pointer, so it is trimmed in INLIST as a side effect!
-        String val = trimRight(GEN_TO_STRING(value));
-        if (val.isEmpty())
-            return true;
-
-        return isValInList(val, l);
+        return GEN_INLIST(value, list, regex, null, null);
     }
 
     /**
@@ -884,72 +857,43 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_INLIST(Object value, Object list, Object regex, Integer startPos, Integer length) {
-        if (value == null)
+        String val = GEN_TO_STRING(value), l = GEN_TO_STRING(list);
+
+        if (val == null || val.isEmpty() || l == null || l.isEmpty())
             return false;
 
-        String l = GEN_TO_STRING(list);
-        if (l.isEmpty())
+        if (regex != null && !GEN_MATCH(value, regex))
             return false;
 
-        if (!GEN_MATCH(value, regex))
-            return false;
+        // weird corner case
+        if (StringUtils.isBlank(l))
+            return list.equals(val);
 
-        // apparently Genedits right-trim the incoming value in their MATCH method, in C++ the value is a pointer, so it is trimmed in INLIST as a side effect!
-        String val = trimRight(GEN_TO_STRING(value));
-
-        if (val.isEmpty())
+        // another weird corner case
+        if (StringUtils.isBlank(val) && regex != null)
             return true;
 
-        int start = startPos - 1; // Genedits uses 1-based index...
-        int end = Math.min(startPos - 1 + length, val.length()); // Gendits allows a length going past the end of the string...
+        if (startPos != null && length != null) {
+            int start = startPos - 1; // Genedits uses 1-based index...
+            int end = Math.min(startPos - 1 + length, val.length()); // Gendits allows a length going past the end of the string...
+            if (start >= end)
+                return false;
+            val = val.substring(start, end);
+        }
 
-        if (val.trim().isEmpty() || start >= end)
-            return false;
+        for (String term : StringUtils.split(StringUtils.replace(l, " ", ""), ',')) {
+            String[] parts = StringUtils.split(term, '-');
 
-        return isValInList(val.substring(start, end), l);
+            // value "1 " is found in list "1"; my best guess is that the trailing spaces are removed...
+            if ((parts.length == 1 && StringUtils.stripEnd(val, null).equals(term)) || (parts.length == 2 && val.compareTo(parts[0]) >= 0 && val.compareTo(parts[1]) <= 0))
+                return true;
+        }
+
+        return false;
     }
 
     public boolean GEN_MATCH(Object value, Object regex) {
         return matches(value, regex);
-
-//        if (value == null)
-//            return false;
-//
-//        String val = GEN_TO_STRING(value);
-//        String reg = GEN_TO_STRING(regex);
-//
-//        // apparently Genedits right-trim the incoming value
-//        val = trimRight(val);
-//
-//        // there isn't supposed to be any spaces in the regex but it looks like it does happen...
-//        reg = _GEN_MATCH_P1.matcher(reg).replaceAll("\\\\s");
-//
-//        // looks like Genedits considers a regex for a single space to match an empty string...
-//        if (val.isEmpty()) {
-//            String tmp = _GEN_MATCH_P2.matcher(reg).replaceAll("\\\\s"); // let's deal only with single spaces, since they seem to do the same in the Genedits language
-//            boolean noParenthesisCondition = tmp.equals("\\s") || tmp.startsWith("\\s|") || tmp.endsWith("|\\s");
-//            boolean oneParenthesisCondition = tmp.startsWith("(\\s|") || tmp.endsWith("|\\s)");
-//            boolean twoParenthesisCondition = tmp.equals("(\\s)") || tmp.startsWith("(\\s)|") || tmp.endsWith("|(\\s)");
-//            if (noParenthesisCondition || oneParenthesisCondition || twoParenthesisCondition)
-//                return true;
-//        }
-//
-//        // deal with the right spaces
-//        reg = _GEN_MATCH_P3.matcher(reg).replaceAll(")");
-//
-//        // and again, right spaces stuff...
-//        reg = _GEN_MATCH_P4.matcher(reg).replaceAll("");
-//
-//        // this is a short term fix for a specific problem, but I am now convinced my implementation of the MATCH method is wrong, I don't think it should
-//        // right-trim values; I will submit an issue in GitHub to look more into it (I need to run more tests against GENEDITS)
-//        if ("(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))".equals(regex) || "(((\\s\\s)|(\\d\\d))((\\s)|(\\d))((\\s)|(\\d)))".equals(regex)) {
-//            if (val.isEmpty())
-//                return true;
-//            reg = "(\\s\\s|\\d\\d)(\\s|\\d)?(\\s|\\d)?";
-//        }
-//
-//        // calling this base method so the regex can be cached (if regex caching is turned on)
-//        return matches(val, reg);
     }
 
     @SuppressWarnings("unchecked")

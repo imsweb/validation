@@ -62,28 +62,36 @@ public class MetafileContextFunctionsTest {
 
     @Test
     public void testGEN_INLIST() {
+
         Assert.assertFalse(_functions.GEN_INLIST(null, "1,10-13,101-111"));
         Assert.assertFalse(_functions.GEN_INLIST("", "1,10-13,101-111"));
-        Assert.assertFalse(_functions.GEN_INLIST("     ", "1,10-13,101-111"));
-        Assert.assertFalse(_functions.GEN_INLIST("100", "1,10-13,101-111"));
+        Assert.assertFalse(_functions.GEN_INLIST(" ", "1,10-13,101-111"));
+        Assert.assertTrue(_functions.GEN_INLIST("1", "1,10-13,101-111"));
+        Assert.assertFalse(_functions.GEN_INLIST("   ", "1,10-13,101-111"));
+        Assert.assertTrue(_functions.GEN_INLIST("100", "1,10-13,101-111"));
         Assert.assertTrue(_functions.GEN_INLIST("101", "1,10-13,101-111"));
+        Assert.assertFalse(_functions.GEN_INLIST("199", "1,10-13,101-111"));
+        Assert.assertFalse(_functions.GEN_INLIST("200", "1,10-13,101-111"));
 
         // value is trimmed...
         Assert.assertTrue(_functions.GEN_INLIST("101    ", "1,10-13,101-111"));
-        Assert.assertTrue(_functions.GEN_INLIST("    101", "1,10-13,101-111"));
-        Assert.assertTrue(_functions.GEN_INLIST("    101    ", "1,10-13,101-111"));
+        Assert.assertFalse(_functions.GEN_INLIST("    101", "1,10-13,101-111"));
+        Assert.assertFalse(_functions.GEN_INLIST("    101    ", "1,10-13,101-111"));
 
         Assert.assertFalse(_functions.GEN_INLIST("2x", "3-5"));
 
         // yet a single space should be found
         Assert.assertTrue(_functions.GEN_INLIST(" ", " "));
+        Assert.assertFalse(_functions.GEN_INLIST(" ", "0-9"));
         Assert.assertTrue(_functions.GEN_INLIST(" ", "0-9", "\\d|\\s"));
 
         // value is only right-trim when a regex is provided
         Assert.assertTrue(_functions.GEN_INLIST("101", "100-150,225-229", "\\d\\d\\d"));
-        Assert.assertTrue(_functions.GEN_INLIST("101   ", "100-150,225-229", "\\d\\d\\d"));
+        Assert.assertFalse(_functions.GEN_INLIST("101   ", "100-150,225-229", "\\d\\d\\d"));
         Assert.assertFalse(_functions.GEN_INLIST("    101", "100-150,225-229", "\\d\\d\\d"));
         Assert.assertFalse(_functions.GEN_INLIST("    101    ", "100-150,225-229", "\\d\\d\\d"));
+
+        Assert.assertTrue(_functions.GEN_INLIST("C515", "C510-C519"));
 
         // following block has been tested with Genedits
         Assert.assertFalse(_functions.GEN_INLIST("C101", "100-150", "C\\d\\d\\d", 2, 2));
@@ -92,9 +100,9 @@ public class MetafileContextFunctionsTest {
         Assert.assertTrue(_functions.GEN_INLIST("C10", "10-15", "C\\d\\d", 2, 2));
         Assert.assertTrue(_functions.GEN_INLIST("C10", "10-15", "C\\d\\d", 2, 3));
         Assert.assertTrue(_functions.GEN_INLIST("C10", "10-15", "C\\d\\d", 2, 4));
-        Assert.assertTrue(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 2));
-        Assert.assertTrue(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 3));
-        Assert.assertTrue(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 4));
+        Assert.assertFalse(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 2));
+        Assert.assertFalse(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 3));
+        Assert.assertFalse(_functions.GEN_INLIST("101", "1-5", "\\d\\d\\d", 2, 4));
         Assert.assertTrue(_functions.GEN_INLIST("C10 ", "10-15", "C\\d\\d\\s", 2, 2));
         Assert.assertTrue(_functions.GEN_INLIST("C10 ", "10-15", "C\\d\\d\\s", 2, 3));
         Assert.assertTrue(_functions.GEN_INLIST("C10 ", "10-15", "C\\d\\d\\s", 2, 4));
@@ -109,29 +117,31 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_INLIST("c   ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 4));
         Assert.assertFalse(_functions.GEN_INLIST("    ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 4));
         Assert.assertTrue(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 2, 10));
-        Assert.assertFalse(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 4, 4));
-        Assert.assertFalse(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 10, 4));
+        Assert.assertFalse(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 4, 4)); // crashes EditsWriter
+        Assert.assertFalse(_functions.GEN_INLIST("cX  ", "X,0,1", "(c[A-Za-z0-9]\\s\\s)", 10, 4)); // crashes EditsWriter
 
         // I just don't understand how that function works!!!  All the following cases have been tested using genedits...
         Assert.assertFalse(_functions.GEN_INLIST("", "")); // this one is not a valid syntax in genedits
         Assert.assertTrue(_functions.GEN_INLIST(" ", " "));
-        Assert.assertTrue(_functions.GEN_INLIST("", " "));
+        Assert.assertFalse(_functions.GEN_INLIST("", " "));
         Assert.assertFalse(_functions.GEN_INLIST(" ", "")); // this one is not a valid syntax in genedits
         Assert.assertFalse(_functions.GEN_INLIST("", "1"));
         Assert.assertFalse(_functions.GEN_INLIST(" ", "1"));
         Assert.assertTrue(_functions.GEN_INLIST("1", "1"));
         Assert.assertTrue(_functions.GEN_INLIST("1 ", "1"));
-        Assert.assertTrue(_functions.GEN_INLIST(" 1", "1"));
-        Assert.assertTrue(_functions.GEN_INLIST(" 1 ", "1"));
+        Assert.assertFalse(_functions.GEN_INLIST(" 1", "1"));
+        Assert.assertTrue(_functions.GEN_INLIST("1  ", "1"));
+        Assert.assertFalse(_functions.GEN_INLIST("  1", "1"));
+        Assert.assertFalse(_functions.GEN_INLIST(" 1 ", "1"));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1"));
         Assert.assertTrue(_functions.GEN_INLIST("1", "1 "));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1 "));
 
         Assert.assertFalse(_functions.GEN_INLIST("", "", "\\s")); // this one is not a valid syntax in genedits
         Assert.assertTrue(_functions.GEN_INLIST(" ", " ", "\\s"));
-        Assert.assertTrue(_functions.GEN_INLIST("", " ", "\\s"));
+        Assert.assertFalse(_functions.GEN_INLIST("", " ", "\\s"));
         Assert.assertFalse(_functions.GEN_INLIST(" ", "", "\\s")); // this one is not a valid syntax in genedits
-        Assert.assertTrue(_functions.GEN_INLIST("", "1", "\\s"));
+        Assert.assertFalse(_functions.GEN_INLIST("", "1", "\\s"));
         Assert.assertTrue(_functions.GEN_INLIST(" ", "1", "\\s"));
         Assert.assertFalse(_functions.GEN_INLIST("1", "1", "\\s"));
         Assert.assertFalse(_functions.GEN_INLIST("1 ", "1", "\\s"));
@@ -148,7 +158,7 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_INLIST("", "1", "\\d"));
         Assert.assertFalse(_functions.GEN_INLIST(" ", "1", "\\d"));
         Assert.assertTrue(_functions.GEN_INLIST("1", "1", "\\d"));
-        Assert.assertTrue(_functions.GEN_INLIST("1 ", "1", "\\d"));
+        Assert.assertFalse(_functions.GEN_INLIST("1 ", "1", "\\d"));
         Assert.assertFalse(_functions.GEN_INLIST(" 1", "1", "\\d"));
         Assert.assertFalse(_functions.GEN_INLIST(" 1 ", "1", "\\d"));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1", "\\d"));
@@ -157,12 +167,12 @@ public class MetafileContextFunctionsTest {
 
         Assert.assertFalse(_functions.GEN_INLIST("", "", "(\\s|\\d)")); // this one is not a valid syntax in genedits
         Assert.assertTrue(_functions.GEN_INLIST(" ", " ", "(\\s|\\d)"));
-        Assert.assertTrue(_functions.GEN_INLIST("", " ", "(\\s|\\d)"));
+        Assert.assertFalse(_functions.GEN_INLIST("", " ", "(\\s|\\d)"));
         Assert.assertFalse(_functions.GEN_INLIST(" ", "", "(\\s|\\d)")); // this one is not a valid syntax in genedits
-        Assert.assertTrue(_functions.GEN_INLIST("", "1", "(\\s|\\d)"));
+        Assert.assertFalse(_functions.GEN_INLIST("", "1", "(\\s|\\d)"));
         Assert.assertTrue(_functions.GEN_INLIST(" ", "1", "(\\s|\\d)"));
         Assert.assertTrue(_functions.GEN_INLIST("1", "1", "(\\s|\\d)"));
-        Assert.assertTrue(_functions.GEN_INLIST("1 ", "1", "(\\s|\\d)"));
+        Assert.assertFalse(_functions.GEN_INLIST("1 ", "1", "(\\s|\\d)"));
         Assert.assertFalse(_functions.GEN_INLIST(" 1", "1", "(\\s|\\d)"));
         Assert.assertFalse(_functions.GEN_INLIST(" 1 ", "1", "(\\s|\\d)"));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1", "(\\s|\\d)"));
@@ -171,20 +181,20 @@ public class MetafileContextFunctionsTest {
 
         Assert.assertFalse(_functions.GEN_INLIST("", "", "(\\d|\\s)")); // this one is not a valid syntax in genedits
         Assert.assertTrue(_functions.GEN_INLIST(" ", " ", "(\\d|\\s)"));
-        Assert.assertTrue(_functions.GEN_INLIST("", " ", "(\\d|\\s)"));
+        Assert.assertFalse(_functions.GEN_INLIST("", " ", "(\\d|\\s)"));
         Assert.assertFalse(_functions.GEN_INLIST(" ", "", "(\\d|\\s)")); // this one is not a valid syntax in genedits
-        Assert.assertTrue(_functions.GEN_INLIST("", "1", "(\\d|\\s)"));
+        Assert.assertFalse(_functions.GEN_INLIST("", "1", "(\\d|\\s)"));
         Assert.assertTrue(_functions.GEN_INLIST(" ", "1", "(\\d|\\s)"));
         Assert.assertTrue(_functions.GEN_INLIST("1", "1", "(\\d|\\s)"));
-        Assert.assertTrue(_functions.GEN_INLIST("1 ", "1", "(\\d|\\s)"));
+        Assert.assertFalse(_functions.GEN_INLIST("1 ", "1", "(\\d|\\s)"));
         Assert.assertFalse(_functions.GEN_INLIST(" 1", "1", "(\\d|\\s)"));
         Assert.assertFalse(_functions.GEN_INLIST(" 1 ", "1", "(\\d|\\s)"));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1", "(\\d|\\s)"));
         Assert.assertTrue(_functions.GEN_INLIST("1", "1 ", "(\\d|\\s)"));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1 ", "(\\d|\\s)"));
 
-        Assert.assertTrue(_functions.GEN_INLIST(" 1", "1"));
-        Assert.assertTrue(_functions.GEN_INLIST(" 1 ", "1"));
+        Assert.assertFalse(_functions.GEN_INLIST(" 1", "1"));
+        Assert.assertFalse(_functions.GEN_INLIST(" 1 ", "1"));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1"));
         Assert.assertTrue(_functions.GEN_INLIST("1", "1 "));
         Assert.assertTrue(_functions.GEN_INLIST("1", " 1 "));
@@ -193,45 +203,45 @@ public class MetafileContextFunctionsTest {
         Assert.assertTrue(_functions.GEN_INLIST("2A", "1-3"));
         Assert.assertFalse(_functions.GEN_INLIST("A2", "1-3"));
         Assert.assertFalse(_functions.GEN_INLIST("1A", "1"));
-        Assert.assertTrue(_functions.GEN_INLIST("1A", "1-1"));
+        Assert.assertFalse(_functions.GEN_INLIST("1A", "1-1"));
         Assert.assertTrue(_functions.GEN_INLIST("1 A", "1-5"));
         Assert.assertTrue(_functions.GEN_INLIST("1!!", "1-5"));
         Assert.assertTrue(_functions.GEN_INLIST("1()", "1-5"));
         Assert.assertTrue(_functions.GEN_INLIST("1()9()", "1-5"));
-        Assert.assertFalse(_functions.GEN_INLIST("11()9()", "1-5"));
+        Assert.assertTrue(_functions.GEN_INLIST("11()9()", "1-5"));
         Assert.assertFalse(_functions.GEN_INLIST("9()", "1-5"));
         Assert.assertFalse(_functions.GEN_INLIST(";;1()", "1-5"));
         Assert.assertTrue(_functions.GEN_INLIST("1 7", "1-5"));
         Assert.assertTrue(_functions.GEN_INLIST("17A", "1-5, 10-20"));
         Assert.assertTrue(_functions.GEN_INLIST("17ABCDEFGHI", "1-5, 10-20"));
-        Assert.assertTrue(_functions.GEN_INLIST("017A", "1-5, 10-20"));
+        Assert.assertFalse(_functions.GEN_INLIST("017A", "1-5, 10-20"));
         Assert.assertFalse(_functions.GEN_INLIST("OOOO017A", "1-5, 10-20"));
-        Assert.assertTrue(_functions.GEN_INLIST("00017A", "1-5, 10-20"));
+        Assert.assertFalse(_functions.GEN_INLIST("00017A", "1-5, 10-20"));
         Assert.assertTrue(_functions.GEN_INLIST("17N00017A", "1-5, 10-20"));
         Assert.assertFalse(_functions.GEN_INLIST("ZZ00017A", "1-5, 10-20"));
-        Assert.assertTrue(_functions.GEN_INLIST("  20A", "1-5, 10-20"));
+        Assert.assertFalse(_functions.GEN_INLIST("  20A", "1-5, 10-20"));
         Assert.assertFalse(_functions.GEN_INLIST("& 20A", "1-5, 10-20"));
 
         Assert.assertFalse(_functions.GEN_INLIST("2A", "2"));
         Assert.assertFalse(_functions.GEN_INLIST("A2", "2"));
-        Assert.assertTrue(_functions.GEN_INLIST("57A", "1-3,57B-59B"));
-        Assert.assertTrue(_functions.GEN_INLIST("57A", "1-3,57C-59"));
+        Assert.assertFalse(_functions.GEN_INLIST("57A", "1-3,57B-59B"));
+        Assert.assertFalse(_functions.GEN_INLIST("57A", "1-3,57C-59"));
         Assert.assertTrue(_functions.GEN_INLIST("57A", "1-3,57-59B"));
         Assert.assertTrue(_functions.GEN_INLIST("57asasa", "1-3,57U-59B"));
         Assert.assertFalse(_functions.GEN_INLIST("57A", "1-3,57,58-59"));
-        Assert.assertTrue(_functions.GEN_INLIST("10F", "A-B, 10"));
+        Assert.assertFalse(_functions.GEN_INLIST("10F", "A-B, 10"));
         Assert.assertFalse(_functions.GEN_INLIST("10F", "10"));
         Assert.assertTrue(_functions.GEN_INLIST("10F", "10-11"));
-        Assert.assertTrue(_functions.GEN_INLIST("10F", "A-<, 10"));
+        Assert.assertFalse(_functions.GEN_INLIST("10F", "A-<, 10"));
         Assert.assertFalse(_functions.GEN_INLIST("10F", "A-1<, 10"));
         Assert.assertFalse(_functions.GEN_INLIST("10F", "A-1, 10"));
         Assert.assertFalse(_functions.GEN_INLIST("10F", "A, 10"));
 
-        Assert.assertTrue(_functions.GEN_INLIST("10", "A-A"));
+        Assert.assertFalse(_functions.GEN_INLIST("10", "A-A"));
         Assert.assertTrue(_functions.GEN_INLIST("10", "1-A"));
         Assert.assertFalse(_functions.GEN_INLIST("10", "A-1"));
-        Assert.assertTrue(_functions.GEN_INLIST("1", "A-1"));
-        Assert.assertTrue(_functions.GEN_INLIST("0", "A-1"));
+        Assert.assertFalse(_functions.GEN_INLIST("1", "A-1"));
+        Assert.assertFalse(_functions.GEN_INLIST("0", "A-1"));
         Assert.assertFalse(_functions.GEN_INLIST("-1", "A-1"));
         Assert.assertFalse(_functions.GEN_INLIST("2", "A-1"));
         Assert.assertFalse(_functions.GEN_INLIST("10", "A-1"));
@@ -240,24 +250,24 @@ public class MetafileContextFunctionsTest {
         Assert.assertTrue(_functions.GEN_INLIST("10000", "1-A"));
         Assert.assertFalse(_functions.GEN_INLIST("0", "1-A"));
 
-        Assert.assertTrue(_functions.GEN_INLIST("10", "A1-A1"));
-        Assert.assertTrue(_functions.GEN_INLIST("10", "1A-A1"));
+        Assert.assertFalse(_functions.GEN_INLIST("10", "A1-A1"));
+        Assert.assertFalse(_functions.GEN_INLIST("10", "1A-A1"));
         Assert.assertFalse(_functions.GEN_INLIST("10", "A1-1A"));
-        Assert.assertTrue(_functions.GEN_INLIST("1", "A1-1A"));
-        Assert.assertTrue(_functions.GEN_INLIST("0", "A1-1A"));
+        Assert.assertFalse(_functions.GEN_INLIST("1", "A1-1A"));
+        Assert.assertFalse(_functions.GEN_INLIST("0", "A1-1A"));
         Assert.assertFalse(_functions.GEN_INLIST("-1", "A1-1A"));
         Assert.assertFalse(_functions.GEN_INLIST("2", "A1-1A"));
         Assert.assertFalse(_functions.GEN_INLIST("10", "A1-1A"));
-        Assert.assertTrue(_functions.GEN_INLIST("1", "1A-A1"));
+        Assert.assertFalse(_functions.GEN_INLIST("1", "1A-A1"));
         Assert.assertTrue(_functions.GEN_INLIST("2", "1A-A1"));
-        Assert.assertTrue(_functions.GEN_INLIST("10000", "1A-A1"));
+        Assert.assertFalse(_functions.GEN_INLIST("10000", "1A-A1"));
         Assert.assertFalse(_functions.GEN_INLIST("0", "1A-A1"));
 
-        Assert.assertTrue(_functions.GEN_INLIST("10FF", "A-A"));
-        Assert.assertTrue(_functions.GEN_INLIST("10SDFA", "1f-A"));
+        Assert.assertFalse(_functions.GEN_INLIST("10FF", "A-A"));
+        Assert.assertFalse(_functions.GEN_INLIST("10SDFA", "1f-A"));
         Assert.assertFalse(_functions.GEN_INLIST("10asdf1", "A-1dd"));
-        Assert.assertTrue(_functions.GEN_INLIST("1ddd", "A-1df"));
-        Assert.assertTrue(_functions.GEN_INLIST("0fad", "A-1f"));
+        Assert.assertFalse(_functions.GEN_INLIST("1ddd", "A-1df"));
+        Assert.assertFalse(_functions.GEN_INLIST("0fad", "A-1f"));
         Assert.assertFalse(_functions.GEN_INLIST("-1df", "A1-1"));
         Assert.assertFalse(_functions.GEN_INLIST("2d", "A1-1"));
         Assert.assertFalse(_functions.GEN_INLIST("10f", "A1-1"));
@@ -267,7 +277,7 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_INLIST("0eee", "1-A"));
 
         // invalid range
-        Assert.assertFalse(_functions.GEN_INLIST("10", "10-9"));
+        Assert.assertTrue(_functions.GEN_INLIST("10", "10-9"));
     }
 
     @Test
@@ -442,8 +452,7 @@ public class MetafileContextFunctionsTest {
         // this one was taken from "EOD--Old 4 digit (SEER IF264DIG_P1)"
         //    original regex: [bb,dd]{b,d}{b,d}
         // following testing values have been tested within Genedits...
-        regex = "(((\\\\s\\\\s)|(\\\\d\\\\d))((\\\\s)|(\\\\d))((\\\\s)|(\\\\d)))";
-        //regex = "(((\\s\\s)|(\\d\\d))?((\\s)|(\\d))((\\s)|(\\d)))"; // note that the translation is wrong; there shouldn't be a question mark!
+        regex = "(((\\s\\s)|(\\d\\d))((\\s)|(\\d))((\\s)|(\\d)))";
         Assert.assertFalse(_functions.GEN_MATCH("", regex));
         Assert.assertFalse(_functions.GEN_MATCH(" ", regex));
         Assert.assertFalse(_functions.GEN_MATCH("0", regex));
