@@ -1501,7 +1501,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         // handle text by block of size "width"
         int loopCounter = 1, i;
         for (i = width; i < txt.length(); i += width) {
-            System.out.println("  > split: " + txt.substring(i - width, i));
             if (txt.substring(i - width, i).indexOf(val) > -1)
                 return loopCounter;
             loopCounter++;
