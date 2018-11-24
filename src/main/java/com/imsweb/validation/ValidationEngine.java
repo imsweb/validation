@@ -1840,12 +1840,15 @@ public class ValidationEngine {
         if (validator.getValidatorId() == null)
             throw new ConstructionException("Validator must have a non-null internal ID to be registered in the engine");
 
-        // get pre-compiled rules
-        CompiledRules compiledRules = RuntimeUtils.findCompileRules(validator, stats);
+        // get pre-compiled rules if we have to
+        CompiledRules compiledRules = null;
+        if (_options.isPreCompiledEditsEnabled()) {
+            compiledRules = RuntimeUtils.findCompileRules(validator, stats);
 
-        // also look for the pre-compiled rules on the classpath (old way); that way is deprecated and will be removed soon
-        if (compiledRules == null && validator.getCompiledRules() == null)
-            compiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
+            // also look for the pre-compiled rules on the classpath (old way); that way is deprecated and will be removed soon
+            if (compiledRules == null)
+                compiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
+        }
 
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_options.getNumCompilationThreads());

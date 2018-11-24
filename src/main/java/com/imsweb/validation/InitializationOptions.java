@@ -11,12 +11,16 @@ public class InitializationOptions {
     // the number of threads the engine can use to compile the edits (defaults to 2)
     private int _numCompilationThreads;
 
+    // whether or not the engine should use pre-compiled edits if available (defaults to true)
+    private boolean _preCompiledEditsEnabled;
+
     /**
      * Constructor.
      */
     public InitializationOptions() {
         _engineStatsEnabled = false;
         _numCompilationThreads = 2;
+        _preCompiledEditsEnabled = true;
     }
 
     public void enableEngineStats() {
@@ -35,5 +39,13 @@ public class InitializationOptions {
 
     public int getNumCompilationThreads() {
         return _numCompilationThreads;
+    }
+
+    public void disablePreCompiledEdits() {
+        _preCompiledEditsEnabled = false;
+    }
+
+    public boolean isPreCompiledEditsEnabled() {
+        return _preCompiledEditsEnabled;
     }
 }

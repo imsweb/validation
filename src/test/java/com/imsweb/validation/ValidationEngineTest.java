@@ -354,7 +354,9 @@ public class ValidationEngineTest {
         });
         Assert.assertFalse(noRuntimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine noRuntimeEngine = new ValidationEngine();
-        stats = noRuntimeEngine.initialize(noRuntimeValidator);
+        InitializationOptions options = new InitializationOptions();
+        options.disablePreCompiledEdits();
+        stats = noRuntimeEngine.initialize(options, noRuntimeValidator);
         Assert.assertEquals(1, stats.getNumEditsLoaded());
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
         Assert.assertEquals(1, stats.getNumEditsCompiled());
