@@ -90,6 +90,8 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_INLIST("101   ", "100-150,225-229", "\\d\\d\\d"));
         Assert.assertFalse(_functions.GEN_INLIST("    101", "100-150,225-229", "\\d\\d\\d"));
         Assert.assertFalse(_functions.GEN_INLIST("    101    ", "100-150,225-229", "\\d\\d\\d"));
+        Assert.assertTrue(_functions.GEN_INLIST("4   ", "0-4", "\\d\\s\\s\\s"));
+        Assert.assertTrue(_functions.GEN_INLIST("3S  ", "1E,1S,2E,2S,3E,3S,4E,4S", "([A-Za-z0-9][A-Za-z0-9]\\s\\s)"));
 
         Assert.assertTrue(_functions.GEN_INLIST("C515", "C510-C519"));
 

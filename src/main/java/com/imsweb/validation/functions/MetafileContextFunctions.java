@@ -884,8 +884,12 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         for (String term : StringUtils.split(StringUtils.replace(l, " ", ""), ',')) {
             String[] parts = StringUtils.split(term, '-');
 
+            if ((parts.length == 1 && val.equals(term)) || (parts.length == 2 && val.compareTo(parts[0]) >= 0 && val.compareTo(parts[1]) <= 0))
+                return true;
+
             // value "1 " is found in list "1"; my best guess is that the trailing spaces are removed...
-            if ((parts.length == 1 && StringUtils.stripEnd(val, null).equals(term)) || (parts.length == 2 && val.compareTo(parts[0]) >= 0 && val.compareTo(parts[1]) <= 0))
+            val = StringUtils.stripEnd(val, null);
+            if ((parts.length == 1 && val.equals(term)) || (parts.length == 2 && val.compareTo(parts[0]) >= 0 && val.compareTo(parts[1]) <= 0))
                 return true;
         }
 
