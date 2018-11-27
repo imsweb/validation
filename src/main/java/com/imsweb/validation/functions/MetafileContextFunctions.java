@@ -897,7 +897,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     }
 
     public boolean GEN_MATCH(Object value, Object regex) {
-        return matches(value, regex);
+        return matches(GEN_TO_STRING(value), GEN_TO_STRING(regex));
     }
 
     @SuppressWarnings("unchecked")
