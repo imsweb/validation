@@ -862,7 +862,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         if (val == null || val.isEmpty() || l == null || l.isEmpty())
             return false;
 
-        if (regex != null && !GEN_MATCH(value, regex))
+        if (regex != null && !GEN_MATCH(val, regex))
             return false;
 
         // weird corner case
