@@ -322,7 +322,7 @@ public class ValidationEngineTest {
         Assert.assertEquals(1, stats.getNumEditsCompiled());
 
         // load the validator using the standard runtime mechanism
-        Validator runtimeValidator = FakeRuntimeEdits.validator();
+        Validator runtimeValidator = FakeRuntimeEdits.getValidator();
         Assert.assertTrue(runtimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine runtimeEngine = new ValidationEngine();
         stats = runtimeEngine.initialize(runtimeValidator);

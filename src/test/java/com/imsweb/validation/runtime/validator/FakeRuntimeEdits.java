@@ -13,7 +13,7 @@ import com.imsweb.validation.runtime.RuntimeEdits;
 
 public class FakeRuntimeEdits implements RuntimeEdits {
 
-    public static Validator validator() {
+    public static Validator getValidator() {
         try {
             return ValidationXmlUtils.loadValidatorFromXml(getXmlUrl(), new FakeRuntimeEdits());
         }
