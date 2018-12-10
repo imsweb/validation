@@ -67,6 +67,7 @@ checkstyle {
 
 // spotbugs plugin settings
 spotbugs {
+    toolVersion = '3.1.9'
     ignoreFailures = true
     excludeFilter = file('config/spotbugs/spotbugs-exclude.xml')
 }
