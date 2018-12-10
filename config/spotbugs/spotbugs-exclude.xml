@@ -19,6 +19,6 @@
 </Match>
 <Match>
   <Class name="com.imsweb.validation.ValidationXmlUtils"/>
-  <Bug code="RCN"/>/>
+  <Bug code="RCN,NP"/>/>
 </Match>
 </FindBugsFilter>
