@@ -62,14 +62,14 @@ jar {
 // checkstyle plugin settings
 checkstyle {
     ignoreFailures = true
-    configFile = file('config/checkstyle/checkstyle.xml')
+    configFile = project(':').file('config/checkstyle/checkstyle.xml')
+    configProperties = ['suppressionFile' : project(':').file('config/checkstyle/checkstyle-excdlue.xml')]
 }
 
 // spotbugs plugin settings
 spotbugs {
-    toolVersion = '3.1.9'
     ignoreFailures = true
-    excludeFilter = file('config/spotbugs/spotbugs-exclude.xml')
+    excludeFilter =  project(':').file("config/spotbugs/spotbugs-exclude.xml")
 }
 
 // use this task to generate the regex parser
