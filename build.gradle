@@ -63,7 +63,7 @@ jar {
 checkstyle {
     ignoreFailures = true
     configFile = project(':').file('config/checkstyle/checkstyle.xml')
-    configProperties = ['suppressionFile' : project(':').file('config/checkstyle/checkstyle-excdlue.xml')]
+    configProperties = ['suppressionFile' : project(':').file('config/checkstyle/checkstyle-exclude.xml')]
 }
 
 // spotbugs plugin settings
