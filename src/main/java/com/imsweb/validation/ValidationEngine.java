@@ -1838,13 +1838,10 @@ public class ValidationEngine {
 
         // get pre-compiled rules if we have to
         CompiledRules compiledRules = null;
-        if (_options.isPreCompiledEditsEnabled()) {
+        if (_options.isPreCompiledEditsEnabled())
             compiledRules = RuntimeUtils.findCompileRules(validator, stats);
-
-            // also look for the pre-compiled rules on the classpath (old way); that way is deprecated and will be removed soon
-            if (compiledRules == null)
-                compiledRules = RuntimeUtils.findCompileRules(validator.getId(), validator.getVersion(), stats);
-        }
+        else if (stats != null)
+            stats.setReasonNotPreCompiled(validator.getId(), InitializationStats.REASON_DISABLED);
 
         // internalize the rules
         ExecutorService service = Executors.newFixedThreadPool(_options.getNumCompilationThreads());

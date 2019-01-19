@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 2.2**
+
+- Improved initialization feedback for pre-compiled edits.
+- Removed deprecated mechanism to load pre-compiled edits by searching for them on the classpath.
+
 **Version 2.1**
 
 - Increased the engine version to 6.1.

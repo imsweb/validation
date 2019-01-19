@@ -99,7 +99,6 @@ import com.imsweb.validation.runtime.ParsedContexts;
 import com.imsweb.validation.runtime.ParsedLookups;
 import com.imsweb.validation.runtime.ParsedProperties;
 import com.imsweb.validation.runtime.RuntimeEdits;
-import com.imsweb.validation.runtime.RuntimeUtils;
 
 import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_GROOVY;
 import static com.imsweb.validation.ValidationEngine.CONTEXT_TYPE_JAVA;
@@ -669,18 +668,13 @@ public final class ValidationXmlUtils {
                     versions.put(release.getVersion().getRawString(), release.getVersion());
 
             // get pre-parsed information
-            ParsedProperties props;
-            ParsedContexts contexts;
-            ParsedLookups lookups;
+            ParsedProperties props = null;
+            ParsedContexts contexts = null;
+            ParsedLookups lookups = null;
             if (runtime != null) {
                 props = runtime.getParsedProperties();
                 contexts = runtime.getParsedContexts();
                 lookups = runtime.getParsedLookups();
-            }
-            else { // also look on the classpath (old way); this way is deprecated and will be removed soon
-                props = RuntimeUtils.findParsedProperties(validator.getId());
-                contexts = RuntimeUtils.findParsedContexts(validator.getId());
-                lookups = RuntimeUtils.findParsedLookups(validator.getId());
             }
 
             // go through each rule (we multi-thread this part since it can be a bit slow

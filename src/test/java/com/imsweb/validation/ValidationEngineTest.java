@@ -29,10 +29,6 @@ import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.internal.ValidatingContext;
-import com.imsweb.validation.runtime.CompiledRules;
-import com.imsweb.validation.runtime.ParsedContexts;
-import com.imsweb.validation.runtime.ParsedLookups;
-import com.imsweb.validation.runtime.ParsedProperties;
 import com.imsweb.validation.runtime.validator.FakeRuntimeEdits;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -320,8 +316,15 @@ public class ValidationEngineTest {
         Assert.assertEquals(1, stats.getNumEditsLoaded());
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
         Assert.assertEquals(1, stats.getNumEditsCompiled());
+        Assert.assertEquals(1, stats.getValidatorStats().size());
+        InitializationStatsPerValidator valStats = stats.getValidatorStats().get(0);
+        Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
+        Assert.assertEquals(1, valStats.getNumEditsLoaded());
+        Assert.assertEquals(0, valStats.getNumEditsPreCompiled());
+        Assert.assertEquals(1, valStats.getNumEditsCompiled());
+        Assert.assertEquals(InitializationStats.REASON_NOT_PROVIDED, valStats.getReasonNotPreCompiled());
 
-        // load the validator using the standard runtime mechanism
+        // load the validator using the runtime mechanism
         Validator runtimeValidator = FakeRuntimeEdits.getValidator();
         Assert.assertTrue(runtimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine runtimeEngine = new ValidationEngine();
@@ -329,37 +332,21 @@ public class ValidationEngineTest {
         Assert.assertEquals(1, stats.getNumEditsLoaded());
         Assert.assertEquals(1, stats.getNumEditsPreCompiled());
         Assert.assertEquals(0, stats.getNumEditsCompiled());
+        valStats = stats.getValidatorStats().get(0);
+        Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
+        Assert.assertEquals(1, valStats.getNumEditsLoaded());
+        Assert.assertEquals(1, valStats.getNumEditsPreCompiled());
+        Assert.assertEquals(0, valStats.getNumEditsCompiled());
+        Assert.assertNull(valStats.getReasonNotPreCompiled());
 
-        // load the validator using the runtime mechanism but forcing the mechanism to be disabled
-        Validator noRuntimeValidator = ValidationXmlUtils.loadValidatorFromXml(FakeRuntimeEdits.getXmlUrl(), new FakeRuntimeEdits() {
-            @Override
-            public CompiledRules getCompiledRules() {
-                return null;
-            }
-
-            @Override
-            public ParsedProperties getParsedProperties() {
-                return null;
-            }
-
-            @Override
-            public ParsedContexts getParsedContexts() {
-                return null;
-            }
-
-            @Override
-            public ParsedLookups getParsedLookups() {
-                return null;
-            }
-        });
-        Assert.assertFalse(noRuntimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
-        ValidationEngine noRuntimeEngine = new ValidationEngine();
+        // force the runtime to be disabled
         InitializationOptions options = new InitializationOptions();
         options.disablePreCompiledEdits();
-        stats = noRuntimeEngine.initialize(options, noRuntimeValidator);
+        stats = new ValidationEngine().initialize(options, runtimeValidator);
         Assert.assertEquals(1, stats.getNumEditsLoaded());
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
         Assert.assertEquals(1, stats.getNumEditsCompiled());
+        Assert.assertEquals(InitializationStats.REASON_DISABLED, stats.getValidatorStats().get(0).getReasonNotPreCompiled());
 
         // the global cached engine should not now about these validators
         Assert.assertNull(ValidationEngine.getInstance().getValidator("fake-validator-runtime"));

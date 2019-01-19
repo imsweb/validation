@@ -3,21 +3,18 @@
  */
 package com.imsweb.validation;
 
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class InitializationStats {
 
     public static final String REASON_NOT_PROVIDED = "pre-compiled edits not provided";
-    public static final String REASON_DIFFERENT_VERSION = "pre-compiled validator has version {1} but application expected {2}";
-
-    // following reasons are deprecated and will be removed in a future version
-    public static final String REASON_CLASS_NOT_FOUND = "pre-compiled class '{0}' not found";
-    public static final String REASON_CLASS_INSTANCIATION_ERROR = "unable to create instance of pre-compiled class '{0}'";
-    public static final String REASON_CLASS_ACCESS_ERROR = "pre-compiled class '{0}' can't be accessed";
-    public static final String REASON_CLASS_CAST_ERROR = "pre-compiled class '{0}' was not of type 'CompiledRules'";
-    public static final String REASON_CONSTRUCTOR_NOT_FOUND = "pre-compiled class '{0}' doesn't define a default constructor";
+    public static final String REASON_DIFFERENT_VERSION = "pre-compiled validator has version {0} but application expected {1}";
+    public static final String REASON_DISABLED = "pre-compiled edits are disabled";
 
     private long _initializationDuration;
 
@@ -27,14 +24,14 @@ public class InitializationStats {
 
     private AtomicInteger _numEditsPreCompiled;
 
-    private Map<String, String> _reasonNotPreCompiled;
+    private Map<String, InitializationStatsPerValidator> _validatorStats;
 
     public InitializationStats() {
         _initializationDuration = 0L;
         _numEditsLoaded = new AtomicInteger();
         _numEditsCompiled = new AtomicInteger();
         _numEditsPreCompiled = new AtomicInteger();
-        _reasonNotPreCompiled = new HashMap<>();
+        _validatorStats = new ConcurrentHashMap<>();
     }
 
     public long getInitializationDuration() {
@@ -49,31 +46,34 @@ public class InitializationStats {
         return _numEditsLoaded.get();
     }
 
-    public void incrementNumEditsLoaded() {
+    public void incrementNumEditsLoaded(String validatorId) {
         _numEditsLoaded.getAndIncrement();
+        _validatorStats.computeIfAbsent(validatorId, InitializationStatsPerValidator::new).incrementNumEditsLoaded();
     }
 
     public int getNumEditsCompiled() {
         return _numEditsCompiled.get();
     }
 
-    public void incrementNumEditsCompiled() {
+    public void incrementNumEditsCompiled(String validatorId) {
         _numEditsCompiled.getAndIncrement();
+        _validatorStats.computeIfAbsent(validatorId, InitializationStatsPerValidator::new).incrementNumEditsCompiled();
     }
 
     public int getNumEditsPreCompiled() {
         return _numEditsPreCompiled.get();
     }
 
-    public void incrementNumEditsFoundOnClassPath() {
+    public void incrementNumEditsPreCompiled(String validatorId) {
         _numEditsPreCompiled.getAndIncrement();
-    }
-
-    public Map<String, String> getReasonNotPreCompiled() {
-        return _reasonNotPreCompiled;
+        _validatorStats.computeIfAbsent(validatorId, InitializationStatsPerValidator::new).incrementNumEditsPreCompiled();
     }
 
     public void setReasonNotPreCompiled(String validatorId, String reason) {
-        _reasonNotPreCompiled.put(validatorId, reason);
+        _validatorStats.computeIfAbsent(validatorId, InitializationStatsPerValidator::new).setReasonNotPreCompiled(reason);
+    }
+
+    public List<InitializationStatsPerValidator> getValidatorStats() {
+        return _validatorStats.values().stream().sorted(Comparator.comparing(InitializationStatsPerValidator::getValidatorId)).collect(Collectors.toList());
     }
 }
