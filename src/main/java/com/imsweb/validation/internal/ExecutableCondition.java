@@ -6,7 +6,6 @@ package com.imsweb.validation.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.imsweb.validation.ValidationServices;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
@@ -14,6 +13,7 @@ import groovy.lang.Script;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.entities.Condition;
 import com.imsweb.validation.entities.Validatable;
 
@@ -39,11 +39,6 @@ public class ExecutableCondition {
     private Long _internalId;
 
     /**
-     * Validator internal ID
-     */
-    private Long _internalValidatorId;
-
-    /**
      * Java-path for this rule
      */
     private String _javaPath;
@@ -63,13 +58,11 @@ public class ExecutableCondition {
      * <p/>
      * Created on Jun 28, 2011 by depryf
      * @param condition the <code>Condition</code> on which this executable ruleset is based one
-     * @throws ConstructionException
      */
     public ExecutableCondition(Condition condition) throws ConstructionException {
         _condition = condition;
         _id = condition.getId();
         _internalId = condition.getConditionId();
-        _internalValidatorId = condition.getValidator() != null ? condition.getValidator().getValidatorId() : null;
         _javaPath = condition.getJavaPath();
 
         _contextKeys = new HashSet<>();
@@ -91,13 +84,11 @@ public class ExecutableCondition {
      * <p/>
      * Created on Oct 7, 2011 by depryf
      * @param condition the <code>ExecutableCondition</code> on which this executable ruleset is based one
-     * @throws ConstructionException
      */
-    public ExecutableCondition(ExecutableCondition condition) throws ConstructionException {
+    public ExecutableCondition(ExecutableCondition condition) {
         _condition = condition._condition;
         _id = condition._id;
         _internalId = condition._internalId;
-        _internalValidatorId = condition._internalValidatorId;
         _javaPath = condition._javaPath;
         _contextKeys = condition._contextKeys;
 
@@ -141,20 +132,6 @@ public class ExecutableCondition {
     }
 
     /**
-     * @return Returns the internalValidatorId.
-     */
-    public Long getInternalValidatorId() {
-        return _internalValidatorId;
-    }
-
-    /**
-     * @param internalValidatorId The internalValidatorId to set.
-     */
-    public void setInternalValidatorId(Long internalValidatorId) {
-        this._internalValidatorId = internalValidatorId;
-    }
-
-    /**
      * Getter for the java path.
      * <p/>
      * Created on Jun 29, 2011 by depryf
@@ -170,6 +147,7 @@ public class ExecutableCondition {
      * Created on Jun 29, 2011 by depryf
      * @return rule IDs
      */
+    @SuppressWarnings("unused")
     public Set<String> getContextKeys() {
         return _contextKeys;
     }
@@ -189,7 +167,6 @@ public class ExecutableCondition {
      * <p/>
      * Created on Jun 30, 2011 by depryf
      * @param expression expression
-     * @throws ConstructionException
      */
     public void setExpression(String expression) throws ConstructionException {
         synchronized (this) {
@@ -225,7 +202,6 @@ public class ExecutableCondition {
      * @param validatable <code>Validatable</code>
      * @param binding the Groovy binding to use
      * @return true if the condition passes, false otherwise
-     * @throws ValidationException
      */
     public boolean check(Validatable validatable, Binding binding) throws ValidationException {
         return checkForGroovy(validatable, binding);
@@ -240,7 +216,6 @@ public class ExecutableCondition {
      * @param validatable <code>Validatable</code>
      * @param binding the Groovy binding to use
      * @return evaluation result
-     * @throws ValidationException
      */
     private synchronized boolean checkForGroovy(Validatable validatable, Binding binding) throws ValidationException {
         if (_script == null)

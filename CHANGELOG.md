@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.3**
+
+- Fixed a bug in execution of pre-compiled edits on complex data structures.
+
 **Version 2.2**
 
 - Improved initialization feedback for pre-compiled edits.

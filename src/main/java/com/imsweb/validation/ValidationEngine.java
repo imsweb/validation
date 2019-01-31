@@ -1094,7 +1094,6 @@ public class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param editableRule <code>EditableRule</code>, cannot be null
-     * @throws ConstructionException
      */
     public void deleteRule(EditableRule editableRule) throws ConstructionException {
         _lock.writeLock().lock();
@@ -1265,7 +1264,6 @@ public class ValidationEngine {
             // create the executable condition
             ExecutableCondition execCondition = new ExecutableCondition(originalExecCondition);
             execCondition.setId(editableCondition.getId());
-            execCondition.setInternalValidatorId(_validators.get(editableCondition.getValidatorId()).getValidatorId());
             execCondition.setJavaPath(editableCondition.getJavaPath());
             if ((condition.getExpression() == null && editableCondition.getExpression() != null) || (condition.getExpression() != null && !condition.getExpression().equals(
                     editableCondition.getExpression())))
@@ -1327,7 +1325,6 @@ public class ValidationEngine {
      * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param editableCondition <code>EditableCondition</code>, cannot be null
-     * @throws ConstructionException
      */
     public void deleteCondition(EditableCondition editableCondition) throws ConstructionException {
         _lock.writeLock().lock();

@@ -42,11 +42,6 @@ public class ExecutableRule {
     private Long _internalId;
 
     /**
-     * Validator internal ID
-     */
-    private Long _internalValidatorId;
-
-    /**
      * ID
      */
     private String _id;
@@ -134,7 +129,6 @@ public class ExecutableRule {
     public ExecutableRule(Rule rule, CompiledRules compiledRules, InitializationStats stats) throws ConstructionException {
         _rule = rule;
         _internalId = rule.getRuleId();
-        _internalValidatorId = rule.getValidator() != null ? rule.getValidator().getValidatorId() : null;
         _javaPath = rule.getJavaPath();
         _conditions = rule.getConditions();
         _useAndForConditions = rule.getUseAndForConditions();
@@ -184,7 +178,6 @@ public class ExecutableRule {
     public ExecutableRule(ExecutableRule execRule) {
         _rule = execRule._rule;
         _internalId = execRule._internalId;
-        _internalValidatorId = execRule._internalValidatorId;
         _javaPath = execRule._javaPath;
         _conditions = execRule._conditions;
         _useAndForConditions = execRule._useAndForConditions;
@@ -207,27 +200,6 @@ public class ExecutableRule {
      */
     public Long getInternalId() {
         return _internalId;
-    }
-
-    /**
-     * @param internalId The internalId to set.
-     */
-    public void setInternalId(Long internalId) {
-        this._internalId = internalId;
-    }
-
-    /**
-     * @return Returns the internalValidatorId.
-     */
-    public Long getInternalValidatorId() {
-        return _internalValidatorId;
-    }
-
-    /**
-     * @param internalValidatorId The internalValidatorId to set.
-     */
-    public void setInternalValidatorId(Long internalValidatorId) {
-        this._internalValidatorId = internalValidatorId;
     }
 
     /**
@@ -493,8 +465,13 @@ public class ExecutableRule {
             params.add(binding);
             params.add(binding.getVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY));
             params.add(binding.getVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY));
-            for (String javaPathPart : StringUtils.split(_rule.getJavaPath(), '.'))
-                params.add(binding.getVariable(javaPathPart));
+            StringBuilder buf = new StringBuilder();
+            for (String javaPathPart : StringUtils.split(_rule.getJavaPath(), '.')) {
+                if (buf.length() > 0)
+                    buf.append(".");
+                buf.append(javaPathPart);
+                params.add(binding.getVariable(ValidationServices.getInstance().getAliasForJavaPath(buf.toString())));
+            }
 
             try {
                 success = (Boolean)_compiledRule.invoke(_compiledRules, params.toArray(new Object[0]));
