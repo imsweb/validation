@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -119,7 +117,14 @@ public class ValidatingProcessor implements Processor {
                 binding = buildBinding(validatable);
 
             // pre-split the java-path since the split results is going to be used a lot
-            String[] validatablePaths = StringUtils.split(validatable.getCurrentLevel(), '.');
+            List<String> validatablePaths = new ArrayList<>();
+            StringBuilder buf = new StringBuilder();
+            for (String validatablePath : StringUtils.split(validatable.getCurrentLevel(), '.')) {
+                if (buf.length() > 0)
+                    buf.append(".");
+                buf.append(validatablePath);
+                validatablePaths.add(buf.toString());
+            }
 
             // we are going to keep track of the failures in this collection (also made available on the execution context)
             Set<String> currentRuleFailures = new HashSet<>();
@@ -175,7 +180,6 @@ public class ValidatingProcessor implements Processor {
                     }
                 }
 
-                Future<Boolean> future = null;
                 try {
                     long startTime = System.currentTimeMillis();
                     boolean success = rule.validate(validatable, binding);
@@ -222,8 +226,6 @@ public class ValidatingProcessor implements Processor {
                 }
                 finally {
                     validatable.clearPropertiesWithError();
-                    if (future != null)
-                        future.cancel(true);
                 }
             }
         }
@@ -344,33 +346,5 @@ public class ValidatingProcessor implements Processor {
     @Override
     public String toString() {
         return _currentJavaPath + " [" + (_rules == null ? "?" : _rules.size()) + " rule(s)]";
-    }
-
-    /**
-     * Simple class to wrap an edit/condition execution into a thread so it can be timed out.
-     */
-    private static class ExecutorCallable implements Callable<Boolean> {
-
-        private ExecutableRule _rule;
-        private ExecutableCondition _condition;
-        private Validatable _validatable;
-        private Binding _binding;
-
-        public ExecutorCallable(ExecutableRule rule, Validatable validatable, Binding binding) {
-            _rule = rule;
-            _validatable = validatable;
-            _binding = binding;
-        }
-
-        public ExecutorCallable(ExecutableCondition condition, Validatable validatable, Binding binding) {
-            _condition = condition;
-            _validatable = validatable;
-            _binding = binding;
-        }
-
-        @Override
-        public Boolean call() throws Exception {
-            return _rule != null ? _rule.validate(_validatable, _binding) : _condition.check(_validatable, _binding);
-        }
     }
 }

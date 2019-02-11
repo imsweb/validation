@@ -6,6 +6,7 @@ package com.imsweb.validation.internal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,17 +99,13 @@ public class ValidatingContext {
      * The default behavior of this method is to check the failed conditions for the current validatable level, and any of it's parent (so no cross-paths in the validatable tree).
      * <br/><br/>
      * Implementation: this method uses the _failedConditionsIds property to determine its result.
-     * @param validatablePaths the currently processed validatable path, already split for convenince
+     * @param validatablePaths the currently processed validatable path, already split for convenience
      * @param conditionId the condition ID to check
      * @return true if the condition has failed, false otherwise
      */
-    public boolean conditionFailed(String[] validatablePaths, String conditionId) {
-        StringBuilder buf = new StringBuilder();
+    public boolean conditionFailed(List<String> validatablePaths, String conditionId) {
         for (String validatablePath : validatablePaths) {
-            if (buf.length() > 0)
-                buf.append(".");
-            buf.append(validatablePath);
-            Set<String> failedIds = _failedConditionIds.get(buf.toString());
+            Set<String> failedIds = _failedConditionIds.get(validatablePath);
             if (failedIds != null && failedIds.contains(conditionId))
                 return true;
         }
@@ -121,17 +118,13 @@ public class ValidatingContext {
      * The default behavior of this method is to check the failed rules for the current validatable level, and any of it's parent (so no cross-paths in the validatable tree).
      * <br/><br/>
      * Implementation: this method uses the _failedRuleIds property to determine its result.
-     * @param validatablePaths the currently processed validatable path, already split for convenince
+     * @param validatablePaths the currently processed validatable path, already split for convenience
      * @param dependencies the rule IDs to check
      * @return true if the at least one "depends-on" rule has failed, false otherwise
      */
-    public boolean atLeastOneDependencyFailed(String[] validatablePaths, Set<String> dependencies) {
-        StringBuilder buf = new StringBuilder();
+    public boolean atLeastOneDependencyFailed(List<String> validatablePaths, Set<String> dependencies) {
         for (String validatablePath : validatablePaths) {
-            if (buf.length() > 0)
-                buf.append(".");
-            buf.append(validatablePath);
-            Set<String> failedIds = _failedRuleIds.get(buf.toString());
+            Set<String> failedIds = _failedRuleIds.get(validatablePath);
             if (failedIds != null && !Collections.disjoint(failedIds, dependencies))
                 return true;
         }

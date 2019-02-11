@@ -420,17 +420,13 @@ public class ValidationEngineTest {
         // now let's use a special context that implements the cross-root checking; the rule shouldn't fail anymore because of the condition
         ValidatingContext specialContext = new ValidatingContext() {
             @Override
-            public boolean conditionFailed(String[] validatablePaths, String conditionId) {
-                StringBuilder buf = new StringBuilder();
+            public boolean conditionFailed(List<String> validatablePaths, String conditionId) {
                 for (String validatablePath : validatablePaths) {
-                    if (buf.length() > 0)
-                        buf.append(".");
-                    buf.append(validatablePath);
-                    Set<String> failedIds = _failedConditionIds.get(buf.toString());
+                    Set<String> failedIds = _failedConditionIds.get(validatablePath);
                     if (failedIds != null && failedIds.contains(conditionId))
                         return true;
                     // conceptually, we map "root" to "level1"; this could be done in a more generic way than this...
-                    if ("root".equals(buf.toString())) {
+                    if ("root".equals(validatablePath)) {
                         failedIds = _failedConditionIds.get("level1");
                         if (failedIds != null && failedIds.contains(conditionId))
                             return true;
