@@ -33,15 +33,6 @@ public class ValidationServicesTest {
      * Created on Aug 27, 2010 by depryf
      */
     @Test
-    public void testIsInitialized() {
-        ValidationServices.getInstance();
-        Assert.assertTrue(ValidationServices.isInitialized());
-    }
-
-    /**
-     * Created on Aug 27, 2010 by depryf
-     */
-    @Test
     public void testGetAliasForJavaPath() {
         Assert.assertNull(ValidationServices.getInstance().getAliasForJavaPath(null));
         Assert.assertNull(ValidationServices.getInstance().getAliasForJavaPath("something"));

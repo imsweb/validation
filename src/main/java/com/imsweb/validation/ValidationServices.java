@@ -90,7 +90,7 @@ public class ValidationServices {
     /**
      * Private instance of a <code>ValidationServices</code>
      */
-    private static ValidationServices _INSTANCE;
+    private static ValidationServices _INSTANCE = new ValidationServices();
 
     /**
      * Pattern for property values replacement
@@ -134,25 +134,12 @@ public class ValidationServices {
     }
 
     /**
-     * Returns true if this class has already been initialized, false otherwise.
-     * <p/>
-     * Created on Mar 6, 2008 by depryf
-     * @return true if this class has already been initialized, false otherwise
-     */
-    public static boolean isInitialized() {
-        return _INSTANCE != null;
-    }
-
-    /**
      * Gets current instance of the <code>ValidationServices</code>
      * <p/>
      * Created on Feb 11, 2008 by depryf
      * @return a <code>ValidationServices</code>
      */
     public static ValidationServices getInstance() {
-        if (_INSTANCE == null)
-            _INSTANCE = new ValidationServices();
-
         return _INSTANCE;
     }
 

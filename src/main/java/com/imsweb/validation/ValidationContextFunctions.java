@@ -46,7 +46,7 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 public class ValidationContextFunctions {
 
     // unique private instance
-    private static ValidationContextFunctions _INSTANCE;
+    private static ValidationContextFunctions _INSTANCE = new ValidationContextFunctions();
 
     /**
      * Initializes this class with the passed instance.
@@ -62,25 +62,12 @@ public class ValidationContextFunctions {
     }
 
     /**
-     * Returns true if this class has already been initialized, false otherwise.
-     * <p/>
-     * Created on Mar 6, 2008 by depryf
-     * @return true if this class has already been initialized, false otherwise
-     */
-    public static boolean isInitialized() {
-        return _INSTANCE != null;
-    }
-
-    /**
      * Gets current instance of the <code>ValidationContextFunctions</code>
      * <p/>
      * Created on Feb 11, 2008 by depryf
      * @return a <code>ValidationContextFunctions</code>
      */
     public static ValidationContextFunctions getInstance() {
-        if (_INSTANCE == null)
-            _INSTANCE = new ValidationContextFunctions();
-
         return _INSTANCE;
     }
 

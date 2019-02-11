@@ -30,16 +30,11 @@ public final class TestingUtils {
         if (!TMP_DIR.exists() && !TMP_DIR.mkdirs())
             throw new RuntimeException("Unable to create tmp folder '" + TMP_DIR.getPath() + "'");
 
-        // initialize services
-        if (!ValidationServices.isInitialized())
-            ValidationServices.initialize(new TestingValidationServices());
-
-        // initialize context functions
-        if (!ValidationContextFunctions.isInitialized())
-            ValidationContextFunctions.initialize(new TestingValidationContextFunctions());
-
         // initialize engine
         if (!ValidationEngine.getInstance().isInitialized()) {
+            ValidationServices.initialize(new TestingValidationServices());
+            ValidationContextFunctions.initialize(new TestingValidationContextFunctions());
+
             InitializationOptions options = new InitializationOptions();
             options.enableEngineStats();
             ValidationEngine.getInstance().initialize(options);
@@ -55,7 +50,8 @@ public final class TestingUtils {
 
         if (v == null) {
             try {
-                v = ValidationEngine.getInstance().addValidator(new EditableValidator(ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
+                v = ValidationEngine.getInstance().addValidator(
+                        new EditableValidator(ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
             }
             catch (Exception e) {
                 throw new RuntimeException("Unable to load '" + id + "'", e);
@@ -74,6 +70,7 @@ public final class TestingUtils {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static String readResource(String path) {
         try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOUtils.copy(is, os);
@@ -143,10 +140,10 @@ public final class TestingUtils {
     }
 
     public static void assertLogMessage(String x) {
-        Assert.assertTrue(((TestingValidationServices) ValidationServices.getInstance()).getLogMessages().contains(x));
+        Assert.assertTrue(((TestingValidationServices)ValidationServices.getInstance()).getLogMessages().contains(x));
     }
 
-    private static class TestingValidationContextFunctions extends ValidationContextFunctions {
+    public static class TestingValidationContextFunctions extends ValidationContextFunctions {
 
         @SuppressWarnings("unused")
         @ContextFunctionAliasAnnotation(value = "ctc")
@@ -161,7 +158,7 @@ public final class TestingUtils {
         }
     }
 
-    private static class TestingValidationServices extends ValidationServices {
+    public static class TestingValidationServices extends ValidationServices {
 
         /**
          * Map of java-path -> alias to use in the edits
