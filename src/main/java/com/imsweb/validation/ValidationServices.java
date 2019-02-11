@@ -149,7 +149,7 @@ public class ValidationServices {
      * Created on Feb 11, 2008 by depryf
      * @return a <code>ValidationServices</code>
      */
-    public static synchronized ValidationServices getInstance() {
+    public static ValidationServices getInstance() {
         if (_INSTANCE == null)
             _INSTANCE = new ValidationServices();
 
@@ -563,18 +563,14 @@ public class ValidationServices {
                 String value;
                 if (replacement != null && "formatDate()".equals(suffix)) {
                     value = replacement.toString().trim();
-
-                    // check if we need to format a date...
-                    if ("formatDate()".equals(suffix)) {
-                        if (value.length() == 8)
-                            value = "Y:" + value.substring(0, 4) + " M:" + value.substring(4, 6) + " D:" + value.substring(6);
-                        else if (value.length() == 6)
-                            value = "Y:" + value.substring(0, 4) + " M:" + value.substring(4, 6) + " D:";
-                        else if (value.length() == 4)
-                            value = "Y:" + value + " M:   D:";
-                        else
-                            value = "Y:     M:   D:";
-                    }
+                    if (value.length() == 8)
+                        value = "Y:" + value.substring(0, 4) + " M:" + value.substring(4, 6) + " D:" + value.substring(6);
+                    else if (value.length() == 6)
+                        value = "Y:" + value.substring(0, 4) + " M:" + value.substring(4, 6) + " D:";
+                    else if (value.length() == 4)
+                        value = "Y:" + value + " M:   D:";
+                    else
+                        value = "Y:     M:   D:";
                 }
                 else if (error)
                     value = "<ERROR>";

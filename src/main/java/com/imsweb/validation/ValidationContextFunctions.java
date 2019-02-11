@@ -3,20 +3,24 @@
  */
 package com.imsweb.validation;
 
-import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
-import com.imsweb.validation.internal.ValidationLRUCache;
-import groovy.lang.Binding;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import groovy.lang.Binding;
+
+import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 
 /**
  * Helper methods made available to the edits.
@@ -53,7 +57,7 @@ public class ValidationContextFunctions {
      * Created on Feb 11, 2008 by depryf
      * @param instance a <code>ValidationContextFunctions</code> instance
      */
-    public static synchronized void initialize(ValidationContextFunctions instance) {
+    public static void initialize(ValidationContextFunctions instance) {
         _INSTANCE = instance;
     }
 
@@ -63,7 +67,7 @@ public class ValidationContextFunctions {
      * Created on Mar 6, 2008 by depryf
      * @return true if this class has already been initialized, false otherwise
      */
-    public static synchronized boolean isInitialized() {
+    public static boolean isInitialized() {
         return _INSTANCE != null;
     }
 
@@ -73,7 +77,7 @@ public class ValidationContextFunctions {
      * Created on Feb 11, 2008 by depryf
      * @return a <code>ValidationContextFunctions</code>
      */
-    public static synchronized ValidationContextFunctions getInstance() {
+    public static ValidationContextFunctions getInstance() {
         if (_INSTANCE == null)
             _INSTANCE = new ValidationContextFunctions();
 
@@ -86,7 +90,7 @@ public class ValidationContextFunctions {
      * Created on Mar 3, 2010 by depryf
      * @return a list of <code>ValidatorContextFunctionDto</code>
      */
-    public static synchronized List<ContextFunctionDocDto> getMethodsDocumentation() {
+    public static List<ContextFunctionDocDto> getMethodsDocumentation() {
         if (_INSTANCE == null)
             throw new RuntimeException("Validation Context Functions have not been initialized!");
 
@@ -146,14 +150,14 @@ public class ValidationContextFunctions {
         return dtos;
     }
 
-    // lock for the cache
-    private final Object _regexCacheLock = new Object();
-
     // cached regular expressions
-    private ValidationLRUCache<String, Pattern> _regexCache;
+    private Map<String, Pattern> _regexCache;
+
+    // maximum size of the regex cache (-1 for no limit)
+    private int _regexCacheSize;
 
     // stats for the cached regular expressions
-    private long _numRegexCacheHit = 0, _numRegexCacheMiss = 0;
+    private AtomicLong _numRegexCacheHit, _numRegexCacheMiss;
 
     /**
      * Forces the given entity (corresponding to the given collection name) to report the given properties when the edit fails.
@@ -453,15 +457,25 @@ public class ValidationContextFunctions {
     /**
      * No documentation on purpose, shouldn't be called from edits!
      * <br/><br/>
-     * Enables the regex caching
-     * @param cacheSize regex cache size
+     * Enables the regex caching with unlimited cache size.
+     */
+    public void enableRegexCaching() {
+        enableRegexCaching(Integer.MAX_VALUE);
+    }
+
+    /**
+     * No documentation on purpose, shouldn't be called from edits!
+     * <br/><br/>
+     * Enables the regex caching with a maximum cache size. It is recommended to you this method only if using an unlimited cache size creates real memory issues.
+     * @param cacheSize regex cache size, must be greater than 0.
      */
     public void enableRegexCaching(int cacheSize) {
-        if (cacheSize < 1 || cacheSize > 10000)
-            throw new RuntimeException("Cache size must be between 1 and 10,000");
-        _regexCache = new ValidationLRUCache<>(cacheSize);
-        _numRegexCacheHit = 0;
-        _numRegexCacheMiss = 0;
+        if (cacheSize < 0)
+            throw new RuntimeException("Cache size must be greater than 0!");
+        _regexCache = new ConcurrentHashMap<>();
+        _regexCacheSize = cacheSize;
+        _numRegexCacheHit = new AtomicLong();
+        _numRegexCacheMiss = new AtomicLong();
     }
 
     /**
@@ -471,8 +485,9 @@ public class ValidationContextFunctions {
      */
     public void disableRegexCaching() {
         _regexCache = null;
-        _numRegexCacheHit = 0;
-        _numRegexCacheMiss = 0;
+        _regexCacheSize = Integer.MAX_VALUE;
+        _numRegexCacheHit = null;
+        _numRegexCacheMiss = null;
     }
 
     /**
@@ -484,24 +499,25 @@ public class ValidationContextFunctions {
     public boolean matches(Object value, Object regex) {
         if (value == null || regex == null)
             return false;
+
         String val = value instanceof String ? (String)value : value.toString();
         String reg = regex instanceof String ? (String)regex : regex.toString();
 
         Pattern pattern;
-        synchronized (_regexCacheLock) {
-            if (_regexCache == null)
+        if (_regexCache != null) {
+            pattern = _regexCache.get(reg);
+            if (pattern == null) {
+                _numRegexCacheMiss.incrementAndGet();
                 pattern = Pattern.compile(reg);
-            else {
-                pattern = _regexCache.get(reg);
-                if (pattern == null) {
-                    pattern = Pattern.compile(reg);
+                // in a multi-threaded environment, it's possible that the cache will add a few more values than the max cache size, and that's OK
+                if (_regexCache.size() < _regexCacheSize)
                     _regexCache.put(reg, pattern);
-                    _numRegexCacheMiss++;
-                }
-                else
-                    _numRegexCacheHit++;
             }
+            else
+                _numRegexCacheHit.incrementAndGet();
         }
+        else
+            pattern = Pattern.compile(reg);
 
         return pattern.matcher(val).matches();
     }
@@ -510,18 +526,14 @@ public class ValidationContextFunctions {
      * Returns the number of hits in the regex cache.
      */
     public long getNumRegexCacheHit() {
-        synchronized (_regexCacheLock) {
-            return _numRegexCacheHit;
-        }
+        return _numRegexCacheHit == null ? 0L : _numRegexCacheHit.get();
     }
 
     /**
      * Returns the number of misses in the regex cache.
      */
     public long getNumRegexCacheMiss() {
-        synchronized (_regexCacheLock) {
-            return _numRegexCacheMiss;
-        }
+        return _numRegexCacheMiss == null ? 0L : _numRegexCacheMiss.get();
     }
 }
 

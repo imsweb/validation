@@ -3,16 +3,18 @@
  */
 package com.imsweb.validation;
 
-import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
-import groovy.lang.Binding;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import groovy.lang.Binding;
+
+import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 
 public class ValidationContextFunctionsTest {
 
@@ -38,7 +40,7 @@ public class ValidationContextFunctionsTest {
     }
 
     @Test
-    @SuppressWarnings({"unchecked", "AssertEqualsBetweenInconvertibleTypes"})
+    @SuppressWarnings({"unchecked"})
     public void testForceFailureOnEntity() {
         Binding binding = new Binding();
         binding.setVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY, null);
@@ -295,7 +297,7 @@ public class ValidationContextFunctionsTest {
         Assert.assertTrue(_functions.matches("A", "[A-Z]"));
 
         try {
-            _functions.enableRegexCaching(10);
+            _functions.enableRegexCaching();
             Assert.assertFalse(_functions.matches("A", null));
             Assert.assertFalse(_functions.matches(null, "[A-Z]"));
             Assert.assertFalse(_functions.matches("", "[A-Z]"));
