@@ -700,7 +700,7 @@ public class MetafileContextFunctionsTest {
         _functions.GEN_ALLOW_FUTURE_DATE_IOP(binding, 21);
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20120202"));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20130202"));
-        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20400202"));
+        //Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20400202")); // this test will fail in future years, not a good test!
     }
 
     @Test

@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.4**
+
+- Remove extra synchronization that slowed down executing edits in a heavily threaded environment.
+
 **Version 2.3**
 
 - Fixed a bug in execution of pre-compiled edits on complex data structures.

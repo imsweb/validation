@@ -6,6 +6,7 @@ package com.imsweb.validation.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,82 +32,53 @@ import com.imsweb.validation.runtime.RuntimeUtils;
  */
 public class ExecutableRule {
 
-    /**
-     * Corresponding rule
-     */
+    // corresponding rule
     private Rule _rule;
 
-    /**
-     * Internal ID
-     */
+    // internal ID
     private Long _internalId;
 
-    /**
-     * ID
-     */
+    // ID
     private String _id;
 
-    /**
-     * Condition IDs.
-     */
+    // condition IDs
     private Set<String> _conditions;
 
-    /**
-     * Operator (AND or OR) to use for the set of conditions.
-     */
+    // operator (AND or OR) to use for the set of conditions.
     private Boolean _useAndForConditions;
 
-    /**
-     * Java-path for this rule
-     */
+    // java-path for this rule
     private String _javaPath;
 
-    /**
-     * Message for this rule
-     */
+    // message for this rule
     private String _message;
 
-    /**
-     * Dependencies
-     */
+    // dependencies
     private Set<String> _dependencies;
 
-    /**
-     * Ignored flag
-     */
+    // ignored flag
     private Boolean _ignored;
 
-    /**
-     * Set of properties contained in this rule; as their appear in the textual expression of the rule
-     */
-    private Set<String> _rawProperties;
+    // set of properties contained in this rule; as their appear in the textual expression of the rule
+    private Set<String> _usedProperties;
 
-    /**
-     * Set of potential context entries (they are potential because they might not all be context entries;
-     * but if a context entry is used, it will be in this list...
-     */
-    private Set<String> _potentialContextEntries;
-
-    /**
-     * Whether this rule needs to check for forced failures on entities/properties (this is an expensive mechanism);
-     * automatically populated when setExpression() is called.
-     */
+    // whether this rule needs to check for forced failures on entities/properties (this is an expensive mechanism); automatically populated when setExpression() is called.
     private Boolean _checkForcedEntities;
 
-    /**
-     * Groovy script to execute
-     */
+    // groovy script to execute
     private Script _script;
 
-    /**
-     * Pre-compiled rules; if those are available and a method corresponding to this rule is found in that class, then the Groovy script won't be compiled.
-     */
+    // lock used for executing groovy scripts (since their interaction with the Binding objects is not thread-safe)
+    private final Object _scriptLock = new Object();
+
+    // pre-compiled rules; if those are available and a method corresponding to this rule is found in that class, then the Groovy script won't be compiled.
     private CompiledRules _compiledRules;
 
-    /**
-     * The pre-compiled rule (as a Groovy method instead of a dynamically compiled Groovy script).
-     */
+    // pre-compiled rule (as a Groovy method instead of a dynamically compiled Groovy script).
     private Method _compiledRule;
+
+    // cached aliases for the java-path, only used with pre-compiled edits
+    private List<String> _aliases;
 
     /**
      * Constructor.
@@ -128,6 +100,7 @@ public class ExecutableRule {
      */
     public ExecutableRule(Rule rule, CompiledRules compiledRules, InitializationStats stats) throws ConstructionException {
         _rule = rule;
+        _id = rule.getId();
         _internalId = rule.getRuleId();
         _javaPath = rule.getJavaPath();
         _conditions = rule.getConditions();
@@ -135,29 +108,32 @@ public class ExecutableRule {
         _dependencies = rule.getDependencies();
         _message = rule.getMessage();
         _ignored = rule.getIgnored() == null ? Boolean.FALSE : rule.getIgnored();
-        _rawProperties = rule.getRawProperties();
-        _potentialContextEntries = rule.getPotentialContextEntries();
+        _usedProperties = rule.getRawProperties();
+        _checkForcedEntities = computeCheckForcedEntities(rule.getExpression());
 
         _compiledRules = compiledRules;
-        if (compiledRules != null)
+        if (compiledRules != null) {
             _compiledRule = RuntimeUtils.findCompiledMethod(compiledRules, rule.getId(), compiledRules.getMethodParameters().get(rule.getJavaPath()));
 
-        synchronized (this) {
-            _id = rule.getId();
-
-            // only compile Groovy script if no re-compiled Groovy method was available...
-            if (_compiledRule == null) {
-                try {
-                    _script = ValidationServices.getInstance().compileExpression(rule.getExpression());
-                }
-                catch (CompilationFailedException e) {
-                    throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);
-                }
+            // optimization - pre-compute the different aliases for the rule's java path
+            _aliases = new ArrayList<>();
+            StringBuilder buf = new StringBuilder();
+            for (String javaPathPart : StringUtils.split(_javaPath, '.')) {
+                if (buf.length() > 0)
+                    buf.append(".");
+                buf.append(javaPathPart);
+                _aliases.add(ValidationServices.getInstance().getAliasForJavaPath(buf.toString()));
             }
+        }
 
-            String exp = rule.getExpression();
-            if (exp != null)
-                _checkForcedEntities = exp.contains("forceFailureOnEntity") || exp.contains("forceFailureOnProperty") || exp.contains("ignoreFailureOnProperty");
+        // only compile Groovy script if no re-compiled Groovy method was available...
+        if (_compiledRule == null) {
+            try {
+                _script = ValidationServices.getInstance().compileExpression(rule.getExpression());
+            }
+            catch (CompilationFailedException e) {
+                throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);
+            }
         }
 
         if (stats != null) {
@@ -177,6 +153,7 @@ public class ExecutableRule {
      */
     public ExecutableRule(ExecutableRule execRule) {
         _rule = execRule._rule;
+        _id = execRule._id;
         _internalId = execRule._internalId;
         _javaPath = execRule._javaPath;
         _conditions = execRule._conditions;
@@ -184,15 +161,12 @@ public class ExecutableRule {
         _dependencies = execRule._dependencies;
         _message = execRule._message;
         _ignored = execRule._ignored;
-        _rawProperties = execRule._rawProperties;
-        _potentialContextEntries = execRule._rawProperties;
+        _usedProperties = execRule._usedProperties;
+        _script = execRule._script;
         _compiledRules = execRule._compiledRules;
         _compiledRule = execRule._compiledRule;
-        synchronized (this) {
-            _id = execRule._id;
-            _script = execRule._script;
-            _checkForcedEntities = execRule._checkForcedEntities;
-        }
+        _aliases = execRule._aliases;
+        _checkForcedEntities = execRule._checkForcedEntities;
     }
 
     /**
@@ -205,15 +179,15 @@ public class ExecutableRule {
     /**
      * @return Returns the id.
      */
-    public synchronized String getId() {
+    public String getId() {
         return _id;
     }
 
     /**
      * @param id The id to set.
      */
-    public synchronized void setId(String id) {
-        this._id = id;
+    public void setId(String id) {
+        _id = id;
     }
 
     /**
@@ -332,7 +306,7 @@ public class ExecutableRule {
      * @param conditions The condition IDs to set.
      */
     public void setConditions(Set<String> conditions) {
-        this._conditions = conditions;
+        _conditions = conditions;
     }
 
     /**
@@ -343,24 +317,25 @@ public class ExecutableRule {
      */
     public void setExpression(String expression) throws ConstructionException {
 
-        // can't use pre-compiled methods when dynamically changing the expression! Let's make sure of that...
-        _compiledRules = null;
+        try {
+            Set<String> usedProperties = new HashSet<>(), usedContextEntries = new HashSet<>();
+            ValidationServices.getInstance().parseExpression("rule", expression, usedProperties, usedContextEntries, null);
+            _script = ValidationServices.getInstance().compileExpression(expression);
+            _usedProperties = usedProperties;
+            _checkForcedEntities = computeCheckForcedEntities(expression);
 
-        synchronized (this) {
-            try {
-                _rawProperties.clear();
-                _potentialContextEntries.clear();
-                ValidationServices.getInstance().parseExpression("rule", expression, _rawProperties, _potentialContextEntries, null);
-                _script = ValidationServices.getInstance().compileExpression(expression);
-            }
-            catch (CompilationFailedException e) {
-                _script = null;
-                throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);
-            }
-
-            if (expression != null)
-                _checkForcedEntities = expression.contains("forceFailureOnEntity") || expression.contains("forceFailureOnProperty") || expression.contains("ignoreFailureOnProperty");
+            // can't use pre-compiled methods when dynamically changing the expression! Let's make sure of that...
+            _compiledRules = null;
+            _compiledRule = null;
+            _aliases = null;
         }
+        catch (CompilationFailedException e) {
+            throw new ConstructionException("Unable to compile rule " + _id, e);
+        }
+    }
+
+    private boolean computeCheckForcedEntities(String expression) {
+        return expression != null && (expression.contains("forceFailureOnEntity") || expression.contains("forceFailureOnProperty") || expression.contains("ignoreFailureOnProperty"));
     }
 
     @Override
@@ -387,18 +362,14 @@ public class ExecutableRule {
      * @return true if the expression passes, false otherwise
      */
     public boolean validate(Validatable validatable, Binding binding) throws ValidationException {
-        ExtraPropertyHandlerDto extra = null;
-        synchronized (this) {
-            if (_checkForcedEntities)
-                extra = new ExtraPropertyHandlerDto();
-        }
+        ExtraPropertyHandlerDto extra = _checkForcedEntities ? new ExtraPropertyHandlerDto() : null;
 
         // this is a bit convoluted, but we still want to set the failing properties even if an exception happens...
         ValidationException exception = null;
 
         boolean success;
         try {
-            success = validateForGroovy(validatable, binding, extra);
+            success = internalValidate(validatable, binding, extra);
             // edits from Genedits use side-effect flags to fail, instead of returning false...
             if (success) {
                 Boolean failingFlag = (Boolean)binding.getVariable(ValidationEngine.VALIDATOR_FAILING_FLAG);
@@ -414,7 +385,7 @@ public class ExecutableRule {
         if (!success) {
             try {
                 // go through each property to report
-                for (String property : _rawProperties)
+                for (String property : _usedProperties)
                     if (extra == null || extra.getIgnoredProperties() == null || !extra.getIgnoredProperties().contains(property))
                         validatable.reportFailureForProperty(property);
                 // also add any property that needs to be forced
@@ -423,7 +394,7 @@ public class ExecutableRule {
                         validatable.reportFailureForProperty(property);
                 // and finally, report the extra entities
                 if (extra != null && extra.getForcedEntities() != null)
-                    validatable.forceFailureForProperties(extra.getForcedEntities(), _rawProperties);
+                    validatable.forceFailureForProperties(extra.getForcedEntities(), _usedProperties);
             }
             catch (IllegalAccessException e) {
                 throw new ValidationException(e.getMessage());
@@ -446,7 +417,7 @@ public class ExecutableRule {
      * @return boolean
      */
     @SuppressWarnings("unchecked")
-    private synchronized boolean validateForGroovy(Validatable validatable, Binding binding, ExtraPropertyHandlerDto extra) throws ValidationException {
+    private boolean internalValidate(Validatable validatable, Binding binding, ExtraPropertyHandlerDto extra) throws ValidationException {
         boolean success;
 
         // make sure there are no left-over stuff in the binding
@@ -465,50 +436,44 @@ public class ExecutableRule {
             params.add(binding);
             params.add(binding.getVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY));
             params.add(binding.getVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY));
-            StringBuilder buf = new StringBuilder();
-            for (String javaPathPart : StringUtils.split(_rule.getJavaPath(), '.')) {
-                if (buf.length() > 0)
-                    buf.append(".");
-                buf.append(javaPathPart);
-                params.add(binding.getVariable(ValidationServices.getInstance().getAliasForJavaPath(buf.toString())));
-            }
+            for (String alias : _aliases)
+                params.add(binding.getVariable(alias));
 
             try {
                 success = (Boolean)_compiledRule.invoke(_compiledRules, params.toArray(new Object[0]));
             }
             catch (IllegalAccessException | InvocationTargetException e) {
-                throw new ValidationException("Exception invoking method for edit " + _rule.getId(), e);
+                throw new ValidationException("Exception invoking method for edit " + _id, e);
             }
         }
         else if (_script != null) {
-            try {
-
+            synchronized (_scriptLock) {
                 _script.setBinding(binding);
-
-                //System.out.println(_rule.getId());
-                Object result = _script.run();
-                if (result instanceof Boolean)
-                    success = (Boolean)result;
-                else
-                    throw new ValidationException("result is not a boolean");
-            }
-            catch (Exception e) {
-                StringBuilder buf = new StringBuilder();
-                if (_id != null) {
-                    buf.append("Unable to execute edit '").append(_id).append("'");
-                    String validated = validatable.getDisplayId();
-                    if (validated != null)
-                        buf.append(" on ").append(validatable.getDisplayId()).append(": ");
+                try {
+                    Object result = _script.run();
+                    if (result instanceof Boolean)
+                        success = (Boolean)result;
                     else
-                        buf.append(": ");
+                        throw new ValidationException("result is not a boolean");
                 }
-                else
-                    buf.append("Unable to execute edit: ");
-                buf.append(e.getMessage() == null ? "null reference" : e.getMessage());
-                throw new ValidationException(buf.toString(), e);
-            }
-            finally {
-                _script.setBinding(null);
+                catch (Exception e) {
+                    StringBuilder buf = new StringBuilder();
+                    if (_id != null) {
+                        buf.append("Unable to execute edit '").append(_id).append("'");
+                        String validated = validatable.getDisplayId();
+                        if (validated != null)
+                            buf.append(" on ").append(validatable.getDisplayId()).append(": ");
+                        else
+                            buf.append(": ");
+                    }
+                    else
+                        buf.append("Unable to execute edit: ");
+                    buf.append(e.getMessage() == null ? "null reference" : e.getMessage());
+                    throw new ValidationException(buf.toString(), e);
+                }
+                finally {
+                    _script.setBinding(null);
+                }
             }
         }
         else
