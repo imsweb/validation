@@ -5,6 +5,7 @@
 - Remove extra synchronization that slowed down executing edits in a heavily threaded environment.
 - Removed "isInitialized" method from ValidationContextFunctions and ValidationServices since they build an default instance right away now.
 - Moved ValidatingContext class out of internal package.
+- Updated Groovy library from version 2.5.4 (indy) to version 2.5.6 (indy).
 
 **Version 2.3**
 
