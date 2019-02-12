@@ -22,6 +22,7 @@ import groovy.lang.Binding;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.EngineStats;
 import com.imsweb.validation.InitializationOptions;
+import com.imsweb.validation.ValidatingContext;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;

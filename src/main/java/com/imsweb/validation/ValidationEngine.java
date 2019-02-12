@@ -41,7 +41,6 @@ import com.imsweb.validation.internal.ExecutableCondition;
 import com.imsweb.validation.internal.ExecutableRule;
 import com.imsweb.validation.internal.IterativeProcessor;
 import com.imsweb.validation.internal.Processor;
-import com.imsweb.validation.internal.ValidatingContext;
 import com.imsweb.validation.internal.ValidatingProcessor;
 import com.imsweb.validation.internal.callable.RuleCompilingCallable;
 import com.imsweb.validation.runtime.CompiledRules;

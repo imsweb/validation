@@ -5,6 +5,7 @@ package com.imsweb.validation.internal;
 
 import java.util.Collection;
 
+import com.imsweb.validation.ValidatingContext;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validatable;

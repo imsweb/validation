@@ -28,7 +28,6 @@ import com.imsweb.validation.entities.RuleHistory;
 import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
-import com.imsweb.validation.internal.ValidatingContext;
 import com.imsweb.validation.runtime.validator.FakeRuntimeEdits;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -114,7 +113,7 @@ public class ValidationEngineTest {
             exception = true;
         }
         if (!exception)
-            Assert.fail("Was excpecting an exception but didn't get it");
+            Assert.fail("Was expecting an exception but didn't get it");
         ValidationEngine.getInstance().uninitialize();
     }
 

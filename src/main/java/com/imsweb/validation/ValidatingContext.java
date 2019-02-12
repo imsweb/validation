@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 Information Management Services, Inc.
  */
-package com.imsweb.validation.internal;
+package com.imsweb.validation;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,36 +13,29 @@ import java.util.Set;
 import com.imsweb.validation.entities.Rule;
 
 /**
- * This class is used as a context when processing a validatable. Note that it has noting to do with user-defined contexts that are made avaialable to the rules...
+ * This class is used as a context when processing a validatable. Note that it has noting to do with user-defined contexts that are made available to the rules...
  * <br/><br/>
- * By overridding the conditionFailed() and atLeastOneDependencyFailed() methods, the conditions and dependencies mechanism can be customized to allow more complect features
+ * By overwriting the conditionFailed() and atLeastOneDependencyFailed() methods, the conditions and dependencies mechanism can be customized to allow more complex features
  * (for example, to allow cross-validator conditions)...
+ * <br/><br/>
+ * This class is not thread-safe. Contexts are created by the engine in the different "validate" methods. While those methods can be called in a multi-threaded environment,
+ * what happens inside the method is single-threaded. In other words, the validating context are not shared between threads and they do not need to be thread-safe.
  */
 public class ValidatingContext {
 
-    /**
-     * Rule IDs to dynamically ignore (if both a collection of rule to execute and ignore are provided, the execute takes precedence).
-     */
+    // rule IDs to dynamically ignore (if both a collection of rule to execute and ignore are provided, the execute takes precedence)
     protected Collection<String> _toIgnore;
 
-    /**
-     * Rule IDs to dynamically execute (if both a collection of rule to execute and ignore are provided, the execute takes precedence).
-     */
+    // rule IDs to dynamically execute (if both a collection of rule to execute and ignore are provided, the execute takes precedence)
     protected Collection<String> _toExecute;
 
-    /**
-     * Single rule to force, useful for unit tests (this takes precedence on both the execute and ignore collections of IDs).
-     */
+    // single rule to force, useful for unit tests (this takes precedence on both the execute and ignore collections of IDs)
     protected Rule _toForce;
 
-    /**
-     * Rule IDs that have failed so far, mapped by validatable path.
-     */
+    // rule IDs that have failed so far, mapped by validatable path.
     protected Map<String, Set<String>> _failedRuleIds;
 
-    /**
-     * Condition IDs that have failed so far, mapped by validatable path.
-     */
+    // condition IDs that have failed so far, mapped by validatable path.
     protected Map<String, Set<String>> _failedConditionIds;
 
     /**
@@ -104,11 +97,15 @@ public class ValidatingContext {
      * @return true if the condition has failed, false otherwise
      */
     public boolean conditionFailed(List<String> validatablePaths, String conditionId) {
+        if (validatablePaths == null || conditionId == null)
+            return false;
+
         for (String validatablePath : validatablePaths) {
             Set<String> failedIds = _failedConditionIds.get(validatablePath);
             if (failedIds != null && failedIds.contains(conditionId))
                 return true;
         }
+
         return false;
     }
 
@@ -123,6 +120,9 @@ public class ValidatingContext {
      * @return true if the at least one "depends-on" rule has failed, false otherwise
      */
     public boolean atLeastOneDependencyFailed(List<String> validatablePaths, Set<String> dependencies) {
+        if (validatablePaths == null || dependencies == null)
+            return false;
+
         for (String validatablePath : validatablePaths) {
             Set<String> failedIds = _failedRuleIds.get(validatablePath);
             if (failedIds != null && !Collections.disjoint(failedIds, dependencies))
