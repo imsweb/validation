@@ -2,8 +2,9 @@
 
 **Version 2.4**
 
-- Removed "isInitialized" method from ValidationContextFunctions and ValidationServices since they build an default instance right away now.
 - Remove extra synchronization that slowed down executing edits in a heavily threaded environment.
+- Removed "isInitialized" method from ValidationContextFunctions and ValidationServices since they build an default instance right away now.
+- Moved ValidatingContext class out of internal package.
 
 **Version 2.3**
 
