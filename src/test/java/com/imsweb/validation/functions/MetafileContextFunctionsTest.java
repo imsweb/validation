@@ -29,6 +29,8 @@ import com.imsweb.validation.entities.ContextTable;
 import com.imsweb.validation.entities.ContextTableIndex;
 import com.imsweb.validation.internal.context.JavaContextParser;
 
+import static com.imsweb.validation.functions.MetafileContextFunctions.TRIM_RIGHT;
+
 public class MetafileContextFunctionsTest {
 
     private MetafileContextFunctions _functions;
@@ -935,7 +937,7 @@ public class MetafileContextFunctionsTest {
     @Test
     public void testGEN_TRIM() {
         Assert.assertEquals("abc   ", _functions.GEN_TRIM("   abc   ", MetafileContextFunctions.TRIM_LEFT));
-        Assert.assertEquals("   abc", _functions.GEN_TRIM("   abc   ", MetafileContextFunctions.TRIM_RIGHT));
+        Assert.assertEquals("   abc", _functions.GEN_TRIM("   abc   ", TRIM_RIGHT));
         Assert.assertEquals("abc", _functions.GEN_TRIM("   abc   ", MetafileContextFunctions.TRIM_BOTH));
         Assert.assertEquals("", _functions.GEN_TRIM("", MetafileContextFunctions.TRIM_BOTH));
     }
@@ -2044,5 +2046,24 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals(3, _functions.GEN_AT("GA", "AKALGANYTX", 2));
         // so the Genedits help says that this call should return 0, but EditsWriter returns 2...
         Assert.assertEquals(2, _functions.GEN_AT("GA", "AKALGANYTX", 3));
+
+        // test interaction of AT with TRIM, which allows empty values to be provided to AT...
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("1", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("1   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   1", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("y", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("y   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   y   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("p", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("p   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   p", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("T", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("T   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   T", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("0", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("0   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   0", TRIM_RIGHT), "ypT0"));
     }
 }
