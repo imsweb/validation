@@ -1496,6 +1496,9 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         String val = GEN_TO_STRING(value);
         String txt = GEN_TO_STRING(text);
+        if (val.isEmpty() || txt.isEmpty())
+            return 0;
+
         int w = width == null ? 1 : Math.max(1, width.intValue());
 
         // special case, if the width is 1, don't bother splitting each character into its own string!

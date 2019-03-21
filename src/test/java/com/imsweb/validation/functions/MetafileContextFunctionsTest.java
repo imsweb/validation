@@ -2056,14 +2056,14 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("y", TRIM_RIGHT), "ypT0"));
         Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("y   ", TRIM_RIGHT), "ypT0"));
         Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   y   ", TRIM_RIGHT), "ypT0"));
-        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("p", TRIM_RIGHT), "ypT0"));
-        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("p   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(2, _functions.GEN_AT(_functions.GEN_TRIM("p", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(2, _functions.GEN_AT(_functions.GEN_TRIM("p   ", TRIM_RIGHT), "ypT0"));
         Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   p", TRIM_RIGHT), "ypT0"));
-        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("T", TRIM_RIGHT), "ypT0"));
-        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("T   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(3, _functions.GEN_AT(_functions.GEN_TRIM("T", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(3, _functions.GEN_AT(_functions.GEN_TRIM("T   ", TRIM_RIGHT), "ypT0"));
         Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   T", TRIM_RIGHT), "ypT0"));
-        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("0", TRIM_RIGHT), "ypT0"));
-        Assert.assertEquals(1, _functions.GEN_AT(_functions.GEN_TRIM("0   ", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(4, _functions.GEN_AT(_functions.GEN_TRIM("0", TRIM_RIGHT), "ypT0"));
+        Assert.assertEquals(4, _functions.GEN_AT(_functions.GEN_TRIM("0   ", TRIM_RIGHT), "ypT0"));
         Assert.assertEquals(0, _functions.GEN_AT(_functions.GEN_TRIM("   0", TRIM_RIGHT), "ypT0"));
     }
 }
