@@ -4,6 +4,11 @@
 
 - Fixed implementation of AT metafile function when dealing with empty values.
 
+**Version 2.5**
+
+- Increased the engine version to 6.2.
+- Fixed behavior of AT metafile context function when used on blank values.
+
 **Version 2.4**
 
 - Remove extra synchronization that slowed down executing edits in a heavily threaded environment.
