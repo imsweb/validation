@@ -1,8 +1,8 @@
 ## Validation Framework Version History
 
-**Version 2.5**
+**Version 2.6**
 
-- Fixed implementation of AT metafile function when dealing with empty values.
+- Fixed edits stats slowing down multi-threaded executions.
 
 **Version 2.5**
 

@@ -246,6 +246,11 @@ public class ValidationEngineTest {
         Assert.assertTrue(ValidationEngine.getInstance().validate(validatable).iterator().next().getProperties().contains("level1.level2[0].otherProp"));
         ((List<Map<String, Object>>)entity.get("level2")).get(0).put("prop", "0");
 
+        // after running some edits, there should be some stats available...
+        Assert.assertFalse(ValidationEngine.getInstance().getStats().isEmpty());
+        ValidationEngine.getInstance().resetStats();
+        Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
+
         TestingUtils.unloadValidator("fake-validator");
 
         // test an exception in the Groovy expression
@@ -295,11 +300,6 @@ public class ValidationEngineTest {
         ValidationEngine.getInstance().uninitialize();
         Assert.assertTrue(ValidationEngine.getInstance().validate(validatable).isEmpty());
         Assert.assertTrue(ValidationEngine.getInstance().validate(new SimpleMapValidatable("ID", "bad-level", entity)).isEmpty());
-
-        // after running some edits, there should be some stats available...
-        Assert.assertFalse(ValidationEngine.getInstance().getStats().isEmpty());
-        ValidationEngine.getInstance().resetStats();
-        Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
     }
 
     @Test

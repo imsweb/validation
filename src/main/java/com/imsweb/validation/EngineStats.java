@@ -18,36 +18,31 @@ public class EngineStats {
     /**
      * Number of run
      */
-    private Long _numRun = 1L;
+    private long _numRun;
 
     /**
      * Total time
      */
-    private Long _totalTime = 0L;
+    private long _totalTime;
 
     /**
      * Longest run time
      */
-    private Long _longestTime = null;
+    private long _longestTime;
 
     /**
      * Shortest run time
      */
-    private Long _shortestTime = null;
+    private long _shortestTime;
 
     /**
      * Constructor.
-     * <p/>
-     * Created on Feb 23, 2011 by depryf
-     * @param id ID for this stat
-     * @param time time for this stat
      */
-    public EngineStats(String id, Long time) {
-        _id = id;
+    public EngineStats() {
         _numRun = 1L;
-        _totalTime = time;
-        _longestTime = time;
-        _shortestTime = time;
+        _totalTime = 0L;
+        _longestTime = 0L;
+        _shortestTime = 0L;
     }
 
     /**
@@ -86,7 +81,7 @@ public class EngineStats {
      * Created on Feb 23, 2011 by depryf
      * @param run longest run
      */
-    public void setNumRun(Long run) {
+    public void setNumRun(long run) {
         _numRun = run;
     }
 
@@ -96,7 +91,7 @@ public class EngineStats {
      * Created on Feb 23, 2011 by depryf
      * @return total time
      */
-    public Long getTotalTime() {
+    public long getTotalTime() {
         return _totalTime;
     }
 
@@ -106,7 +101,7 @@ public class EngineStats {
      * Created on Feb 23, 2011 by depryf
      * @param time total time
      */
-    public void setTotalTime(Long time) {
+    public void setTotalTime(long time) {
         _totalTime = time;
     }
 
@@ -116,7 +111,7 @@ public class EngineStats {
      * Created on Feb 23, 2011 by depryf
      * @return longest time
      */
-    public Long getLongestTime() {
+    public long getLongestTime() {
         return _longestTime;
     }
 
@@ -136,7 +131,7 @@ public class EngineStats {
      * Created on Feb 23, 2011 by depryf
      * @return shortest time
      */
-    public Long getShortestTime() {
+    public long getShortestTime() {
         return _shortestTime;
     }
 
@@ -146,25 +141,7 @@ public class EngineStats {
      * Created on Feb 23, 2011 by depryf
      * @param time shortest time
      */
-    public void setShortestTime(Long time) {
+    public void setShortestTime(long time) {
         _shortestTime = time;
-    }
-
-    /**
-     * Reports that passed time to the passed <code>StatsDTO</code>
-     * <p/>
-     * Created on Dec 10, 2007 by depryf
-     * @param dto <code>ValidatorStatsDto</code>, can't be null
-     * @param time time
-     */
-    public static synchronized void reportRun(EngineStats dto, long time) {
-        if (time >= 0) {
-            dto.setNumRun(dto.getNumRun() + 1);
-            dto.setTotalTime(dto.getTotalTime() + time);
-            if (dto.getShortestTime() == null || dto.getShortestTime() > time)
-                dto.setShortestTime(time);
-            if (dto.getLongestTime() == null || dto.getLongestTime() < time)
-                dto.setLongestTime(time);
-        }
     }
 }

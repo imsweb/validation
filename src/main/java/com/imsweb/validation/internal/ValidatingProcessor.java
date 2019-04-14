@@ -40,9 +40,6 @@ import com.imsweb.validation.runtime.RuntimeUtils;
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ValidatingProcessor implements Processor {
 
-    // map of stats object to keep track of how long each polisher takes to run
-    private static final Map<String, EngineStats> _STATS = new HashMap<>();
-
     // the current java path for this validating processor
     private String _currentJavaPath;
 
@@ -63,6 +60,9 @@ public class ValidatingProcessor implements Processor {
 
     // whether or not stats should be recorded
     private InitializationOptions _options;
+
+    // map of stats object to keep track of how long each polisher takes to run
+    private Map<String, EngineStats> _stats = new HashMap<>();
 
     /**
      * Constructor.
@@ -188,12 +188,14 @@ public class ValidatingProcessor implements Processor {
 
                     // keep track of the stats...
                     if (_options.isEngineStatsEnabled() && id != null && !id.trim().isEmpty()) {
-                        synchronized (_STATS) {
-                            if (_STATS.containsKey(id))
-                                EngineStats.reportRun(_STATS.get(id), endTime - startTime);
-                            else
-                                _STATS.put(id, new EngineStats(id, endTime - startTime));
-                        }
+                        long time = endTime - startTime;
+                        EngineStats stats = _stats.computeIfAbsent(id, k -> new EngineStats());
+                        stats.setNumRun(stats.getNumRun() + 1);
+                        stats.setTotalTime(stats.getTotalTime() + time);
+                        if (stats.getShortestTime() == 0L || stats.getShortestTime() > time)
+                            stats.setShortestTime(time);
+                        if (stats.getLongestTime() == 0L || stats.getLongestTime() < time)
+                            stats.setLongestTime(time);
                     }
 
                     // if failure, need to keep track of it since other depending rules might not have to run
@@ -313,7 +315,7 @@ public class ValidatingProcessor implements Processor {
      * @param buffer buffer for the internal cache
      * @param path current path
      */
-    public synchronized void dumpCache(StringBuilder buffer, String path) {
+    public void dumpCache(StringBuilder buffer, String path) {
         buffer.append("\n").append(path).append(": ");
         for (ExecutableRule r : _rules)
             buffer.append(r.getId()).append(",");
@@ -327,10 +329,8 @@ public class ValidatingProcessor implements Processor {
      * Created on Nov 30, 2007 by depryf
      * @return a collection of <code>StatsDTO</code> object, possibly empty
      */
-    public static Map<String, EngineStats> getStats() {
-        synchronized (_STATS) {
-            return Collections.unmodifiableMap(_STATS);
-        }
+    public Map<String, EngineStats> getStats() {
+        return _stats;
     }
 
     /**
@@ -338,10 +338,8 @@ public class ValidatingProcessor implements Processor {
      * <p/>
      * Created on Jun 29, 2009 by depryf
      */
-    public static void resetStats() {
-        synchronized (_STATS) {
-            _STATS.clear();
-        }
+    public void resetStats() {
+        _stats.clear();
     }
 
     @Override

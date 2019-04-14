@@ -1774,13 +1774,16 @@ public class ValidationEngine {
      * @return a collection of <code>StatsDTO</code> object, possibly empty
      */
     public Map<String, EngineStats> getStats() {
+        Map<String, EngineStats> results = new HashMap<>();
         _lock.readLock().lock();
         try {
-            return ValidatingProcessor.getStats();
+            for (ValidatingProcessor processor : _processors.values())
+                results.putAll(processor.getStats());
         }
         finally {
             _lock.readLock().unlock();
         }
+        return results;
     }
 
     /**
@@ -1791,7 +1794,8 @@ public class ValidationEngine {
     public void resetStats() {
         _lock.writeLock().lock();
         try {
-            ValidatingProcessor.resetStats();
+            for (ValidatingProcessor processor : _processors.values())
+                processor.resetStats();
         }
         finally {
             _lock.writeLock().unlock();
