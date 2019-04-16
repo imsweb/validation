@@ -1775,13 +1775,15 @@ public class ValidationEngine {
      */
     public Map<String, EngineStats> getStats() {
         Map<String, EngineStats> results = new HashMap<>();
-        _lock.readLock().lock();
+
+        // this needs to be a write because the processors constantly update the stats when they run
+        _lock.writeLock().lock();
         try {
             for (ValidatingProcessor processor : _processors.values())
                 results.putAll(processor.getStats());
         }
         finally {
-            _lock.readLock().unlock();
+            _lock.writeLock().unlock();
         }
         return results;
     }

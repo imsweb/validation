@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.7**
+
+- Fixed synchronization issue in edits stats.
+
 **Version 2.6**
 
 - Fixed edits stats slowing down multi-threaded executions.
