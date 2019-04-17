@@ -248,6 +248,7 @@ public class ValidationEngineTest {
 
         // after running some edits, there should be some stats available...
         Assert.assertFalse(ValidationEngine.getInstance().getStats().isEmpty());
+        Assert.assertNotNull(ValidationEngine.getInstance().getStats().values().iterator().next().getId());
         ValidationEngine.getInstance().resetStats();
         Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
 

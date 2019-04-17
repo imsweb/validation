@@ -190,6 +190,7 @@ public class ValidatingProcessor implements Processor {
                     if (_options.isEngineStatsEnabled() && id != null && !id.trim().isEmpty()) {
                         long time = endTime - startTime;
                         EngineStats stats = _stats.computeIfAbsent(id, k -> new EngineStats());
+                        stats.setId(id);
                         stats.setNumRun(stats.getNumRun() + 1);
                         stats.setTotalTime(stats.getTotalTime() + time);
                         if (stats.getShortestTime() == 0L || stats.getShortestTime() > time)
