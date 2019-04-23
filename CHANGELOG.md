@@ -2,10 +2,6 @@
 
 **Version 2.7**
 
-- Fixed synchronization issue in edits stats.
-
-**Version 2.7**
-
 - Fixed a problem in edits stats that got introduced in the previous release.
 
 **Version 2.6**
