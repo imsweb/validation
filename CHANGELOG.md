@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.8 (not released yet)**
+
+- Added more information to the exception throws when an edit cannot be properly loaded.
+
 **Version 2.7**
 
 - Fixed a problem in edits stats that got introduced in the previous release.

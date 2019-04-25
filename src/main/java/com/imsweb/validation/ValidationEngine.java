@@ -2121,34 +2121,32 @@ public class ValidationEngine {
     private void addToRuleQueue(ExecutableRule rule, Map<String, ExecutableRule> cache, Set<String> currents, List<ExecutableRule> queue, Map<String, String> pathCache, Map<String, String> validatorCache) throws ConstructionException {
 
         if (rule.getDependencies() != null && !rule.getDependencies().isEmpty()) {
-            for (String id : rule.getDependencies()) {
-                String validatorCachedId = validatorCache.get(id);
+            String rId = rule.getId(), rPath = rule.getJavaPath(), vId = rule.getRule().getValidator().getId();
+            for (String depId : rule.getDependencies()) {
+                String validatorCachedId = validatorCache.get(depId);
                 if (validatorCachedId == null)
-                    throw new ConstructionException("Unable to resolve dependencies for " + id);
+                    throw new ConstructionException("Unable to resolve dependency " + depId + " for edit " + rId + "(" + vId + ")");
 
                 // check that dependencies go bottom-up in the patient set structure
-                String rulePath = rule.getJavaPath();
-                String dependPath = pathCache.get(id);
-                if (rulePath == null)
-                    throw new ConstructionException("Got a null java-path for edit " + rule.getId());
-                if (dependPath == null)
-                    throw new ConstructionException("Got a null java-path for edit " + id + " (on which " + rule.getId() + " depends)");
-                if (!rulePath.startsWith(dependPath) || rulePath.length() < dependPath.length())
-                    throw new ConstructionException(rule.getId() + " includes a dependency for an edit lower in the data structure tree.");
+                String depPath = pathCache.get(depId);
+                if (rPath == null)
+                    throw new ConstructionException("Got a null java-path for edit " + rId + "(" + vId + ")");
+                if (depPath == null)
+                    throw new ConstructionException("Got a null java-path for edit " + depId + " (on which " + rId + " depends)");
+                if (!rPath.startsWith(depPath) || rPath.length() < depPath.length())
+                    throw new ConstructionException(rId + " includes a dependency for an edit lower in the data structure tree.");
 
                 // check that dependencies do not cross validators                    
-                if (!rule.getRule().getValidator().getId().equals(validatorCachedId))
-                    throw new ConstructionException(
-                            "No cross-group dependency is allowed, " + rule.getId() + " (" + rule.getRule().getValidator().getId() + ") cannot depend on " + id + " (" + validatorCachedId + ")",
-                            rule.getId());
+                if (!vId.equals(validatorCachedId))
+                    throw new ConstructionException("No cross-group dependency is allowed, " + rId + " (" + vId + ") cannot depend on " + depId + " (" + validatorCachedId + ")", rId);
 
                 // check for circular dependencies
-                if (currents.contains(id))
-                    throw new ConstructionException("Circular dependency detected between '" + id + "' and '" + rule.getId() + "'", id, rule.getId());
+                if (currents.contains(depId))
+                    throw new ConstructionException("Circular dependency detected between " + depId + " and " + rId, depId, rId);
 
-                if (cache.containsKey(id)) {
+                if (cache.containsKey(depId)) {
                     currents.add(rule.getId());
-                    addToRuleQueue(cache.remove(id), cache, currents, queue, pathCache, validatorCache);
+                    addToRuleQueue(cache.remove(depId), cache, currents, queue, pathCache, validatorCache);
                 }
             }
         }
