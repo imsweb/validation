@@ -2125,24 +2125,24 @@ public class ValidationEngine {
             for (String depId : rule.getDependencies()) {
                 String validatorCachedId = validatorCache.get(depId);
                 if (validatorCachedId == null)
-                    throw new ConstructionException("Unable to resolve dependency " + depId + " for edit " + rId + "(" + vId + ")");
+                    throw new ConstructionException("Unable to resolve dependency '" + depId + "' for edit '" + rId + "' (" + vId + ")");
 
                 // check that dependencies go bottom-up in the patient set structure
                 String depPath = pathCache.get(depId);
                 if (rPath == null)
-                    throw new ConstructionException("Got a null java-path for edit " + rId + "(" + vId + ")");
+                    throw new ConstructionException("Got a null java-path for edit '" + rId + "' (" + vId + ")");
                 if (depPath == null)
-                    throw new ConstructionException("Got a null java-path for edit " + depId + " (on which " + rId + " depends)");
+                    throw new ConstructionException("Got a null java-path for edit '" + depId + "' (on which '" + rId + "' depends)");
                 if (!rPath.startsWith(depPath) || rPath.length() < depPath.length())
-                    throw new ConstructionException(rId + " includes a dependency for an edit lower in the data structure tree.");
+                    throw new ConstructionException("Edit '" + rId + "' cannot depend on '" + depId + "' which is lower in the data structure tree.");
 
                 // check that dependencies do not cross validators                    
                 if (!vId.equals(validatorCachedId))
-                    throw new ConstructionException("No cross-group dependency is allowed, " + rId + " (" + vId + ") cannot depend on " + depId + " (" + validatorCachedId + ")", rId);
+                    throw new ConstructionException("No cross-group dependency is allowed, edit '" + rId + "' (" + vId + ") cannot depend on '" + depId + "' (" + validatorCachedId + ")", rId);
 
                 // check for circular dependencies
                 if (currents.contains(depId))
-                    throw new ConstructionException("Circular dependency detected between " + depId + " and " + rId, depId, rId);
+                    throw new ConstructionException("Circular dependency detected between '" + depId + "' and '" + rId + "'", depId, rId);
 
                 if (cache.containsKey(depId)) {
                     currents.add(rule.getId());
