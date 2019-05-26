@@ -38,12 +38,16 @@ public class ValidatingContext {
     // condition IDs that have failed so far, mapped by validatable path.
     protected Map<String, Set<String>> _failedConditionIds;
 
+    // the edits duration, per validatable path, then per edit ID (done that way to ensure thread-safety)
+    private Map<String, Map<String, Long>> _editsStats;
+
     /**
      * Constructor.
      */
     public ValidatingContext() {
         _failedRuleIds = new HashMap<>();
         _failedConditionIds = new HashMap<>();
+        _editsStats = new HashMap<>();
     }
 
     public Collection<String> getToIgnore() {
@@ -76,6 +80,16 @@ public class ValidatingContext {
 
     public Map<String, Set<String>> getFailedConditionIds() {
         return _failedConditionIds;
+    }
+
+    public void reportEditDuration(String path, String id, long duration) {
+        _editsStats.computeIfAbsent(path, k -> new HashMap<>()).put(id, duration);
+    }
+
+    public Map<String, Long> getEditDurations() {
+        Map<String, Long> stats = new HashMap<>();
+        _editsStats.values().forEach(stats::putAll);
+        return stats;
     }
 
     /**

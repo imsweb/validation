@@ -179,32 +179,32 @@ public class ValidationEngine {
     /**
      * Map of <code>Validator</code>s, keyed by validator ID
      */
-    protected Map<String, Validator> _validators = new ConcurrentHashMap<>();
+    protected Map<String, Validator> _validators = new HashMap<>();
 
     /**
      * Map of <code>Processor</code>s, keyed by java-path root
      */
-    protected Map<String, ValidatingProcessor> _processors = new ConcurrentHashMap<>();
+    protected Map<String, ValidatingProcessor> _processors = new HashMap<>();
 
     /**
      * Currently used processor roots (for SEER, that would be "lines", for DMS it would be "patient", etc...); values are number of edits under that root
      */
-    protected Map<String, AtomicInteger> _processorRoots = new ConcurrentHashMap<>();
+    protected Map<String, AtomicInteger> _processorRoots = new HashMap<>();
 
     /**
      * Map of <code>ExecutableRule</code>s, keyed by rule internal ID
      */
-    protected Map<Long, ExecutableRule> _executableRules = new ConcurrentHashMap<>();
+    protected Map<Long, ExecutableRule> _executableRules = new HashMap<>();
 
     /**
      * Map of <code>ExecutableCondition</code>s, keyed by condition internal ID
      */
-    protected Map<Long, ExecutableCondition> _executableConditions = new ConcurrentHashMap<>();
+    protected Map<Long, ExecutableCondition> _executableConditions = new HashMap<>();
 
     /**
      * Compiled contexts, keyed by validator internal ID and context ID
      */
-    protected Map<Long, Map<String, Object>> _contexts = new ConcurrentHashMap<>();
+    protected Map<Long, Map<String, Object>> _contexts = new HashMap<>();
 
     /**
      * Possible statuses for the engine
@@ -239,6 +239,16 @@ public class ValidationEngine {
      * all methods changing the state of the engine need to acquire a write lock.
      */
     private ReentrantReadWriteLock _lock = new ReentrantReadWriteLock();
+
+    /**
+     * The edits statistics gathered so far by the engine (the collection will be empty if the statistics are disabled in the initialization options)
+     */
+    protected Map<String, EngineStats> _editsStats = new HashMap<>();
+
+    /**
+     * Private lock controlling access to the stats; those are "written" every time new stats are reported (which is constantly), and so using a global engine lock is not good enough.
+     */
+    private ReentrantReadWriteLock _statsLock = new ReentrantReadWriteLock();
 
     // ********************************************************************************
     //                INITIALIZATION METHOD (require the write lock)
@@ -1774,18 +1784,13 @@ public class ValidationEngine {
      * @return a collection of <code>StatsDTO</code> object, possibly empty
      */
     public Map<String, EngineStats> getStats() {
-        Map<String, EngineStats> results = new HashMap<>();
-
-        // this needs to be a write because the processors constantly update the stats when they run
-        _lock.writeLock().lock();
+        _statsLock.readLock().lock();
         try {
-            for (ValidatingProcessor processor : _processors.values())
-                results.putAll(processor.getStats());
+            return _editsStats;
         }
         finally {
-            _lock.writeLock().unlock();
+            _statsLock.readLock().unlock();
         }
-        return results;
     }
 
     /**
@@ -1794,13 +1799,12 @@ public class ValidationEngine {
      * Created on Jun 29, 2009 by depryf
      */
     public void resetStats() {
-        _lock.writeLock().lock();
+        _statsLock.writeLock().lock();
         try {
-            for (ValidatingProcessor processor : _processors.values())
-                processor.resetStats();
+            _editsStats.clear();
         }
         finally {
-            _lock.writeLock().unlock();
+            _statsLock.writeLock().unlock();
         }
     }
 
@@ -1985,7 +1989,21 @@ public class ValidationEngine {
             throw new ValidationException("Unknown java path for forced edit: " + vContext.getToForce().getJavaPath());
 
         // process the validatable
-        return processor.process(validatable, vContext);
+        Collection<RuleFailure> failures = processor.process(validatable, vContext);
+
+        // report the stats if we have to
+        if (_options.isEngineStatsEnabled()) {
+            _statsLock.writeLock().lock();
+            try {
+                for (Entry<String, Long> entry : vContext.getEditDurations().entrySet())
+                    _editsStats.computeIfAbsent(entry.getKey(), EngineStats::new).reportStat(entry.getValue());
+            }
+            finally {
+                _statsLock.writeLock().unlock();
+            }
+        }
+
+        return failures;
     }
 
     private void populateProcessors(List<ExecutableRule> sortedRules) {

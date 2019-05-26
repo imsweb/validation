@@ -2,6 +2,7 @@
 
 **Version 2.8 (not released yet)**
 
+- Fixed another threading issue related to edits stats.
 - Added more information to the exception throws when an edit cannot be properly loaded.
 
 **Version 2.7**

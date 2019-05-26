@@ -6,7 +6,6 @@ package com.imsweb.validation.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import groovy.lang.Binding;
 
 import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.EngineStats;
 import com.imsweb.validation.InitializationOptions;
 import com.imsweb.validation.ValidatingContext;
 import com.imsweb.validation.ValidationContextFunctions;
@@ -60,9 +58,6 @@ public class ValidatingProcessor implements Processor {
 
     // whether or not stats should be recorded
     private InitializationOptions _options;
-
-    // map of stats object to keep track of how long each polisher takes to run
-    private Map<String, EngineStats> _stats = new HashMap<>();
 
     /**
      * Constructor.
@@ -187,17 +182,8 @@ public class ValidatingProcessor implements Processor {
                     long endTime = System.currentTimeMillis();
 
                     // keep track of the stats...
-                    if (_options.isEngineStatsEnabled() && id != null && !id.trim().isEmpty()) {
-                        long time = endTime - startTime;
-                        EngineStats stats = _stats.computeIfAbsent(id, k -> new EngineStats());
-                        stats.setId(id);
-                        stats.setNumRun(stats.getNumRun() + 1);
-                        stats.setTotalTime(stats.getTotalTime() + time);
-                        if (stats.getShortestTime() == 0L || stats.getShortestTime() > time)
-                            stats.setShortestTime(time);
-                        if (stats.getLongestTime() == 0L || stats.getLongestTime() < time)
-                            stats.setLongestTime(time);
-                    }
+                    if (_options.isEngineStatsEnabled() && id != null && !id.isEmpty())
+                        vContext.reportEditStat(_currentJavaPath, id, endTime - startTime);
 
                     // if failure, need to keep track of it since other depending rules might not have to run
                     if (!success) {
@@ -322,25 +308,6 @@ public class ValidatingProcessor implements Processor {
             buffer.append(r.getId()).append(",");
         if (!_rules.isEmpty())
             buffer.setLength(buffer.length() - 1);
-    }
-
-    /**
-     * Returns the statistics gathered so far...
-     * <p/>
-     * Created on Nov 30, 2007 by depryf
-     * @return a collection of <code>StatsDTO</code> object, possibly empty
-     */
-    public Map<String, EngineStats> getStats() {
-        return _stats;
-    }
-
-    /**
-     * Resets the statistics gathered so far...
-     * <p/>
-     * Created on Jun 29, 2009 by depryf
-     */
-    public void resetStats() {
-        _stats.clear();
     }
 
     @Override

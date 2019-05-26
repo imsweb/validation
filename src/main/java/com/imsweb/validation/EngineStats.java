@@ -38,11 +38,21 @@ public class EngineStats {
     /**
      * Constructor.
      */
-    public EngineStats() {
-        _numRun = 1L;
-        _totalTime = 0L;
-        _longestTime = 0L;
-        _shortestTime = 0L;
+    public EngineStats(String id) {
+        _id = id;
+        _numRun = 0;
+        _totalTime = 0;
+        _longestTime = 0;
+        _shortestTime = 0;
+    }
+
+    public void reportStat(long duration) {
+        _numRun++;
+        _totalTime += duration;
+        if (duration > _longestTime)
+            _longestTime = duration;
+        if ((duration < _shortestTime || _shortestTime == 0) && duration > 0)
+            _shortestTime = duration;
     }
 
     /**
@@ -56,16 +66,6 @@ public class EngineStats {
     }
 
     /**
-     * Setter.
-     * <p/>
-     * Created on Feb 23, 2011 by depryf
-     * @param id ID
-     */
-    public void setId(String id) {
-        this._id = id;
-    }
-
-    /**
      * Getter.
      * <p/>
      * Created on Feb 23, 2011 by depryf
@@ -73,16 +73,6 @@ public class EngineStats {
      */
     public long getNumRun() {
         return _numRun;
-    }
-
-    /**
-     * Setter.
-     * <p/>
-     * Created on Feb 23, 2011 by depryf
-     * @param run longest run
-     */
-    public void setNumRun(long run) {
-        _numRun = run;
     }
 
     /**
@@ -96,16 +86,6 @@ public class EngineStats {
     }
 
     /**
-     * Setter.
-     * <p/>
-     * Created on Feb 23, 2011 by depryf
-     * @param time total time
-     */
-    public void setTotalTime(long time) {
-        _totalTime = time;
-    }
-
-    /**
      * Getter.
      * <p/>
      * Created on Feb 23, 2011 by depryf
@@ -116,16 +96,6 @@ public class EngineStats {
     }
 
     /**
-     * Setter.
-     * <p/>
-     * Created on Feb 23, 2011 by depryf
-     * @param time longest time
-     */
-    public void setLongestTime(long time) {
-        _longestTime = time;
-    }
-
-    /**
      * Getter.
      * <p/>
      * Created on Feb 23, 2011 by depryf
@@ -133,15 +103,5 @@ public class EngineStats {
      */
     public long getShortestTime() {
         return _shortestTime;
-    }
-
-    /**
-     * Setter.
-     * <p/>
-     * Created on Feb 23, 2011 by depryf
-     * @param time shortest time
-     */
-    public void setShortestTime(long time) {
-        _shortestTime = time;
     }
 }
