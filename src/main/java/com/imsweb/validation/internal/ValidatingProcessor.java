@@ -183,7 +183,7 @@ public class ValidatingProcessor implements Processor {
 
                     // keep track of the stats...
                     if (_options.isEngineStatsEnabled() && id != null && !id.isEmpty())
-                        vContext.reportEditStat(_currentJavaPath, id, endTime - startTime);
+                        vContext.reportEditDuration(_currentJavaPath, id, endTime - startTime);
 
                     // if failure, need to keep track of it since other depending rules might not have to run
                     if (!success) {
