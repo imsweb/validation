@@ -1,9 +1,10 @@
 ## Validation Framework Version History
 
-**Version 2.8 (not released yet)**
+**Version 2.8**
 
+- Fixed bad property parsing behavior for edits using casts.
 - Fixed another threading issue related to edits stats.
-- Added more information to the exception throws when an edit cannot be properly loaded.
+- Added more information to the exception thrown when an edit cannot be properly loaded.
 
 **Version 2.7**
 
