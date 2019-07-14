@@ -16,9 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.ast.CodeVisitorSupport;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
 import org.codehaus.groovy.ast.expr.BinaryExpression;
+import org.codehaus.groovy.ast.expr.CastExpression;
 import org.codehaus.groovy.ast.expr.ClosureExpression;
 import org.codehaus.groovy.ast.expr.ConstantExpression;
 import org.codehaus.groovy.ast.expr.DeclarationExpression;
+import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.PropertyExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
@@ -90,7 +92,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
 
         if (expression.getProperty() instanceof ConstantExpression) {
             String prop = expression.getProperty().getText();
-            String[] parts = StringUtils.split(StringUtils.replace(expression.getObjectExpression().getText(), "?", ""), '.');
+            String[] parts = StringUtils.split(StringUtils.replace(uncast(expression.getObjectExpression()).getText(), "?", ""), '.');
             if (parts.length > 0) {
                 if (ValidationEngine.VALIDATOR_CONTEXT_KEY.equals(parts[0]))
                     _contextEntries.add(prop);
@@ -152,8 +154,10 @@ public class EditCodeVisitor extends CodeVisitorSupport {
         // this is not perfect because it doesn't take into account the limited scope, for example a def inside a loop...
         _defVariables.add(expression.getLeftExpression().getText());
 
-        if (expression.getRightExpression() instanceof MethodCallExpression) {
-            MethodCallExpression call = (MethodCallExpression)expression.getRightExpression();
+        Expression rightExpression = uncast(expression.getRightExpression());
+
+        if (rightExpression instanceof MethodCallExpression) {
+            MethodCallExpression call = (MethodCallExpression)rightExpression;
             for (Method m : ValidationContextFunctions.getInstance().getClass().getMethods()) {
                 if (m.getName().equals(call.getMethodAsString()) && m.getAnnotation(ContextFunctionAliasAnnotation.class) != null) {
                     _variableAliases.put(expression.getLeftExpression().getText(), m.getAnnotation(ContextFunctionAliasAnnotation.class).value());
@@ -161,24 +165,24 @@ public class EditCodeVisitor extends CodeVisitorSupport {
                 }
             }
 
-            expression.getRightExpression().visit(this);
+            rightExpression.visit(this);
         }
-        else if (expression.getRightExpression() instanceof VariableExpression) {
-            _variableAliases.put(expression.getLeftExpression().getText(), expression.getRightExpression().getText());
+        else if (rightExpression instanceof VariableExpression) {
+            _variableAliases.put(expression.getLeftExpression().getText(), rightExpression.getText());
         }
-        else if (expression.getRightExpression() instanceof PropertyExpression) {
-            _variableAliases.put(expression.getLeftExpression().getText(), expression.getRightExpression().getText());
-            expression.getRightExpression().visit(this);
+        else if (rightExpression instanceof PropertyExpression) {
+            _variableAliases.put(expression.getLeftExpression().getText(), rightExpression.getText());
+            rightExpression.visit(this);
         }
         else
-            expression.getRightExpression().visit(this);
+            rightExpression.visit(this);
     }
 
     @Override
     public void visitForLoop(ForStatement forLoop) {
         // for (ctc : patient.ctcs) {...}
 
-        String alias = getAliasForPartialPath(forLoop.getCollectionExpression().getText());
+        String alias = getAliasForPartialPath(uncast(forLoop.getCollectionExpression()));
         if (alias != null) {
             _variableAliases.put(forLoop.getVariable().getName(), alias);
             forLoop.getLoopBlock().visit(this);
@@ -196,7 +200,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
         // def ctc1 = patientc.ctcs.get(index1)
 
         String method = call.getMethodAsString();
-        String alias = getAliasForPartialPath(call.getObjectExpression().getText());
+        String alias = getAliasForPartialPath(uncast(call.getObjectExpression()));
         if (alias != null) {
             if (call.getArguments() instanceof ArgumentListExpression) {
                 ArgumentListExpression list = (ArgumentListExpression)call.getArguments();
@@ -215,16 +219,17 @@ public class EditCodeVisitor extends CodeVisitorSupport {
             }
         }
 
-        String caller = call.getObjectExpression().getText();
+        Expression objExpression = uncast(call.getObjectExpression());
+        String caller = objExpression.getText();
         // methods can be called on context (if the context is a closure for example)
         if (ValidationEngine.VALIDATOR_CONTEXT_KEY.equals(caller))
             _contextEntries.add(method);
         // any method called on "this" is a context entry (this is the old way of calling contexts, without a prefix...)
-        if ((call.getObjectExpression() instanceof VariableExpression && "this".equals(caller)) && !_defVariables.contains(method))
+        if ((objExpression instanceof VariableExpression && "this".equals(caller)) && !_defVariables.contains(method))
             if (ValidationServices.getInstance().getJavaPathForAlias(method) == null && !isInternalContextName(method))
                 _contextEntries.add(method);
         // the calling object could also be a context entry: ARRAY.contains(...)
-        if ((call.getObjectExpression() instanceof VariableExpression && !"this".equals(caller)) && !_defVariables.contains(caller))
+        if ((objExpression instanceof VariableExpression && !"this".equals(caller)) && !_defVariables.contains(caller))
             if (ValidationServices.getInstance().getJavaPathForAlias(caller) == null && !isInternalContextName(caller))
                 _contextEntries.add(caller);
 
@@ -242,7 +247,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
         // def line1 = lines[index]
         // def ctc1 = patient.ctcs[index]
         if (expression.getOperation() != null && expression.getOperation().getText().equals("[")) {
-            String alias = getAliasForPartialPath(expression.getLeftExpression().getText());
+            String alias = getAliasForPartialPath(uncast(expression.getLeftExpression()));
             if (alias != null)
                 if (!_defVariables.isEmpty())
                     _variableAliases.put(_defVariables.get(_defVariables.size() - 1), alias);
@@ -252,10 +257,10 @@ public class EditCodeVisitor extends CodeVisitorSupport {
     }
 
     // helper
-    protected String getAliasForPartialPath(String path) {
+    protected String getAliasForPartialPath(Expression expression) {
         String alias = null;
 
-        String[] parts = StringUtils.split(path, '.');
+        String[] parts = StringUtils.split(expression.getText(), '.');
         if (parts.length > 0) {
             String javaPath = ValidationServices.getInstance().getJavaPathForAlias(parts[0]);
             if (javaPath != null) {
@@ -274,6 +279,11 @@ public class EditCodeVisitor extends CodeVisitorSupport {
         }
 
         return alias;
+    }
+
+    // helper
+    private Expression uncast(Expression expression) {
+        return expression instanceof CastExpression ? ((CastExpression)expression).getExpression() : expression;
     }
 
     // helper

@@ -1,0 +1,6 @@
+List ctcs = []
+for (ctc in (Set)patient.ctcs)
+    if (!((Map)ctc).deleted == true && ((Map)ctc).sequenceNumber != null && ((Map)ctc).sequenceNumber != '88' && ((Map)ctc).sequenceNumber != '98' && ((Map)ctc).sequenceNumber != '99')
+        ctcs.add(ctc)
+
+return true

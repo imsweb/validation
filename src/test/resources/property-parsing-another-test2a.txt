@@ -1,0 +1,6 @@
+def ctcs = []
+for (ctc in patient.ctcs)
+    if (!ctc.deleted && ctc.sequenceNumber != null && ctc.sequenceNumber != '88' && ctc.sequenceNumber != '98' && ctc.sequenceNumber != '99')
+        ctcs.add(ctc)
+
+return true

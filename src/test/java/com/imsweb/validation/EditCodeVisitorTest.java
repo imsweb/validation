@@ -74,6 +74,9 @@ public class EditCodeVisitorTest {
         parser.parseExpression("id", "if (record.majorSubtype.shortName.trim == 'hrec_naaccr') return false", properties, null, null);
         assertProperties(properties, "record.majorSubtype.shortName");
         properties.clear();
+        parser.parseExpression("id", "return ((List)Context.CONTEXT).contains(line.primarySite);", properties, null, null);
+        assertProperties(properties, "line.primarySite");
+        properties.clear();
 
         // declarations
         parser.parseExpression("id", "def alias = ctc; return alias.primarySite != null", properties, null, null);
@@ -316,11 +319,22 @@ public class EditCodeVisitorTest {
         expected.add("line.histologyIcdO3");
         expected.add("line.behaviorIcdO3");
         rawProperties.clear();
-        exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test.txt"));
+        exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test1a.txt"));
         ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
         Assert.assertEquals(expected, rawProperties);
         rawProperties.clear();
-        exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test2.txt"));
+        exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test1b.txt"));
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
+        Assert.assertEquals(expected, rawProperties);
+        expected.clear();
+        expected.add("ctc.deleted");
+        expected.add("ctc.sequenceNumber");
+        rawProperties.clear();
+        exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test2a.txt"));
+        ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
+        Assert.assertEquals(expected, rawProperties);
+        rawProperties.clear();
+        exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test2b.txt"));
         ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);
         Assert.assertEquals(expected, rawProperties);
     }
