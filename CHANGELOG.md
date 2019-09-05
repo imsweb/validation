@@ -2,7 +2,7 @@
 
 **Version 2.9**
 
-- Updated EOD version to 1.7 and fixed the EOD field mapping for an SSDI key that was changed
+- Updated EOD version to 1.7 and fixed the EOD field mapping for an SSDI key that was changed.
 
 **Version 2.8**
 
