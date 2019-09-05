@@ -269,7 +269,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("boneInvasion", "bone_invasion");
         put("brainMolecularMarkers", "brain_molecular_markers");
         put("breslowTumorThickness", "breslow_thickness");
-        put("ca125PretreatmentInterpretation", "ca125_pretx_lab_value");
+        put("ca125PretreatmentInterpretation", "ca125_pretx_interpretation");
         put("ceaPretreatmentInterpretation", "cea_pretx_interpretation");
         put("ceaPretreatmentLabValue", "cea_pretx_lab_value");
         put("chromosome19qLossOfHeterozygosity", "chrom_19q_status");
