@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.9**
+
+- Updated EOD version to 1.7 and fixed the EOD field mapping for an SSDI key that was changed
+
 **Version 2.8**
 
 - Fixed bad property parsing behavior for edits using casts.

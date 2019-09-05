@@ -28,8 +28,8 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'commons-io:commons-io:2.6'
-    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.1'
-    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9'
+    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.3'
+    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.2'
     testImplementation 'com.imsweb:staging-algorithm-eod-public:1.7.3'
 }
 
