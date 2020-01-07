@@ -1,5 +1,11 @@
 ## Validation Framework Version History
 
+**Version 2.10**
+
+- Updated Groovy library from version 2.5.6 (indy) to version 2.5.8 (indy).
+- Updated commons-codec library from version 1.11 to version 1.14.
+- Updated Apache commons-lang library from version 3.7 to version 3.9.
+
 **Version 2.9**
 
 - Updated EOD version to 1.7 and fixed the EOD field mapping for an SSDI key that was changed.

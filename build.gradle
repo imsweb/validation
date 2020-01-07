@@ -20,17 +20,17 @@ repositories {
 
 dependencies {
     api 'com.imsweb:staging-client-java:4.7'
-    api 'org.codehaus.groovy:groovy:2.5.6:indy'
+    api 'org.codehaus.groovy:groovy:2.5.8:indy'
     api 'com.thoughtworks.xstream:xstream:1.4.11.1'
 
-    implementation 'commons-codec:commons-codec:1.11'
-    implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'commons-codec:commons-codec:1.14'
+    implementation 'org.apache.commons:commons-lang3:3.9'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     testImplementation 'commons-io:commons-io:2.6'
     testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.3'
     testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.2'
-    testImplementation 'com.imsweb:staging-algorithm-eod-public:1.7.3'
+    testImplementation 'com.imsweb:staging-algorithm-eod-public:1.7.4'
 }
 
 // enforce UTF-8, display the compilation warnings
