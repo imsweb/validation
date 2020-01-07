@@ -375,7 +375,7 @@ public class ValidationContextFunctions {
      * @return true if value is between low and high, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "value", param1 = "value to compare", paramName2 = "low", param2 = "low limit", paramName3 = "high", param3 = "high limit",
-            desc = "returns true if the value is between the low and hight limit (inclusive), false it is not or cannot be determined",
+            desc = "Returns true if the value is between the low and hight limit (inclusive), false it is not or cannot be determined.",
             example = "Functions.between(2, 1, 3) -> true\nFunctions.between('B', 'A', 'C') -> true")
     public boolean between(Object value, Object low, Object high) {
         if (value == null || low == null || high == null)
@@ -483,6 +483,9 @@ public class ValidationContextFunctions {
      * @param regex regular expression (Java style) to match against
      * @return true if the value matches, false otherwise.
      */
+    @ContextFunctionDocAnnotation(paramName1 = "value", param1 = "value to use with the regular expression", paramName2 = "regex", param2 = "regular expression",
+            desc = "Returns true if the provided value matches the provided Java regular expression.",
+            example = "Functions.matches('123', /\\d+/) -> true")
     public boolean matches(Object value, Object regex) {
         if (value == null || regex == null)
             return false;
@@ -510,6 +513,8 @@ public class ValidationContextFunctions {
     }
 
     /**
+     * No documentation on purpose, shouldn't be called from edits!
+     * <br/><br/>
      * Returns the number of hits in the regex cache.
      */
     public long getNumRegexCacheHit() {
@@ -517,6 +522,8 @@ public class ValidationContextFunctions {
     }
 
     /**
+     * No documentation on purpose, shouldn't be called from edits!
+     * <br/><br/>
      * Returns the number of misses in the regex cache.
      */
     public long getNumRegexCacheMiss() {
