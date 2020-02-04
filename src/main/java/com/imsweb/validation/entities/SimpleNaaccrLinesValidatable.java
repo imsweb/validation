@@ -30,7 +30,7 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
  * the CStage implementation. The variable and set to the CStage schema name based on the following properties:
  * <ul>
  * <li>primarySite</li>
- * <li>histologyIcdO3</li>
+ * <li>histologicTypeIcdO3</li>
  * <li>csSiteSpecificFactor25</li>
  * </ul>
  * The property will be added if it's not there yet, or if either one of the site/hist properties exists. In other words, if you want to
@@ -168,7 +168,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
      */
     private SimpleNaaccrLinesValidatable(SimpleNaaccrLinesValidatable parent, String prefix, Map<String, String> map, Map<String, Object> context, boolean useUntrimmedNotation) {
         _prefix = prefix;
-        _alias = ValidationServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+\\]", ""));
+        _alias = ValidationServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+]", ""));
         _lines = null;
         _currentLine = map;
         _parent = parent;
@@ -267,7 +267,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     }
 
     @Override
-    public void reportFailureForProperty(String propertyName) throws IllegalAccessException {
+    public void reportFailureForProperty(String propertyName) {
         if (propertyName != null) {
             int pos = propertyName.indexOf('.');
             if (pos >= 0) {
@@ -281,7 +281,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     }
 
     @Override
-    public void forceFailureForProperties(Set<ExtraPropertyEntityHandlerDto> toReport, Set<String> rawProperties) throws IllegalAccessException {
+    public void forceFailureForProperties(Set<ExtraPropertyEntityHandlerDto> toReport, Set<String> rawProperties) {
         if (_lines == null)
             return;
 

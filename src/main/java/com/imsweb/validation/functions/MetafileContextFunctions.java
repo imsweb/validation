@@ -1923,7 +1923,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 return -1;
             Map<String, String> input = new HashMap<String, String>();
             input.put("primarySite", site);
-            input.put("histologyIcdO3", hist);
+            input.put("histologicTypeIcdO3", hist);
             input.put("csSiteSpecificFactor25", GEN_TO_STRING(param3));
             return getCsSchemaNumber(input);
         }

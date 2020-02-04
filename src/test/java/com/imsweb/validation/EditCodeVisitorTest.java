@@ -253,7 +253,7 @@ public class EditCodeVisitorTest {
         SortedSet<String> expected = new TreeSet<>();
         expected.add("ctc.seerSummaryStage2000");
         expected.add("ctc.primarySite");
-        expected.add("ctc.histologyICDO3");
+        expected.add("ctc.histologicTypeIcdO3");
         expected.add("ctc.typeOfReportingSource");
         expected.add("facilityAdmission.registryData");
         expected.add("facilityAdmission.registryData.prop2");
@@ -285,8 +285,8 @@ public class EditCodeVisitorTest {
 
         // another full test
         expected.clear();
-        expected.add("line.behaviorIcdO3");
-        expected.add("line.histologyIcdO3");
+        expected.add("line.behaviorCodeIcdO3");
+        expected.add("line.histologicTypeIcdO3");
         expected.add("line.laterality");
         expected.add("line.overRideSiteLatSeqNo");
         expected.add("line.primarySite");
@@ -301,8 +301,8 @@ public class EditCodeVisitorTest {
         expected.add("untrimmedline.tnmClinStageGroup");
         expected.add("untrimmedline.tnmPathStageGroup");
         expected.add("untrimmedline.dateOfDiagnosis");
-        expected.add("untrimmedline.behaviorIcdO3");
-        expected.add("untrimmedline.histologyIcdO3");
+        expected.add("untrimmedline.behaviorCodeIcdO3");
+        expected.add("untrimmedline.histologicTypeIcdO3");
         expected.add("untrimmedline.tnmEditionNumber");
         expected.add("untrimmedline.ageAtDx");
         expected.add("untrimmedline.overRideSiteTnmStgGrp");
@@ -316,8 +316,8 @@ public class EditCodeVisitorTest {
         // another test based on a bug
         expected.clear();
         expected.add("line.dateOfDiagnosisYear");
-        expected.add("line.histologyIcdO3");
-        expected.add("line.behaviorIcdO3");
+        expected.add("line.histologicTypeIcdO3");
+        expected.add("line.behaviorCodeIcdO3");
         rawProperties.clear();
         exp = getContent(Thread.currentThread().getContextClassLoader().getResource("property-parsing-another-test1a.txt"));
         ValidationServices.getInstance().parseExpression("id", exp, rawProperties, null, null);

@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 2.11**
+
+- Increased the engine version to 6.3.
+- Changed hard-coded field names in StagingContextFunctions to align with NAACCR XLM IDs.
+
 **Version 2.10**
 
 - Updated Groovy library from version 2.5.6 (indy) to version 2.5.8 (indy).

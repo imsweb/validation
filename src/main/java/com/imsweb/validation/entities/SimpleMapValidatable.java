@@ -147,7 +147,7 @@ public class SimpleMapValidatable implements Validatable {
      */
     private SimpleMapValidatable(SimpleMapValidatable parent, String prefix, Map<String, Object> map) {
         _prefix = prefix;
-        _alias = ValidationServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+\\]", ""));
+        _alias = ValidationServices.getInstance().getAliasForJavaPath(prefix.replaceAll("\\[\\d+]", ""));
         _current = map;
         _parent = parent;
         _prefixes = new HashMap<>(_parent.getPrefixes());
@@ -212,7 +212,7 @@ public class SimpleMapValidatable implements Validatable {
     }
 
     @Override
-    public void reportFailureForProperty(String propertyName) throws IllegalAccessException {
+    public void reportFailureForProperty(String propertyName) {
         if (propertyName != null) {
             int pos = propertyName.indexOf('.');
             if (pos >= 0) {
@@ -227,7 +227,7 @@ public class SimpleMapValidatable implements Validatable {
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public void forceFailureForProperties(Set<ExtraPropertyEntityHandlerDto> toReport, Set<String> rawProperties) throws IllegalAccessException {
+    public void forceFailureForProperties(Set<ExtraPropertyEntityHandlerDto> toReport, Set<String> rawProperties) {
         for (ExtraPropertyEntityHandlerDto extra : toReport) {
             Set<String> props = extra.getProperties();
             if (props == null)

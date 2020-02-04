@@ -50,20 +50,20 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getCsSchemaName(null));
         Assert.assertNull(_functions.getCsSchemaName(input));
         input.put("primarySite", "C004");
-        input.put("histologyIcdO3", "8750");
+        input.put("histologicTypeIcdO3", "8750");
         input.put("csSiteSpecificFactor25", "30");
         Assert.assertEquals("MelanomaLipLower", _functions.getCsSchemaName(input));
         input.put("primarySite", "C003");
         Assert.assertEquals("MelanomaLipUpper", _functions.getCsSchemaName(input));
         input.put("csSiteSpecificFactor25", null);
         Assert.assertEquals("MelanomaLipUpper", _functions.getCsSchemaName(input));
-        input.put("histologyIcdO3", "8720");
+        input.put("histologicTypeIcdO3", "8720");
         Assert.assertEquals("MelanomaLipUpper", _functions.getCsSchemaName(input));
-        input.put("histologyIcdO3", "8790");
+        input.put("histologicTypeIcdO3", "8790");
         Assert.assertEquals("MelanomaLipUpper", _functions.getCsSchemaName(input));
-        input.put("histologyIcdO3", "8719");
+        input.put("histologicTypeIcdO3", "8719");
         Assert.assertNull(_functions.getCsSchemaName(input));
-        input.put("histologyIcdO3", "8791");
+        input.put("histologicTypeIcdO3", "8791");
         Assert.assertNull(_functions.getCsSchemaName(input));
     }
 
@@ -77,20 +77,20 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getCsSchemaId(null));
         Assert.assertNull(_functions.getCsSchemaId(input));
         input.put("primarySite", "C004");
-        input.put("histologyIcdO3", "8750");
+        input.put("histologicTypeIcdO3", "8750");
         input.put("csSiteSpecificFactor25", "30");
         Assert.assertEquals("melanoma_lip_lower", _functions.getCsSchemaId(input));
         input.put("primarySite", "C003");
         Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
         input.put("csSiteSpecificFactor25", null);
         Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
-        input.put("histologyIcdO3", "8720");
+        input.put("histologicTypeIcdO3", "8720");
         Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
-        input.put("histologyIcdO3", "8790");
+        input.put("histologicTypeIcdO3", "8790");
         Assert.assertEquals("melanoma_lip_upper", _functions.getCsSchemaId(input));
-        input.put("histologyIcdO3", "8719");
+        input.put("histologicTypeIcdO3", "8719");
         Assert.assertNull(_functions.getCsSchemaId(input));
-        input.put("histologyIcdO3", "8791");
+        input.put("histologicTypeIcdO3", "8791");
         Assert.assertNull(_functions.getCsSchemaId(input));
     }
 
@@ -100,7 +100,7 @@ public class StagingContextFunctionsTest {
         // C447/8000 and csTumorSize, expecting [989, 994, 995, 001-988, 992, 993, 990, 991, 000, 999]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C447");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertTrue(_functions.isAcceptableCsCode(input, "csTumorSize", "000"));
@@ -121,9 +121,9 @@ public class StagingContextFunctionsTest {
 
         input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
-        Assert.assertTrue(_functions.isAcceptableCsCode(input, "csSiteSpecFact25", "988"));
+        Assert.assertTrue(_functions.isAcceptableCsCode(input, "csSiteSpecificFactor25", "988"));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class StagingContextFunctionsTest {
         // C180/8000 and csMetsAtDx with value of 40 (obsolete)
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C180");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         //assertTrue(_functions.isObsoleteCsCode(input, "csMetsAtDx", "40"));
@@ -145,9 +145,9 @@ public class StagingContextFunctionsTest {
 
         input.clear();
         input.put("primarySite", "C696");
-        input.put("histologyIcdO3", "9699");
+        input.put("histologicTypeIcdO3", "9699");
         input.put("csSiteSpecificFactor25", "988");
-        Assert.assertFalse(_functions.isObsoleteCsCode(input, "csSiteSpecFact5", "988"));
+        Assert.assertFalse(_functions.isObsoleteCsCode(input, "csSiteSpecificFactor5", "988"));
     }
 
     @Test
@@ -156,7 +156,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [1,3,8,10,2,7,9,11,12,13]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertTrue(_functions.isRequiredCsCode(input, 1));
@@ -170,7 +170,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [blank]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isAlreadyCollectedCsCode(input, 1));
@@ -184,7 +184,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [1,3,8,10]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertTrue(_functions.isNeededForStagingCsCode(input, 1));
@@ -198,7 +198,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [2,7,9,11,12,13]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isClinicallySignificantCsCode(input, 1));
@@ -212,7 +212,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [4]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isRequiredPre2010CsCode(input, 1));
@@ -226,7 +226,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [1,3,8,10,2,7,9,11,12,13]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertTrue(_functions.isCocRequiredCsCode(input, 1));
@@ -240,7 +240,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [blank]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isCocAlreadyCollectedCsCode(input, 1));
@@ -254,7 +254,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [1,3,8,10]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertTrue(_functions.isCocNeededForStagingCsCode(input, 1));
@@ -268,7 +268,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [2,7,9,11,12,13]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isCocClinicallySignificantCsCode(input, 1));
@@ -282,7 +282,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [4]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isCocRequiredPre2010CsCode(input, 1));
@@ -297,7 +297,7 @@ public class StagingContextFunctionsTest {
         // testing a single case (Bladder); the goal here is not to test the Obsolete logic, just that the call through is successful
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C670");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", "988");
         input.put("_csSchemaName", "Bladder");
         Assert.assertEquals("14", _functions.getCsObsoleteReason(input, "csExtension", "600"));
@@ -317,7 +317,7 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getTnmStagingSchema(input));
 
         input.put("primarySite", "C481");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
         Assert.assertNull(_functions.getTnmStagingSchema(input));
 
@@ -341,20 +341,20 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getTnmSchemaName(input));
 
         input.put("primarySite", "C004");
-        input.put("histologyIcdO3", "8750");
+        input.put("histologicTypeIcdO3", "8750");
         input.put("csSiteSpecificFactor25", "30");
         Assert.assertEquals("Melanoma Lip Lower", _functions.getTnmSchemaName(input));
         input.put("primarySite", "C003");
         Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
         input.put("csSiteSpecificFactor25", null);
         Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
-        input.put("histologyIcdO3", "8720");
+        input.put("histologicTypeIcdO3", "8720");
         Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
-        input.put("histologyIcdO3", "8790");
+        input.put("histologicTypeIcdO3", "8790");
         Assert.assertEquals("Melanoma Lip Upper", _functions.getTnmSchemaName(input));
-        input.put("histologyIcdO3", "8719");
+        input.put("histologicTypeIcdO3", "8719");
         Assert.assertNull(_functions.getTnmSchemaName(input));
-        input.put("histologyIcdO3", "8791");
+        input.put("histologicTypeIcdO3", "8791");
         Assert.assertNull(_functions.getTnmSchemaName(input));
     }
 
@@ -365,23 +365,23 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getTnmSchemaId(input));
 
         input.put("primarySite", "C004");
-        input.put("histologyIcdO3", "8750");
+        input.put("histologicTypeIcdO3", "8750");
         input.put("csSiteSpecificFactor25", "30");
         Assert.assertEquals("melanoma_lip_lower", _functions.getTnmSchemaId(input));
         input.put("primarySite", "C003");
         Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
         input.put("csSiteSpecificFactor25", null);
         Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
-        input.put("histologyIcdO3", "8720");
+        input.put("histologicTypeIcdO3", "8720");
         Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
-        input.put("histologyIcdO3", "8790");
+        input.put("histologicTypeIcdO3", "8790");
         Assert.assertEquals("melanoma_lip_upper", _functions.getTnmSchemaId(input));
-        input.put("histologyIcdO3", "8719");
+        input.put("histologicTypeIcdO3", "8719");
         Assert.assertNull(_functions.getTnmSchemaId(input));
-        input.put("histologyIcdO3", "8791");
+        input.put("histologicTypeIcdO3", "8791");
         Assert.assertNull(_functions.getTnmSchemaId(input));
         input.put("primarySite", "C481");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
         input.put("sex", "2");
         Assert.assertEquals("peritoneum_female_gen", _functions.getTnmSchemaId(input));
@@ -395,7 +395,7 @@ public class StagingContextFunctionsTest {
         // C447/8000 and tnmClinT, expecting [88, c0, c1, c2, c3, c4, cX, pIS, blank]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C447");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isAcceptableTnmCode(input, "csTumorSize", "000"));
@@ -430,7 +430,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [1,8,10,2,7,9,12,13]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertTrue(_functions.isRequiredTnmCode(input, 1));
@@ -444,7 +444,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [1,8,10]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertTrue(_functions.isNeededForStagingTnmCode(input, 1));
@@ -459,7 +459,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [1,2,7,8,9,10,11,12,13]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isCocRequiredTnmCode(input, 3));
@@ -480,7 +480,7 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getEodStagingSchema(input));
 
         input.put("primarySite", "C481");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         Assert.assertNull(_functions.getEodStagingSchema(input));
 
         input.put("sex", "1");
@@ -499,8 +499,8 @@ public class StagingContextFunctionsTest {
         Assert.assertNotNull(_functions.getEodStagingSchema(input)); // oropharynx_hpv_mediated_p16_pos
 
         input.put("primarySite", "C700");
-        input.put("histologyIcdO3", "8710");
-        input.put("behaviorIcdO3", "0");
+        input.put("histologicTypeIcdO3", "8710");
+        input.put("behaviorCodeIcdO3", "0");
         input.put("schemaDiscriminator1", null);
         input.put("schemaDiscriminator2", null);
         Assert.assertNotNull(_functions.getEodStagingSchema(input)); // brain
@@ -513,20 +513,20 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getEodSchemaName(input));
 
         input.put("primarySite", "C004");
-        input.put("histologyIcdO3", "8750");
+        input.put("histologicTypeIcdO3", "8750");
         input.put("schemaDiscriminator1", "0");
         Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
         input.put("primarySite", "C003");
         Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
         input.put("schemaDiscriminator1", null);
         Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
-        input.put("histologyIcdO3", "8720");
+        input.put("histologicTypeIcdO3", "8720");
         Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
-        input.put("histologyIcdO3", "8790");
+        input.put("histologicTypeIcdO3", "8790");
         Assert.assertEquals("Melanoma Head and Neck", _functions.getEodSchemaName(input));
-        input.put("histologyIcdO3", "8719");
+        input.put("histologicTypeIcdO3", "8719");
         Assert.assertNull(_functions.getEodSchemaName(input));
-        input.put("histologyIcdO3", "8791");
+        input.put("histologicTypeIcdO3", "8791");
         Assert.assertNull(_functions.getEodSchemaName(input));
     }
 
@@ -537,23 +537,23 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getEodSchemaId(input));
 
         input.put("primarySite", "C004");
-        input.put("histologyIcdO3", "8750");
+        input.put("histologicTypeIcdO3", "8750");
         input.put("schemaDiscriminator1", "0");
         Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
         input.put("primarySite", "C003");
         Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
         input.put("schemaDiscriminator1", null);
         Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
-        input.put("histologyIcdO3", "8720");
+        input.put("histologicTypeIcdO3", "8720");
         Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
-        input.put("histologyIcdO3", "8790");
+        input.put("histologicTypeIcdO3", "8790");
         Assert.assertEquals("melanoma_head_neck", _functions.getEodSchemaId(input));
-        input.put("histologyIcdO3", "8719");
+        input.put("histologicTypeIcdO3", "8719");
         Assert.assertNull(_functions.getEodSchemaId(input));
-        input.put("histologyIcdO3", "8791");
+        input.put("histologicTypeIcdO3", "8791");
         Assert.assertNull(_functions.getEodSchemaId(input));
         input.put("primarySite", "C481");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("schemaDiscriminator1", null);
         input.put("sex", "2");
         Assert.assertEquals("primary_peritoneal_carcinoma", _functions.getEodSchemaId(input));
@@ -567,7 +567,7 @@ public class StagingContextFunctionsTest {
         // C447/8000 and eodPrimaryTumor, expecting [000, 100, 200, 700, 800, 999]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C447");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
 
         Assert.assertFalse(_functions.isAcceptableEodCode(input, "gradeClinical", "000"));
@@ -603,7 +603,7 @@ public class StagingContextFunctionsTest {
         //                        gleasonScoreClinical, gleasonPatternsClinical, gleasonScorePathological, gleasonPatternsPathological]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("schemaDiscriminator1", null);
 
         Assert.assertTrue(_functions.isRequiredEodField(input, "gleasonPatternsClinical"));
@@ -617,7 +617,7 @@ public class StagingContextFunctionsTest {
         // C619/8000 -> Prostate [psa, prostatePathologicalExtension]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("schemaDiscriminator1", null);
 
         Assert.assertTrue(_functions.isNeededForStagingEodField(input, "psaLabValue"));
@@ -633,7 +633,7 @@ public class StagingContextFunctionsTest {
         //                        gleasonScoreClinical, gleasonPatternsClinical, gleasonScorePathological, gleasonPatternsPathological]
         Map<String, String> input = new HashMap<>();
         input.put("primarySite", "C619");
-        input.put("histologyIcdO3", "8000");
+        input.put("histologicTypeIcdO3", "8000");
         input.put("schemaDiscriminator1", null);
 
         Assert.assertTrue(_functions.isCocRequiredEodField(input, "psaLabValue"));

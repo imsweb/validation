@@ -45,11 +45,11 @@ if (dx_year < 2003 || dx_year > 2009)
 if (!Functions.GEN_INLIST(untrimmedline.tnmEditionNumber, "06,88"))
     return true
 
-if (Functions.GEN_EMPTY(untrimmedline.histologyIcdO3))
+if (Functions.GEN_EMPTY(untrimmedline.histologicTypeIcdO3))
     return true
 
 /* if behavior is benign or borderline - pass */
-if (Functions.GEN_INLIST(untrimmedline.behaviorIcdO3, "0,1"))
+if (Functions.GEN_INLIST(untrimmedline.behaviorCodeIcdO3, "0,1"))
     return true
 
 if (Functions.GEN_INLIST(untrimmedline.overRideSiteTnmStgGrp, "1")) {
@@ -135,15 +135,15 @@ def Validate_ClinStg6() {
 def Get_SiteGrp6() {
 
     /* Lymphoid neoplasms */
-    if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "9590-9596,9650-9667,9670-9729"))
+    if (Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "9590-9596,9650-9667,9670-9729"))
         Functions.GEN_STRCPY(SiteGrp, "48")
     else {
         /* Prostate - transitional cell carcinoma - chg to site group 39 */
-        if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8120-8130"))
+        if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8120-8130"))
             Functions.GEN_STRCPY(SiteGrp, "39")
         else {
             /* Melanoma of skin - set to site group 24 */
-            if (Functions.GEN_INLIST(untrimmedline.primarySite, "440-449,510-512,518,519,600-602,608,609,632", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8720-8722, 8742-8745, 8761, 8771, 8772, 8780"))
+            if (Functions.GEN_INLIST(untrimmedline.primarySite, "440-449,510-512,518,519,600-602,608,609,632", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8720-8722, 8742-8745, 8761, 8771, 8772, 8780"))
                 Functions.GEN_STRCPY(SiteGrp, "24")
             else {
                 Functions.GEN_STRCPY(Site, untrimmedline.primarySite)
@@ -170,17 +170,17 @@ def Check_IfReq6() {
     if (Functions.GEN_INLIST(SiteGrp, "48"))
         req_flag = 1
     else {
-        if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8120,8130"))
+        if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8120,8130"))
             req_flag = 1
         else {
             /* Concatenate SiteGroup, Histology */
             Functions.GEN_STRCPY(GrpHist, SiteGrp)
-            Functions.GEN_STRCAT(GrpHist, untrimmedline.histologyIcdO3)
+            Functions.GEN_STRCAT(GrpHist, untrimmedline.histologicTypeIcdO3)
 
             /* look up closest record >= impossible search key */
             if (Functions.GEN_RLOOKUP(GrpHist, AJC6HIST_DBF, AJC6HIST_DBF_GRPHISTLOW, [0:GRP, 1:HISTLOW, 2:HISTHIGH])) {
                 /* If found, confirm it's the impossible case */
-                if (Functions.GEN_STRCMP(GRP, SiteGrp) == 0 && Functions.GEN_STRCMP(untrimmedline.histologyIcdO3, HISTLOW) >= 0 && Functions.GEN_STRCMP(untrimmedline.histologyIcdO3, HISTHIGH) <= 0)
+                if (Functions.GEN_STRCMP(GRP, SiteGrp) == 0 && Functions.GEN_STRCMP(untrimmedline.histologicTypeIcdO3, HISTLOW) >= 0 && Functions.GEN_STRCMP(untrimmedline.histologicTypeIcdO3, HISTHIGH) <= 0)
                     req_flag = 1
             }
 
@@ -191,31 +191,31 @@ def Check_IfReq6() {
 
 def Check_IfPermit6() {
     /* Prostate - transitional cell carcinoma - site group 39 */
-    if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8120-8130"))
+    if (Functions.GEN_INLIST(untrimmedline.primarySite, "619", '(C\\d\\d\\d)', 2, 3) && Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8120-8130"))
         permit_flag = 1
     else {
         if (Functions.GEN_INLIST(SiteGrp, "03-19, 23, 25-31, 33, 34, 36-39")) {
-            if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000-8576, 8940-8950, 8980, 8981"))
+            if (Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8000-8576, 8940-8950, 8980, 8981"))
                 permit_flag = 1
         }
         else {
             if (Functions.GEN_INLIST(SiteGrp, "20,32")) {
-                if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000"))
+                if (Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8000"))
                     permit_flag = 1
             }
             else {
                 if (Functions.GEN_INLIST(SiteGrp, "21,22")) {
-                    if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000,8800-9582"))
+                    if (Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8000,8800-9582"))
                         permit_flag = 1
                 }
                 else {
                     if (Functions.GEN_INLIST(SiteGrp, "24")) {
-                        if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8742"))
+                        if (Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8742"))
                             permit_flag = 1
                     }
                     else {
                         if (Functions.GEN_INLIST(SiteGrp, "35")) {
-                            if (Functions.GEN_INLIST(untrimmedline.histologyIcdO3, "8000-8576, 8940-8950, 8980, 8981,9060-9085"))
+                            if (Functions.GEN_INLIST(untrimmedline.histologicTypeIcdO3, "8000-8576, 8940-8950, 8980, 8981,9060-9085"))
                                 permit_flag = 1
                         }
                     }

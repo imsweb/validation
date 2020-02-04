@@ -8,16 +8,16 @@ while ( index1 < lines.size() ) {
     def line1 = lines.get(index1)
     def index2 = index1 + 1
     def site1 = line1.primarySite
-    def hist1 = line1.histologyIcdO3
-    def behav1 = line1.behaviorIcdO3
+    def hist1 = line1.histologicTypeIcdO3
+    def behav1 = line1.behaviorCodeIcdO3
     def lat1 = line1.laterality
     if (line1.overRideSiteLatSeqNo != '1' && site1 != null && behav1 != null &&
        site1.length() == 4 && hist1.length() == 4) {
         while ( index2 < lines.size() ) {
             def line2 = lines.get(index2)
             def site2 = line2.primarySite
-            def hist2 = line2.histologyIcdO3
-            def behav2 = line2.behaviorIcdO3
+            def hist2 = line2.histologicTypeIcdO3
+            def behav2 = line2.behaviorCodeIcdO3
             def lat2 = line2.laterality
             if (line2.overRideSiteLatSeqNo != '1' && site2 != null && hist2 != null && behav2 != null && 
                site2.length() == 4 && hist2.length() == 4) {

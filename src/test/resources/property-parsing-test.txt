@@ -1,6 +1,6 @@
 
 // regular property access
-if (ctc.dateOfDiagnosisYyyy < 2001 || ctc.dateOfDiagnosisYyyy > 2003 || ctc.typeOfReportingSource == 7 || ctc.seerSummaryStage2000 != 1 || Functions.between(ctc.histologyICDO3, "9590", "9729"))
+if (ctc.dateOfDiagnosisYyyy < 2001 || ctc.dateOfDiagnosisYyyy > 2003 || ctc.typeOfReportingSource == 7 || ctc.seerSummaryStage2000 != 1 || Functions.between(ctc.histologicTypeIcdO3, "9590", "9729"))
     return true;
 
 // simple alias

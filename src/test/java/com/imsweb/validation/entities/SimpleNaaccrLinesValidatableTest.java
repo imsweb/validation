@@ -124,7 +124,7 @@ public class SimpleNaaccrLinesValidatableTest {
 
             record.put("dateOfDiagnosisYear", "2016");
             record.put("primarySite", "C111");
-            record.put("histologyIcdO3", "8000");
+            record.put("histologicTypeIcdO3", "8000");
             v = new SimpleNaaccrLinesValidatable(record);
             validatables = v.followCollection("line");
             line = (Map<String, String>)validatables.get(0).getScope().get("line");

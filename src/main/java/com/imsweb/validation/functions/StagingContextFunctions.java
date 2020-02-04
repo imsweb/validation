@@ -32,7 +32,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
 
     // the standard NAACCR properties used when getting a CStage schema
     public static final String CSTAGE_INPUT_PROP_SITE = "primarySite";
-    public static final String CSTAGE_INPUT_PROP_HIST = "histologyIcdO3";
+    public static final String CSTAGE_INPUT_PROP_HIST = "histologicTypeIcdO3";
     public static final String CSTAGE_INPUT_PROP_DISC = "csSiteSpecificFactor25";
 
     // this maps the CS fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
@@ -46,31 +46,31 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("regionalNodesExamined", "nodes_exam");
         put("csMetsAtDx", "mets");
         put("csMetsEval", "mets_eval");
-        put("csSiteSpecFact1", "ssf1");
-        put("csSiteSpecFact2", "ssf2");
-        put("csSiteSpecFact3", "ssf3");
-        put("csSiteSpecFact4", "ssf4");
-        put("csSiteSpecFact5", "ssf5");
-        put("csSiteSpecFact6", "ssf6");
-        put("csSiteSpecFact7", "ssf7");
-        put("csSiteSpecFact8", "ssf8");
-        put("csSiteSpecFact9", "ssf9");
-        put("csSiteSpecFact10", "ssf10");
-        put("csSiteSpecFact11", "ssf11");
-        put("csSiteSpecFact12", "ssf12");
-        put("csSiteSpecFact13", "ssf13");
-        put("csSiteSpecFact14", "ssf14");
-        put("csSiteSpecFact15", "ssf15");
-        put("csSiteSpecFact16", "ssf16");
-        put("csSiteSpecFact17", "ssf17");
-        put("csSiteSpecFact18", "ssf18");
-        put("csSiteSpecFact19", "ssf19");
-        put("csSiteSpecFact20", "ssf20");
-        put("csSiteSpecFact21", "ssf21");
-        put("csSiteSpecFact22", "ssf22");
-        put("csSiteSpecFact23", "ssf23");
-        put("csSiteSpecFact24", "ssf24");
-        put("csSiteSpecFact25", "ssf25");
+        put("csSiteSpecificFactor1", "ssf1");
+        put("csSiteSpecificFactor2", "ssf2");
+        put("csSiteSpecificFactor3", "ssf3");
+        put("csSiteSpecificFactor4", "ssf4");
+        put("csSiteSpecificFactor5", "ssf5");
+        put("csSiteSpecificFactor6", "ssf6");
+        put("csSiteSpecificFactor7", "ssf7");
+        put("csSiteSpecificFactor8", "ssf8");
+        put("csSiteSpecificFactor9", "ssf9");
+        put("csSiteSpecificFactor10", "ssf10");
+        put("csSiteSpecificFactor11", "ssf11");
+        put("csSiteSpecificFactor12", "ssf12");
+        put("csSiteSpecificFactor13", "ssf13");
+        put("csSiteSpecificFactor14", "ssf14");
+        put("csSiteSpecificFactor15", "ssf15");
+        put("csSiteSpecificFactor16", "ssf16");
+        put("csSiteSpecificFactor17", "ssf17");
+        put("csSiteSpecificFactor18", "ssf18");
+        put("csSiteSpecificFactor19", "ssf19");
+        put("csSiteSpecificFactor20", "ssf20");
+        put("csSiteSpecificFactor21", "ssf21");
+        put("csSiteSpecificFactor22", "ssf22");
+        put("csSiteSpecificFactor23", "ssf23");
+        put("csSiteSpecificFactor24", "ssf24");
+        put("csSiteSpecificFactor25", "ssf25");
     }});
 
     // this maps the table number of the old DLL to the input keys used in the Staging framework
@@ -149,7 +149,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
 
     // the standard NAACCR properties used when getting a TNM schema
     public static final String TNM_INPUT_PROP_SITE = "primarySite";
-    public static final String TNM_INPUT_PROP_HIST = "histologyIcdO3";
+    public static final String TNM_INPUT_PROP_HIST = "histologicTypeIcdO3";
     public static final String TNM_INPUT_PROP_SSF25 = "csSiteSpecificFactor25";
     public static final String TNM_INPUT_PROP_SEX = "sex";
 
@@ -161,12 +161,12 @@ public class StagingContextFunctions extends ValidationContextFunctions {
 
     // this maps the TNM fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
     public static final Map<String, String> TNM_FIELDS = Collections.unmodifiableMap(new HashMap<String, String>() {{
-        put("seerPrimaryTumor", "seer_primary_tumor");
-        put("seerRegionalNodes", "seer_nodes");
-        put("seerMets", "seer_mets");
+        put("eodPrimaryTumor", "seer_primary_tumor");
+        put("eodRegionalNodes", "seer_nodes");
+        put("eodMets", "seer_mets");
         put("tnmClinStageGroup", "clin_stage_group_direct");
         put("tnmPathStageGroup", "path_stage_group_direct");
-        put("rxSummSystemicSurgSeq", "systemic_surg_seq");
+        put("rxSummSystemicSurSeq", "systemic_surg_seq");
         put("rxSummSurgRadSeq", "radiation_surg_seq");
         put("tnmClinT", "clin_t");
         put("tnmClinN", "clin_n");
@@ -174,40 +174,40 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("tnmPathT", "path_t");
         put("tnmPathN", "path_n");
         put("tnmPathM", "path_m");
-        put("csSiteSpecFact1", "ssf1");
-        put("csSiteSpecFact2", "ssf2");
-        put("csSiteSpecFact3", "ssf3");
-        put("csSiteSpecFact4", "ssf4");
-        put("csSiteSpecFact5", "ssf5");
-        put("csSiteSpecFact6", "ssf6");
-        put("csSiteSpecFact7", "ssf7");
-        put("csSiteSpecFact8", "ssf8");
-        put("csSiteSpecFact9", "ssf9");
-        put("csSiteSpecFact10", "ssf10");
-        put("csSiteSpecFact11", "ssf11");
-        put("csSiteSpecFact12", "ssf12");
-        put("csSiteSpecFact13", "ssf13");
-        put("csSiteSpecFact14", "ssf14");
-        put("csSiteSpecFact15", "ssf15");
-        put("csSiteSpecFact16", "ssf16");
-        put("csSiteSpecFact17", "ssf17");
-        put("csSiteSpecFact18", "ssf18");
-        put("csSiteSpecFact19", "ssf19");
-        put("csSiteSpecFact20", "ssf20");
-        put("csSiteSpecFact21", "ssf21");
-        put("csSiteSpecFact22", "ssf22");
-        put("csSiteSpecFact23", "ssf23");
-        put("csSiteSpecFact24", "ssf24");
-        put("csSiteSpecFact25", "ssf25");
+        put("csSiteSpecificFactor1", "ssf1");
+        put("csSiteSpecificFactor2", "ssf2");
+        put("csSiteSpecificFactor3", "ssf3");
+        put("csSiteSpecificFactor4", "ssf4");
+        put("csSiteSpecificFactor5", "ssf5");
+        put("csSiteSpecificFactor6", "ssf6");
+        put("csSiteSpecificFactor7", "ssf7");
+        put("csSiteSpecificFactor8", "ssf8");
+        put("csSiteSpecificFactor9", "ssf9");
+        put("csSiteSpecificFactor10", "ssf10");
+        put("csSiteSpecificFactor11", "ssf11");
+        put("csSiteSpecificFactor12", "ssf12");
+        put("csSiteSpecificFactor13", "ssf13");
+        put("csSiteSpecificFactor14", "ssf14");
+        put("csSiteSpecificFactor15", "ssf15");
+        put("csSiteSpecificFactor16", "ssf16");
+        put("csSiteSpecificFactor17", "ssf17");
+        put("csSiteSpecificFactor18", "ssf18");
+        put("csSiteSpecificFactor19", "ssf19");
+        put("csSiteSpecificFactor20", "ssf20");
+        put("csSiteSpecificFactor21", "ssf21");
+        put("csSiteSpecificFactor22", "ssf22");
+        put("csSiteSpecificFactor23", "ssf23");
+        put("csSiteSpecificFactor24", "ssf24");
+        put("csSiteSpecificFactor25", "ssf25");
     }});
 
     // the standard NAACCR properties used when getting a EOD schema
     public static final String EOD_INPUT_PROP_SITE = "primarySite";
-    public static final String EOD_INPUT_PROP_HIST = "histologyIcdO3";
+    public static final String EOD_INPUT_PROP_HIST = "histologicTypeIcdO3";
     public static final String EOD_INPUT_PROP_SEX = "sex";
     public static final String EOD_INPUT_PROP_DISC_1 = "schemaDiscriminator1";
     public static final String EOD_INPUT_PROP_DISC_2 = "schemaDiscriminator2";
-    public static final String EOD_INPUT_PROP_BEHAV = "behaviorIcdO3";
+    public static final String EOD_INPUT_PROP_BEHAV = "behaviorCodeIcdO3";
 
     // EOD metadata tags
     public static final String EOD_TAG_SEER_REQUIRED = "SEER_REQUIRED";
@@ -249,7 +249,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("tumorSizePathologic", "size_path");
         put("tumorSizeSummary", "size_summary");
         put("summaryStage2018", "ss2018");
-        put("rxSummSystemicSurgSeq", "systemic_surg_seq");
+        put("rxSummSystemicSurSeq", "systemic_surg_seq");
         put("rxSummSurgRadSeq", "radiation_surg_seq");
         put("regionalNodesPositive", "nodes_pos");
         put("regionalNodesExamined", "nodes_exam");
@@ -264,33 +264,33 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("afpPretreatmentLabValue", "afp_pretx_lab_value");
         put("anemia", "anemia");
         put("bSymptoms", "b_symptoms");
-        put("bilirubinPretreatmentTotalLabValue", "bilirubin_pretx_lab_value");
-        put("bilirubinPretreatmentUnitOfMeasure", "bilirubin_pretx_unit");
+        put("bilirubinPretxTotalLabValue", "bilirubin_pretx_lab_value");
+        put("bilirubinPretxUnitOfMeasure", "bilirubin_pretx_unit");
         put("boneInvasion", "bone_invasion");
         put("brainMolecularMarkers", "brain_molecular_markers");
         put("breslowTumorThickness", "breslow_thickness");
         put("ca125PretreatmentInterpretation", "ca125_pretx_interpretation");
         put("ceaPretreatmentInterpretation", "cea_pretx_interpretation");
         put("ceaPretreatmentLabValue", "cea_pretx_lab_value");
-        put("chromosome19qLossOfHeterozygosity", "chrom_19q_status");
-        put("chromosome1pLossOfHeterozygosity", "chrom_1p_status");
+        put("chromosome19qLossHeterozygosity", "chrom_19q_status");
+        put("chromosome1pLossHeterozygosity", "chrom_1p_status");
         put("chromosome3Status", "chrom_3_status");
         put("chromosome8qStatus", "chrom_8q_status");
         put("circumferentialResectionMargin", "crm");
         put("creatininePretreatmentLabValue", "creatinine_pretx_lab_value");
-        put("creatininePretreatmentUnitOfMeasure", "creatinine_pretx_unit");
+        put("creatininePretxUnitOfMeasure", "creatinine_pretx_unit");
         put("esophagusAndEgjTumorEpicenter", "esoph_tumor_epicenter");
-        put("estrogenReceptorPercentPositiveOrRange", "er_percent_positive");
+        put("estrogenReceptorPercntPosOrRange", "er_percent_positive");
         put("estrogenReceptorSummary", "er");
         put("estrogenReceptorTotalAllredScore", "er_allred_score");
         put("extranodalExtensionClin", "extranodal_ext_clin");
-        put("extranodalExtensionHeadAndNeckClinical", "extranodal_ext_hn_clin");
-        put("extranodalExtensionHeadAndNeckPathological", "extranodal_ext_hn_path");
+        put("extranodalExtensionHeadNeckClin", "extranodal_ext_hn_clin");
+        put("extranodalExtensionHeadNeckPath", "extranodal_ext_hn_path");
         put("extranodalExtensionPath", "extranodal_ext_path");
         put("extravascularMatrixPatterns", "extravascular_matrix_patterns");
         put("fibrosisScore", "fibrosis_score");
         put("figoStage", "figo");
-        put("gestationalTrophoblasticPrognosticScoringIndex", "gestational_prog_index");
+        put("gestationalTrophoblasticPxIndex", "gestational_prog_index");
         put("gleasonPatternsClinical", "gleason_patterns_clin");
         put("gleasonPatternsPathological", "gleason_patterns_path");
         put("gleasonScoreClinical", "gleason_score_clin");
@@ -310,9 +310,9 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("highRiskCytogenetics", "high_risk_cytogenetics");
         put("highRiskHistologicFeatures", "high_risk_features");
         put("hivStatus", "hiv");
-        put("internationalNormalizedRatioForProthrombinTime", "inr_prothrombin_time");
+        put("iNRProthrombinTime", "inr_prothrombin_time");
         put("invasionBeyondCapsule", "invasion_beyond_capsule");
-        put("ipsilateralAdrenalGlandInvolvement", "ipsilateral_adrenal_gland_involv");
+        put("ipsilateralAdrenalGlandInvolve", "ipsilateral_adrenal_gland_involv");
         put("jak2", "jak2");
         put("ki67", "ki67");
         put("kitGeneImmunohistochemistry", "kit");
@@ -321,10 +321,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("ldhPreOrchiectomyRange", "ldh_pre_orch_range");
         put("ldhPretreatmentLevel", "ldh_pretx_level");
         put("ldhUpperLimitsOfNormal", "ldh_upper_limit");
-        put("lnAssessmentMethodFemoralInguinal", "ln_assessment_femoral");
-        put("lnAssessmentMethodParaAortic", "ln_assessment_para_aortic");
-        put("lnAssessmentMethodPelvic", "ln_assessment_pelvic");
-        put("lnDistantAssessmentMethod", "ln_distant_assessment");
+        put("lnAssessMethodFemoralInguinal", "ln_assessment_femoral");
+        put("lnAssessMethodParaaortic", "ln_assessment_para_aortic");
+        put("lnAssessMethodPelvic", "ln_assessment_pelvic");
+        put("lnDistantAssessMethod", "ln_distant_assessment");
         put("lnDistantMediastinalScalene", "ln_distant_mediastinal_scalene");
         put("lnHeadAndNeckLevels1To3", "ln_hn_1_2_3");
         put("lnHeadAndNeckLevels4To5", "ln_hn_4_5");
@@ -334,12 +334,12 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("lnLaterality", "ln_laterality");
         put("lnPositiveAxillaryLevel1To2", "ln_pos_axillary_level_1_2");
         put("lnSize", "ln_size_of_mets");
-        put("lnStatusFemoralInguinalParaAorticPelvic", "ln_status");
+        put("lnStatusFemorInguinParaaortPelv", "ln_status");
         put("lymphocytosis", "lymphocytosis");
         put("majorVeinInvolvement", "major_vein_involv");
         put("measuredBasalDiameter", "measured_basal_diameter");
         put("measuredThickness", "measured_thickness");
-        put("methylationOfO6MethylguanineMethyltransferase", "mgmt");
+        put("methylationOfO6MGMT", "mgmt");
         put("microsatelliteInstability", "msi");
         put("microvascularDensity", "mvd");
         put("mitoticCountUvealMelanoma", "mitotic_count_uveal_mel");
@@ -354,7 +354,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("numberOfPositiveParaAorticNodes", "num_pos_para_aortic_nodes");
         put("numberOfPositivePelvicNodes", "num_pos_pelvic_nodes");
         put("oncotypeDxRecurrenceScoreDcis", "oncotype_dx_score_dcis");
-        put("oncotypeDxRecurrenceScoreInvasive", "oncotype_dx_score");
+        put("oncotypeDxRecurrenceScoreInvasiv", "oncotype_dx_score");
         put("oncotypeDxRiskLevelDcis", "oncotype_dx_risk_level_dcis");
         put("oncotypeDxRiskLevelInvasive", "oncotype_dx_risk_level");
         put("organomegaly", "organomegaly");
@@ -365,26 +365,26 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         put("pleuralEffusion", "pleural_effusion");
         put("primarySclerosingCholangitis", "prim_scleros_cholangitis");
         put("profoundImmuneSuppression", "profound_immune_suppression");
-        put("progesteroneReceptorPercentPositiveOrRange", "pr_percent_positive");
-        put("progesteroneReceptorSummary", "pr");
-        put("progesteroneReceptorTotalAllredScore", "pr_allred_score");
+        put("progesteroneRecepPrcntPosOrRange", "pr_percent_positive");
+        put("progesteroneRecepSummary", "pr");
+        put("progesteroneRecepTotalAllredScor", "pr_allred_score");
         put("prostatePathologicalExtension", "prostate_path_extension");
         put("psaLabValue", "psa");
-        put("residualTumorVolumePostCytoreduction", "resid_tumor_vol_post_cyto");
+        put("residualTumVolPostCytoreduction", "resid_tumor_vol_post_cyto");
         put("responseToNeoadjuvantTherapy", "response_neoadjuv_therapy");
         put("sCategoryClinical", "s_category_clin");
         put("sCategoryPathological", "s_category_path");
         put("sarcomatoidFeatures", "sarcomatoid_features");
-        put("seerSiteSpecificFactor1", "seer_ssf1");
+        put("seerSiteSpecificFact1", "seer_ssf1");
         put("separateTumorNodules", "separate_tumor_nodules");
         put("serumAlbuminPretreatmentLevel", "serum_alb_pretx_level");
-        put("serumBeta2MicroglobulinPretreatmentLevel", "b2_microglob_pretx_level");
+        put("serumBeta2MicroglobulinPretxLvl", "b2_microglob_pretx_level");
         put("ldhPretreatmentLabValue", "ldh_pretx_lab_value");
         put("thrombocytopenia", "thrombocytopenia");
         put("tumorDeposits", "tumor_deposits");
         put("tumorGrowthPattern", "tumor_growth_pattern");
         put("ulceration", "ulceration");
-        put("visceralAndParietalPleuralInvasion", "visceral_pleural_invasion");
+        put("visceralParietalPleuralInvasion", "visceral_pleural_invasion");
     }});
 
     // the staging instances to use for cstage- and tnm-related logic
@@ -435,19 +435,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * The site and the histology cannot be null (or the resulting schema will be null); the SSF25 can be null or missing.
      * <p/>
      * Created on Jan 19, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @return the corresponding CS schema name; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the CS schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getCsSchemaName(inputs)")
+            desc = "Returns the CS schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\ndef schemaName = Functions.getCsSchemaName(inputs)")
     public String getCsSchemaName(Map<String, String> input) {
         if (_csStaging == null)
             return null;
@@ -462,19 +462,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * The site and the histology cannot be null (or the resulting schema will be null); the SSF25 can be null or missing.
      * <p/>
      * Created on Jan 19, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @return the corresponding CS schema ID; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the CS schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaId = Functions.getCsSchemaId(inputs)")
+            desc = "Returns the CS schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\ndef schemaId = Functions.getCsSchemaId(inputs)")
     public String getCsSchemaId(Map<String, String> input) {
         if (_csStaging == null)
             return null;
@@ -489,19 +489,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Jan 22, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param field requested CS field
      * @param valueToCheck the value to check
      * @return true if the value is acceptable, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "CS field name", paramName3 = "valueToCheck", param3 = "value to validate",
-            desc = "Returns true if the provided value is valid for the CS schema corresponding to the inputs and the CS field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAcceptableCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+            desc = "Returns true if the provided value is valid for the CS schema corresponding to the inputs and the CS field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public boolean isAcceptableCsCode(Map<String, String> input, String field, String valueToCheck) {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
@@ -517,19 +517,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Jan 22, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param field requested CS field
      * @param valueToCheck the value to check
      * @return true if the value is obsolete, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "CS field name", paramName3 = "valueToCheck", param3 = "value to check",
-            desc = "Returns true if the provided value is obsolete for the CS schema corresponding to the inputs and the CS field, false otherwise. The value is obsolete if its description in the CS table starts with OBSOLETE. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isObsoleteCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+            desc = "Returns true if the provided value is obsolete for the CS schema corresponding to the inputs and the CS field, false otherwise. The value is obsolete if its description in the CS table starts with OBSOLETE. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isObsoleteCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public boolean isObsoleteCsCode(Map<String, String> input, String field, String valueToCheck) {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
@@ -545,19 +545,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Jan 22, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param field requested CS field
      * @param valueToCheck the value to check
      * @return true if the value is obsolete, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "CS field name", paramName3 = "valueToCheck", param3 = "value to check",
             desc = "Returns the reason why a particular code is obsolete.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.getCsObsoleteReason(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.getCsObsoleteReason(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public String getCsObsoleteReason(Map<String, String> input, String field, String valueToCheck) {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return null;
@@ -583,19 +583,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. Required means either 'already-collected', 'needed-for-staging' or 'clinically significant'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredCsCode(inputs, 1)")
+                    + "false otherwise. Required means either 'already-collected', 'needed-for-staging' or 'clinically significant'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isRequiredCsCode(inputs, 1)")
     public boolean isRequiredCsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -616,19 +616,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required (needed for staging), false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required (needed-for-staging) for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isNeededForStagingCsCode(inputs, 1)")
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isNeededForStagingCsCode(inputs, 1)")
     public boolean isNeededForStagingCsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -650,19 +650,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required (already collected), false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required (already-collected) for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAlreadyCollectedCsCode(inputs, 1)")
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAlreadyCollectedCsCode(inputs, 1)")
     public boolean isAlreadyCollectedCsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -682,19 +682,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required (clinically significant), false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required (clinically-significant) for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isClinicallySignificantCsCode(inputs, 1)")
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isClinicallySignificantCsCode(inputs, 1)")
     public boolean isClinicallySignificantCsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -716,19 +716,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required pre-2010, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required (pre-2010) for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredPre2010CsCode(inputs, 1)")
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isRequiredPre2010CsCode(inputs, 1)")
     public boolean isRequiredPre2010CsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -750,19 +750,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required for CoC for the schema corresponding to the passed input, "
-                    + "false otherwise. Required means either 'already-collected', 'needed-for-staging' or 'clinically significant'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredCsCode(inputs, 1)")
+                    + "false otherwise. Required means either 'already-collected', 'needed-for-staging' or 'clinically significant'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isRequiredCsCode(inputs, 1)")
     public boolean isCocRequiredCsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -783,18 +783,18 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required (already collected), false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
-            desc = "Returns true if the passed Site Specific Factor index is required (already-collected) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAlreadyCollectedCsCode(inputs, 1)")
+            desc = "Returns true if the passed Site Specific Factor index is required (already-collected) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAlreadyCollectedCsCode(inputs, 1)")
     public boolean isCocAlreadyCollectedCsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -814,18 +814,18 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required (needed for staging), false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
-            desc = "Returns true if the passed Site Specific Factor index is required (needed-for-staging) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isNeededForStagingCsCode(inputs, 1)")
+            desc = "Returns true if the passed Site Specific Factor index is required (needed-for-staging) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isNeededForStagingCsCode(inputs, 1)")
     public boolean isCocNeededForStagingCsCode(Map<String, String> input, Integer ssfIndex) {
         return isNeededForStagingCsCode(input, ssfIndex); // needed for staging is not agency-specific...
     }
@@ -836,18 +836,18 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required (clinically significant), false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
-            desc = "Returns true if the passed Site Specific Factor index is required (clinically-significant) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isClinicallySignificantCsCode(inputs, 1)")
+            desc = "Returns true if the passed Site Specific Factor index is required (clinically-significant) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isClinicallySignificantCsCode(inputs, 1)")
     public boolean isCocClinicallySignificantCsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -869,18 +869,18 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * </ul>
      * <p/>
      * Created on Feb 23, 2010 by depryf
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" key
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" key
      * @param ssfIndex requested SSF index
      * @return true if the index is required pre-2010, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
-            desc = "Returns true if the passed Site Specific Factor index is required (pre-2010) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredPre2010CsCode(inputs, 1)")
+            desc = "Returns true if the passed Site Specific Factor index is required (pre-2010) for CoC for the schema corresponding to the passed input, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isRequiredPre2010CsCode(inputs, 1)")
     public boolean isCocRequiredPre2010CsCode(Map<String, String> input, Integer ssfIndex) {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
@@ -914,17 +914,17 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * <li>sex</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
      * @return the corresponding TNM schema name; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the TNM schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getTnmSchemaName(inputs)")
+            desc = "Returns the TNM schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\ndef schemaName = Functions.getTnmSchemaName(inputs)")
     public String getTnmSchemaName(Map<String, String> input) {
         if (_tnmStaging == null)
             return null;
@@ -939,17 +939,17 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * <li>sex</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
      * @return the corresponding TNM schema ID; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the TNM schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaId = Functions.getTnmSchemaId(inputs)")
+            desc = "Returns the TNM schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the key 'csSiteSpecificFactor25' or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\ndef schemaId = Functions.getTnmSchemaId(inputs)")
     public String getTnmSchemaId(Map<String, String> input) {
         if (_tnmStaging == null)
             return null;
@@ -964,19 +964,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * <li>sex</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
      * @param field requested TNM field
      * @param valueToCheck value to check
      * @return true if the value is acceptable, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "TNM field name", paramName3 = "valueToCheck", param3 = "value to validate",
-            desc = "Returns true if the provided value is valid for the TNM schema corresponding to the inputs and the TNM field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' and 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAcceptableTnmCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+            desc = "Returns true if the provided value is valid for the TNM schema corresponding to the inputs and the TNM field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' and 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableTnmCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
     public boolean isAcceptableTnmCode(Map<String, String> input, String field, String valueToCheck) {
         if (_tnmStaging == null || input == null || field == null)
             return false;
@@ -991,19 +991,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * <li>sex</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
      * @param ssfIndex requested SSF index
      * @return true if the index is required for SEER, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. Required means either 'seer-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredTnmCode(inputs, 1)")
+                    + "false otherwise. Required means either 'seer-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isRequiredTnmCode(inputs, 1)")
     public boolean isRequiredTnmCode(Map<String, String> input, Integer ssfIndex) {
         if (_tnmStaging == null || input == null || ssfIndex == null)
             return false;
@@ -1022,19 +1022,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * <li>sex</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
      * @param ssfIndex requested SSF index
      * @return true if the index is needed for staging, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required (needed-for-staging) for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isNeededForStagingTnmCode(inputs, 1)")
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isNeededForStagingTnmCode(inputs, 1)")
     public boolean isNeededForStagingTnmCode(Map<String, String> input, Integer ssfIndex) {
         if (_tnmStaging == null || input == null || ssfIndex == null)
             return false;
@@ -1056,19 +1056,19 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>csSiteSpecificFactor25</li>
      * <li>sex</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "csSiteSpecificFactor25" or "sex" keys
      * @param ssfIndex requested SSF index
      * @return true if the index is required for COC, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "ssfIndex", param2 = "site specific factor index (Integer)",
             desc = "Returns true if the passed Site Specific Factor index is required for COC for the schema corresponding to the passed input, "
-                    + "false otherwise. Required means either 'coc-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isCocRequiredTnmCode(inputs, 1)")
+                    + "false otherwise. Required means either 'coc-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isCocRequiredTnmCode(inputs, 1)")
     public boolean isCocRequiredTnmCode(Map<String, String> input, Integer ssfIndex) {
         if (_tnmStaging == null || input == null || ssfIndex == null)
             return false;
@@ -1098,18 +1098,18 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>sex</li>
      * <li>schemaDiscriminator1</li>
      * <li>schemaDiscriminator2</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
      * @return the corresponding EOD schema name; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the EOD schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the key 'schemaDiscriminator1', 'schemaDiscriminator2 ', or 'sex'. Returns null if the schema can't be determined.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaName = Functions.getEodSchemaName(inputs)")
+            desc = "Returns the EOD schema name corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the key 'schemaDiscriminator1', 'schemaDiscriminator2 ', or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\ndef schemaName = Functions.getEodSchemaName(inputs)")
     public String getEodSchemaName(Map<String, String> input) {
         if (_eodStaging == null)
             return null;
@@ -1124,18 +1124,18 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>sex</li>
      * <li>schemaDiscriminator1</li>
      * <li>schemaDiscriminator2</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
      * @return the corresponding EOD schema ID; null if not found
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs",
-            desc = "Returns the TNM schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'. Returns null if the schema can't be determined.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\ndef schemaId = Functions.getEodSchemaId(inputs)")
+            desc = "Returns the TNM schema ID corresponding to the inputs; those inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'. Returns null if the schema can't be determined.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\ndef schemaId = Functions.getEodSchemaId(inputs)")
     public String getEodSchemaId(Map<String, String> input) {
         if (_eodStaging == null)
             return null;
@@ -1150,20 +1150,20 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>sex</li>
      * <li>schemaDiscriminator1</li>
      * <li>schemaDiscriminator2</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
      * @param field requested EOD field
      * @param valueToCheck value to check
      * @return true if the value is acceptable, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name", paramName3 = "valueToCheck", param3 = "value to validate",
-            desc = "Returns true if the provided value is valid for the EOD schema corresponding to the inputs and the EOD field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isAcceptableEodCode(inputs, 'eodPrimaryTumor', record.eodPrimaryTumor)")
+            desc = "Returns true if the provided value is valid for the EOD schema corresponding to the inputs and the EOD field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableEodCode(inputs, 'eodPrimaryTumor', record.eodPrimaryTumor)")
     public boolean isAcceptableEodCode(Map<String, String> input, String field, String valueToCheck) {
         if (_eodStaging == null || input == null || field == null)
             return false;
@@ -1178,20 +1178,20 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>sex</li>
      * <li>schemaDiscriminator1</li>
      * <li>schemaDiscriminator2</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
      * @param field requested EOD field
      * @return true if the field is required for SEER, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
             desc = "Returns true if the passed EOD field is required for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. Required means either 'seer-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionaly contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isRequiredEodField(inputs, ''eodPrimaryTumor')")
+                    + "false otherwise. Required means either 'seer-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isRequiredEodField(inputs, ''eodPrimaryTumor')")
     public boolean isRequiredEodField(Map<String, String> input, String field) {
         if (_eodStaging == null || input == null || field == null)
             return false;
@@ -1210,20 +1210,20 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>sex</li>
      * <li>schemaDiscriminator1</li>
      * <li>schemaDiscriminator2</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
      * @param field requested EOD field
      * @return true if the field is needed for staging, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
             desc = "Returns true if the passed EOD field is required (needed-for-staging) for SEER for the schema corresponding to the passed input, "
-                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isNeededForStagingEodField(inputs, 'eodPrimaryTumor')")
+                    + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isNeededForStagingEodField(inputs, 'eodPrimaryTumor')")
     public boolean isNeededForStagingEodField(Map<String, String> input, String field) {
         if (_eodStaging == null || input == null || field == null)
             return false;
@@ -1245,20 +1245,20 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * The data structure should contains the following keys:
      * <ul>
      * <li>primarySite</li>
-     * <li>histologyIcdO3</li>
+     * <li>histologicTypeIcdO3</li>
      * <li>sex</li>
      * <li>schemaDiscriminator1</li>
      * <li>schemaDiscriminator2</li>
      * </ul>
      * <p/>
-     * @param input input map containing the required "primarySite" and "histologyIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
+     * @param input input map containing the required "primarySite" and "histologicTypeIcdO3" keys and the optional "schemaDiscriminator1", "schemaDiscriminator2", or "sex" keys
      * @param field requested EOD field
      * @return true if the field is required for COC, false otherwise
      */
     @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
             desc = "Returns true if the passed EOD field is required for COC for the schema corresponding to the passed input, "
-                    + "false otherwise. Required means either 'coc-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologyIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologyIcdO3' : record.histologyIcdO3\n]\n\nreturn Functions.isCocRequiredEodField(inputs, 'eodPrimaryTumor')")
+                    + "false otherwise. Required means either 'coc-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isCocRequiredEodField(inputs, 'eodPrimaryTumor')")
     public boolean isCocRequiredEodField(Map<String, String> input, String field) {
         if (_eodStaging == null || input == null || field == null)
             return false;
