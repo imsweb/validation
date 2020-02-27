@@ -3,7 +3,7 @@
 **Version 2.11**
 
 - Increased the engine version to 6.3.
-- Changed hard-coded field names in StagingContextFunctions to align with NAACCR XLM IDs.
+- Changed hard-coded field names in StagingContextFunctions to align with NAACCR XML IDs.
 
 **Version 2.10**
 
