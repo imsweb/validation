@@ -18,13 +18,13 @@ public class InitializationStats {
 
     private long _initializationDuration;
 
-    private AtomicInteger _numEditsLoaded;
+    private final AtomicInteger _numEditsLoaded;
 
-    private AtomicInteger _numEditsCompiled;
+    private final AtomicInteger _numEditsCompiled;
 
-    private AtomicInteger _numEditsPreCompiled;
+    private final AtomicInteger _numEditsPreCompiled;
 
-    private Map<String, InitializationStatsPerValidator> _validatorStats;
+    private final Map<String, InitializationStatsPerValidator> _validatorStats;
 
     public InitializationStats() {
         _initializationDuration = 0L;

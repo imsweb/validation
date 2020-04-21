@@ -24,12 +24,12 @@ public class IterativeProcessor implements Processor {
     /**
      * Name of the collection associated with this processor
      */
-    private String _collectionName;
+    private final String _collectionName;
 
     /**
      * Child processor
      */
-    private Processor _processor;
+    private final Processor _processor;
 
     /**
      * Constructor

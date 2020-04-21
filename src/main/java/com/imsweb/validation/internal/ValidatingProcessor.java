@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import groovy.lang.Binding;
 
 import com.imsweb.validation.ConstructionException;
-import com.imsweb.validation.InitializationOptions;
 import com.imsweb.validation.ValidatingContext;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.ValidationEngine;
@@ -39,36 +38,31 @@ import com.imsweb.validation.runtime.RuntimeUtils;
 public class ValidatingProcessor implements Processor {
 
     // the current java path for this validating processor
-    private String _currentJavaPath;
+    private final String _currentJavaPath;
 
     // collection of child processors; guaranteed never to be null; modified only during initialization (so thread-safe)
-    private Collection<IterativeProcessor> _processors = new ArrayList<>();
+    private final Collection<IterativeProcessor> _processors = new ArrayList<>();
 
     // cached collection of conditions to be run by this processor (need to use a thread-safe collection)
-    private List<ExecutableCondition> _conditions = new CopyOnWriteArrayList<>();
+    private final List<ExecutableCondition> _conditions = new CopyOnWriteArrayList<>();
 
     // cached sorted rules (need to use a thread-safe collection) - rules are rarely written but are read all the time...
-    private List<ExecutableRule> _rules = new CopyOnWriteArrayList<>();
+    private final List<ExecutableRule> _rules = new CopyOnWriteArrayList<>();
 
     // cached base context; depends directly on the rulesets (there is no CopyOnWriteHashMap, boooh)
-    private Map<String, Object> _contexts = new ConcurrentHashMap<>();
+    private final Map<String, Object> _contexts = new ConcurrentHashMap<>();
 
     // cached compiled forced rules (#294)
-    private ValidationLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidationLRUCache<>(10);
-
-    // whether or not stats should be recorded
-    private InitializationOptions _options;
+    private final ValidationLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidationLRUCache<>(10);
 
     /**
      * Constructor.
      * <p/>
      * Created on Aug 15, 2011 by depryf
      * @param javaPath current java path for this validating processor
-     * @param options engine initialization options
      */
-    public ValidatingProcessor(String javaPath, InitializationOptions options) {
+    public ValidatingProcessor(String javaPath) {
         _currentJavaPath = javaPath;
-        _options = options;
     }
 
     @Override
@@ -182,7 +176,7 @@ public class ValidatingProcessor implements Processor {
                     long endTime = System.currentTimeMillis();
 
                     // keep track of the stats...
-                    if (_options.isEngineStatsEnabled() && id != null && !id.isEmpty())
+                    if (vContext.computeEditsStats() && id != null && !id.isEmpty())
                         vContext.reportEditDuration(_currentJavaPath, id, endTime - startTime);
 
                     // if failure, need to keep track of it since other depending rules might not have to run
@@ -312,6 +306,6 @@ public class ValidatingProcessor implements Processor {
 
     @Override
     public String toString() {
-        return _currentJavaPath + " [" + (_rules == null ? "?" : _rules.size()) + " rule(s)]";
+        return _currentJavaPath + " [" + _rules.size() + " rule(s)]";
     }
 }

@@ -13,7 +13,7 @@ public class EngineStats {
     /**
      * ID for this DTO (can represent anything - polisher ID, registry coding task ID, auto-cons rule ID, etc...)
      */
-    private String _id;
+    private final String _id;
 
     /**
      * Number of run

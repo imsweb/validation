@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.12**
+
+- Now allowing edits statistics to be dynamically turned ON/OFF via the engine.
+
 **Version 2.11**
 
 - Increased the engine version to 6.3.

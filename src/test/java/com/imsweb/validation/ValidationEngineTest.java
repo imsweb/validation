@@ -237,6 +237,15 @@ public class ValidationEngineTest {
         TestingUtils.assertNoEditFailure(ValidationEngine.getInstance().validate(validatable, Collections.singletonList("fv-rule1")), "fv-rule3");
         entity.put("prop", "0");
 
+        // after running some edits, there should be some stats available...
+        Assert.assertFalse(ValidationEngine.getInstance().getStats().isEmpty());
+        Assert.assertNotNull(ValidationEngine.getInstance().getStats().values().iterator().next().getId());
+        ValidationEngine.getInstance().resetStats();
+        Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
+
+        Assert.assertTrue(ValidationEngine.getInstance().isEditsStatsEnabled());
+        ValidationEngine.getInstance().disableEditsStats();
+
         // let's make the second level fail, that rule overrides the returned properties
         ((List<Map<String, Object>>)entity.get("level2")).get(0).put("prop", "1");
         validatable = new SimpleMapValidatable("ID", "level1", entity);
@@ -246,11 +255,9 @@ public class ValidationEngineTest {
         Assert.assertTrue(ValidationEngine.getInstance().validate(validatable).iterator().next().getProperties().contains("level1.level2[0].otherProp"));
         ((List<Map<String, Object>>)entity.get("level2")).get(0).put("prop", "0");
 
-        // after running some edits, there should be some stats available...
-        Assert.assertFalse(ValidationEngine.getInstance().getStats().isEmpty());
-        Assert.assertNotNull(ValidationEngine.getInstance().getStats().values().iterator().next().getId());
-        ValidationEngine.getInstance().resetStats();
         Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
+        ValidationEngine.getInstance().enableEditsStats();
+        Assert.assertTrue(ValidationEngine.getInstance().isEditsStatsEnabled());
 
         TestingUtils.unloadValidator("fake-validator");
 
