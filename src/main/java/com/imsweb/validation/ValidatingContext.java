@@ -42,7 +42,7 @@ public class ValidatingContext {
     private final Map<String, Map<String, Long>> _editsStats;
 
     // whether or not the edits statistics should be computed
-    private boolean computeEditsStats;
+    private boolean _computeEditsStats;
 
     /**
      * Constructor.
@@ -51,7 +51,7 @@ public class ValidatingContext {
         _failedRuleIds = new HashMap<>();
         _failedConditionIds = new HashMap<>();
         _editsStats = new HashMap<>();
-        computeEditsStats = false;
+        _computeEditsStats = false;
     }
 
     public Collection<String> getToIgnore() {
@@ -87,11 +87,14 @@ public class ValidatingContext {
     }
 
     public boolean computeEditsStats() {
-        return computeEditsStats;
+        return _computeEditsStats;
     }
 
+    /**
+     * Sets whether or not the edits statistics should be computed; this method should only be called by the engine.
+     */
     public void setComputeEditsStats(boolean computeEditsStats) {
-        this.computeEditsStats = computeEditsStats;
+        _computeEditsStats = computeEditsStats;
     }
 
     public void reportEditDuration(String path, String id, long duration) {

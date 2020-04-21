@@ -244,7 +244,7 @@ public class ValidationEngineTest {
         Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
 
         Assert.assertTrue(ValidationEngine.getInstance().isEditsStatsEnabled());
-        ValidationEngine.getInstance().disableEditsStats();
+        ValidationEngine.getInstance().setEditsStatsEnabled(false);
 
         // let's make the second level fail, that rule overrides the returned properties
         ((List<Map<String, Object>>)entity.get("level2")).get(0).put("prop", "1");
@@ -256,7 +256,7 @@ public class ValidationEngineTest {
         ((List<Map<String, Object>>)entity.get("level2")).get(0).put("prop", "0");
 
         Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
-        ValidationEngine.getInstance().enableEditsStats();
+        ValidationEngine.getInstance().setEditsStatsEnabled(true);
         Assert.assertTrue(ValidationEngine.getInstance().isEditsStatsEnabled());
 
         TestingUtils.unloadValidator("fake-validator");

@@ -1826,17 +1826,10 @@ public class ValidationEngine {
     }
 
     /**
-     * Dynamically enable computing the edits statistics on this engine.
+     * Dynamically enables/disabled computing the edits statistics on this engine.
      */
-    public void enableEditsStats() {
-        _computeEditsStats = true;
-    }
-
-    /**
-     * Dynamically disable computing the edits statistics on this engine.
-     */
-    public void disableEditsStats() {
-        _computeEditsStats = false;
+    public void setEditsStatsEnabled(boolean enabled) {
+        _computeEditsStats = enabled;
     }
 
     /**
