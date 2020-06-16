@@ -2,6 +2,7 @@
 
 **Version 2.13**
 
+- Added missing setters in Rule and Condition, renamed a few variables in those classes.
 - Updated Groovy library from version 2.5.8 (indy) to version 3.0.4 (indy).
 - Updated XStream library from version 1.4.11.1 to version 1.4.12.
 - Updated Apache commons-lang library from version 3.9 to version 3.10.
