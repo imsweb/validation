@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'checkstyle'
-    id 'com.github.spotbugs' version '3.0.0'
+    id 'com.github.spotbugs' version '4.3.0'
     id 'com.bmuschko.nexus' version '2.3.1'
     id 'io.codearte.nexus-staging' version '0.21.2'
 }
@@ -20,17 +20,17 @@ repositories {
 
 dependencies {
     api 'com.imsweb:staging-client-java:4.7'
-    api 'org.codehaus.groovy:groovy:2.5.8:indy'
-    api 'com.thoughtworks.xstream:xstream:1.4.11.1'
+    api 'org.codehaus.groovy:groovy:3.0.4:indy'
+    api 'com.thoughtworks.xstream:xstream:1.4.12'
 
     implementation 'commons-codec:commons-codec:1.14'
-    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'org.apache.commons:commons-lang3:3.10'
 
     testImplementation 'junit:junit:4.13'
-    testImplementation 'commons-io:commons-io:2.6'
+    testImplementation 'commons-io:commons-io:2.7'
     testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.3'
     testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.2'
-    testImplementation 'com.imsweb:staging-algorithm-eod-public:1.7.4'
+    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0'
 }
 
 // enforce UTF-8, display the compilation warnings
@@ -130,7 +130,7 @@ if (version.endsWith('-SNAPSHOT'))
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '6.0.1'
+    gradleVersion = '6.5'
     distributionType = Wrapper.DistributionType.ALL
 }
 
