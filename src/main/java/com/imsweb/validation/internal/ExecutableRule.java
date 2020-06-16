@@ -108,7 +108,7 @@ public class ExecutableRule {
         _dependencies = rule.getDependencies();
         _message = rule.getMessage();
         _ignored = rule.getIgnored() == null ? Boolean.FALSE : rule.getIgnored();
-        _usedProperties = rule.getRawProperties();
+        _usedProperties = rule.getUsedProperties();
         _checkForcedEntities = computeCheckForcedEntities(rule.getExpression());
 
         _compiledRules = compiledRules;

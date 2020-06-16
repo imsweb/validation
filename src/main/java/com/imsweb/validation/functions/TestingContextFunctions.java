@@ -3,16 +3,6 @@
  */
 package com.imsweb.validation.functions;
 
-import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.ValidationException;
-import com.imsweb.validation.entities.Rule;
-import com.imsweb.validation.entities.RuleFailure;
-import com.imsweb.validation.entities.RuleTest;
-import com.imsweb.validation.entities.RuleTestResult;
-import com.imsweb.validation.entities.SimpleMapValidatable;
-import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
-import com.imsweb.validation.entities.Validatable;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,6 +20,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+
+import com.imsweb.validation.ValidationEngine;
+import com.imsweb.validation.ValidationException;
+import com.imsweb.validation.entities.Rule;
+import com.imsweb.validation.entities.RuleFailure;
+import com.imsweb.validation.entities.RuleTest;
+import com.imsweb.validation.entities.RuleTestResult;
+import com.imsweb.validation.entities.SimpleMapValidatable;
+import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
+import com.imsweb.validation.entities.Validatable;
 
 /**
  * Context available to the testing framework. The testing Groovy scripts can access the methdos of this context
@@ -451,7 +451,7 @@ public class TestingContextFunctions {
             String javaPath = r.getJavaPath();
             if (javaPath.startsWith("lines") || javaPath.startsWith("untrimmedlines")) {
                 usedProperties = new HashSet<>();
-                for (String s : r.getRawProperties())
+                for (String s : r.getUsedProperties())
                     usedProperties.add(javaPath.startsWith("lines") ? s.replace("line.", "") : s.replace("untrimmedline.", ""));
             }
         }

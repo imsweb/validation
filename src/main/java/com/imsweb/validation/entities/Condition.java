@@ -17,6 +17,7 @@ import com.imsweb.validation.ValidationServices;
  * <p/>
  * Created on Nov 9, 2007 by depryf
  */
+@SuppressWarnings("unused")
 public class Condition {
 
     /**
@@ -57,7 +58,7 @@ public class Condition {
     /**
      * Set of properties contained in the expression
      */
-    protected Set<String> _rawProperties;
+    protected Set<String> _usedProperties;
 
     /**
      * Set of lookup IDs used in the expression
@@ -65,9 +66,9 @@ public class Condition {
     protected Set<String> _usedLookupIds;
 
     /**
-     * Set of potiental context entries (they are potential because they might not all be context entries; but if a context entry is used, it will be in this list...
+     * Set of used context keys.
      */
-    protected Set<String> _potentialContextEntries;
+    protected Set<String> _usedContextKeys;
 
     /**
      * Constructor.
@@ -75,9 +76,9 @@ public class Condition {
      * Created on Nov 9, 2007 by depryf
      */
     public Condition() {
-        _rawProperties = new HashSet<>();
+        _usedProperties = new HashSet<>();
         _usedLookupIds = new HashSet<>();
-        _potentialContextEntries = new HashSet<>();
+        _usedContextKeys = new HashSet<>();
     }
 
     /**
@@ -193,7 +194,7 @@ public class Condition {
         if (expression != null && !expression.trim().isEmpty()) {
             synchronized (this) {
                 try {
-                    ValidationServices.getInstance().parseExpression("condition", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
+                    ValidationServices.getInstance().parseExpression("condition", _expression, _usedProperties, _usedContextKeys, _usedLookupIds);
                 }
                 catch (CompilationFailedException e) {
                     throw new ConstructionException("Unable to parse condition " + getId(), e);
@@ -248,8 +249,18 @@ public class Condition {
      * Created on Mar 10, 2011 by depryf
      * @return the set of properties, maybe empty but never null
      */
-    public Set<String> getRawProperties() {
-        return _rawProperties;
+    public Set<String> getUsedProperties() {
+        return _usedProperties;
+    }
+
+    /**
+     * Setter for the properties used in the expression.
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param usedProperties used properties
+     */
+    public void setUsedProperties(Set<String> usedProperties) {
+        _usedProperties = usedProperties;
     }
 
     /**
@@ -263,13 +274,33 @@ public class Condition {
     }
 
     /**
+     * Setter for the the lookup IDs used in the expression.
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param usedLookupIds used lookup IDs
+     */
+    public void setUsedLookupIds(Set<String> usedLookupIds) {
+        _usedLookupIds = usedLookupIds;
+    }
+
+    /**
      * Getter for the potential context entries referenced in the condition.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the set of potential context entries, maybe empty but never null
      */
-    public Set<String> getPotentialContextEntries() {
-        return _potentialContextEntries;
+    public Set<String> getUsedContextKeys() {
+        return _usedContextKeys;
+    }
+
+    /**
+     * Setter for the context entries referenced in the expression.
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param usedContextKeys used lookup IDs
+     */
+    public void setUsedContextKeys(Set<String> usedContextKeys) {
+        _usedContextKeys = usedContextKeys;
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.imsweb.validation.runtime.RuntimeUtils;
  * <p/>
  * Created on Nov 9, 2007 by depryf
  */
+@SuppressWarnings("unused")
 public class Rule {
 
     private static final Pattern _MESSAGE_PATTERN = Pattern.compile("\r?\n");
@@ -111,7 +112,7 @@ public class Rule {
     /**
      * Set of properties contained in this rule; as their appear in the textual expression of the rule
      */
-    protected Set<String> _rawProperties;
+    protected Set<String> _usedProperties;
 
     /**
      * Set of lookup IDs used in this rule; as their appear in the textual expression of the rule
@@ -119,10 +120,9 @@ public class Rule {
     protected Set<String> _usedLookupIds;
 
     /**
-     * Set of potential context entries (they are potential because they might not all be context entries;
-     * but if a context entry is used, it will be in this list...
+     * Set of used context keys.
      */
-    protected Set<String> _potentialContextEntries;
+    protected Set<String> _usedContextKeys;
 
     /**
      * If set to true, the rule won't be executed when validating a validatable, unless the rule is explicitly forced (default to false, should never be null)
@@ -154,9 +154,9 @@ public class Rule {
         _histories = new HashSet<>();
         _dependencies = new HashSet<>();
         _invertedDependencies = new HashSet<>();
-        _rawProperties = new HashSet<>();
+        _usedProperties = new HashSet<>();
         _usedLookupIds = new HashSet<>();
-        _potentialContextEntries = new HashSet<>();
+        _usedContextKeys = new HashSet<>();
         _ignored = Boolean.FALSE;
         _useAndForConditions = Boolean.TRUE;
         _allowOverride = Boolean.FALSE;
@@ -337,10 +337,10 @@ public class Rule {
             _expression = expression;
             synchronized (this) {
                 try {
-                    _rawProperties.clear();
-                    _potentialContextEntries.clear();
+                    _usedProperties.clear();
+                    _usedContextKeys.clear();
                     _usedLookupIds.clear();
-                    ValidationServices.getInstance().parseExpression("rule", _expression, _rawProperties, _potentialContextEntries, _usedLookupIds);
+                    ValidationServices.getInstance().parseExpression("rule", _expression, _usedProperties, _usedContextKeys, _usedLookupIds);
                 }
                 catch (CompilationFailedException e) {
                     throw new ConstructionException("Unable to parse rule " + getId(), e);
@@ -359,8 +359,8 @@ public class Rule {
         Set<String> lookups = RuntimeUtils.getParsedLookups(parsedLookups, _id);
         if (properties != null && contexts != null && lookups != null) {
             _expression = expression;
-            _rawProperties = properties;
-            _potentialContextEntries = contexts;
+            _usedProperties = properties;
+            _usedContextKeys = contexts;
             _usedLookupIds = lookups;
         }
         else
@@ -453,8 +453,18 @@ public class Rule {
      * Created on Mar 10, 2011 by depryf
      * @return the set of properties, maybe empty but never null
      */
-    public Set<String> getRawProperties() {
-        return _rawProperties;
+    public Set<String> getUsedProperties() {
+        return _usedProperties;
+    }
+
+    /**
+     * Setter for the properties used in the expression.
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param usedProperties used properties
+     */
+    public void setUsedProperties(Set<String> usedProperties) {
+        _usedProperties = usedProperties;
     }
 
     /**
@@ -465,6 +475,16 @@ public class Rule {
      */
     public Set<String> getUsedLookupIds() {
         return _usedLookupIds;
+    }
+
+    /**
+     * Setter for the the lookup IDs used in the expression.
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param usedLookupIds used lookup IDs
+     */
+    public void setUsedLookupIds(Set<String> usedLookupIds) {
+        _usedLookupIds = usedLookupIds;
     }
 
     /**
@@ -566,13 +586,23 @@ public class Rule {
     }
 
     /**
-     * Getter for the potential context entries referenced in the expression.
+     * Getter for the context entries referenced in the expression.
      * <p/>
      * Created on Mar 10, 2011 by depryf
      * @return the set of potential context entries, maybe empty but never null
      */
-    public Set<String> getPotentialContextEntries() {
-        return _potentialContextEntries;
+    public Set<String> getUsedContextKeys() {
+        return _usedContextKeys;
+    }
+
+    /**
+     * Setter for the context entries referenced in the expression.
+     * <p/>
+     * Created on Mar 10, 2011 by depryf
+     * @param usedContextKeys used lookup IDs
+     */
+    public void setUsedContextKeys(Set<String> usedContextKeys) {
+        _usedContextKeys = usedContextKeys;
     }
 
     /**

@@ -30,7 +30,7 @@ dependencies {
     testImplementation 'commons-io:commons-io:2.7'
     testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.3'
     testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.2'
-    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0'
+    testImplementation 'com.imsweb:staging-algorithm-eod-public:1.7.4'
 }
 
 // enforce UTF-8, display the compilation warnings

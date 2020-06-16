@@ -265,7 +265,7 @@ public class ValidationXmlUtilsTest {
         Assert.assertEquals(0, c.get(Calendar.MONTH));
         Assert.assertEquals(15, c.get(Calendar.DAY_OF_MONTH));
         Assert.assertEquals("999999", hist.getReference());
-        Assert.assertEquals(1, r1.getRawProperties().size());
+        Assert.assertEquals(1, r1.getUsedProperties().size());
 
         Rule r2 = v.getRule("fv-rule2");
         Assert.assertEquals("fv-rule2", r2.getId());
