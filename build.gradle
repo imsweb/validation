@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     api 'com.imsweb:staging-client-java:4.7'
-    api 'org.codehaus.groovy:groovy:3.0.4:indy'
+    api 'org.codehaus.groovy:groovy:2.5.12:indy'
     api 'com.thoughtworks.xstream:xstream:1.4.12'
 
     implementation 'commons-codec:commons-codec:1.14'

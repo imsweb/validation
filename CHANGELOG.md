@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.14**
+
+- Downgraded Groovy library from version 3.04 (indy) to version 2.5.12 (indy) after finding performance issues with 3.x.
+
 **Version 2.13**
 
 - Added missing setters in Rule and Condition, renamed a few variables in those classes.
