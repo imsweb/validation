@@ -2,7 +2,7 @@
 
 **Version 2.14**
 
-- Downgraded Groovy library from version 3.04 (indy) to version 2.5.12 (indy) after finding performance issues with 3.x.
+- Downgraded Groovy library from version 3.0.4 (indy) to version 2.5.12 (indy) after finding performance issues with 3.x.
 
 **Version 2.13**
 
