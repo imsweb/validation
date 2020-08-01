@@ -13,7 +13,7 @@ import groovy.lang.Binding;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.runtime.CompiledRules;
 
-public class FakeRuntimeEditsCompiledRules implements CompiledRules {
+public class SplitFakeRuntimeEditsCompiledRules2 implements CompiledRules {
 
     @Override
     public String getValidatorId() {
@@ -35,8 +35,9 @@ public class FakeRuntimeEditsCompiledRules implements CompiledRules {
         return Collections.singletonMap("runtime", parameters);
     }
 
-    public boolean fvrtRule1(Binding binding, Map<String, Object> context, ValidationContextFunctions functions, Map<String, Object> runtime) {
-        return "value".equals(runtime.get("key"));
+    @Override
+    public boolean containsRuleId(String id) {
+        return "fvrt-rule2".equals(id);
     }
 
     public boolean fvrtRule2(Binding binding, Map<String, Object> context, ValidationContextFunctions functions, Map<String, Object> runtime) {

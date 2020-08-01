@@ -320,15 +320,15 @@ public class ValidationEngineTest {
         Assert.assertFalse(normalValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine normalEngine = new ValidationEngine();
         InitializationStats stats = normalEngine.initialize(normalValidator);
-        Assert.assertEquals(1, stats.getNumEditsLoaded());
+        Assert.assertEquals(2, stats.getNumEditsLoaded());
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
-        Assert.assertEquals(1, stats.getNumEditsCompiled());
+        Assert.assertEquals(2, stats.getNumEditsCompiled());
         Assert.assertEquals(1, stats.getValidatorStats().size());
         InitializationStatsPerValidator valStats = stats.getValidatorStats().get(0);
         Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
-        Assert.assertEquals(1, valStats.getNumEditsLoaded());
+        Assert.assertEquals(2, valStats.getNumEditsLoaded());
         Assert.assertEquals(0, valStats.getNumEditsPreCompiled());
-        Assert.assertEquals(1, valStats.getNumEditsCompiled());
+        Assert.assertEquals(2, valStats.getNumEditsCompiled());
         Assert.assertEquals(InitializationStats.REASON_NOT_PROVIDED, valStats.getReasonNotPreCompiled());
 
         // load the validator using the runtime mechanism
@@ -336,13 +336,28 @@ public class ValidationEngineTest {
         Assert.assertTrue(runtimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine runtimeEngine = new ValidationEngine();
         stats = runtimeEngine.initialize(runtimeValidator);
-        Assert.assertEquals(1, stats.getNumEditsLoaded());
-        Assert.assertEquals(1, stats.getNumEditsPreCompiled());
+        Assert.assertEquals(2, stats.getNumEditsLoaded());
+        Assert.assertEquals(2, stats.getNumEditsPreCompiled());
         Assert.assertEquals(0, stats.getNumEditsCompiled());
         valStats = stats.getValidatorStats().get(0);
         Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
-        Assert.assertEquals(1, valStats.getNumEditsLoaded());
-        Assert.assertEquals(1, valStats.getNumEditsPreCompiled());
+        Assert.assertEquals(2, valStats.getNumEditsLoaded());
+        Assert.assertEquals(2, valStats.getNumEditsPreCompiled());
+        Assert.assertEquals(0, valStats.getNumEditsCompiled());
+        Assert.assertNull(valStats.getReasonNotPreCompiled());
+
+        // load the validator using the runtime mechanism with a split compiled rules class
+        Validator splitRuntimeValidator = FakeRuntimeEdits.getValidator();
+        Assert.assertTrue(splitRuntimeValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
+        ValidationEngine splitRuntimeEngine = new ValidationEngine();
+        stats = splitRuntimeEngine.initialize(splitRuntimeValidator);
+        Assert.assertEquals(2, stats.getNumEditsLoaded());
+        Assert.assertEquals(2, stats.getNumEditsPreCompiled());
+        Assert.assertEquals(0, stats.getNumEditsCompiled());
+        valStats = stats.getValidatorStats().get(0);
+        Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
+        Assert.assertEquals(2, valStats.getNumEditsLoaded());
+        Assert.assertEquals(2, valStats.getNumEditsPreCompiled());
         Assert.assertEquals(0, valStats.getNumEditsCompiled());
         Assert.assertNull(valStats.getReasonNotPreCompiled());
 
@@ -350,9 +365,9 @@ public class ValidationEngineTest {
         InitializationOptions options = new InitializationOptions();
         options.disablePreCompiledEdits();
         stats = new ValidationEngine().initialize(options, runtimeValidator);
-        Assert.assertEquals(1, stats.getNumEditsLoaded());
+        Assert.assertEquals(2, stats.getNumEditsLoaded());
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
-        Assert.assertEquals(1, stats.getNumEditsCompiled());
+        Assert.assertEquals(2, stats.getNumEditsCompiled());
         Assert.assertEquals(InitializationStats.REASON_DISABLED, stats.getValidatorStats().get(0).getReasonNotPreCompiled());
 
         // the global cached engine should not now about these validators
@@ -364,9 +379,11 @@ public class ValidationEngineTest {
         data.put("key", "value");
         TestingUtils.assertNoEditFailure(normalEngine.validate(validatable), "fvrt-rule1");
         TestingUtils.assertNoEditFailure(runtimeEngine.validate(validatable), "fvrt-rule1");
+        TestingUtils.assertNoEditFailure(splitRuntimeEngine.validate(validatable), "fvrt-rule1");
         data.put("key", "other");
         TestingUtils.assertEditFailure(normalEngine.validate(validatable), "fvrt-rule1");
         TestingUtils.assertEditFailure(runtimeEngine.validate(validatable), "fvrt-rule1");
+        TestingUtils.assertEditFailure(splitRuntimeEngine.validate(validatable), "fvrt-rule1");
     }
 
     @Test

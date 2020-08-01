@@ -92,6 +92,11 @@ public class RuntimeUtils {
     public static Method findCompiledMethod(CompiledRules compiledRules, String ruleId, List<Class<?>> parameters) {
         if (ruleId == null)
             return null;
+
+        // if the compiledRules is a group, extract that correct compiledRules to use based on the rule ID
+        if (compiledRules instanceof CompiledRulesBundle)
+            compiledRules = ((CompiledRulesBundle)compiledRules).getCompiledRulesForRuleId(ruleId);
+
         try {
             return compiledRules.getClass().getMethod(RuntimeUtils.createMethodName(ruleId), parameters.toArray(new Class[0]));
         }

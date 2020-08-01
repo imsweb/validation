@@ -1,8 +1,11 @@
 <validator id="fake-validator-runtime" version="TEST-001-01">
-
     <rules>
         <rule id="fvrt-rule1" java-path="runtime">
             <expression>return "value".equals(runtime.get("key"));</expression>
+            <message>message</message>
+        </rule>
+        <rule id="fvrt-rule2" java-path="runtime">
+            <expression>return "other".equals(runtime.get("key"));</expression>
             <message>message</message>
         </rule>
     </rules>
