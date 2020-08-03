@@ -40,12 +40,10 @@ import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
  */
 public class RuntimeUtils {
 
-    public static final String RUNTIME_PACKAGE_PREFIX = "com.imsweb.validation.runtime.";
-
-    private static Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
-    private static Pattern _P2 = Pattern.compile("[()]");
-    private static Pattern _P3 = Pattern.compile("[\\W&&[^\\s]]");
-    private static Pattern _P4 = Pattern.compile("^_|_$");
+    private static final Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
+    private static final Pattern _P2 = Pattern.compile("[()]");
+    private static final Pattern _P3 = Pattern.compile("[\\W&&[^\\s]]");
+    private static final Pattern _P4 = Pattern.compile("^_|_$");
 
     public static String createMethodName(String ruleId) {
         if (ruleId == null || ruleId.isEmpty())
@@ -90,12 +88,18 @@ public class RuntimeUtils {
     }
 
     public static Method findCompiledMethod(CompiledRules compiledRules, String ruleId, List<Class<?>> parameters) {
-        if (ruleId == null)
+        if (ruleId == null || compiledRules == null)
             return null;
 
-        // if the compiledRules is a group, extract that correct compiledRules to use based on the rule ID
-        if (compiledRules instanceof CompiledRulesBundle)
+        if (parameters == null)
+            throw new RuntimeException("Got null parameters for rule ID '" + ruleId + "'");
+
+        // if the compiledRules is a bundle, extract that correct compiledRules to use based on the rule ID
+        if (compiledRules instanceof CompiledRulesBundle) {
             compiledRules = ((CompiledRulesBundle)compiledRules).getCompiledRulesForRuleId(ruleId);
+            if (compiledRules == null)
+                throw new RuntimeException("Unable to find bundled CompiledRules for rule ID '" + ruleId + "'");
+        }
 
         try {
             return compiledRules.getClass().getMethod(RuntimeUtils.createMethodName(ruleId), parameters.toArray(new Class[0]));
