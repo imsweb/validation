@@ -2,7 +2,7 @@
 
 **Version 2.15**
 
-- Added support for using split classes of runtime edits.
+- Added support for using split classes for runtime edits.
 
 **Version 2.14**
 
