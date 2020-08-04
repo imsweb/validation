@@ -21,13 +21,13 @@ import com.imsweb.validation.entities.Validatable;
 public class ExecutableCondition {
 
     // corresponding condition
-    private Condition _condition;
+    private final Condition _condition;
 
     // ID
     private String _id;
 
     // internal ID
-    private Long _internalId;
+    private final Long _internalId;
 
     // java-path for this rule
     private String _javaPath;

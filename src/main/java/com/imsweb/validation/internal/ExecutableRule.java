@@ -24,6 +24,7 @@ import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.entities.Rule;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.runtime.CompiledRules;
+import com.imsweb.validation.runtime.CompiledRulesBundle;
 import com.imsweb.validation.runtime.RuntimeUtils;
 
 /**
@@ -36,7 +37,7 @@ public class ExecutableRule {
     private Rule _rule;
 
     // internal ID
-    private Long _internalId;
+    private final Long _internalId;
 
     // ID
     private String _id;
@@ -112,8 +113,13 @@ public class ExecutableRule {
         _checkForcedEntities = computeCheckForcedEntities(rule.getExpression());
 
         _compiledRules = compiledRules;
-        if (compiledRules != null) {
-            _compiledRule = RuntimeUtils.findCompiledMethod(compiledRules, rule.getId(), compiledRules.getMethodParameters().get(rule.getJavaPath()));
+        if (_compiledRules != null) {
+
+            // if the compiledRules is a bundle, extract that correct compiledRules to use based on the rule ID
+            if (_compiledRules instanceof CompiledRulesBundle)
+                _compiledRules = ((CompiledRulesBundle)compiledRules).getCompiledRulesForRuleId(_id);
+
+            _compiledRule = RuntimeUtils.findCompiledMethod(_compiledRules, rule.getId(), _compiledRules.getMethodParameters().get(rule.getJavaPath()));
 
             // optimization - pre-compute the different aliases for the rule's java path
             _aliases = new ArrayList<>();

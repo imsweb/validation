@@ -94,13 +94,6 @@ public class RuntimeUtils {
         if (parameters == null)
             throw new RuntimeException("Got null parameters for rule ID '" + ruleId + "'");
 
-        // if the compiledRules is a bundle, extract that correct compiledRules to use based on the rule ID
-        if (compiledRules instanceof CompiledRulesBundle) {
-            compiledRules = ((CompiledRulesBundle)compiledRules).getCompiledRulesForRuleId(ruleId);
-            if (compiledRules == null)
-                throw new RuntimeException("Unable to find bundled CompiledRules for rule ID '" + ruleId + "'");
-        }
-
         try {
             return compiledRules.getClass().getMethod(RuntimeUtils.createMethodName(ruleId), parameters.toArray(new Class[0]));
         }
