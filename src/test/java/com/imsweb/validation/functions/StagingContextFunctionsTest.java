@@ -6,7 +6,6 @@ package com.imsweb.validation.functions;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,8 +13,6 @@ import org.junit.Test;
 
 import com.imsweb.staging.Staging;
 import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.entities.StagingSchema;
-import com.imsweb.staging.entities.StagingSchemaInput;
 import com.imsweb.staging.eod.EodDataProvider;
 import com.imsweb.staging.tnm.TnmDataProvider;
 import com.imsweb.validation.TestingUtils;
@@ -681,17 +678,5 @@ public class StagingContextFunctionsTest {
 
         Assert.assertNull(_functions.getSsf25FromSex(null, null, null, null, null));
         Assert.assertEquals("981", _functions.getSsf25FromSex(null, null, null, "2016", "peritoneum"));
-    }
-    
-    @Test
-    public void testEodStagingFieldMappings() {
-        for (String schemaId : _functions._eodStaging.getSchemaIds()) {
-            StagingSchema schema = _functions._eodStaging.getSchema(schemaId);
-            for (StagingSchemaInput schemaInput : schema.getInputs()) {
-                Set<String> metadata = schemaInput.getMetadata() == null ? Collections.emptySet() : schemaInput.getMetadata();
-                if (metadata.contains(StagingContextFunctions.EOD_TAG_SSDI))
-                    Assert.assertTrue(schemaId + " " + schemaInput.getKey(), StagingContextFunctions.EOD_FIELDS.containsValue(schemaInput.getKey()));
-            }
-        }
     }
 }

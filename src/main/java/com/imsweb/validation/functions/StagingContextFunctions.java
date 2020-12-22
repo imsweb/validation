@@ -35,44 +35,6 @@ public class StagingContextFunctions extends ValidationContextFunctions {
     public static final String CSTAGE_INPUT_PROP_HIST = "histologicTypeIcdO3";
     public static final String CSTAGE_INPUT_PROP_DISC = "csSiteSpecificFactor25";
 
-    // this maps the CS fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
-    public static final Map<String, String> CSTAGE_FIELDS = Collections.unmodifiableMap(new HashMap<String, String>() {{
-        put("csTumorSize", "size");
-        put("csExtension", "extension");
-        put("csTumorSizeExtEval", "extension_eval");
-        put("csLymphNodes", "nodes");
-        put("csLymphNodesEval", "nodes_eval");
-        put("regionalNodesPositive", "nodes_pos");
-        put("regionalNodesExamined", "nodes_exam");
-        put("csMetsAtDx", "mets");
-        put("csMetsEval", "mets_eval");
-        put("csSiteSpecificFactor1", "ssf1");
-        put("csSiteSpecificFactor2", "ssf2");
-        put("csSiteSpecificFactor3", "ssf3");
-        put("csSiteSpecificFactor4", "ssf4");
-        put("csSiteSpecificFactor5", "ssf5");
-        put("csSiteSpecificFactor6", "ssf6");
-        put("csSiteSpecificFactor7", "ssf7");
-        put("csSiteSpecificFactor8", "ssf8");
-        put("csSiteSpecificFactor9", "ssf9");
-        put("csSiteSpecificFactor10", "ssf10");
-        put("csSiteSpecificFactor11", "ssf11");
-        put("csSiteSpecificFactor12", "ssf12");
-        put("csSiteSpecificFactor13", "ssf13");
-        put("csSiteSpecificFactor14", "ssf14");
-        put("csSiteSpecificFactor15", "ssf15");
-        put("csSiteSpecificFactor16", "ssf16");
-        put("csSiteSpecificFactor17", "ssf17");
-        put("csSiteSpecificFactor18", "ssf18");
-        put("csSiteSpecificFactor19", "ssf19");
-        put("csSiteSpecificFactor20", "ssf20");
-        put("csSiteSpecificFactor21", "ssf21");
-        put("csSiteSpecificFactor22", "ssf22");
-        put("csSiteSpecificFactor23", "ssf23");
-        put("csSiteSpecificFactor24", "ssf24");
-        put("csSiteSpecificFactor25", "ssf25");
-    }});
-
     // this maps the table number of the old DLL to the input keys used in the Staging framework
     public static final Map<Integer, String> CSTAGE_TABLE_NUMBERS = Collections.unmodifiableMap(new HashMap<Integer, String>() {{
         put(1, "size");
@@ -159,48 +121,6 @@ public class StagingContextFunctions extends ValidationContextFunctions {
     public static final String TNM_TAG_NPCR_REQUIRED = "NPCR_REQUIRED";
     public static final String TNM_TAG_CCCR_REQUIRED = "CCCR_REQUIRED";
 
-    // this maps the TNM fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
-    public static final Map<String, String> TNM_FIELDS = Collections.unmodifiableMap(new HashMap<String, String>() {{
-        put("eodPrimaryTumor", "seer_primary_tumor");
-        put("eodRegionalNodes", "seer_nodes");
-        put("eodMets", "seer_mets");
-        put("tnmClinStageGroup", "clin_stage_group_direct");
-        put("tnmPathStageGroup", "path_stage_group_direct");
-        put("rxSummSystemicSurSeq", "systemic_surg_seq");
-        put("rxSummSurgRadSeq", "radiation_surg_seq");
-        put("tnmClinT", "clin_t");
-        put("tnmClinN", "clin_n");
-        put("tnmClinM", "clin_m");
-        put("tnmPathT", "path_t");
-        put("tnmPathN", "path_n");
-        put("tnmPathM", "path_m");
-        put("csSiteSpecificFactor1", "ssf1");
-        put("csSiteSpecificFactor2", "ssf2");
-        put("csSiteSpecificFactor3", "ssf3");
-        put("csSiteSpecificFactor4", "ssf4");
-        put("csSiteSpecificFactor5", "ssf5");
-        put("csSiteSpecificFactor6", "ssf6");
-        put("csSiteSpecificFactor7", "ssf7");
-        put("csSiteSpecificFactor8", "ssf8");
-        put("csSiteSpecificFactor9", "ssf9");
-        put("csSiteSpecificFactor10", "ssf10");
-        put("csSiteSpecificFactor11", "ssf11");
-        put("csSiteSpecificFactor12", "ssf12");
-        put("csSiteSpecificFactor13", "ssf13");
-        put("csSiteSpecificFactor14", "ssf14");
-        put("csSiteSpecificFactor15", "ssf15");
-        put("csSiteSpecificFactor16", "ssf16");
-        put("csSiteSpecificFactor17", "ssf17");
-        put("csSiteSpecificFactor18", "ssf18");
-        put("csSiteSpecificFactor19", "ssf19");
-        put("csSiteSpecificFactor20", "ssf20");
-        put("csSiteSpecificFactor21", "ssf21");
-        put("csSiteSpecificFactor22", "ssf22");
-        put("csSiteSpecificFactor23", "ssf23");
-        put("csSiteSpecificFactor24", "ssf24");
-        put("csSiteSpecificFactor25", "ssf25");
-    }});
-
     // the standard NAACCR properties used when getting a EOD schema
     public static final String EOD_INPUT_PROP_SITE = "primarySite";
     public static final String EOD_INPUT_PROP_HIST = "histologicTypeIcdO3";
@@ -215,177 +135,6 @@ public class StagingContextFunctions extends ValidationContextFunctions {
     public static final String EOD_TAG_NPCR_REQUIRED = "NPCR_REQUIRED";
     public static final String EOD_TAG_CCCR_REQUIRED = "CCCR_REQUIRED";
     public static final String EOD_TAG_SSDI = "SSDI";
-
-    // this maps the EOD fields used by the edits (NAACCR property names) to the input keys used in the Staging framework
-    public static final Map<String, String> EOD_FIELDS = Collections.unmodifiableMap(new HashMap<String, String>() {{
-        put("schemaDiscriminator1", "discriminator_1");
-        put("schemaDiscriminator2", "discriminator_2");
-        put("schemaDiscriminator3", "discriminator_3");
-        put("ajccTnmClinM", "clin_m");
-        put("ajccTnmClinN", "clin_n");
-        put("ajccTnmClinNSuffix", "clin_n_suffix");
-        put("ajccTnmClinStageGroup", "clin_stage_group_direct");
-        put("ajccTnmClinT", "clin_t");
-        put("ajccTnmClinTSuffix", "clin_t_suffix");
-        put("ajccTnmPathM", "path_m");
-        put("ajccTnmPathN", "path_n");
-        put("ajccTnmPathNSuffix", "path_n_suffix");
-        put("ajccTnmPathStageGroup", "path_stage_group_direct");
-        put("ajccTnmPathT", "path_t");
-        put("ajccTnmPathTSuffix", "path_t_suffix");
-        put("ajccTnmPostTherapyM", "ypath_m");
-        put("ajccTnmPostTherapyN", "ypath_n");
-        put("ajccTnmPostTherapyNSuffix", "ypath_n_suffix");
-        put("ajccTnmPostTherapyStageGroup", "ypath_stage_group_direct");
-        put("ajccTnmPostTherapyT", "ypath_t");
-        put("ajccTnmPostTherapyTSuffix", "ypath_t_suffix");
-        put("eodPrimaryTumor", "eod_primary_tumor");
-        put("eodRegionalNodes", "eod_regional_nodes");
-        put("eodMets", "eod_mets");
-        put("gradeClinical", "grade_clin");
-        put("gradePathological", "grade_path");
-        put("gradePostTherapy", "grade_post_therapy");
-        put("tumorSizeClinical", "size_clin");
-        put("tumorSizePathologic", "size_path");
-        put("tumorSizeSummary", "size_summary");
-        put("summaryStage2018", "ss2018");
-        put("rxSummSystemicSurSeq", "systemic_surg_seq");
-        put("rxSummSurgRadSeq", "radiation_surg_seq");
-        put("regionalNodesPositive", "nodes_pos");
-        put("regionalNodesExamined", "nodes_exam");
-        put("lymphVascularInvasion", "lvi");
-        put("adenoidCysticBasaloidPattern", "adenoid_cystic_basaloid_pattern");
-        put("adenopathy", "adenopathy");
-        put("afpPostOrchiectomyLabValue", "afp_post_orch_lab_value");
-        put("afpPostOrchiectomyRange", "afp_post_orch_range");
-        put("afpPreOrchiectomyLabValue", "afp_pre_orch_lab_value");
-        put("afpPreOrchiectomyRange", "afp_pre_orch_range");
-        put("afpPretreatmentInterpretation", "afp_pretx_interpretation");
-        put("afpPretreatmentLabValue", "afp_pretx_lab_value");
-        put("anemia", "anemia");
-        put("bSymptoms", "b_symptoms");
-        put("bilirubinPretxTotalLabValue", "bilirubin_pretx_lab_value");
-        put("bilirubinPretxUnitOfMeasure", "bilirubin_pretx_unit");
-        put("boneInvasion", "bone_invasion");
-        put("brainMolecularMarkers", "brain_molecular_markers");
-        put("breslowTumorThickness", "breslow_thickness");
-        put("ca125PretreatmentInterpretation", "ca125_pretx_interpretation");
-        put("ceaPretreatmentInterpretation", "cea_pretx_interpretation");
-        put("ceaPretreatmentLabValue", "cea_pretx_lab_value");
-        put("chromosome19qLossHeterozygosity", "chrom_19q_status");
-        put("chromosome1pLossHeterozygosity", "chrom_1p_status");
-        put("chromosome3Status", "chrom_3_status");
-        put("chromosome8qStatus", "chrom_8q_status");
-        put("circumferentialResectionMargin", "crm");
-        put("creatininePretreatmentLabValue", "creatinine_pretx_lab_value");
-        put("creatininePretxUnitOfMeasure", "creatinine_pretx_unit");
-        put("esophagusAndEgjTumorEpicenter", "esoph_tumor_epicenter");
-        put("estrogenReceptorPercntPosOrRange", "er_percent_positive");
-        put("estrogenReceptorSummary", "er");
-        put("estrogenReceptorTotalAllredScore", "er_allred_score");
-        put("extranodalExtensionClin", "extranodal_ext_clin");
-        put("extranodalExtensionHeadNeckClin", "extranodal_ext_hn_clin");
-        put("extranodalExtensionHeadNeckPath", "extranodal_ext_hn_path");
-        put("extranodalExtensionPath", "extranodal_ext_path");
-        put("extravascularMatrixPatterns", "extravascular_matrix_patterns");
-        put("fibrosisScore", "fibrosis_score");
-        put("figoStage", "figo");
-        put("gestationalTrophoblasticPxIndex", "gestational_prog_index");
-        put("gleasonPatternsClinical", "gleason_patterns_clin");
-        put("gleasonPatternsPathological", "gleason_patterns_path");
-        put("gleasonScoreClinical", "gleason_score_clin");
-        put("gleasonScorePathological", "gleason_score_path");
-        put("gleasonTertiaryPattern", "gleason_tertiary_pattern");
-        put("hcgPostOrchiectomyLabValue", "hcg_post_orch_lab_value");
-        put("hcgPostOrchiectomyRange", "hcg_post_orch_range");
-        put("hcgPreOrchiectomyLabValue", "hcg_pre_orch_lab_value");
-        put("hcgPreOrchiectomyRange", "hcg_pre_orch_range");
-        put("her2IhcSummary", "her2_ihc_summary");
-        put("her2IshDualProbeCopyNumber", "her2_ish_dp_copy_no");
-        put("her2IshDualProbeRatio", "her2_ish_dp_ratio");
-        put("her2IshSingleProbeCopyNumber", "her2_ish_sp_copy_no");
-        put("her2IshSummary", "her2_ish_summary");
-        put("her2OverallSummary", "her2_summary");
-        put("heritableTrait", "heritable_trait");
-        put("highRiskCytogenetics", "high_risk_cytogenetics");
-        put("highRiskHistologicFeatures", "high_risk_features");
-        put("hivStatus", "hiv");
-        put("iNRProthrombinTime", "inr_prothrombin_time");
-        put("invasionBeyondCapsule", "invasion_beyond_capsule");
-        put("ipsilateralAdrenalGlandInvolve", "ipsilateral_adrenal_gland_involv");
-        put("jak2", "jak2");
-        put("ki67", "ki67");
-        put("kitGeneImmunohistochemistry", "kit");
-        put("kras", "kras");
-        put("ldhPostOrchiectomyRange", "ldh_post_orch_range");
-        put("ldhPreOrchiectomyRange", "ldh_pre_orch_range");
-        put("ldhPretreatmentLevel", "ldh_pretx_level");
-        put("ldhUpperLimitsOfNormal", "ldh_upper_limit");
-        put("lnAssessMethodFemoralInguinal", "ln_assessment_femoral");
-        put("lnAssessMethodParaaortic", "ln_assessment_para_aortic");
-        put("lnAssessMethodPelvic", "ln_assessment_pelvic");
-        put("lnDistantAssessMethod", "ln_distant_assessment");
-        put("lnDistantMediastinalScalene", "ln_distant_mediastinal_scalene");
-        put("lnHeadAndNeckLevels1To3", "ln_hn_1_2_3");
-        put("lnHeadAndNeckLevels4To5", "ln_hn_4_5");
-        put("lnHeadAndNeckLevels6To7", "ln_hn_6_7");
-        put("lnHeadAndNeckOther", "ln_hn_other");
-        put("lnIsolatedTumorCells", "ln_itc");
-        put("lnLaterality", "ln_laterality");
-        put("lnPositiveAxillaryLevel1To2", "ln_pos_axillary_level_1_2");
-        put("lnSize", "ln_size_of_mets");
-        put("lnStatusFemorInguinParaaortPelv", "ln_status");
-        put("lymphocytosis", "lymphocytosis");
-        put("majorVeinInvolvement", "major_vein_involv");
-        put("measuredBasalDiameter", "measured_basal_diameter");
-        put("measuredThickness", "measured_thickness");
-        put("methylationOfO6MGMT", "mgmt");
-        put("microsatelliteInstability", "msi");
-        put("microvascularDensity", "mvd");
-        put("mitoticCountUvealMelanoma", "mitotic_count_uveal_mel");
-        put("mitoticRateMelanoma", "mitotic_rate_melanoma");
-        put("multigeneSignatureMethod", "multigene_signature_method");
-        put("multigeneSignatureResults", "multigene_signature_result");
-        put("nccnInternationalPrognosticIndex", "intern_prog_index");
-        put("numberOfCoresExamined", "number_cores_exam");
-        put("numberOfCoresPositive", "number_cores_pos");
-        put("numberOfExaminedParaAorticNodes", "num_exam_para_aortic_nodes");
-        put("numberOfExaminedPelvicNodes", "num_exam_pelvic_nodes");
-        put("numberOfPositiveParaAorticNodes", "num_pos_para_aortic_nodes");
-        put("numberOfPositivePelvicNodes", "num_pos_pelvic_nodes");
-        put("oncotypeDxRecurrenceScoreDcis", "oncotype_dx_score_dcis");
-        put("oncotypeDxRecurrenceScoreInvasiv", "oncotype_dx_score");
-        put("oncotypeDxRiskLevelDcis", "oncotype_dx_risk_level_dcis");
-        put("oncotypeDxRiskLevelInvasive", "oncotype_dx_risk_level");
-        put("organomegaly", "organomegaly");
-        put("percentNecrosisPostNeoadjuvant", "post_neoadj_chemo_percent_necrosis");
-        put("perineuralInvasion", "perineural_invasion");
-        put("peripheralBloodInvolvement", "peripheral_blood_involv");
-        put("peritonealCytology", "peritoneal_cytology");
-        put("pleuralEffusion", "pleural_effusion");
-        put("primarySclerosingCholangitis", "prim_scleros_cholangitis");
-        put("profoundImmuneSuppression", "profound_immune_suppression");
-        put("progesteroneRecepPrcntPosOrRange", "pr_percent_positive");
-        put("progesteroneRecepSummary", "pr");
-        put("progesteroneRecepTotalAllredScor", "pr_allred_score");
-        put("prostatePathologicalExtension", "prostate_path_extension");
-        put("psaLabValue", "psa");
-        put("residualTumVolPostCytoreduction", "resid_tumor_vol_post_cyto");
-        put("responseToNeoadjuvantTherapy", "response_neoadjuv_therapy");
-        put("sCategoryClinical", "s_category_clin");
-        put("sCategoryPathological", "s_category_path");
-        put("sarcomatoidFeatures", "sarcomatoid_features");
-        put("seerSiteSpecificFact1", "seer_ssf1");
-        put("separateTumorNodules", "separate_tumor_nodules");
-        put("serumAlbuminPretreatmentLevel", "serum_alb_pretx_level");
-        put("serumBeta2MicroglobulinPretxLvl", "b2_microglob_pretx_level");
-        put("ldhPretreatmentLabValue", "ldh_pretx_lab_value");
-        put("thrombocytopenia", "thrombocytopenia");
-        put("tumorDeposits", "tumor_deposits");
-        put("tumorGrowthPattern", "tumor_growth_pattern");
-        put("ulceration", "ulceration");
-        put("visceralParietalPleuralInvasion", "visceral_pleural_invasion");
-    }});
 
     // the staging instances to use for cstage- and tnm-related logic
     protected Staging _csStaging;
@@ -499,15 +248,22 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param valueToCheck the value to check
      * @return true if the value is acceptable, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "CS field name", paramName3 = "valueToCheck", param3 = "value to validate",
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID", paramName3 = "valueToCheck", param3 = "value to validate",
             desc = "Returns true if the provided value is valid for the CS schema corresponding to the inputs and the CS field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableCsCode(inputs, 'csSiteSpecificFactor1', record.csSiteSpecificFactor1)")
     public boolean isAcceptableCsCode(Map<String, String> input, String field, String valueToCheck) {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
 
         StagingSchema schema = getCsStagingSchema(input);
-        return schema != null && _csStaging.isCodeValid(schema.getId(), CSTAGE_FIELDS.get(field), valueToCheck);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        if (inputField == null)
+            return false;
+
+        return _csStaging.isCodeValid(schema.getId(), inputField.getKey(), valueToCheck);
 
     }
 
@@ -527,14 +283,14 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param valueToCheck the value to check
      * @return true if the value is obsolete, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "CS field name", paramName3 = "valueToCheck", param3 = "value to check",
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID", paramName3 = "valueToCheck", param3 = "value to check",
             desc = "Returns true if the provided value is obsolete for the CS schema corresponding to the inputs and the CS field, false otherwise. The value is obsolete if its description in the CS table starts with OBSOLETE. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the key 'csSiteSpecificFactor25'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isObsoleteCsCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isObsoleteCsCode(inputs, 'csSiteSpecificFactor1', record.csSiteSpecificFactor1)")
     public boolean isObsoleteCsCode(Map<String, String> input, String field, String valueToCheck) {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
 
-        String description = getDescriptionForCode(input, CSTAGE_FIELDS.get(field), valueToCheck);
+        String description = getDescriptionForCode(input, field, valueToCheck);
         return description != null && description.trim().toUpperCase().startsWith("OBSOLETE");
 
     }
@@ -555,14 +311,14 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param valueToCheck the value to check
      * @return true if the value is obsolete, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "CS field name", paramName3 = "valueToCheck", param3 = "value to check",
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID", paramName3 = "valueToCheck", param3 = "value to check",
             desc = "Returns the reason why a particular code is obsolete.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.getCsObsoleteReason(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.getCsObsoleteReason(inputs, 'csSiteSpecificFactor1', record.csSiteSpecificFactor1)")
     public String getCsObsoleteReason(Map<String, String> input, String field, String valueToCheck) {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return null;
 
-        String description = getDescriptionForCode(input, CSTAGE_FIELDS.get(field), valueToCheck);
+        String description = getDescriptionForCode(input, field, valueToCheck);
         if (description == null)
             return null;
 
@@ -974,15 +730,22 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param valueToCheck value to check
      * @return true if the value is acceptable, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "TNM field name", paramName3 = "valueToCheck", param3 = "value to validate",
-            desc = "Returns true if the provided value is valid for the TNM schema corresponding to the inputs and the TNM field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the keys 'csSiteSpecificFactor25' and 'sex'.",
-            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableTnmCode(inputs, 'csSiteSpecFact1', record.csSiteSpecFact1)")
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID", paramName3 = "valueToCheck", param3 = "value to validate",
+            desc = "Returns true if the provided value is valid for the TNM schema corresponding to the inputs and the TNM field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'csSiteSpecificFactor25' and 'sex'.",
+            example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableTnmCode(inputs, 'csSiteSpecificFactor1', record.csSiteSpecificFactor1)")
     public boolean isAcceptableTnmCode(Map<String, String> input, String field, String valueToCheck) {
         if (_tnmStaging == null || input == null || field == null)
             return false;
 
         StagingSchema schema = getTnmStagingSchema(input);
-        return schema != null && _tnmStaging.isCodeValid(schema.getId(), TNM_FIELDS.get(field), valueToCheck);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        if (inputField == null)
+            return false;
+
+        return _tnmStaging.isCodeValid(schema.getId(), inputField.getKey(), valueToCheck);
     }
 
     /**
@@ -1161,7 +924,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param valueToCheck value to check
      * @return true if the value is acceptable, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name", paramName3 = "valueToCheck", param3 = "value to validate",
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID", paramName3 = "valueToCheck", param3 = "value to validate",
             desc = "Returns true if the provided value is valid for the EOD schema corresponding to the inputs and the EOD field, false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isAcceptableEodCode(inputs, 'eodPrimaryTumor', record.eodPrimaryTumor)")
     public boolean isAcceptableEodCode(Map<String, String> input, String field, String valueToCheck) {
@@ -1169,7 +932,14 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         StagingSchema schema = getEodStagingSchema(input);
-        return schema != null && _eodStaging.isCodeValid(schema.getId(), EOD_FIELDS.get(field), valueToCheck);
+        if (schema == null)
+            return false;
+
+        StagingSchemaInput inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        if (inputField == null)
+            return false;
+
+        return _eodStaging.isCodeValid(schema.getId(), inputField.getKey(), valueToCheck);
     }
 
     /**
@@ -1188,7 +958,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param field requested EOD field
      * @return true if the field is required for SEER, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID",
             desc = "Returns true if the passed EOD field is required for SEER for the schema corresponding to the passed input, "
                     + "false otherwise. Required means either 'seer-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionaly contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isRequiredEodField(inputs, ''eodPrimaryTumor')")
@@ -1200,8 +970,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
-        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED)));
+        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        if (schemaInput == null)
+            return false;
+
+        return schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED));
     }
 
     /**
@@ -1220,7 +993,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param field requested EOD field
      * @return true if the field is needed for staging, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID",
             desc = "Returns true if the passed EOD field is required (needed-for-staging) for SEER for the schema corresponding to the passed input, "
                     + "false otherwise. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isNeededForStagingEodField(inputs, 'eodPrimaryTumor')")
@@ -1232,7 +1005,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
+        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (schemaInput == null)
             return false;
 
@@ -1255,7 +1028,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param field requested EOD field
      * @return true if the field is required for COC, false otherwise
      */
-    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "EOD field name",
+    @ContextFunctionDocAnnotation(paramName1 = "input", param1 = "map of inputs", paramName2 = "field", param2 = "field NAACCR XML ID",
             desc = "Returns true if the passed EOD field is required for COC for the schema corresponding to the passed input, "
                     + "false otherwise. Required means either 'coc-required' or 'needed-for-staging'. The inputs must contain the keys 'primarySite' and 'histologicTypeIcdO3'; they can optionally contain the keys 'schemaDiscriminator1', 'schemaDiscriminator2', or 'sex'.",
             example = "def inputs = [\n 'primarySite' : record.primarySite,\n 'histologicTypeIcdO3' : record.histologicTypeIcdO3\n]\n\nreturn Functions.isCocRequiredEodField(inputs, 'eodPrimaryTumor')")
@@ -1267,8 +1040,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get(EOD_FIELDS.get(field));
-        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED)));
+        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        if (schemaInput == null)
+            return false;
+
+        return schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED));
     }
 
     /**
@@ -1372,10 +1148,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * <br/>
      * The method assumes there is only one description column (if there is several, it will only consider the first one).
      * @param input input input fields (standard NAACCR properties)
-     * @param cstageField field/key to check (to know which table to use)
+     * @param naaccrXmlId field to check (to know which table to use)
      * @return corresponding description, maybe null
      */
-    private String getDescriptionForCode(Map<String, String> input, String cstageField, String code) {
+    private String getDescriptionForCode(Map<String, String> input, String naaccrXmlId, String code) {
         if (_csStaging == null || input == null || code == null)
             return null;
 
@@ -1383,7 +1159,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (schema == null)
             return null;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get(cstageField);
+        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> naaccrXmlId.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (schemaInput == null)
             return null;
 
@@ -1401,7 +1177,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (colIndex == -1)
             return null;
 
-        Integer rowIndex = _csStaging.findMatchingTableRow(table.getId(), cstageField, code);
+        Integer rowIndex = _csStaging.findMatchingTableRow(table.getId(), schemaInput.getKey(), code);
         if (rowIndex == null)
             return null;
 

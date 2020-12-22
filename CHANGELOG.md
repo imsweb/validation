@@ -2,7 +2,11 @@
 
 **Version 2.16**
 
+- Increased the engine version to 6.4.
 - Updated Groovy library from version 2.5.12 (indy) to version 2.5.14 (indy).
+- Updated staging client from version 4.7 to version 5.0.
+- Updated XStream library from version 1.4.12 to version 1.4.15.
+- Updated Apache commons-lang library from version 3.10 to version 3.11.
 
 **Version 2.15**
 
