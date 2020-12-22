@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.16**
+
+- Updated Groovy library from version 2.5.12 (indy) to version 2.5.14 (indy).
+
 **Version 2.15**
 
 - Added support for using split classes for runtime edits.
