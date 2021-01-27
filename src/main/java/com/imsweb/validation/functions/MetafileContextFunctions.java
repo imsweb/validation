@@ -1672,8 +1672,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return false;
 
         /**
-         * Generates messages but does not set error flags. This function causes FAIL to be returned from the edit.
-         * Messages reported by SAVE_TEXT are in addition to any reported by ERROR_MSG or other returns from the edit.
+         * Generates messages with Message Type "M". SAVE_TEXT causes the function to return FAIL (i.e., the edit will tally as a FAIL; refer to Note 2, below).
+         * Messages reported by SAVE_TEXT are in addition to any reported by other returns from the edit.
          */
 
         @SuppressWarnings("unchecked")
@@ -1684,7 +1684,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
         extraErrorMsgs.add(trimRight(GEN_TO_STRING(text)));
 
-        // this method does NOT set the failure flag, this has been verified using GeneditsPlus...
+        binding.setVariable(ValidationEngine.VALIDATOR_FAILING_FLAG, Boolean.TRUE);
 
         return false;
     }
@@ -1716,7 +1716,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             if (text != null)
                 extraErrorMsgs.add(trimRight(GEN_TO_STRING(text)));
 
-        // this edits DOES SET the failure flag, unlike what is specified in their documentation; this has been verified with GeneditsPlus...
         binding.setVariable(ValidationEngine.VALIDATOR_FAILING_FLAG, Boolean.TRUE);
 
         return false;

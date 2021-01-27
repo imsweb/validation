@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 2.17**
+
+- Increased the engine version to 6.5.
+- Fixed a behavior of SAVE_TEXT Genedits context function so it causes edits to fail. 
+
 **Version 2.16**
 
 - Increased the engine version to 6.4.
