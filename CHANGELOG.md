@@ -3,7 +3,7 @@
 **Version 2.17**
 
 - Increased the engine version to 6.5.
-- Fixed a behavior of SAVE_TEXT Genedits context function so it causes edits to fail. 
+- Fixed behavior of SAVE_TEXT Genedits context function so it causes edits to properly fail.
 
 **Version 2.16**
 
