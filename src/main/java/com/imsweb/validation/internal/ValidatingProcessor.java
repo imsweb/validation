@@ -21,12 +21,19 @@ import groovy.lang.Binding;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidatingContext;
 import com.imsweb.validation.ValidationContextFunctions;
-import com.imsweb.validation.ValidationEngine;
 import com.imsweb.validation.ValidationException;
 import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.runtime.RuntimeUtils;
+
+import static com.imsweb.validation.ValidationEngine.EXCEPTION_MSG;
+import static com.imsweb.validation.ValidationEngine.VALIDATOR_CONTEXT_KEY;
+import static com.imsweb.validation.ValidationEngine.VALIDATOR_ERROR_MESSAGE;
+import static com.imsweb.validation.ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES;
+import static com.imsweb.validation.ValidationEngine.VALIDATOR_FUNCTIONS_KEY;
+import static com.imsweb.validation.ValidationEngine.VALIDATOR_INFORMATION_MESSAGES;
+import static com.imsweb.validation.ValidationEngine.VALIDATOR_ORIGINAL_RESULT;
 
 /**
  * A <code>ValidatingProcessor</code> is a <code>Processor</code> that runs edits on a particular level of a <code>Validatable</code>.
@@ -184,29 +191,23 @@ public class ValidatingProcessor implements Processor {
                         String message = ValidationServices.getInstance().fillInMessage(rule.getMessage(), validatable);
 
                         // translated edits can override the default error message
-                        String overriddenError = (String)binding.getVariable(ValidationEngine.VALIDATOR_ERROR_MESSAGE);
+                        String overriddenError = (String)binding.getVariable(VALIDATOR_ERROR_MESSAGE);
                         if (overriddenError != null)
                             message = ValidationServices.getInstance().fillInMessage(overriddenError, validatable);
 
-                        // translated edits can dynamically report error messages
-                        List<String> extraErrors = ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES), validatable);
-                        if (extraErrors != null && !extraErrors.isEmpty())
-                            message = StringUtils.join(extraErrors, ". ");
-
                         RuleFailure failure = new RuleFailure(rule.getRule(), message, validatable);
-                        failure.setExtraErrorMessages(extraErrors);
-                        failure.setInformationMessages(
-                                ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES), validatable));
-                        failure.setOriginalResult((Boolean)binding.getVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT));
+                        failure.setExtraErrorMessages(ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(VALIDATOR_EXTRA_ERROR_MESSAGES), validatable));
+                        failure.setInformationMessages(ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(VALIDATOR_INFORMATION_MESSAGES), validatable));
+                        failure.setOriginalResult((Boolean)binding.getVariable(VALIDATOR_ORIGINAL_RESULT));
                         results.add(failure);
                         currentRuleFailures.add(id);
                     }
                 }
                 catch (ValidationException e) {
-                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e.getCause()));
+                    results.add(new RuleFailure(rule.getRule(), EXCEPTION_MSG, validatable, e.getCause()));
                 }
                 catch (Throwable e) {
-                    results.add(new RuleFailure(rule.getRule(), ValidationEngine.EXCEPTION_MSG, validatable, e));
+                    results.add(new RuleFailure(rule.getRule(), EXCEPTION_MSG, validatable, e));
                 }
                 finally {
                     validatable.clearPropertiesWithError();
@@ -232,8 +233,8 @@ public class ValidatingProcessor implements Processor {
         Binding binding = new Binding();
 
         // add static context
-        binding.setVariable(ValidationEngine.VALIDATOR_FUNCTIONS_KEY, ValidationContextFunctions.getInstance());
-        binding.setVariable(ValidationEngine.VALIDATOR_CONTEXT_KEY, _contexts);
+        binding.setVariable(VALIDATOR_FUNCTIONS_KEY, ValidationContextFunctions.getInstance());
+        binding.setVariable(VALIDATOR_CONTEXT_KEY, _contexts);
 
         // add dynamic context
         for (Entry<String, Object> entry : validatable.getScope().entrySet())
