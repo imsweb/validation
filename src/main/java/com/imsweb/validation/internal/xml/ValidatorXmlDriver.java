@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2021 Information Management Services, Inc.
  */
-package com.imsweb.validation.internal;
+package com.imsweb.validation.internal.xml;
 
 import java.io.Writer;
 
@@ -15,15 +15,12 @@ import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 
 import io.github.xstream.mxparser.MXParser;
 
-/**
- * XML driver that handles CDATA block for text fields.
- */
-public class XStreamDriver extends AbstractXppDriver {
+public class ValidatorXmlDriver extends AbstractXppDriver {
 
     /**
      * Construct.
      */
-    public XStreamDriver() {
+    public ValidatorXmlDriver() {
         super(new XmlFriendlyNameCoder());
     }
 

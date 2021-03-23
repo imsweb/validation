@@ -61,10 +61,6 @@ import com.thoughtworks.xstream.converters.basic.ShortConverter;
 import com.thoughtworks.xstream.converters.basic.StringConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
-import com.thoughtworks.xstream.core.util.QuickWriter;
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
-import com.thoughtworks.xstream.io.xml.Xpp3Driver;
 import com.thoughtworks.xstream.security.NoTypePermission;
 import com.thoughtworks.xstream.security.WildcardTypePermission;
 
@@ -94,8 +90,10 @@ import com.imsweb.validation.entities.xml.StandaloneSetXmlDto;
 import com.imsweb.validation.entities.xml.TestXmlDto;
 import com.imsweb.validation.entities.xml.TestedValidatorXmlDto;
 import com.imsweb.validation.entities.xml.ValidatorXmlDto;
-import com.imsweb.validation.internal.XStreamDriver;
 import com.imsweb.validation.internal.callable.RuleParsingCallable;
+import com.imsweb.validation.internal.xml.StandaloneSetXmlDriver;
+import com.imsweb.validation.internal.xml.TestsXmlDriver;
+import com.imsweb.validation.internal.xml.ValidatorXmlDriver;
 import com.imsweb.validation.runtime.ParsedContexts;
 import com.imsweb.validation.runtime.ParsedLookups;
 import com.imsweb.validation.runtime.ParsedProperties;
@@ -169,7 +167,7 @@ public final class ValidationXmlUtils {
      * @return an instance of XStream, never null
      */
     private static XStream createValidatorXStream() {
-        XStream xstream = new XStream(new XStreamDriver()) {
+        XStream xstream = new XStream(new ValidatorXmlDriver()) {
             // only register the converters we need; other converters generate a private access warning in the console on Java9+...
             @Override
             protected void setupConverters() {
@@ -1039,12 +1037,7 @@ public final class ValidationXmlUtils {
      * @return an instance of XStream, never null
      */
     private static XStream createStandaloneSetXStream() {
-        XStream xstream = new XStream(new Xpp3Driver() {
-            @Override
-            public HierarchicalStreamWriter createWriter(Writer out) {
-                return new PrettyPrintWriter(out, "    ");
-            }
-        }) {
+        XStream xstream = new XStream(new StandaloneSetXmlDriver()) {
             // only register the converters we need; other converters generate a private access warning in the console on Java9+...
             @Override
             protected void setupConverters() {
@@ -1303,31 +1296,7 @@ public final class ValidationXmlUtils {
      * @return an instance of XStream, never null
      */
     private static XStream createTestsXStream() {
-        XStream xstream = new XStream(new Xpp3Driver() {
-            @Override
-            public HierarchicalStreamWriter createWriter(Writer out) {
-                return new PrettyPrintWriter(out, "    ") {
-                    boolean _cdata = false;
-
-                    @Override
-                    public void startNode(String name) {
-                        super.startNode(name);
-                        _cdata = "script".equals(name);
-                    }
-
-                    @Override
-                    protected void writeText(QuickWriter writer, String text) {
-                        if (_cdata) {
-                            writer.write("<![CDATA[");
-                            writer.write(text);
-                            writer.write("]]>");
-                        }
-                        else
-                            super.writeText(writer, text);
-                    }
-                };
-            }
-        }) {
+        XStream xstream = new XStream(new TestsXmlDriver()) {
             // only register the converters we need; other converters generate a private access warning in the console on Java9+...
             @Override
             protected void setupConverters() {
