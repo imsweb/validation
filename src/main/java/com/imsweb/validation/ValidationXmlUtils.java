@@ -94,6 +94,7 @@ import com.imsweb.validation.entities.xml.StandaloneSetXmlDto;
 import com.imsweb.validation.entities.xml.TestXmlDto;
 import com.imsweb.validation.entities.xml.TestedValidatorXmlDto;
 import com.imsweb.validation.entities.xml.ValidatorXmlDto;
+import com.imsweb.validation.internal.XStreamDriver;
 import com.imsweb.validation.internal.callable.RuleParsingCallable;
 import com.imsweb.validation.runtime.ParsedContexts;
 import com.imsweb.validation.runtime.ParsedLookups;
@@ -168,31 +169,7 @@ public final class ValidationXmlUtils {
      * @return an instance of XStream, never null
      */
     private static XStream createValidatorXStream() {
-        XStream xstream = new XStream(new Xpp3Driver() {
-            @Override
-            public HierarchicalStreamWriter createWriter(Writer out) {
-                return new PrettyPrintWriter(out, "    ") {
-                    boolean _cdata = false;
-
-                    @Override
-                    public void startNode(String name) {
-                        super.startNode(name);
-                        _cdata = "entry".equals(name) || "expression".equals(name) || "description".equals(name);
-                    }
-
-                    @Override
-                    protected void writeText(QuickWriter writer, String text) {
-                        if (_cdata) {
-                            writer.write("<![CDATA[");
-                            writer.write(text);
-                            writer.write("]]>");
-                        }
-                        else
-                            super.writeText(writer, text);
-                    }
-                };
-            }
-        }) {
+        XStream xstream = new XStream(new XStreamDriver()) {
             // only register the converters we need; other converters generate a private access warning in the console on Java9+...
             @Override
             protected void setupConverters() {
