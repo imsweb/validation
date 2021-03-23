@@ -28,7 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 public class ContextTableIndex {
 
     // index name
-    private String _name;
+    private final String _name;
 
     // data structure used for unique keys
     private NavigableMap<String, Integer> _uniqueKeysData;
@@ -119,24 +119,25 @@ public class ContextTableIndex {
 
         // if the value is smaller than the smaller index key, return not found (-1)
         // if the value is greater than the greatest index key, return the last index value
-        // if the value is equals to an index key, return that index value
-        // if a value is not equals to any index keys (but within the range of the keys), return the value of the first key that is greater than the value
+        // if the value is equals to an index key, return the greatest index with that value
+        // if a value is not equals to any index keys (but within the range of the keys), return the greatest (last) index that is smaller than the value
 
         if (_uniqueKeysData != null) {
             if (value.compareTo(_uniqueKeysData.firstKey()) >= 0) {
                 Entry<String, Integer> entry = _uniqueKeysData.floorEntry(value);
                 if (entry != null)
                     result = entry.getValue();
-                else if (value.compareTo(_uniqueKeysData.lastKey()) > 0)
+                else
                     result = _uniqueKeysData.lastEntry().getValue();
             }
+
         }
         else {
             if (value.compareTo(_nonUniqueKeysData.get(0).getKey()) >= 0) {
                 for (int indexIdx = 0; indexIdx < _nonUniqueKeysData.size(); indexIdx++) {
                     Pair<String, Integer> pair = _nonUniqueKeysData.get(indexIdx);
                     int comp = value.compareTo(pair.getKey());
-                    if (comp == 0) {
+                    if (comp == 0 && (indexIdx == _nonUniqueKeysData.size() - 1 || value.compareTo(_nonUniqueKeysData.get(indexIdx + 1).getKey()) < 0)) {
                         result = pair.getValue();
                         break;
                     }
@@ -146,8 +147,7 @@ public class ContextTableIndex {
                     }
                 }
                 if (result == -1)
-                    if (value.compareTo(_nonUniqueKeysData.get(_nonUniqueKeysData.size() - 1).getKey()) > 0)
-                        result = _nonUniqueKeysData.get(_nonUniqueKeysData.size() - 1).getValue();
+                    result = _nonUniqueKeysData.get(_nonUniqueKeysData.size() - 1).getValue();
             }
         }
 

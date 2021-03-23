@@ -92,7 +92,7 @@ public class ContextTableIndexTest {
         Assert.assertFalse(idx2.hasUniqueKeys());
         Assert.assertEquals(-1, idx2.findFloor("a1"));
         Assert.assertEquals(-1, idx2.findFloor("b2"));
-        Assert.assertEquals(0, idx2.findFloor("b3"));
+        Assert.assertEquals(1, idx2.findFloor("b3"));
         Assert.assertEquals(1, idx2.findFloor("c3"));
         Assert.assertEquals(1, idx2.findFloor("e3"));
         Assert.assertEquals(2, idx2.findFloor("f3"));
@@ -108,5 +108,24 @@ public class ContextTableIndexTest {
         Assert.assertEquals(1, idx3.findFloor("e1e3"));
         Assert.assertEquals(2, idx3.findFloor("f1f3"));
         Assert.assertEquals(2, idx3.findFloor("g1g3"));
+
+        tableData = new ArrayList<>();
+        tableData.add(Collections.singletonList("header1"));
+        tableData.add(Collections.singletonList("1"));
+        tableData.add(Collections.singletonList("1"));
+        tableData.add(Collections.singletonList("3"));
+        tableData.add(Collections.singletonList("3"));
+        tableData.add(Collections.singletonList("5"));
+        tableData.add(Collections.singletonList("5"));
+        table = new ContextTable("table", tableData);
+        ContextTableIndex idx4 = new ContextTableIndex("idx4", table, Collections.singletonList("header1"));
+        Assert.assertFalse(idx4.hasUniqueKeys());
+        Assert.assertEquals(-1, idx4.findFloor("0"));
+        Assert.assertEquals(1, idx4.findFloor("1"));
+        Assert.assertEquals(1, idx4.findFloor("2"));
+        Assert.assertEquals(3, idx4.findFloor("3"));
+        Assert.assertEquals(3, idx4.findFloor("4"));
+        Assert.assertEquals(5, idx4.findFloor("5"));
+        Assert.assertEquals(5, idx4.findFloor("6"));
     }
 }

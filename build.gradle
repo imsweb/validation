@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'checkstyle'
-    id 'com.github.spotbugs' version '4.3.0'
+    id 'com.github.spotbugs' version '4.5.1'
     id 'com.bmuschko.nexus' version '2.3.1'
     id 'io.codearte.nexus-staging' version '0.21.2'
 }
@@ -19,18 +19,18 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:5.0'
+    api 'com.imsweb:staging-client-java:5.0.1'
     api 'org.codehaus.groovy:groovy:2.5.14:indy'
-    api 'com.thoughtworks.xstream:xstream:1.4.15'
+    api 'com.thoughtworks.xstream:xstream:1.4.16'
 
-    implementation 'commons-codec:commons-codec:1.14'
+    implementation 'commons-codec:commons-codec:1.15'
     implementation 'org.apache.commons:commons-lang3:3.11'
 
     testImplementation 'junit:junit:4.13'
     testImplementation 'commons-io:commons-io:2.7'
-    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.4'
-    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.3'
-    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0.3'
+    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.5'
+    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.4'
+    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0.6'
 }
 
 // enforce UTF-8, display the compilation warnings

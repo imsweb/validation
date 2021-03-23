@@ -1,5 +1,13 @@
 ## Validation Framework Version History
 
+**Version 2.18**
+
+- Increased the engine version to 6.6.
+- Fixed behavior of SQLRANGELOOKUP Genedits context function when used with an index that contains non-unique values.
+- Updated staging client from version 5.0 to version 5.0.1.
+- Updated XStream library from version 1.4.15 to version 1.4.16.
+- Updated commons-codec library from version 1.14 to version 1.15.
+
 **Version 2.17**
 
 - Increased the engine version to 6.5.
