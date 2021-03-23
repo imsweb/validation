@@ -1468,17 +1468,16 @@ public class MetafileContextFunctionsTest {
         // If we were looking for a row with ALPHA1 = abcd & ALPHA2 = ef, the function should return false, but we would hit row 1 and return true
         Assert.assertTrue(_functions.GEN_SQLLOOKUP(table, index, "abcdef", null));
 
-        // This is probably not what the user wants; Row 3 -> NUMBER1 = 1 < 10 = Row 4 NUMBER1, and Row 3 -> NUMBER2 = 1 = 1 = Row 4 NUMBER2
-        // So Row 3 < Row 4, but Row 3 is returned to tableVars
+        // another test
         columns.clear();
         columns.add("NUMBER1");
         columns.add("NUMBER2");
         index = new ContextTableIndex("index", table, columns);
         Assert.assertTrue(_functions.GEN_SQLRANGELOOKUP(table, index, "101", tablevars));
         Assert.assertEquals("cdef", _functions.GEN_TO_STRING(tablevars.get("ALPHA1")));
-        Assert.assertEquals("ghij", _functions.GEN_TO_STRING(tablevars.get("ALPHA2")));
-        Assert.assertEquals("1", _functions.GEN_TO_STRING(tablevars.get("NUMBER1")));
-        Assert.assertEquals("01", _functions.GEN_TO_STRING(tablevars.get("NUMBER2")));
+        Assert.assertEquals("klmn", _functions.GEN_TO_STRING(tablevars.get("ALPHA2")));
+        Assert.assertEquals("10", _functions.GEN_TO_STRING(tablevars.get("NUMBER1")));
+        Assert.assertEquals("1", _functions.GEN_TO_STRING(tablevars.get("NUMBER2")));
     }
 
     @Test
