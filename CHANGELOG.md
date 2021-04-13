@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.19**
+
+- Changed allowOverride from Boolean to Byte on Rule entity. 
+
 **Version 2.18**
 
 - Increased the engine version to 6.6.

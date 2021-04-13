@@ -137,7 +137,7 @@ public class Rule {
     /**
      * Whether the failures from this rule can be overridden or not; this field is not used in this library and was added for other projects using the library.
      */
-    protected Boolean _allowOverride;
+    protected Byte _allowOverride;
 
     /**
      * Whether this rule needs to be reviewed or not; this field is not used in this library and was added for other projects using the library.
@@ -159,7 +159,6 @@ public class Rule {
         _usedContextKeys = new HashSet<>();
         _ignored = Boolean.FALSE;
         _useAndForConditions = Boolean.TRUE;
-        _allowOverride = Boolean.FALSE;
         _needsReview = Boolean.FALSE;
     }
 
@@ -631,7 +630,7 @@ public class Rule {
      * Created on Mar 10, 2011 by depryf
      * @return whether override is allowed
      */
-    public Boolean getAllowOverride() {
+    public Byte getAllowOverride() {
         return _allowOverride;
     }
 
@@ -641,7 +640,7 @@ public class Rule {
      * Created on Mar 10, 2011 by depryf
      * @param allowOverride whether override is allowed
      */
-    public void setAllowOverride(Boolean allowOverride) {
+    public void setAllowOverride(Byte allowOverride) {
         _allowOverride = allowOverride;
     }
 
