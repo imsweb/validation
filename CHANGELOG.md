@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 2.20**
+
+- Updated Groovy library from version 2.5.14 (indy) to version 3.0.8 (indy).
+- Updated staging client from version 5.0.1 to version 5.0.6.
+
 **Version 2.19**
 
 - Changed allowOverride from Boolean to Byte on Rule entity. 
