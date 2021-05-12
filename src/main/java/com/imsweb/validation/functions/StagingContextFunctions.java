@@ -14,12 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import groovy.lang.IntRange;
 
-import com.imsweb.decisionengine.ColumnDefinition;
-import com.imsweb.staging.SchemaLookup;
 import com.imsweb.staging.Staging;
-import com.imsweb.staging.entities.StagingSchema;
-import com.imsweb.staging.entities.StagingSchemaInput;
-import com.imsweb.staging.entities.StagingTable;
+import com.imsweb.staging.entities.ColumnDefinition;
+import com.imsweb.staging.entities.Input;
+import com.imsweb.staging.entities.Schema;
+import com.imsweb.staging.entities.SchemaLookup;
+import com.imsweb.staging.entities.Table;
 import com.imsweb.validation.ContextFunctionDocAnnotation;
 import com.imsweb.validation.ValidationContextFunctions;
 
@@ -157,7 +157,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
 
         if (_csStaging != null) {
             for (String schemaId : _csStaging.getSchemaIds()) {
-                StagingSchema schema = _csStaging.getSchema(schemaId);
+                Schema schema = _csStaging.getSchema(schemaId);
                 if (schema.getSchemaNum() != null)
                     _csSchemaIdByNumber.put(schema.getSchemaNum(), schemaId);
             }
@@ -201,7 +201,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null)
             return null;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         return schema == null ? null : schema.getName();
     }
 
@@ -228,7 +228,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null)
             return null;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         return schema == null ? null : schema.getId();
     }
 
@@ -255,11 +255,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || field == null || valueToCheck == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        Input inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (inputField == null)
             return false;
 
@@ -356,11 +356,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
                 (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER))));
 
@@ -389,11 +389,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         if (schemaInput == null)
             return false;
 
@@ -423,11 +423,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER);
 
     }
@@ -455,11 +455,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER);
 
     }
@@ -489,11 +489,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_REQUIRED_PRE_2010_SEER);
 
     }
@@ -523,11 +523,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
                 (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC))));
 
@@ -555,11 +555,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC);
 
     }
@@ -608,11 +608,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC);
 
     }
@@ -641,11 +641,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_REQUIRED_PRE_2010_COC);
 
     }
@@ -685,7 +685,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_tnmStaging == null)
             return null;
 
-        StagingSchema schema = getTnmStagingSchema(input);
+        Schema schema = getTnmStagingSchema(input);
         return schema == null ? null : schema.getName();
     }
 
@@ -710,7 +710,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_tnmStaging == null)
             return null;
 
-        StagingSchema schema = getTnmStagingSchema(input);
+        Schema schema = getTnmStagingSchema(input);
         return schema == null ? null : schema.getId();
     }
 
@@ -737,11 +737,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_tnmStaging == null || input == null || field == null)
             return false;
 
-        StagingSchema schema = getTnmStagingSchema(input);
+        Schema schema = getTnmStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        Input inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (inputField == null)
             return false;
 
@@ -771,11 +771,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_tnmStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getTnmStagingSchema(input);
+        Schema schema = getTnmStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(TNM_TAG_SEER_REQUIRED)));
     }
 
@@ -802,11 +802,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_tnmStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getTnmStagingSchema(input);
+        Schema schema = getTnmStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         if (schemaInput == null)
             return false;
 
@@ -836,11 +836,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_tnmStaging == null || input == null || ssfIndex == null)
             return false;
 
-        StagingSchema schema = getTnmStagingSchema(input);
+        Schema schema = getTnmStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
+        Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
         return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(TNM_TAG_COC_REQUIRED)));
     }
 
@@ -877,7 +877,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_eodStaging == null)
             return null;
 
-        StagingSchema schema = getEodStagingSchema(input);
+        Schema schema = getEodStagingSchema(input);
         return schema == null ? null : schema.getName();
     }
 
@@ -903,7 +903,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_eodStaging == null)
             return null;
 
-        StagingSchema schema = getEodStagingSchema(input);
+        Schema schema = getEodStagingSchema(input);
         return schema == null ? null : schema.getId();
     }
 
@@ -931,11 +931,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_eodStaging == null || input == null || field == null)
             return false;
 
-        StagingSchema schema = getEodStagingSchema(input);
+        Schema schema = getEodStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        Input inputField = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (inputField == null)
             return false;
 
@@ -966,11 +966,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_eodStaging == null || input == null || field == null)
             return false;
 
-        StagingSchema schema = getEodStagingSchema(input);
+        Schema schema = getEodStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        Input schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (schemaInput == null)
             return false;
 
@@ -1001,11 +1001,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_eodStaging == null || input == null || field == null)
             return false;
 
-        StagingSchema schema = getEodStagingSchema(input);
+        Schema schema = getEodStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        Input schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (schemaInput == null)
             return false;
 
@@ -1036,11 +1036,11 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_eodStaging == null || input == null || field == null)
             return false;
 
-        StagingSchema schema = getEodStagingSchema(input);
+        Schema schema = getEodStagingSchema(input);
         if (schema == null)
             return false;
 
-        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        Input schemaInput = schema.getInputs().stream().filter(i -> field.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (schemaInput == null)
             return false;
 
@@ -1054,7 +1054,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param input input fields (standard NAACCR properties)
      * @return corresponding schema, maybe null
      */
-    public StagingSchema getCsStagingSchema(Map<String, String> input) {
+    public Schema getCsStagingSchema(Map<String, String> input) {
         if (_csStaging == null || input == null)
             return null;
 
@@ -1065,7 +1065,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         SchemaLookup lkup = new SchemaLookup(site, hist);
         lkup.setInput("ssf25", ssf25);
 
-        List<StagingSchema> schemas = _csStaging.lookupSchema(lkup);
+        List<Schema> schemas = _csStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
             return _csStaging.getSchema(schemas.get(0).getId());
 
@@ -1079,7 +1079,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param input input fields (standard NAACCR properties)
      * @return corresponding schema, maybe null
      */
-    public StagingSchema getTnmStagingSchema(Map<String, String> input) {
+    public Schema getTnmStagingSchema(Map<String, String> input) {
         if (_tnmStaging == null || input == null)
             return null;
 
@@ -1092,7 +1092,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         lkup.setInput("ssf25", ssf25);
         lkup.setInput("sex", sex);
 
-        List<StagingSchema> schemas = _tnmStaging.lookupSchema(lkup);
+        List<Schema> schemas = _tnmStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
             return _tnmStaging.getSchema(schemas.get(0).getId());
 
@@ -1106,7 +1106,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param input input fields (standard NAACCR properties)
      * @return corresponding schema, maybe null
      */
-    public StagingSchema getEodStagingSchema(Map<String, String> input) {
+    public Schema getEodStagingSchema(Map<String, String> input) {
         if (_eodStaging == null || input == null)
             return null;
 
@@ -1123,7 +1123,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         lkup.setInput("sex", sex);
         lkup.setInput("behavior", behav);
 
-        List<StagingSchema> schemas = _eodStaging.lookupSchema(lkup);
+        List<Schema> schemas = _eodStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
             return _eodStaging.getSchema(schemas.get(0).getId());
 
@@ -1136,7 +1136,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
      * @param schemaNumber schema number
      * @return corresponding schema, maybe null
      */
-    private StagingSchema getCsStagingSchema(int schemaNumber) {
+    private Schema getCsStagingSchema(int schemaNumber) {
         if (_csStaging == null || schemaNumber == -1)
             return null;
 
@@ -1155,15 +1155,15 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null || input == null || code == null)
             return null;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         if (schema == null)
             return null;
 
-        StagingSchemaInput schemaInput = schema.getInputs().stream().filter(i -> naaccrXmlId.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
+        Input schemaInput = schema.getInputs().stream().filter(i -> naaccrXmlId.equals(i.getNaaccrXmlId())).findFirst().orElse(null);
         if (schemaInput == null)
             return null;
 
-        StagingTable table = _csStaging.getTable(schemaInput.getTable());
+        Table table = _csStaging.getTable(schemaInput.getTable());
         if (table == null)
             return null;
 
@@ -1195,7 +1195,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null)
             return -1;
 
-        StagingSchema schema = getCsStagingSchema(input);
+        Schema schema = getCsStagingSchema(input);
         return schema == null || schema.getSchemaNum() == null ? -1 : schema.getSchemaNum();
     }
 
@@ -1203,7 +1203,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null)
             return null;
 
-        StagingSchema schema = getCsStagingSchema(schemaNum);
+        Schema schema = getCsStagingSchema(schemaNum);
         return schema == null ? null : schema.getName();
     }
 
@@ -1211,7 +1211,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (_csStaging == null)
             return false;
 
-        StagingSchema schema = getCsStagingSchema(schemaNumber);
+        Schema schema = getCsStagingSchema(schemaNumber);
         return schema != null && _csStaging.isCodeValid(schema.getId(), CSTAGE_TABLE_NUMBERS.get(tableNumber), valueToCheck);
     }
 

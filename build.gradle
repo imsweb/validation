@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:5.0.6'
+    api 'com.imsweb:staging-client-java:6.0.0'
     api 'org.codehaus.groovy:groovy:3.0.8:indy'
     api 'com.thoughtworks.xstream:xstream:1.4.16'
 
