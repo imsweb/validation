@@ -28,9 +28,9 @@ dependencies {
 
     testImplementation 'junit:junit:4.13'
     testImplementation 'commons-io:commons-io:2.7'
-    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.6'
-    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.5'
-    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0.7'
+    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.7'
+    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.6'
+    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0.8'
 }
 
 // enforce UTF-8, display the compilation warnings
