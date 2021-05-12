@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.imsweb.staging.entities.StagingSchema;
+import com.imsweb.staging.entities.Schema;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.ValidationServices;
 import com.imsweb.validation.functions.StagingContextFunctions;
@@ -190,17 +190,17 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
 
             // set TNM schema
             if (!hasTnmSchemaId || hasSite || hasHist) {
-                StagingSchema schema = ((StagingContextFunctions)ValidationContextFunctions.getInstance()).getTnmStagingSchema(_currentLine);
+                Schema schema = ((StagingContextFunctions)ValidationContextFunctions.getInstance()).getTnmStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_TNM_SCHEMA_ID, schema != null ? schema.getId() : null);
             }
 
             // set CS schema
             if (!hasCsSchemaId || hasSite || hasHist) {
-                StagingSchema schema = ((StagingContextFunctions)ValidationContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
+                Schema schema = ((StagingContextFunctions)ValidationContextFunctions.getInstance()).getCsStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_CS_SCHEMA_ID, schema != null ? schema.getId() : null);
             }
             if (!hasEodSchemaId || hasSite || hasHist) {
-                StagingSchema schema = ((StagingContextFunctions)ValidationContextFunctions.getInstance()).getEodStagingSchema(_currentLine);
+                Schema schema = ((StagingContextFunctions)ValidationContextFunctions.getInstance()).getEodStagingSchema(_currentLine);
                 _currentLine.put(Validatable.KEY_EOD_SCHEMA_ID, schema != null ? schema.getId() : null);
             }
         }
