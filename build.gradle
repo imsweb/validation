@@ -16,15 +16,10 @@ println "Starting build using JDK ${Runtime.version().feature()}"
 
 repositories {
     mavenCentral()
-
-    // Keep SNAPSHOT repository commented out unless needed
-    maven {
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:6.0.9-SNAPSHOT'
+    api 'com.imsweb:staging-client-java:6.0.0'
     api 'org.codehaus.groovy:groovy:3.0.8:indy'
     api 'com.thoughtworks.xstream:xstream:1.4.16'
 
