@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:6.0.0'
+    api 'com.imsweb:staging-client-java:6.1.0'
     api 'org.codehaus.groovy:groovy:3.0.8:indy'
     api 'com.thoughtworks.xstream:xstream:1.4.16'
 
@@ -28,9 +28,9 @@ dependencies {
 
     testImplementation 'junit:junit:4.13'
     testImplementation 'commons-io:commons-io:2.7'
-    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.7'
-    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.6'
-    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0.8'
+    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.8'
+    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.7'
+    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.0.9'
 }
 
 // enforce UTF-8, display the compilation warnings

@@ -10,13 +10,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import groovy.lang.IntRange;
 
 import com.imsweb.staging.Staging;
 import com.imsweb.staging.entities.ColumnDefinition;
 import com.imsweb.staging.entities.Input;
+import com.imsweb.staging.entities.Metadata;
 import com.imsweb.staging.entities.Schema;
 import com.imsweb.staging.entities.SchemaLookup;
 import com.imsweb.staging.entities.Table;
@@ -34,6 +37,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
     public static final String CSTAGE_INPUT_PROP_SITE = "primarySite";
     public static final String CSTAGE_INPUT_PROP_HIST = "histologicTypeIcdO3";
     public static final String CSTAGE_INPUT_PROP_DISC = "csSiteSpecificFactor25";
+
+    // meta data required the DX year; the full date is the standard item, but some framework use the year itself and so this class will check the year before the fulll date
+    public static final String CSTAGE_INPUT_PROP_DX_DATE = "dateOfDiagnosis";
+    public static final String CSTAGE_INPUT_PROP_DX_DATE_YEAR = "dateOfDiagnosisYear";
 
     // this maps the table number of the old DLL to the input keys used in the Staging framework
     public static final Map<Integer, String> CSTAGE_TABLE_NUMBERS = Collections.unmodifiableMap(new HashMap<Integer, String>() {{
@@ -361,9 +368,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
-                (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER))));
+        if (schemaInput == null)
+            return false;
 
+        return schemaInput.getUsedForStaging() || checkMetaData(input, schemaInput, CSTAGE_TAG_ALREADY_COLLECTED_SEER, CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER);
     }
 
     /**
@@ -428,8 +436,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_SEER);
+        if (schemaInput == null)
+            return false;
 
+        return checkMetaData(input, schemaInput, CSTAGE_TAG_ALREADY_COLLECTED_SEER);
     }
 
     /**
@@ -460,8 +470,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER);
+        if (schemaInput == null)
+            return false;
 
+        return checkMetaData(input, schemaInput, CSTAGE_TAG_CLINICALLY_SIGNIFICANT_SEER);
     }
 
     /**
@@ -494,8 +506,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_REQUIRED_PRE_2010_SEER);
+        if (schemaInput == null)
+            return false;
 
+        return checkMetaData(input, schemaInput, CSTAGE_TAG_REQUIRED_PRE_2010_SEER);
     }
 
     /**
@@ -528,9 +542,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null &&
-                (schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC) || schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC))));
+        if (schemaInput == null)
+            return false;
 
+        return schemaInput.getUsedForStaging() || checkMetaData(input, schemaInput, CSTAGE_TAG_ALREADY_COLLECTED_COC, CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC);
     }
 
     /**
@@ -560,8 +575,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_ALREADY_COLLECTED_COC);
+        if (schemaInput == null)
+            return false;
 
+        return checkMetaData(input, schemaInput, CSTAGE_TAG_ALREADY_COLLECTED_COC);
     }
 
     /**
@@ -613,8 +630,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC);
+        if (schemaInput == null)
+            return false;
 
+        return checkMetaData(input, schemaInput, CSTAGE_TAG_CLINICALLY_SIGNIFICANT_COC);
     }
 
     /**
@@ -646,8 +665,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(CSTAGE_TAG_REQUIRED_PRE_2010_COC);
+        if (schemaInput == null)
+            return false;
 
+        return checkMetaData(input, schemaInput, CSTAGE_TAG_REQUIRED_PRE_2010_COC);
     }
 
     /**
@@ -776,7 +797,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(TNM_TAG_SEER_REQUIRED)));
+        if (schemaInput == null)
+            return false;
+
+        return schemaInput.getUsedForStaging() || checkMetaData(input, schemaInput, TNM_TAG_SEER_REQUIRED);
     }
 
     /**
@@ -841,7 +865,10 @@ public class StagingContextFunctions extends ValidationContextFunctions {
             return false;
 
         Input schemaInput = schema.getInputMap().get("ssf" + ssfIndex);
-        return schemaInput != null && (schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(TNM_TAG_COC_REQUIRED)));
+        if (schemaInput == null)
+            return false;
+
+        return schemaInput.getUsedForStaging() || checkMetaData(input, schemaInput, TNM_TAG_COC_REQUIRED);
     }
 
     /**
@@ -974,7 +1001,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (schemaInput == null)
             return false;
 
-        return schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(EOD_TAG_SEER_REQUIRED));
+        return schemaInput.getUsedForStaging() || checkMetaData(input, schemaInput, EOD_TAG_SEER_REQUIRED);
     }
 
     /**
@@ -1044,7 +1071,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         if (schemaInput == null)
             return false;
 
-        return schemaInput.getUsedForStaging() || (schemaInput.getMetadata() != null && schemaInput.getMetadata().contains(EOD_TAG_COC_REQUIRED));
+        return schemaInput.getUsedForStaging() || checkMetaData(input, schemaInput, EOD_TAG_COC_REQUIRED);
     }
 
     /**
@@ -1213,6 +1240,38 @@ public class StagingContextFunctions extends ValidationContextFunctions {
 
         Schema schema = getCsStagingSchema(schemaNumber);
         return schema != null && _csStaging.isCodeValid(schema.getId(), CSTAGE_TABLE_NUMBERS.get(tableNumber), valueToCheck);
+    }
+
+    protected boolean checkMetaData(Map<String, String> input, Input schemaInput, String... tags) {
+        if (schemaInput == null || schemaInput.getMetadata() == null || schemaInput.getMetadata().isEmpty())
+            return false;
+
+        for (Metadata data : schemaInput.getMetadata()) {
+            if (ArrayUtils.contains(tags, data.getName())) {
+                if (data.getStart() == null && data.getEnd() == null)
+                    return true;
+
+                Integer inputDxYear = extractDxYear(input);
+
+                return inputDxYear != null && (data.getStart() == null || inputDxYear >= data.getStart()) && (data.getEnd() == null || inputDxYear <= data.getEnd());
+            }
+        }
+
+        return false;
+    }
+
+    protected Integer extractDxYear(Map<String, String> input) {
+        if (input == null)
+            return null;
+
+        String val = input.get(CSTAGE_INPUT_PROP_DX_DATE_YEAR);
+        if (StringUtils.isBlank(val)) {
+            String fullVal = input.get(CSTAGE_INPUT_PROP_DX_DATE);
+            if (fullVal != null && fullVal.length() >= 4)
+                val = fullVal.substring(0, 4);
+        }
+
+        return NumberUtils.isDigits(val) ? Integer.valueOf(val) : null;
     }
 
     /**

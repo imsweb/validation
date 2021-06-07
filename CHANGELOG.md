@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.22**
+
+- Updated staging client from version 6.0.0 to version 6.1.0.
+
 **Version 2.21**
 
 - Updated staging client from version 5.0.6 to version 6.0.0.

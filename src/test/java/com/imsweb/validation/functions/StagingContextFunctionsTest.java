@@ -13,6 +13,8 @@ import org.junit.Test;
 
 import com.imsweb.staging.Staging;
 import com.imsweb.staging.cs.CsDataProvider;
+import com.imsweb.staging.entities.impl.StagingMetadata;
+import com.imsweb.staging.entities.impl.StagingSchemaInput;
 import com.imsweb.staging.eod.EodDataProvider;
 import com.imsweb.staging.tnm.TnmDataProvider;
 import com.imsweb.validation.TestingUtils;
@@ -678,5 +680,54 @@ public class StagingContextFunctionsTest {
 
         Assert.assertNull(_functions.getSsf25FromSex(null, null, null, null, null));
         Assert.assertEquals("981", _functions.getSsf25FromSex(null, null, null, "2016", "peritoneum"));
+    }
+
+    @Test
+    public void testExtractDxYear() {
+        Assert.assertNull(_functions.extractDxYear(null));
+        Assert.assertNull(_functions.extractDxYear(Collections.emptyMap()));
+        Assert.assertEquals(1234, _functions.extractDxYear(Collections.singletonMap("dateOfDiagnosisYear", "1234")).intValue());
+        Assert.assertEquals(1234, _functions.extractDxYear(Collections.singletonMap("dateOfDiagnosis", "12340101")).intValue());
+        Assert.assertEquals(1234, _functions.extractDxYear(Collections.singletonMap("dateOfDiagnosis", "123401")).intValue());
+        Assert.assertEquals(1234, _functions.extractDxYear(Collections.singletonMap("dateOfDiagnosis", "1234")).intValue());
+        Map<String, String> map = new HashMap<>();
+        map.put("dateOfDiagnosisYear", "1234");
+        map.put("dateOfDiagnosis", "56780101");
+        Assert.assertEquals(1234, _functions.extractDxYear(map).intValue());
+    }
+
+    @Test
+    public void testCheckMetaData() {
+        Map<String, String> input = Collections.singletonMap("dateOfDiagnosisYear", "2020");
+
+        StagingSchemaInput schemaInput = new StagingSchemaInput();
+        Assert.assertFalse(_functions.checkMetaData(input, schemaInput, "TAG"));
+        Assert.assertFalse(_functions.checkMetaData(input, schemaInput, "OTHER"));
+
+        StagingMetadata metadata = new StagingMetadata("TAG");
+        schemaInput.setMetadata(Collections.singletonList(metadata));
+        Assert.assertTrue(_functions.checkMetaData(input, schemaInput, "TAG"));
+        Assert.assertFalse(_functions.checkMetaData(input, schemaInput, "OTHER"));
+
+        metadata.setStart(2019);
+        Assert.assertTrue(_functions.checkMetaData(input, schemaInput, "TAG"));
+        metadata.setStart(2020);
+        Assert.assertTrue(_functions.checkMetaData(input, schemaInput, "TAG"));
+        metadata.setStart(2021);
+        Assert.assertFalse(_functions.checkMetaData(input, schemaInput, "TAG"));
+        metadata.setStart(null);
+
+        metadata.setEnd(2019);
+        Assert.assertFalse(_functions.checkMetaData(input, schemaInput, "TAG"));
+        metadata.setEnd(2020);
+        Assert.assertTrue(_functions.checkMetaData(input, schemaInput, "TAG"));
+        metadata.setEnd(2021);
+        Assert.assertTrue(_functions.checkMetaData(input, schemaInput, "TAG"));
+        metadata.setEnd(null);
+
+        metadata.setStart(2000);
+        metadata.setStart(2025);
+        input = Collections.singletonMap("dateOfDiagnosisYear", null);
+        Assert.assertFalse(_functions.checkMetaData(input, schemaInput, "TAG"));
     }
 }
