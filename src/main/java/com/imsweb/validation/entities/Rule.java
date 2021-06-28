@@ -145,6 +145,11 @@ public class Rule {
     protected Boolean _needsReview;
 
     /**
+     * Whether or not this rule is an "import" edit; this field is not used in this library and was added for other projects using the library.
+     */
+    protected Boolean _isImportEdit;
+
+    /**
      * Constructor.
      * <p/>
      * Created on Nov 9, 2007 by depryf
@@ -160,6 +165,7 @@ public class Rule {
         _ignored = Boolean.FALSE;
         _useAndForConditions = Boolean.TRUE;
         _needsReview = Boolean.FALSE;
+        _isImportEdit = Boolean.FALSE;
     }
 
     /**
@@ -662,6 +668,27 @@ public class Rule {
      */
     public void setNeedsReview(Boolean needsReview) {
         _needsReview = needsReview;
+    }
+
+
+    /**
+     * Getter
+     * <p/>
+     * Created on Jun 28, 2021 by depryf
+     * @return whether this rule is an "import" edit
+     */
+    public Boolean isImportEdit() {
+        return _isImportEdit;
+    }
+
+    /**
+     * Setter
+     * <p/>
+     * Created on Jun 28, 2021 by depryf
+     * @param isImportEdit whether this rule is an "import" edit
+     */
+    public void setIsImportEdit(Boolean isImportEdit) {
+        _isImportEdit = isImportEdit;
     }
 
     @Override
