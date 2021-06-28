@@ -3,6 +3,7 @@
 **Version 2.22**
 
 - Updated staging client from version 6.0.0 to version 6.1.0.
+- Updated XStream library from version 1.4.16 to version 1.4.17.
 
 **Version 2.21**
 
