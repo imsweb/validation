@@ -4,7 +4,6 @@ name: publish
 
 on:
   workflow_dispatch:
-    types: manual-publish
   release:
     types: [created]
 
