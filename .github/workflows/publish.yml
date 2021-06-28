@@ -3,8 +3,8 @@
 name: publish
 
 on:
-  repository_dispatch:
-    types: manual-publish
+  workflow_dispatch:
+    types: [manual-publish]
   release:
     types: [created]
 
