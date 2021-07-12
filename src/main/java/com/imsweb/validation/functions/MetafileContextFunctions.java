@@ -403,6 +403,22 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public int GEN_YEARINTERNAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
+        return GEN_YEARINTERVAL_IOP(binding, value1, value2, minInt, maxInt, minMaxFlagObj); // made a mistake on the name, leaving the old name in place for now...
+    }
+
+    /**
+     * Special genedit method. Internal use only.
+     * <p/>
+     * Created on Apr 5, 2011 by depryf
+     * @param binding
+     * @param value1
+     * @param value2
+     * @param minInt
+     * @param maxInt
+     * @param minMaxFlagObj
+     * @return - internal use only -
+     */
+    public int GEN_YEARINTERVAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
         int yearDiff = GEN_YEARDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (yearDiff > SENTINEL_TRESHOLD)
             return yearDiff;
@@ -439,6 +455,20 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public int GEN_MONTHINTERNAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
+        return GEN_MONTHINTERVAL_IOP(binding, value1, value2, minInt, maxInt, minMaxFlagObj); // made a mistake on the name, leaving the old name in place for now...
+    }
+
+    /**
+     * Created on Apr 5, 2011 by depryf
+     * @param binding
+     * @param value1
+     * @param value2
+     * @param minInt
+     * @param maxInt
+     * @param minMaxFlagObj
+     * @return - internal use only -
+     */
+    public int GEN_MONTHINTERVAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
         int monthDiff = GEN_MONTHDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (monthDiff > SENTINEL_TRESHOLD)
             return monthDiff;
@@ -483,6 +513,20 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public int GEN_DAYINTERNAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
+        return GEN_DAYINTERVAL_IOP(binding, value1, value2, minInt, maxInt, minMaxFlagObj); // made a mistake on the name, leaving the old name in place for now...
+    }
+
+    /**
+     * Created on Apr 5, 2011 by depryf
+     * @param binding
+     * @param value1
+     * @param value2
+     * @param minInt
+     * @param maxInt
+     * @param minMaxFlagObj
+     * @return - internal use only -
+     */
+    public int GEN_DAYINTERVAL_IOP(Binding binding, String value1, String value2, Integer minInt, Integer maxInt, Object minMaxFlagObj) {
         int dayDiff = GEN_DAYDIFF_IOP(binding, value1, value2, minMaxFlagObj);
         if (dayDiff > SENTINEL_TRESHOLD)
             return dayDiff;

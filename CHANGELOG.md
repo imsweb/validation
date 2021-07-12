@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.23**
+
+- Fixed name of metafile context functions YEARINTERVAL_IOP, MONTHINTERVAL_IOP and DAYINTERVAL_IOP.
+
 **Version 2.22**
 
 - Updated staging client from version 6.0.0 to version 6.1.0.
