@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 2.24**
+
+- Updated XStream library from version 1.4.17 to version 1.4.18.
+- Updated Apache commons-lang library from version 3.11 to version 3.12.0.
+
 **Version 2.23**
 
 - Fixed name of metafile context functions YEARINTERVAL_IOP, MONTHINTERVAL_IOP and DAYINTERVAL_IOP.
