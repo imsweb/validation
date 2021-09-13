@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 2.25**
+
+- Changed new isImportEdit on Rule class from Boolean to Byte.
+
 **Version 2.24**
 
 - Updated XStream library from version 1.4.17 to version 1.4.18.

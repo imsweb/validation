@@ -145,9 +145,9 @@ public class Rule {
     protected Boolean _needsReview;
 
     /**
-     * Whether or not this rule is an "import" edit; this field is not used in this library and was added for other projects using the library.
+     * Import edit flag; this field is not used in this library and was added for other projects using the library.
      */
-    protected Boolean _isImportEdit;
+    protected Byte _importEditFlag;
 
     /**
      * Constructor.
@@ -165,7 +165,6 @@ public class Rule {
         _ignored = Boolean.FALSE;
         _useAndForConditions = Boolean.TRUE;
         _needsReview = Boolean.FALSE;
-        _isImportEdit = Boolean.FALSE;
     }
 
     /**
@@ -670,25 +669,24 @@ public class Rule {
         _needsReview = needsReview;
     }
 
-
     /**
      * Getter
      * <p/>
      * Created on Jun 28, 2021 by depryf
      * @return whether this rule is an "import" edit
      */
-    public Boolean getIsImportEdit() {
-        return _isImportEdit;
+    public Byte getImportEditFlag() {
+        return _importEditFlag;
     }
 
     /**
      * Setter
      * <p/>
      * Created on Jun 28, 2021 by depryf
-     * @param isImportEdit whether this rule is an "import" edit
+     * @param importEditFlag whether this rule is an "import" edit
      */
-    public void setIsImportEdit(Boolean isImportEdit) {
-        _isImportEdit = isImportEdit;
+    public void setImportEditFlag(Byte importEditFlag) {
+        _importEditFlag = importEditFlag;
     }
 
     @Override
