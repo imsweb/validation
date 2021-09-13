@@ -677,7 +677,7 @@ public class Rule {
      * Created on Jun 28, 2021 by depryf
      * @return whether this rule is an "import" edit
      */
-    public Boolean isImportEdit() {
+    public Boolean getIsImportEdit() {
         return _isImportEdit;
     }
 
