@@ -194,7 +194,7 @@ if (version.endsWith('-SNAPSHOT')) {
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '7.0.2'
+    gradleVersion = '7.2'
     distributionType = Wrapper.DistributionType.ALL
 }
 
