@@ -54,38 +54,38 @@ public class ValidationServices {
     /**
      * Internal sequence to use for rule IDs
      */
-    private static AtomicInteger _RULE_SEQ = new AtomicInteger(0);
+    private static final AtomicInteger _RULE_SEQ = new AtomicInteger(0);
 
     /**
      * Internal sequence to use for category IDs
      */
-    private static AtomicInteger _CATEGORY_SEQ = new AtomicInteger(0);
+    private static final AtomicInteger _CATEGORY_SEQ = new AtomicInteger(0);
 
     /**
      * Internal sequence to use for condition IDs
      */
-    private static AtomicInteger _CONDITION_SEQ = new AtomicInteger(0);
+    private static final AtomicInteger _CONDITION_SEQ = new AtomicInteger(0);
 
     /**
      * Internal sequence to use for validator IDs
      */
-    private static AtomicInteger _VALIDATOR_SEQ = new AtomicInteger(0);
+    private static final AtomicInteger _VALIDATOR_SEQ = new AtomicInteger(0);
 
     /**
      * Internal sequence to use for context entry IDs
      */
-    private static AtomicInteger _CONTEXT_ENTRY_SEQ = new AtomicInteger(0);
+    private static final AtomicInteger _CONTEXT_ENTRY_SEQ = new AtomicInteger(0);
 
     /**
      * Internal sequence to use for set IDs
      */
-    private static AtomicInteger _SET_SEQ = new AtomicInteger(0);
+    private static final AtomicInteger _SET_SEQ = new AtomicInteger(0);
 
     /**
      * Internal sequence to use for rule history IDs (and deleted rule history; they share this sequence)
      */
 
-    private static AtomicInteger _RULE_HISTORY_SEQ = new AtomicInteger(0);
+    private static final AtomicInteger _RULE_HISTORY_SEQ = new AtomicInteger(0);
 
     /**
      * Private instance of a <code>ValidationServices</code>
@@ -95,7 +95,7 @@ public class ValidationServices {
     /**
      * Pattern for property values replacement
      */
-    private static Pattern _PROP_REPLACEMENT_PATTERN = Pattern.compile("(\\$\\{(.+?)})");
+    private static final Pattern _PROP_REPLACEMENT_PATTERN = Pattern.compile("(\\$\\{(.+?)})");
 
     /**
      * Map of java-path -> alias to use in the edits
