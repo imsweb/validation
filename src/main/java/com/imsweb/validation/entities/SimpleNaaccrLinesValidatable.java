@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.imsweb.staging.entities.Schema;
@@ -34,7 +33,7 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
  * <li>csSiteSpecificFactor25</li>
  * </ul>
  * The property will be added if it's not there yet, or if either one of the site/hist properties exists. In other words, if you want to
- * to populate the "_csSchemaName" yourself on the line (which can be useful for unit tests), make sure to not also provide a site/hist.
+ * populate the "_csSchemaName" yourself on the line (which can be useful for unit tests), make sure to not also provide a site/hist.
  * or the schema will be overridden.
  * <br/><br/>
  * Created on Apr 17, 2010 by Fabian
@@ -54,52 +53,52 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     /**
      * Used to keep track of the property paths (prefix) when an error is reported; this is the full path with the indexes
      */
-    private String _prefix;
+    private final String _prefix;
 
     /**
      * The current alias
      */
-    private String _alias;
+    private final String _alias;
 
     /**
      * Current collections of lines (applied only to the root validatable)
      */
-    private List<Map<String, String>> _lines;
+    private final List<Map<String, String>> _lines;
 
     /**
      * Context entries
      */
-    private Map<String, Object> _context;
+    private final Map<String, Object> _context;
 
     /**
      * Current map being validated
      */
-    private Map<String, String> _currentLine;
+    private final Map<String, String> _currentLine;
 
     /**
      * Link to the parent validatable
      */
-    private SimpleNaaccrLinesValidatable _parent;
+    private final SimpleNaaccrLinesValidatable _parent;
 
     /**
      * Map of prefixes, contains the prefixes of this validatable plus any prefixes from the parents
      */
-    private Map<String, String> _prefixes;
+    private final Map<String, String> _prefixes;
 
     /**
      * Map of scopes, contains the scope of this validatable plus any scopes from the parents
      */
-    private Map<String, Object> _scopes;
+    private final Map<String, Object> _scopes;
 
     /**
      * Set of failing properties
      */
-    private Set<String> _propertiesWithError;
+    private final Set<String> _propertiesWithError;
 
     /**
      * If true, the untrimmed notation will be used ('untrimmedline' instead of 'line')
      */
-    private boolean _useUntrimmedNotation;
+    private final boolean _useUntrimmedNotation;
 
     /**
      * Constructor.
@@ -260,8 +259,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     @Override
     public Map<String, Object> getScope() {
         if (_context != null)
-            for (Entry<String, Object> entry : _context.entrySet())
-                _scopes.put(entry.getKey(), entry.getValue());
+            _scopes.putAll(_context);
 
         return _scopes;
     }
@@ -281,6 +279,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     }
 
     @Override
+    @SuppressWarnings("SuspiciousMethodCalls")
     public void forceFailureForProperties(Set<ExtraPropertyEntityHandlerDto> toReport, Set<String> rawProperties) {
         if (_lines == null)
             return;

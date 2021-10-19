@@ -27,7 +27,7 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
  * is the root prefix, it defines the alias to be used in the edits: if the root is "record", the edit will have to access the properties as
  * "record.property"; if the root is "tumor", the edit will have to access the properties as "tumor.property".
  * <br/><br/>
- * In it's simplest form, this validatable can be used to wrap a data line represented as a map of properties where every value is the String read
+ * In its simplest form, this validatable can be used to wrap a data line represented as a map of properties where every value is the String read
  * from the data line. In that case, the default prefix "record" will be used, and the wrapped entity shouldn't have any complex types nor collections.
  * <br/><br/>
  * Created on Apr 17, 2010 by Fabian
@@ -47,37 +47,37 @@ public class SimpleMapValidatable implements Validatable {
     /**
      * Used to keep track of the property paths (prefix) when an error is reported; this is the full path with the indexes.
      */
-    private String _prefix;
+    private final String _prefix;
 
     /**
      * The current alias.
      */
-    private String _alias;
+    private final String _alias;
 
     /**
      * Current map being validated.
      */
-    private Map<String, Object> _current;
+    private final Map<String, Object> _current;
 
     /**
      * Link to the parent validatable.
      */
-    private SimpleMapValidatable _parent;
+    private final SimpleMapValidatable _parent;
 
     /**
      * Map of prefixes, contains the prefixes of this validatable plus any prefixes from the parents.
      */
-    private Map<String, String> _prefixes;
+    private final Map<String, String> _prefixes;
 
     /**
      * Map of scopes, contains the scope of this validatable plus any scopes from the parents.
      */
-    private Map<String, Object> _scopes;
+    private final Map<String, Object> _scopes;
 
     /**
      * Set of failing properties.
      */
-    private Set<String> _propertiesWithError;
+    private final Set<String> _propertiesWithError;
 
     /**
      * Constructor.
