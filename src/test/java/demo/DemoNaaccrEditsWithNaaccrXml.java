@@ -35,12 +35,21 @@ import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.functions.MetafileContextFunctions;
 
+/**
+ * This example demonstrates running the pre-compiled NAACCR edits on a NAACCR XML file.
+ * <br/><br/>
+ * It requires two dependencies available on Maven Central (see the build file from the project):
+ *   1. The "layout" framework to read the data file: com.imsweb:layout:X.X'
+ *   2. The pre-compiled SEER edits: com.imsweb:validation-edits-naaccr-translated:XXX-XX
+ * <br/><br/>
+ * The example uses a fake NAACCR 22 XML files that is also contained in this project.
+ */
 public class DemoNaaccrEditsWithNaaccrXml {
 
     public static void main(String[] args) throws Exception {
 
         // it would be simpler to get the file on the classpath, but using an actual File object will allow people to easily point to their own file...
-        File dataFile = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/data/synthetic-data_naaccr-xml-21-abstract_10-tumors.xml");
+        File dataFile = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/data/synthetic-data_naaccr-xml-22-abstract_5-tumors.xml");
 
         // we have to initialize the CS staging framework since the NAACCR edits use it...
         Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsVersion.LATEST));
@@ -72,25 +81,38 @@ public class DemoNaaccrEditsWithNaaccrXml {
             while (patient != null) {
                 tumorCount.addAndGet(patient.getTumors().size());
 
-                // in NAACCR flat world, the edits were written in terms of a "line" representing a single tumor; in NAACCR XML word, this should really become
-                // "tumor" instead of "line" and the validatable should work natively on tumors, but for now the edits still expect a "line" which is just a simple map...
+                // In NAACCR flat world, the edits were written in terms of a "untrimmedline" representing a single tumor; in NAACCR XML word, this should really become
+                // "tumor" instead of "untrimmedline" and the validatable should work natively on tumors, but for now the edits still expect an "untrimmedline"
+                // which is just a simple map.
                 List<Map<String, String>> tumorList = new ArrayList<>();
                 for (Tumor tumor : patient.getTumors()) {
                     Map<String, String> tumorMap = new HashMap<>();
+                    // add the NaaccrData items (they appear once per file)
+                    for (Item item : reader.getRootData().getItems())
+                        tumorMap.put(item.getNaaccrId(), item.getValue());
+                    // add the patient items (they appear once per Patient)
                     for (Item item : patient.getItems())
                         tumorMap.put(item.getNaaccrId(), item.getValue());
+                    // add the tumor items (they appear once per Tumor)
                     for (Item item : tumor.getItems())
                         tumorMap.put(item.getNaaccrId(), item.getValue());
                     tumorList.add(tumorMap);
-                }
 
-                // note that unlike the SEER edits, NAACCR edits don't have "inter-tumor" edits, and so we could just validate each tumor independently...
-                Collection<RuleFailure> failures = ValidationEngine.getInstance().validate(new SimpleNaaccrLinesValidatable(tumorList));
-                failuresCount.addAndGet(failures.size());
+                    // Unlike the SEER edits, NAACCR edits don't have "inter-tumor" edits, and so we can just validate each tumor independently...
+                    // Also, the translated edits require leading/trailing spaces to be provided with the values (in other words, the values are always
+                    // exactly their expected length); that means the validatable has to behave differently and use a "untrimmedline" notation.
+                    // The context param can be used to provide meta-data information to the edits (like the current version of the software running them);
+                    // that feature is not used for SEER or NAACCR edits.
+                    Collection<RuleFailure> failures = ValidationEngine.getInstance().validate(new SimpleNaaccrLinesValidatable(tumorList, null, true));
+                    System.out.println("Validated Tumor " + tumor.getItemValue("tumorRecordNumber") + " on Patient " + patient.getItemValue("patientIdNumber") + ":");
+                    for (RuleFailure failure : failures)
+                        System.out.println("  > " + failure.getRule().getId() + ": " + failure.getMessage());
+                    failuresCount.addAndGet(failures.size());
+                }
                 patient = layout.readNextPatient(reader);
             }
         }
-        System.out.println("  > done in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Done running edits in " + (System.currentTimeMillis() - start) + "ms");
         System.out.println("  > num tumors: " + tumorCount.get());
         System.out.println("  > num failures: " + failuresCount.get());
     }

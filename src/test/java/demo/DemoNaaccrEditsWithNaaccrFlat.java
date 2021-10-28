@@ -30,6 +30,15 @@ import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
 import com.imsweb.validation.functions.MetafileContextFunctions;
 
+/**
+ * This example demonstrates running the pre-compiled NAACCR edits on a NAACCR fixed-columns (flat) file.
+ * <br/><br/>
+ * It requires two dependencies available on Maven Central (see the build file from the project):
+ *   1. The "layout" framework to read the data file: com.imsweb:layout:X.X'
+ *   2. The pre-compiled SEER edits: com.imsweb:validation-edits-naaccr-translated:XXX-XX
+ * <br/><br/>
+ * The example uses a fake NAACCR 18 flat files that is also contained in this project.
+ */
 public class DemoNaaccrEditsWithNaaccrFlat {
 
     public static void main(String[] args) throws Exception {
@@ -67,14 +76,18 @@ public class DemoNaaccrEditsWithNaaccrFlat {
             while (rec != null) {
                 recCount.getAndIncrement();
 
+                // we have to use the "untrimmed" notation because translated edits expect to see the leading/trailing spaces!
                 Validatable validatable = new SimpleNaaccrLinesValidatable(Collections.singletonList(rec), null, true);
                 Collection<RuleFailure> failures = ValidationEngine.getInstance().validate(validatable);
+                System.out.println("Validated Patient " + rec.get("patientIdNumber") + " (line #" + reader.getLineNumber() + "):");
+                for (RuleFailure failure : failures)
+                    System.out.println("  > " + failure.getRule().getId() + ": " + failure.getMessage());
                 failuresCount.addAndGet(failures.size());
 
                 rec = layout.readNextRecord(reader);
             }
         }
-        System.out.println("  > done in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Done running edits in " + (System.currentTimeMillis() - start) + "ms");
         System.out.println("  > num records: " + recCount.get());
         System.out.println("  > num failures: " + failuresCount.get());
 

@@ -32,6 +32,15 @@ import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.functions.StagingContextFunctions;
 
+/**
+ * This example demonstrates running the pre-compiled SEER edits on a NAACCR fixed-columns (flat) file.
+ * <br/><br/>
+ * It requires two dependencies available on Maven Central (see the build file from the project):
+ *   1. The "layout" framework to read the data file: com.imsweb:layout:X.X'
+ *   2. The pre-compiled SEER edits: com.imsweb:validation-edits-seer:XXX-XX
+ * <br/><br/>
+ * The example uses a fake NAACCR 18 flat files that is also contained in this project.
+ */
 public class DemoSeerEditsWithNaaccrFlat {
 
     public static void main(String[] args) throws Exception {
@@ -61,14 +70,22 @@ public class DemoSeerEditsWithNaaccrFlat {
             while (rec != null) {
                 recCount.getAndIncrement();
 
-                Validatable validatable = new SimpleNaaccrLinesValidatable(Collections.singletonList(rec), null, true);
+                Validatable validatable = new SimpleNaaccrLinesValidatable(Collections.singletonList(rec));
                 Collection<RuleFailure> failures = ValidationEngine.getInstance().validate(validatable);
                 failuresCount.addAndGet(failures.size());
+
+                // The SEER edits contain inter-record edits but for those to work, the list of all lines for a given patient needs to be
+                // provided to the validatable; this simple example reads each line of the data file individually and doesn't attempt to group
+                // them by Patient ID Number, and so the SEER inter-record edits won't work. See the NAACCR XML demo for an example that
+                // properly runs those inter-record edits...
+                System.out.println("Validated Patient " + rec.get("patientIdNumber") + " (line #" + reader.getLineNumber() + "):");
+                for (RuleFailure failure : failures)
+                    System.out.println("  > " + failure.getRule().getId() + ": " + failure.getMessage());
 
                 rec = layout.readNextRecord(reader);
             }
         }
-        System.out.println("  > done in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Done running edits in " + (System.currentTimeMillis() - start) + "ms");
         System.out.println("  > num records: " + recCount.get());
         System.out.println("  > num failures: " + failuresCount.get());
     }

@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.imsweb.staging.entities.Schema;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.ValidationServices;
@@ -229,6 +231,11 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
                 String tumRecNum = _currentLine.get("tumorRecordNumber");
                 if (tumRecNum != null)
                     result = result + "/" + tumRecNum;
+                else {
+                    String seqNum = _currentLine.get("sequenceNumberCentral");
+                    if (seqNum != null)
+                        result = result + "/" + seqNum;
+                }
             }
         }
 
@@ -237,7 +244,14 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
 
     @Override
     public Long getCurrentTumorId() {
-        return null;
+        if (_currentLine == null)
+            return null;
+
+        String tumorId = _currentLine.get("tumorRecordNumber");
+        if (!NumberUtils.isDigits(tumorId))
+            tumorId = _currentLine.get("sequenceNumberCentral");
+        return NumberUtils.isDigits(tumorId) ? Long.valueOf(tumorId) : null;
+
     }
 
     @Override

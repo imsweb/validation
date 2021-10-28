@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.imsweb.layout.LayoutFactory;
 import com.imsweb.layout.naaccrxml.NaaccrXmlLayout;
 import com.imsweb.naaccrxml.PatientXmlReader;
@@ -37,12 +39,21 @@ import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.SimpleNaaccrLinesValidatable;
 import com.imsweb.validation.functions.StagingContextFunctions;
 
+/**
+ * This example demonstrates running the pre-compiled SEER edits on a NAACCR XML file.
+ * <br/><br/>
+ * It requires two dependencies available on Maven Central (see the build file from the project):
+ *   1. The "layout" framework to read the data file: com.imsweb:layout:X.X'
+ *   2. The pre-compiled SEER edits: com.imsweb:validation-edits-seer:XXX-XX
+ * <br/><br/>
+ * The example uses a fake NAACCR 22 XML files that is also contained in this project.
+ */
 public class DemoSeerEditsWithNaaccrXml {
 
     public static void main(String[] args) throws Exception {
 
         // it would be simpler to get the file on the classpath, but using an actual File object will allow people to easily point to their own file...
-        File dataFile = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/data/synthetic-data_naaccr-xml-21-abstract_10-tumors.xml");
+        File dataFile = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/data/synthetic-data_naaccr-xml-22-abstract_5-tumors.xml");
 
         // we have to initialize the staging framework since the SEER edits use it...
         Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsVersion.LATEST));
@@ -66,14 +77,20 @@ public class DemoSeerEditsWithNaaccrXml {
             while (patient != null) {
                 tumorCount.addAndGet(patient.getTumors().size());
 
-                // even in NAACCR flat world, the SEER edits already supported the concept of a "patient" which was a grouping of lines with the same patient ID number;
-                // the syntax of the SEER edits still references the "lines" and "line" context variables and expect those to be simple maps of string. It's possible one
-                // day the SEER edits will be re-written to natively run on NAACCR XML Patients and Tumors, but for now those need to be translated to maps...
+                // The SEER edits have always supported the concept of a "patient" which is a grouping of lines with the same patient ID number; with NAACCR XML, that grouping
+                // exists at the data level (a Patient can contain multiple Tumor tags), but the syntax of the SEER edits still references the "lines" and "line"
+                // and expect those to be simple maps of string. It's possible one day the SEER edits will be re-written to natively run on NAACCR XML Patients and Tumors,
+                // but for now those need to be translated to maps...
                 List<Map<String, String>> tumorList = new ArrayList<>();
                 for (Tumor tumor : patient.getTumors()) {
                     Map<String, String> tumorMap = new HashMap<>();
+                    // add the NaaccrData items (they appear once per file)
+                    for (Item item : reader.getRootData().getItems())
+                        tumorMap.put(item.getNaaccrId(), item.getValue());
+                    // add the patient items (they appear once per Patient)
                     for (Item item : patient.getItems())
                         tumorMap.put(item.getNaaccrId(), item.getValue());
+                    // add the tumor items (they appear once per Tumor)
                     for (Item item : tumor.getItems())
                         tumorMap.put(item.getNaaccrId(), item.getValue());
                     tumorList.add(tumorMap);
@@ -81,10 +98,22 @@ public class DemoSeerEditsWithNaaccrXml {
 
                 Collection<RuleFailure> failures = ValidationEngine.getInstance().validate(new SimpleNaaccrLinesValidatable(tumorList));
                 failuresCount.addAndGet(failures.size());
+
+                // The collection contains the failures for all the Tumors on the current Patient; to split them by Tumor, we have to use
+                // the "tumorId" field from each failure (that ID can be null for inter-record edits that involve more than one Tumor).
+                // The default behavior for hte simple validatable is to use the TumorRecordNumber if it can, otherwise use the SequenceNumberCentral.
+                System.out.println("Validated Patient " + patient.getItemValue("patientIdNumber") + ":");
+                for (RuleFailure failure : failures) {
+                    String tumId = "";
+                    if (failure.getTumorIdentifier() != null)
+                        tumId = "[Tumor " + StringUtils.leftPad(String.valueOf(failure.getTumorIdentifier()), 2, '0') + "] ";
+                    System.out.println("  > " + tumId + failure.getRule().getId() + ": " + failure.getMessage());
+                }
+
                 patient = layout.readNextPatient(reader);
             }
         }
-        System.out.println("  > done in " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("Done running edits in " + (System.currentTimeMillis() - start) + "ms");
         System.out.println("  > num tumors: " + tumorCount.get());
         System.out.println("  > num failures: " + failuresCount.get());
     }

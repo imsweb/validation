@@ -48,17 +48,6 @@ public class SimpleNaaccrLinesValidatableTest {
         e2.put("patientIdNumber", "00000000");
         e2.put("tumorRecordNumber", "01");
 
-        // null map
-        boolean exception = false;
-        try {
-            new SimpleNaaccrLinesValidatable(null, null);
-        }
-        catch (RuntimeException e) {
-            exception = true;
-        }
-        if (!exception)
-            Assert.fail("Where is the exception?");
-
         // empty list
         SimpleNaaccrLinesValidatable v = new SimpleNaaccrLinesValidatable(Collections.singletonList(e1), context);
         Assert.assertEquals("?", v.getDisplayId());
@@ -78,6 +67,9 @@ public class SimpleNaaccrLinesValidatableTest {
         v = new SimpleNaaccrLinesValidatable(e2);
         TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule1"); // exception bc 'out' not defined
         TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(v), "fvnl-rule2");
+        RuleFailure rf = ValidationEngine.getInstance().validate(v).stream().filter(f -> "fvnl-rule1".equals(f.getRule().getId())).findFirst().orElse(null);
+        Assert.assertNotNull(rf);
+        Assert.assertEquals(1, rf.getTumorIdentifier().intValue());
 
         List<Map<String, String>> list = new ArrayList<>();
         list.add(e2);

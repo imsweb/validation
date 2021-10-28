@@ -114,7 +114,7 @@ And here is the code that can be used to initialize the validation engine from t
 ```java
 File file = new File("my-edits.xml")
 Validator v = ValidationXmlUtils.loadValidatorFromXml(file);
-ValidationEngine.initialize(v);
+ValidationEngine.getInstance().initialize(v);
 ```
 
 ### Creating an edit programmatically
@@ -149,7 +149,7 @@ the engine has already been initialized with specific edits.
 
 ```java
 File dataFile = new File("my-data.txd.gz");
-NaaccrLayout layout = (NaaccrLayout)LayoutFactory.getLayout(LayoutFactory.LAYOUT_ID_NAACCR_16_ABSTRACT);
+NaaccrLayout layout = LayoutFactory.getNaaccrFixedColumnsLayout(LayoutFactory.LAYOUT_ID_NAACCR_16_ABSTRACT);
 for (<Map<String, String> rec : layout.readAllRecords(dataFile)) {
 
     // this is how the engine knows how to validate the provided object
@@ -161,6 +161,7 @@ for (<Map<String, String> rec : layout.readAllRecords(dataFile)) {
         System.out.println(failure.getMessage());
 }
 ```
+The `demo` package in the unit tests contains more detailed examples of running SEER and NAACCR edits on NAACCR flat and XML files.
 
 ## Optimizing loading an executing edits
 
@@ -175,7 +176,7 @@ InitializationOptions options = new InitializationOptions();
 options.setNumCompilationThreads(4);
 ValidationEngine.getInstance().initialize(options, myValidator);
 ```
-A value of 4 will usually work well for optimizing the compilation although it depends on the available resources. The default is to use 2 threads.
+A value of 4 will usually work well for optimizing the compilation, although it depends on the available resources. The default is to use 2 threads.
 
 ### Speed up the initialization and execution by using pre-compiled/pre-parsed edits
 
