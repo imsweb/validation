@@ -96,23 +96,26 @@ public class ValidationServicesTest {
     public void testAddContextExpression() throws ConstructionException {
         Map<String, Object> context = new HashMap<>();
 
-        Assert.assertEquals(1, ValidationServices.getInstance().addContextExpression("1", context, "key1", "groovy"));
+        Assert.assertEquals(1, ValidationServices.getInstance().addContextExpression("1", context, "key1", ValidationEngine.CONTEXT_TYPE_GROOVY));
         Assert.assertEquals(1, context.size());
 
-        ValidationServices.getInstance().addContextExpression("[1,2]", context, "key2", "java");
+        ValidationServices.getInstance().addContextExpression("[1,2]", context, "key2", ValidationEngine.CONTEXT_TYPE_JAVA);
         Assert.assertEquals(2, context.size());
 
-        ValidationServices.getInstance().addContextExpression("[1:'A']", context, "key3", "java");
+        ValidationServices.getInstance().addContextExpression("[1:'A']", context, "key3", ValidationEngine.CONTEXT_TYPE_JAVA);
         Assert.assertEquals(3, context.size());
 
-        ValidationServices.getInstance().addContextExpression("[[1,1],[2,2]]", context, "key4", "java");
+        ValidationServices.getInstance().addContextExpression("[[1,1],[2,2]]", context, "key4", ValidationEngine.CONTEXT_TYPE_JAVA);
         Assert.assertEquals(4, context.size());
 
-        ValidationServices.getInstance().addContextExpression("123", context, "key5", "java");
+        ValidationServices.getInstance().addContextExpression("123", context, "key5", ValidationEngine.CONTEXT_TYPE_JAVA);
         Assert.assertEquals(5, context.size());
 
-        ValidationServices.getInstance().addContextExpression("123", context, "key6", "java");
+        ValidationServices.getInstance().addContextExpression("123", context, "key6", ValidationEngine.CONTEXT_TYPE_JAVA);
         Assert.assertEquals(6, context.size());
+
+        ValidationServices.getInstance().addContextExpression("[['H1','H2'],['V2','V2']]", context, "key10", ValidationEngine.CONTEXT_TYPE_TABLE);
+        Assert.assertEquals(7, context.size());
     }
 
     /**
@@ -144,6 +147,15 @@ public class ValidationServicesTest {
 
         ValidationServices.getInstance().addTableContextExpression("[['header'], ['val1'], ['val2'], ['val3']]", context, "table2");
         Assert.assertEquals(3, ((ContextTable)context.get("table2")).getData().size());
+
+        // tables with numerical columns are not supported!
+        try {
+            ValidationServices.getInstance().addTableContextExpression("[['H1','H2'],[1,'1'],[2,'2'],[11,'11']]", context, "table3");
+            Assert.fail("Was expected an exception!");
+        }
+        catch (ConstructionException e) {
+            // expected
+        }
     }
 
     @Test

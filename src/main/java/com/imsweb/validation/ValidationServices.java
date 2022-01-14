@@ -409,6 +409,14 @@ public class ValidationServices {
             Object data = JavaContextParser.parseContext(expression, context);
             if (!(data instanceof List))
                 throw new ConstructionException("Unable to evaluate context for key '" + entryId + "'; bad format for a table");
+
+            // first row has to be String values (the headers); technically Genedits support numeric columns, but those are not supported in the engine
+            for (List<?> row : (List<List<?>>)data)
+                for (Object obj : row)
+                    if (!(obj instanceof String))
+                        throw new RuntimeException("Tables only support String values; found " + obj.getClass().getSimpleName());
+
+
             result = new ContextTable(entryId, (List<List<String>>)data);
             context.put(entryId, result);
         }
@@ -513,6 +521,7 @@ public class ValidationServices {
      * @param validatable current validatable
      * @return replaced message
      */
+    @SuppressWarnings("rawtypes")
     public String fillInMessage(String msg, Validatable validatable) {
         if (msg == null)
             return "";

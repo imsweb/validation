@@ -12,13 +12,13 @@ import java.util.Objects;
 public class ContextTable {
 
     // table name
-    private String _name;
+    private final String _name;
 
     // table headers
-    private List<String> _headers;
+    private final List<String> _headers;
 
     // table content
-    private List<List<String>> _data;
+    private final List<List<String>> _data;
 
     /**
      * Constructor
