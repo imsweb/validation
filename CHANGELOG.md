@@ -1,5 +1,11 @@
 ## Validation Framework Version History
 
+**Version 2.26**
+
+- Updated Groovy library from version 3.0.8 (indy) to version 3.0.10 (indy).
+- Updated XStream library from version 1.4.18 to version 1.4.19.
+- Updated staging client from version 6.1.0 to version 6.2.0.
+
 **Version 2.25**
 
 - Changed new isImportEdit on Rule class from Boolean to Byte.
