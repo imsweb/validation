@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 2.28**
+
+- Increased the engine version to 6.7.
+- Fixed behavior of TRIM Genedits context function when used a value that only contains spaces.
+
 **Version 2.27**
 
 - Updated staging client from version 6.2.0 to version 6.3.0.

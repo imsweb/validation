@@ -778,6 +778,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 break;
             case TRIM_RIGHT:
                 result = _GEN_TRIM_P2.matcher(val).replaceAll("");
+                if (result.isEmpty()) // non-documented "feature"
+                    result = " ";
                 break;
             case TRIM_BOTH:
                 result = _GEN_TRIM_P3.matcher(val).replaceAll("");

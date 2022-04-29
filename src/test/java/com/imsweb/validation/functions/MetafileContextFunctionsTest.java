@@ -29,6 +29,8 @@ import com.imsweb.validation.entities.ContextTable;
 import com.imsweb.validation.entities.ContextTableIndex;
 import com.imsweb.validation.internal.context.JavaContextParser;
 
+import static com.imsweb.validation.functions.MetafileContextFunctions.TRIM_BOTH;
+import static com.imsweb.validation.functions.MetafileContextFunctions.TRIM_LEFT;
 import static com.imsweb.validation.functions.MetafileContextFunctions.TRIM_RIGHT;
 
 public class MetafileContextFunctionsTest {
@@ -936,10 +938,23 @@ public class MetafileContextFunctionsTest {
 
     @Test
     public void testGEN_TRIM() {
-        Assert.assertEquals("abc   ", _functions.GEN_TRIM("   abc   ", MetafileContextFunctions.TRIM_LEFT));
+        Assert.assertEquals("abc   ", _functions.GEN_TRIM("   abc   ", TRIM_LEFT));
         Assert.assertEquals("   abc", _functions.GEN_TRIM("   abc   ", TRIM_RIGHT));
-        Assert.assertEquals("abc", _functions.GEN_TRIM("   abc   ", MetafileContextFunctions.TRIM_BOTH));
-        Assert.assertEquals("", _functions.GEN_TRIM("", MetafileContextFunctions.TRIM_BOTH));
+        Assert.assertEquals("abc", _functions.GEN_TRIM("   abc   ", TRIM_BOTH));
+        Assert.assertEquals("", _functions.GEN_TRIM("", TRIM_BOTH));
+
+        // unbelievable; the trim right leaves a single space when trimming an all-blank value (the trim left and trim both don't)!!!
+        Assert.assertEquals(" ", _functions.GEN_TRIM("  ", TRIM_RIGHT));
+        Assert.assertEquals("", _functions.GEN_TRIM("  ", TRIM_LEFT));
+        Assert.assertEquals("", _functions.GEN_TRIM("  ", TRIM_BOTH));
+
+        Assert.assertEquals(" ", _functions.GEN_TRIM(" ", TRIM_RIGHT));
+        Assert.assertEquals("", _functions.GEN_TRIM(" ", TRIM_LEFT));
+        Assert.assertEquals("", _functions.GEN_TRIM(" ", TRIM_BOTH));
+
+        Assert.assertEquals("", _functions.GEN_TRIM("", TRIM_RIGHT));
+        Assert.assertEquals("", _functions.GEN_TRIM("", TRIM_LEFT));
+        Assert.assertEquals("", _functions.GEN_TRIM("", TRIM_BOTH));
     }
 
     @Test
