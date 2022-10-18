@@ -1,12 +1,14 @@
+import java.time.Duration
+
 plugins {
     id 'java-library'
     id 'checkstyle'
-    id 'com.github.spotbugs' version '5.0.3'
+    id 'com.github.spotbugs' version '5.0.12'
     id 'maven-publish'
     id 'signing'
-    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-    id 'org.sonatype.gradle.plugins.scan' version '2.2.2'
-    id "com.github.ben-manes.versions" version '0.39.0'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' // publish to Maven Central
+    id 'com.github.ben-manes.versions' version '0.43.0' // check for out-of-date dependencies (run manually)
+    id 'org.sonatype.gradle.plugins.scan' version '2.4.1' // scan for vulnerabilities
 }
 
 group = 'com.imsweb'
@@ -31,12 +33,12 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'commons-io:commons-io:2.11.0'
-    testImplementation 'com.imsweb:layout:4.8'
+    testImplementation 'com.imsweb:layout:5.0'
     testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.10'
     testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.9'
     testImplementation 'com.imsweb:staging-algorithm-eod-public:2.1.2'
-    testImplementation 'com.imsweb:validation-edits-seer:021-10'
-    testImplementation 'com.imsweb:validation-edits-naaccr-translated:014-01'
+    testImplementation 'com.imsweb:validation-edits-seer:022-10'
+    testImplementation 'com.imsweb:validation-edits-naaccr-translated:015-01'
 }
 
 // enforce UTF-8, display the compilation warnings
@@ -75,7 +77,7 @@ jar {
 checkstyle {
     ignoreFailures = false
     configFile = file('config/checkstyle/checkstyle.xml')
-    configProperties = ['suppressionFile' : file('config/checkstyle/checkstyle-exclude.xml')]
+    configProperties = ['suppressionFile': file('config/checkstyle/checkstyle-exclude.xml')]
 }
 
 // spotbugs plugin settings
@@ -100,17 +102,21 @@ task generateJavaContextParser {
 
 // Nexus vulnerability scan (https://github.com/sonatype-nexus-community/scan-gradle-plugin)
 ossIndexAudit {
-    dependencyGraph = true
+    proxyConfiguration {
+        protocol = 'http'
+        host = 'webproxy-btp.imsweb.com'
+        port = 8080
+    }
+
     printBanner = false
 
-    // only set proxy if running outside of Github Actions
-    if (!System.getenv().GITHUB_ACTIONS) {
-        proxyConfiguration {
-            protocol = 'http'
-            host = 'webproxy-btp.imsweb.com'
-            port = 8080
-        }
-    }
+    excludeCoordinates = [
+            'com.thoughtworks.xstream:xstream:1.4.19' // developer doesn't agree and won't fix
+    ]
+
+    //excludeVulnerabilityIds = [
+    //        'CVE-2022-42003'  // jackson-databind 2.13.4.2 fixes this but the CVE is mislabeled
+    //]
 }
 check.dependsOn 'ossIndexAudit'
 
@@ -181,12 +187,12 @@ nexusPublishing {
         }
     }
 
-    clientTimeout = java.time.Duration.ofSeconds(300)
-    connectTimeout = java.time.Duration.ofSeconds(60)
+    clientTimeout = Duration.ofSeconds(300)
+    connectTimeout = Duration.ofSeconds(60)
 
     transitionCheckOptions {
         maxRetries.set(50)
-        delayBetween.set(java.time.Duration.ofMillis(5000))
+        delayBetween.set(Duration.ofMillis(5000))
     }
 }
 
