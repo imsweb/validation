@@ -114,11 +114,12 @@ ossIndexAudit {
             'com.thoughtworks.xstream:xstream:1.4.19' // developer doesn't agree and won't fix
     ]
 
-    //excludeVulnerabilityIds = [
-    //        'CVE-2022-42003'  // jackson-databind 2.13.4.2 fixes this but the CVE is mislabeled
-    //]
+    excludeVulnerabilityIds = [
+            'CVE-2022-42003'  // jackson-databind 2.13.4.2 fixes this but the CVE is mislabeled
+    ]
 }
-check.dependsOn 'ossIndexAudit'
+if (project.hasProperty('branch_name') && (project.ext.get('branch_name') == 'master' || project.ext.get('branch_name') == 'main'))
+    check.dependsOn 'ossIndexAudit'
 
 // needed to deploy to Maven Central
 publishing {
