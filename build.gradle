@@ -3,12 +3,14 @@ import java.time.Duration
 plugins {
     id 'java-library'
     id 'checkstyle'
+    id 'jacoco'
     id 'com.github.spotbugs' version '5.0.12'
     id 'maven-publish'
     id 'signing'
     id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' // publish to Maven Central
     id 'com.github.ben-manes.versions' version '0.43.0' // check for out-of-date dependencies (run manually)
     id 'org.sonatype.gradle.plugins.scan' version '2.4.1' // scan for vulnerabilities
+    id "org.sonarqube" version "3.3" // sonarQube analysis
 }
 
 group = 'com.imsweb'
@@ -80,11 +82,49 @@ checkstyle {
     configProperties = ['suppressionFile': file('config/checkstyle/checkstyle-exclude.xml')]
 }
 
+// jacoco plugin settings
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+test.finalizedBy jacocoTestReport
+
 // spotbugs plugin settings
 spotbugs {
     ignoreFailures = false
     excludeFilter = file('config/spotbugs/spotbugs-exclude.xml')
 }
+
+spotbugsMain {
+    reports {
+        xml {
+            enabled = true
+        }
+    }
+}
+
+spotbugsTest {
+    reports {
+        xml {
+            enabled = true
+        }
+    }
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectName', 'Library-Validation'
+        property 'sonar.projectKey', 'Library---Validation'
+        property 'sonar.organization', 'imsweb'
+        property 'sonar.host.url', project.ext.get('sonar.host.url')
+        property 'sonar.exclusions', '**/lab/*'
+        property 'sonar.coverage.exclusions', '**/lab/*'
+    }
+}
+
+if (!project.hasProperty('branch_name') || (project.ext.get('branch_name') != 'master' && project.ext.get('branch_name') != 'main'))
+    gradle.startParameter.excludedTaskNames += 'sonarqube'
 
 // use this task to generate the regex parser
 task generateJavaContextParser {
