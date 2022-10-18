@@ -152,7 +152,7 @@ ossIndexAudit {
 
     excludeCoordinates = [
             'com.thoughtworks.xstream:xstream:1.4.19', // developer doesn't agree and won't fix
-            'jackson-databind:2.13.2.2' // jackson-databind 2.13.2.2 - need to upgrade staging to fix it, but I can't upgrade yet...
+            'com.fasterxml.jackson.core:jackson-databind:2.13.2.2' // jackson-databind 2.13.2.2 - need to upgrade staging to fix it, but I can't upgrade yet...
     ]
 }
 if (project.hasProperty('branch_name') && (project.ext.get('branch_name') == 'master' || project.ext.get('branch_name') == 'main'))
