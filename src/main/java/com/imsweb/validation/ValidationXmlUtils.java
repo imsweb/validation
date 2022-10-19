@@ -137,13 +137,13 @@ public final class ValidationXmlUtils {
     /**
      * Compiled <code>Pattern</code> for leading and trailing empty lines
      */
-    private static final Pattern _PATTERN_LEADING_EMPTY_LINES = Pattern.compile("^(\\s*\r?\n)*+");
-    private static final Pattern _PATTERN_TRAILING_EMPTY_LINES = Pattern.compile("(\r?\n\\s*)*+$");
+    private static final Pattern _PATTERN_LEADING_EMPTY_LINES = Pattern.compile("^(\\s*+\r?\n)*+");
+    private static final Pattern _PATTERN_TRAILING_EMPTY_LINES = Pattern.compile("(\r?\n\\s*+)*+$");
 
     /**
      * Compiled <code>Pattern</code> for sorting the rule by ID
      */
-    private static final Pattern _PATTERN_RULE_ID = Pattern.compile("^(.+?)(\\d+)(.+)?$");
+    private static final Pattern _PATTERN_RULE_ID = Pattern.compile("^(.+?)(\\d++)(.+)?+$");
 
     /**
      * Whether or not the expressions, descriptions, messages, etc... should be re-aligned (disabled by default).
