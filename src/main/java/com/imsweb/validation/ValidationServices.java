@@ -588,6 +588,7 @@ public class ValidationServices {
     Object getMessageValueReplacement(Object object, String propertyName) throws IllegalAccessException, NoSuchFieldException {
         Object replacement;
 
+        // this code is not pretty, but it can only use Java 8 language syntax; it will be improved once the language level can be upgraded...
         if (object instanceof Map)
             replacement = ((Map)object).get(propertyName);
         else {
@@ -595,7 +596,12 @@ public class ValidationServices {
                 replacement = object.getClass().getMethod("get" + StringUtils.capitalize(propertyName)).invoke(object);
             }
             catch (InvocationTargetException | NoSuchMethodException e) {
-                replacement = object.getClass().getDeclaredField(propertyName).get(object);
+                try {
+                    replacement = object.getClass().getDeclaredField(propertyName).get(object);
+                }
+                catch (IllegalAccessException | NoSuchFieldException e2) {
+                    replacement = object.getClass().getDeclaredField("_" + propertyName).get(object);
+                }
             }
         }
 

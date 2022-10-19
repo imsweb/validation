@@ -353,34 +353,34 @@ public class ValidationServicesTest {
 
     private static class EntityBean1 {
 
-        public String field;
+        public String _field;
 
         public EntityBean1(String val) {
-            field = val;
+            _field = val;
         }
     }
 
     @SuppressWarnings("unused")
     private static class EntityBean2 {
 
-        private final String field;
+        private final String _field;
 
         public EntityBean2(String val) {
-            field = val;
+            _field = val;
         }
 
         public String getField() {
-            return field;
+            return _field;
         }
     }
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private static class EntityBean3 {
 
-        private final String field;
+        private final String _field;
 
         public EntityBean3(String val) {
-            field = val;
+            _field = val;
         }
     }
 
