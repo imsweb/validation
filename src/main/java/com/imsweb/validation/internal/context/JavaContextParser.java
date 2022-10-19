@@ -6,10 +6,8 @@ package com.imsweb.validation.internal.context;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +29,7 @@ import com.imsweb.validation.internal.context.Symbol.SymbolType;
  * Created on Oct 4, 2011 by murphyr
  * @author murphyr
  */
+@SuppressWarnings({"java:S1149", "rawtypes"})
 public final class JavaContextParser {
 
     private static final Pattern _TYPE_HINT_PATTERN = Pattern.compile("(.+])\\sas\\s(.+)$");
@@ -48,7 +48,7 @@ public final class JavaContextParser {
      * @param currentContext current context
      * @return the parsed expression (a tree)
      */
-    @SuppressWarnings({"unchecked", "JdkObsolete", "rawtypes"})
+    @SuppressWarnings({"unchecked", "JdkObsolete"})
     public static Object parseContext(String expression, Map<String, Object> currentContext) throws ConstructionException {
         Object result;
 
@@ -98,15 +98,15 @@ public final class JavaContextParser {
                         if (!(obj instanceof List) && !(obj instanceof Set))
                             throw new ConstructionException("Unable to assign list to type " + typeHint);
                         if (obj instanceof List)
-                            ((List<?>)obj).addAll((List)result);
+                            ((List)obj).addAll((List)result);
                         else
-                            ((Set<?>)obj).addAll((List)result);
+                            ((Set)obj).addAll((List)result);
                         result = obj;
                     }
                     else if (result instanceof Map) {
                         if (!(obj instanceof Map))
                             throw new ConstructionException("Unable to assign map to type " + typeHint);
-                        ((Map<?, ?>)obj).putAll((Map)result);
+                        ((Map)obj).putAll((Map)result);
                         result = obj;
                     }
                 }
@@ -138,7 +138,7 @@ public final class JavaContextParser {
      */
     @SuppressWarnings({"unchecked", "JdkObsolete", "ConstantConditions"})
     private static Object buildListOrMapFromQueue(Queue<Symbol> queue, Map<String, Object> currentContext, boolean containsListBeginToken) throws ConstructionException {
-        Deque<Object> stack = new ArrayDeque<>();
+        Stack<Object> stack = new Stack<>();
         Object returnValue = null;
 
         Symbol s = queue.remove();
@@ -269,10 +269,9 @@ public final class JavaContextParser {
      * Created on Oct 5, 2011 by murphyr
      * @author murphyr
      */
-    @SuppressWarnings("FieldMayBeFinal")
     private static class RangeObject {
 
-        private List<Integer> _rangeList;
+        private final List<Integer> _rangeList;
 
         /**
          * Created on Oct 5, 2011 by murphyr
