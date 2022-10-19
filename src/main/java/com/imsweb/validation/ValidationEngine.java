@@ -280,7 +280,7 @@ public class ValidationEngine {
             initialize(new InitializationOptions(), Collections.emptyList());
         }
         catch (ConstructionException e) {
-            throw new RuntimeException(e); // should never happen since we are not really initializing anything...
+            throw new IllegalStateException(e); // should never happen since we are not really initializing anything...
         }
     }
 
@@ -296,7 +296,7 @@ public class ValidationEngine {
             return initialize(options, Collections.emptyList());
         }
         catch (ConstructionException e) {
-            throw new RuntimeException(e); // should never happen since we are not really initializing anything...
+            throw new IllegalStateException(e); // should never happen since we are not really initializing anything...
         }
     }
 
@@ -1953,26 +1953,30 @@ public class ValidationEngine {
                 result.get();
             }
             catch (InterruptedException e) {
-                // ignore this one
+                Thread.currentThread().interrupt();
             }
             catch (ExecutionException e) {
                 if (e.getCause() instanceof ConstructionException)
                     throw (ConstructionException)e.getCause();
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         }
 
         // the work should be done by now because we call get(), which is a blocking call; but better safe than sorry...
         try {
-            service.awaitTermination(30, TimeUnit.SECONDS);
+            if (!service.awaitTermination(30, TimeUnit.SECONDS))
+                throw new IllegalStateException("Background compilation took too long to complete");
         }
         catch (InterruptedException e) {
-            // ignore this one...
+            Thread.currentThread().interrupt();
         }
     }
 
     private void checkValidatorConstraints(List<Validator> validators) throws ConstructionException {
-        Set<String> validatorIds = new HashSet<>(), conditionIds = new HashSet<>(), categoryIds = new HashSet<>(), ruleIds = new HashSet<>();
+        Set<String> validatorIds = new HashSet<>();
+        Set<String> conditionIds = new HashSet<>();
+        Set<String> categoryIds = new HashSet<>();
+        Set<String> ruleIds = new HashSet<>();
         for (Validator v : validators) {
             if (validatorIds.contains(v.getId()))
                 throw new ConstructionException("Group ID '" + v.getId() + "' is not unique");
@@ -2170,7 +2174,9 @@ public class ValidationEngine {
     private void addToRuleQueue(ExecutableRule rule, Map<String, ExecutableRule> cache, Set<String> currents, List<ExecutableRule> queue, Map<String, String> pathCache, Map<String, String> validatorCache) throws ConstructionException {
 
         if (rule.getDependencies() != null && !rule.getDependencies().isEmpty()) {
-            String rId = rule.getId(), rPath = rule.getJavaPath(), vId = rule.getRule().getValidator().getId();
+            String rId = rule.getId();
+            String rPath = rule.getJavaPath();
+            String vId = rule.getRule().getValidator().getId();
             for (String depId : rule.getDependencies()) {
                 String validatorCachedId = validatorCache.get(depId);
                 if (validatorCachedId == null)

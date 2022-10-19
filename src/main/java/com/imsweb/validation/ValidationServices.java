@@ -172,7 +172,7 @@ public class ValidationServices {
      * Returns all the java paths and their corresponding aliases.
      * <p/>
      * Created on Apr 5, 2011 by depryf
-     * @return a non-modifiable map of java paths -> alias
+     * @return a non-modifiable map of java paths -&gt alias
      */
     public Map<String, String> getAllJavaPaths() {
         return Collections.unmodifiableMap(_ALIASES);
@@ -207,21 +207,27 @@ public class ValidationServices {
      * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void log(Object message) {}
+    public void log(Object message) {
+        // no default behavior for this method
+    }
 
     /**
      * Logs the message as a warning
      * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void logWarning(Object message) {}
+    public void logWarning(Object message) {
+        // no default behavior for this method
+    }
 
     /**
      * Logs the message as an error
      * @param message message to log
      */
     @SuppressWarnings("UnusedParameters")
-    public void logError(Object message) {}
+    public void logError(Object message) {
+        // no default behavior for this method
+    }
 
     /**
      * Returns the next rule ID to use.
@@ -535,7 +541,9 @@ public class ValidationServices {
             String[] parts = StringUtils.split(matcher.group(2), '.');
 
             if (parts.length >= 2) {
-                String prefix = parts[0], propertyName = parts[1], suffix = parts.length == 3 ? parts[2] : null;
+                String prefix = parts[0];
+                String propertyName = parts[1];
+                String suffix = parts.length == 3 ? parts[2] : null;
                 boolean error = false;
                 Object replacement = null;
 
@@ -598,7 +606,8 @@ public class ValidationServices {
         String[] parts1 = StringUtils.split(version1, '.');
         String[] parts2 = StringUtils.split(version2, '.');
 
-        List<Integer> list1 = new ArrayList<>(), list2 = new ArrayList<>();
+        List<Integer> list1 = new ArrayList<>();
+        List<Integer> list2 = new ArrayList<>();
         for (int i = 0; i < Math.max(parts1.length, parts2.length); i++) {
             if (i < parts1.length)
                 list1.add(Integer.valueOf(parts1[i]));

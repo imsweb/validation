@@ -400,7 +400,7 @@ public class ValidationEngineTest {
         c.setJavaPath("level1");
         c.setExpression("return false");
         c.setValidatorId(v.getId());
-        ValidationEngine.getInstance().addCondition(c);
+        Assert.assertNotNull(ValidationEngine.getInstance().addCondition(c));
 
         EditableRule r = new EditableRule();
         r.setId("fvcr-rule");
@@ -409,7 +409,7 @@ public class ValidationEngineTest {
         r.setMessage("message");
         r.setValidatorId(v.getId());
         Assert.assertFalse(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("root"));
-        ValidationEngine.getInstance().addRule(r);
+        Assert.assertNotNull(ValidationEngine.getInstance().addRule(r));
         Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("root"));
 
         Map<String, Object> root = new HashMap<>();
@@ -1070,7 +1070,7 @@ public class ValidationEngineTest {
         // by default the level3 rule should fail
         TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(validatable), "fv-rule3");
 
-        ValidationEngine.getInstance().addContext(null, "test", "fake-validator", "[1,2,3]", "java");
+        Assert.assertNotNull(ValidationEngine.getInstance().addContext(null, "test", "fake-validator", "[1,2,3]", "java"));
         Assert.assertNotNull(ValidationEngine.getInstance().getContext("test"));
         Assert.assertEquals(2, ValidationEngine.getInstance().getValidator("fake-validator").getRawContext().size());
 

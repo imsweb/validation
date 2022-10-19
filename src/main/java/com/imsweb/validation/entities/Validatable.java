@@ -42,7 +42,7 @@ public interface Validatable {
 
     /**
      * Returns the current level of this validatable. This correspond to the full prefix of the property path.
-     * <br/><br/>
+     * <p/>
      * For a simple validatable wrapping a NAACCR line, the root prefix might be "line" and that might also be
      * the full prefix since there is only a single level of properties. For a more complex data structure like a patient set
      * in SEER*DMS, the current level could be something like "patient.ctcs".
@@ -54,7 +54,7 @@ public interface Validatable {
 
     /**
      * Returns the scope for this validatable object.
-     * <br/>br/>
+     * <p/>
      * The scope is all the properties and their values for the current level being validated, plus any scope of parent levels. So for
      * example, if the current level is "patient.ctcs", the current scope is all the properties and values of the current tumor being validated
      * plus all the properties and values of the patient. That means an edit can always access the fields of the level it is supposed to run
@@ -101,7 +101,7 @@ public interface Validatable {
 
     /**
      * Force a failure on the passed properties.
-     * <br/></br/>
+     * <p/>
      * This is an advanced feature that allows an edit to report a failure on a property that is not actually used. See the
      * <code>forceFailureOnProperty()</code> method on the {@link ValidationContextFunctions} class.
      * <p/>
