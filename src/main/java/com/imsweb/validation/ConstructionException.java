@@ -15,10 +15,10 @@ public class ConstructionException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /** First rule involved in the circular dependency (will be null for non-dependency exceptions) */
-    private String _leftDependencyRule = null;
+    private final String _leftDependencyRule;
 
     /** Second rule involved in the circular dependency (will be null for non-dependency exceptions or self-dependency exception) */
-    private String _rightDependencyRule = null;
+    private final String _rightDependencyRule;
 
     /**
      * Constructor.
@@ -28,6 +28,8 @@ public class ConstructionException extends Exception {
      */
     public ConstructionException(String message) {
         super(message);
+        _leftDependencyRule = null;
+        _rightDependencyRule = null;
     }
 
     /**
@@ -38,6 +40,8 @@ public class ConstructionException extends Exception {
      */
     public ConstructionException(Throwable parent) {
         super(parent);
+        _leftDependencyRule = null;
+        _rightDependencyRule = null;
     }
 
     /**
@@ -49,6 +53,8 @@ public class ConstructionException extends Exception {
      */
     public ConstructionException(String message, Throwable parent) {
         super(message, parent);
+        _leftDependencyRule = null;
+        _rightDependencyRule = null;
     }
 
     /**
@@ -60,8 +66,8 @@ public class ConstructionException extends Exception {
      */
     public ConstructionException(String message, String leftDependencyRule) {
         super(message);
-
         _leftDependencyRule = leftDependencyRule;
+        _rightDependencyRule = null;
     }
 
     /**
@@ -74,7 +80,6 @@ public class ConstructionException extends Exception {
      */
     public ConstructionException(String message, String leftDependencyRule, String rightDependencyRule) {
         super(message);
-
         _leftDependencyRule = leftDependencyRule;
         _rightDependencyRule = rightDependencyRule;
     }

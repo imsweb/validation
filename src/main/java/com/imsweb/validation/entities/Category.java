@@ -40,14 +40,6 @@ public class Category {
     protected Validator _validator;
 
     /**
-     * Constructor.
-     * <p/>
-     * Created on Nov 9, 2007 by depryf
-     */
-    public Category() {
-    }
-
-    /**
      * Getter for the category persistence ID. Must be unique within the validation engine.
      * <p/>
      * In a system persisting the categories in a database, that would represent a database primary key.

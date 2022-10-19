@@ -17,6 +17,7 @@ import com.imsweb.validation.functions.TestingContextFunctions.AssertionType;
  * <p/>
  * Created on Aug 8, 2011 by depryf
  */
+@SuppressWarnings("unused")
 public class RuleTestResult {
 
     /**
@@ -222,7 +223,7 @@ public class RuleTestResult {
             buf.append("ENGINE EXCEPTION - ").append(_validationException.getMessage());
         else if (_ruleFailure != null && _ruleFailure.getGroovyException() != null)
             buf.append("EDIT EXCEPTION - ").append(_ruleFailure.getGroovyException().getMessage());
-        else if (_isSuccess)
+        else if (Boolean.TRUE.equals(_isSuccess))
             buf.append("SUCCESS");
         else if (_assertionType == AssertionType.PASS)
             buf.append("FAILURE - ").append("expected edit to PASS but it FAILED");

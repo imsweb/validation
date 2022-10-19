@@ -12,6 +12,7 @@ import java.util.List;
  * Created on Apr 5, 2011 by depryf
  * @author depryf
  */
+@SuppressWarnings("unused")
 public class ContextFunctionDocDto {
 
     /** Method name */
@@ -24,7 +25,8 @@ public class ContextFunctionDocDto {
     private String _example;
 
     /** Method parameters */
-    private List<String> _params, _paramNames;
+    private List<String> _params;
+    private List<String> _paramNames;
 
     /**
      * Default constructor.

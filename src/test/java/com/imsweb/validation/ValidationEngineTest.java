@@ -648,6 +648,8 @@ public class ValidationEngineTest {
         }
         catch (ConstructionException e) {
             exception = true;
+            Assert.assertEquals("fv-rule11", e.getLeftDependencyRule());
+            Assert.assertEquals("fv-rule1", e.getRightDependencyRule());
             Assert.assertTrue(e.getMessage().startsWith("Circular dependency detected"));
         }
         if (!exception)

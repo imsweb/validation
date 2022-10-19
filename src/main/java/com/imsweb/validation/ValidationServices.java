@@ -98,7 +98,7 @@ public class ValidationServices {
     private static final Pattern _PROP_REPLACEMENT_PATTERN = Pattern.compile("(\\$\\{(.+?)})");
 
     /**
-     * Map of java-path -> alias to use in the edits
+     * Map of java-path -&gt; alias to use in the edits
      */
     private static final Map<String, String> _ALIASES = new HashMap<>();
 
@@ -172,7 +172,7 @@ public class ValidationServices {
      * Returns all the java paths and their corresponding aliases.
      * <p/>
      * Created on Apr 5, 2011 by depryf
-     * @return a non-modifiable map of java paths -&gt alias
+     * @return a non-modifiable map of java paths -&gt; alias
      */
     public Map<String, String> getAllJavaPaths() {
         return Collections.unmodifiableMap(_ALIASES);

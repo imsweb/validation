@@ -36,7 +36,7 @@ import com.imsweb.validation.entities.ContextTableIndex;
  * As of version 5.3 of the engine, it is now possible to treat WARNINGS in translated edits as a failing state. To do that, just call
  * the setFailWarnings() method with an argument of "true" after instanciating this class.
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings({"ALL", "java:S100", "java:S1172", "java:S1126", "java:S3516"}) // this class is special, it mimics C++ methods from Genedits...
 public class MetafileContextFunctions extends StagingContextFunctions {
 
     // Special Geneedits constant
@@ -99,13 +99,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     private static final DateTimeFormatter _GEN_DATECMP_IOP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final Pattern _GEN_TRIM_P1 = Pattern.compile("^\\s+");
     private static final Pattern _GEN_TRIM_P2 = Pattern.compile("\\s+$");
-    private static final Pattern _GEN_TRIM_P3 = Pattern.compile("(^\\s+|\\s+$)");
-    private static final Pattern _GEN_MATCH_P1 = Pattern.compile("\\s");
-    private static final Pattern _GEN_MATCH_P2 = Pattern.compile("(\\\\s)+");
-    private static final Pattern _GEN_MATCH_P3 = Pattern.compile("((\\\\s)+)\\)$");
-    private static final Pattern _GEN_MATCH_P4 = Pattern.compile("((\\\\s)+)$");
+    private static final Pattern _GEN_TRIM_P3 = Pattern.compile("((^\\s+)|(\\s+$))");
     private static final Pattern _GEN_FMTSTR_P1 = Pattern.compile("%(.*)ld");
-    private static final Pattern _GEN_INLIST_P1 = Pattern.compile("(\\d+)\\D*.*");
 
     // I don't love giving a state to this class, but I am not sure how else to do it since we already have multiple flavors for the constructor...
     private boolean _failWarnings = false;
@@ -158,7 +153,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * Created on Apr 5, 2011 by depryf
      */
     public void GEN_NOOP() {
-        return;
+        // nothing to do for a noop
     }
 
     /**
@@ -803,69 +798,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         return val == null ? 0 : val.length();
     }
 
-    // helper
-    private boolean isValInList2(String val, String list) {
-        // if the value has trailing non-numeric values, trim off those non-numeric values first
-        String numericVal = removeTrailingNonNumerics(val);
-
-        if (" ".equals(list))
-            return " ".equals(val);
-
-        for (String term : StringUtils.split(list, ',')) {
-            String[] parts = StringUtils.split(term, '-');
-
-            // term is single value
-            if (parts.length == 1 && val.equals(term.trim()))
-                return true;
-                // term is a range
-            else if (parts.length == 2) {
-                // if the input value is a digit
-                if (numericVal != null) {
-                    String low = parts[0].trim(), high = parts[1].trim();
-
-                    //remove trailing non-numeric values from range numbers
-                    low = removeTrailingNonNumerics(low);
-                    high = removeTrailingNonNumerics(high);
-
-                    // if both the low and high values are numeric
-                    if (low != null && high != null) {
-                        int iVal = Integer.parseInt(numericVal);
-                        int iLow = Integer.parseInt(low);
-                        int iHigh = Integer.parseInt(high);
-                        if (iVal >= iLow && iVal <= iHigh)
-                            return true;
-                    }// if low is numeric but the high value is non-numeric
-                    else if (low != null && high == null) {
-                        int iVal = Integer.parseInt(numericVal);
-                        int iLow = Integer.parseInt(low);
-                        if (iVal >= iLow)
-                            return true;
-                    }// if low is non-numeric but the high value is numeric
-                    else if (low == null && high != null) {
-                        int iVal = Integer.parseInt(numericVal);
-                        int iHigh = Integer.parseInt(high);
-                        if (iVal <= iHigh)
-                            return true;
-                    }
-                    else
-                        return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    // helper
-    private String removeTrailingNonNumerics(String input) {
-        String newString = null;
-        Matcher m4 = _GEN_INLIST_P1.matcher(input);
-        if (m4.matches())
-            newString = m4.group(1);
-
-        return newString;
-    }
-
     /**
      * Special genedit method. Internal use only.
      * <p/>
@@ -903,7 +835,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_INLIST(Object value, Object list, Object regex, Integer startPos, Integer length) {
-        String val = GEN_TO_STRING(value), l = GEN_TO_STRING(list);
+        String val = GEN_TO_STRING(value);
+        String l = GEN_TO_STRING(list);
 
         if (val == null || val.isEmpty() || l == null || l.isEmpty())
             return false;
@@ -1348,11 +1281,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return new char[0];
 
         String str = GEN_TO_STRING(value);
-        if (str.length() >= start) {
+        if (str.length() >= start)
             str = trimRight(str.substring(start - 1));
-        }
 
-        return str.toCharArray();
+        return str == null ? new char[0] : str.toCharArray();
     }
 
     /**
@@ -1552,7 +1484,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return txt.indexOf(val) + 1;
 
         // handle text by block of size "width"
-        int loopCounter = 1, i;
+        int loopCounter = 1;
+        int i;
         for (i = width; i < txt.length(); i += width) {
             if (txt.substring(i - width, i).indexOf(val) > -1)
                 return loopCounter;
@@ -1727,7 +1660,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         @SuppressWarnings("unchecked")
         List<String> extraErrorMsgs = (List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES);
         if (extraErrorMsgs == null) {
-            extraErrorMsgs = new ArrayList<String>();
+            extraErrorMsgs = new ArrayList<>();
             binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, extraErrorMsgs);
         }
         extraErrorMsgs.add(trimRight(GEN_TO_STRING(text)));
@@ -1757,7 +1690,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         @SuppressWarnings("unchecked")
         List<String> extraErrorMsgs = (List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES);
         if (extraErrorMsgs == null) {
-            extraErrorMsgs = new ArrayList<String>();
+            extraErrorMsgs = new ArrayList<>();
             binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, extraErrorMsgs);
         }
         for (Object text : texts)
@@ -1827,7 +1760,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         @SuppressWarnings("unchecked")
         List<String> extraErrorMsgs = (List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES);
         if (extraErrorMsgs == null) {
-            extraErrorMsgs = new ArrayList<String>();
+            extraErrorMsgs = new ArrayList<>();
             binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, extraErrorMsgs);
         }
         for (Object text : texts)
@@ -1857,7 +1790,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                         @SuppressWarnings("unchecked")
                         List<String> extraErrorMsgs = (List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES);
                         if (extraErrorMsgs == null) {
-                            extraErrorMsgs = new ArrayList<String>();
+                            extraErrorMsgs = new ArrayList<>();
                             binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, extraErrorMsgs);
                         }
                         extraErrorMsgs.add(trimRight(msg));
@@ -1968,7 +1901,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             String hist = GEN_TO_STRING(param2);
             if (site == null || site.trim().isEmpty() || hist == null || hist.trim().isEmpty())
                 return -1;
-            Map<String, String> input = new HashMap<String, String>();
+            Map<String, String> input = new HashMap<>();
             input.put("primarySite", site);
             input.put("histologicTypeIcdO3", hist);
             input.put("csSiteSpecificFactor25", GEN_TO_STRING(param3));

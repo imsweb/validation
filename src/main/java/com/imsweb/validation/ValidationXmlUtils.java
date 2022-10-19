@@ -4,8 +4,6 @@
 package com.imsweb.validation;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,6 +15,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -251,7 +250,7 @@ public final class ValidationXmlUtils {
         if (!file.exists())
             throw new IOException("Unable to load validator, target file doesn't exist");
 
-        try (InputStream is = file.getName().toLowerCase().endsWith(".gz") ? new GZIPInputStream(new FileInputStream(file)) : new FileInputStream(file)) {
+        try (InputStream is = file.getName().toLowerCase().endsWith(".gz") ? new GZIPInputStream(Files.newInputStream(file.toPath())) : Files.newInputStream(file.toPath())) {
             return loadValidatorFromXml(is, runtime);
         }
     }
@@ -410,7 +409,7 @@ public final class ValidationXmlUtils {
         if (file == null)
             throw new IOException("Unable to write validator, target file is null");
 
-        try (OutputStream os = file.getName().toLowerCase().endsWith(".gz") ? new GZIPOutputStream(new FileOutputStream(file)) : new FileOutputStream(file)) {
+        try (OutputStream os = file.getName().toLowerCase().endsWith(".gz") ? new GZIPOutputStream(Files.newOutputStream(file.toPath())) : Files.newOutputStream(file.toPath())) {
             writeValidatorToXml(validator, os);
         }
     }
@@ -673,7 +672,7 @@ public final class ValidationXmlUtils {
                     result.get();
                 }
                 catch (InterruptedException e) {
-                    // ignore this one
+                    Thread.currentThread().interrupt();
                 }
                 catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException)
@@ -684,10 +683,11 @@ public final class ValidationXmlUtils {
 
             // the work should be done by now because we call get(), which is a blocking call; but better safe than sorry...
             try {
-                service.awaitTermination(5, TimeUnit.MINUTES);
+                if (!service.awaitTermination(5, TimeUnit.MINUTES))
+                    throw new IllegalStateException("Edits compilation took too long to complete");
             }
             catch (InterruptedException e) {
-                // ignore this one...
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -942,7 +942,7 @@ public final class ValidationXmlUtils {
                 StringBuilder condBuf = new StringBuilder();
                 for (String c : rule.getConditions()) {
                     if (c.length() > 0)
-                        condBuf.append(rule.getUseAndForConditions() ? "&" : "|");
+                        condBuf.append(Boolean.TRUE.equals(rule.getUseAndForConditions()) ? "&" : "|");
                     condBuf.append(c);
                 }
                 ruleType.setCondition(condBuf.toString());
@@ -1083,7 +1083,7 @@ public final class ValidationXmlUtils {
         if (!file.exists())
             throw new IOException("Unable to load standalone set, target file doesn't exist");
 
-        try (InputStream is = file.getName().toLowerCase().endsWith(".gz") ? new GZIPInputStream(new FileInputStream(file)) : new FileInputStream(file)) {
+        try (InputStream is = file.getName().toLowerCase().endsWith(".gz") ? new GZIPInputStream(Files.newInputStream(file.toPath())) : Files.newInputStream(file.toPath())) {
             return loadStandaloneSetFromXml(is);
         }
     }
@@ -1198,7 +1198,7 @@ public final class ValidationXmlUtils {
         if (file == null)
             throw new IOException("Unable to write set '" + set.getId() + "', target file is null");
 
-        try (OutputStream os = file.getName().toLowerCase().endsWith(".gz") ? new GZIPOutputStream(new FileOutputStream(file)) : new FileOutputStream(file)) {
+        try (OutputStream os = file.getName().toLowerCase().endsWith(".gz") ? new GZIPOutputStream(Files.newOutputStream(file.toPath())) : Files.newOutputStream(file.toPath())) {
             writeStandaloneSetToXml(set, os);
         }
     }
@@ -1342,7 +1342,7 @@ public final class ValidationXmlUtils {
         if (!file.exists())
             throw new IOException("Unable to load tests suite, target file doesn't exist");
 
-        try (InputStream is = file.getName().toLowerCase().endsWith(".gz") ? new GZIPInputStream(new FileInputStream(file)) : new FileInputStream(file)) {
+        try (InputStream is = file.getName().toLowerCase().endsWith(".gz") ? new GZIPInputStream(Files.newInputStream(file.toPath())) : Files.newInputStream(file.toPath())) {
             return loadTestsFromXml(is);
         }
     }
@@ -1436,7 +1436,7 @@ public final class ValidationXmlUtils {
         if (file == null)
             throw new IOException("Unable to tests suite for '" + tests.getTestedValidatorId() + "', target file is null");
 
-        try (OutputStream os = file.getName().toLowerCase().endsWith(".gz") ? new GZIPOutputStream(new FileOutputStream(file)) : new FileOutputStream(file)) {
+        try (OutputStream os = file.getName().toLowerCase().endsWith(".gz") ? new GZIPOutputStream(Files.newOutputStream(file.toPath())) : Files.newOutputStream(file.toPath())) {
             writeTestsToXml(tests, os);
         }
     }
@@ -1779,13 +1779,13 @@ public final class ValidationXmlUtils {
                     line = reader.readLine();
                 }
             }
-            catch (Exception e) {
+            catch (IOException | RuntimeException e) {
                 return s;
             }
 
             // don't bother going on if there is nothing to trim
             if (extraSpaces == 0 || extraSpaces == Integer.MAX_VALUE)
-                return s.trim();
+                return StringUtils.trim(s);
 
             // apply the trimming
             StringBuilder result = new StringBuilder();

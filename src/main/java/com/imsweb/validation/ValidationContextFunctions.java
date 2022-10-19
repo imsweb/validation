@@ -144,7 +144,8 @@ public class ValidationContextFunctions {
     private int _regexCacheSize;
 
     // stats for the cached regular expressions
-    private AtomicLong _numRegexCacheHit, _numRegexCacheMiss;
+    private AtomicLong _numRegexCacheHit;
+    private AtomicLong _numRegexCacheMiss;
 
     /**
      * Forces the given entity (corresponding to the given collection name) to report the given properties when the edit fails.
