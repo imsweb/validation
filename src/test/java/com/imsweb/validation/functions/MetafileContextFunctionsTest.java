@@ -651,7 +651,7 @@ public class MetafileContextFunctionsTest {
     public void testGEN_FMTSTR() {
         char[] val = new char[10];
         _functions.GEN_FMTSTR(val, "%-5ld", 10);
-        Assert.assertEquals(_functions.GEN_TO_STRING(val), "10   ");
+        Assert.assertEquals("10   ", _functions.GEN_TO_STRING(val));
     }
 
     @Test

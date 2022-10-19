@@ -38,12 +38,16 @@ import static com.imsweb.validation.InitializationStats.REASON_NOT_PROVIDED;
  * <br/>
  * Typically a caller will use the "create" methods in this class instead of trying to implement the conventions; that's by far the safest way.
  */
-public class RuntimeUtils {
+public final class RuntimeUtils {
 
     private static final Pattern _P1 = Pattern.compile("\\s+|-+|/|\\.");
     private static final Pattern _P2 = Pattern.compile("[()]");
     private static final Pattern _P3 = Pattern.compile("[\\W&&[^\\s]]");
-    private static final Pattern _P4 = Pattern.compile("^_|_$");
+    private static final Pattern _P4 = Pattern.compile("(^_)|(_$)");
+
+    private RuntimeUtils() {
+        // utility class
+    }
 
     public static String createMethodName(String ruleId) {
         if (ruleId == null || ruleId.isEmpty())
