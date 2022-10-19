@@ -54,10 +54,12 @@ public final class JavaContextParser {
 
         // this is a bit hackish, but I am parsing out the type hint at the end of the expression instead of using the lexer...
         String typeHint = null;
-        Matcher m = _TYPE_HINT_PATTERN.matcher(expression);
-        if (m.matches()) {
-            expression = m.group(1);
-            typeHint = m.group(2);
+        if (expression.contains(" as ")) {
+            Matcher m = _TYPE_HINT_PATTERN.matcher(expression);
+            if (m.matches()) {
+                expression = m.group(1);
+                typeHint = m.group(2);
+            }
         }
 
         JavaContextLexer lexer = new JavaContextLexer(new StringReader(expression));
