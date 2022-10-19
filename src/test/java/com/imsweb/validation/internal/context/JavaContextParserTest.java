@@ -23,7 +23,6 @@ public class JavaContextParserTest {
      * Some basic tests.
      * <p/>
      * Created on Oct 6, 2011 by murphyr
-     * @throws Exception
      */
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")

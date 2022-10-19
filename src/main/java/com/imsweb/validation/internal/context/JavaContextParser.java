@@ -32,7 +32,7 @@ import com.imsweb.validation.internal.context.Symbol.SymbolType;
 @SuppressWarnings({"java:S1149", "rawtypes"})
 public final class JavaContextParser {
 
-    private static final Pattern _TYPE_HINT_PATTERN = Pattern.compile("(.+])\\sas\\s(.+)$");
+    private static final Pattern _TYPE_HINT_PATTERN = Pattern.compile("(.+])\\sas\\s(.++)$");
 
     /**
      * Created on Oct 4, 2011 by murphyr
