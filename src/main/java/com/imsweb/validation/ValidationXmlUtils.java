@@ -132,12 +132,13 @@ public final class ValidationXmlUtils {
     /**
      * Compiled  <code>Pattern</code> for many new lines combined together (at least 3)
      */
-    private static final Pattern _NEW_LINES_PATTERN = Pattern.compile("(\r?\n){3,}");
+    private static final Pattern _NEW_LINES_PATTERN = Pattern.compile("(\r?\n){3,}+");
 
     /**
      * Compiled <code>Pattern</code> for leading and trailing empty lines
      */
-    private static final Pattern _PATTERN_LEADING_TRAILING_EMPTY_LINES = Pattern.compile("^(\\s*\r?\n)*|(\r?\n\\s*)*$");
+    private static final Pattern _PATTERN_LEADING_EMPTY_LINES = Pattern.compile("^(\\s*\r?\n)*+");
+    private static final Pattern _PATTERN_TRAILING_EMPTY_LINES = Pattern.compile("(\r?\n\\s*)*+$");
 
     /**
      * Compiled <code>Pattern</code> for sorting the rule by ID
@@ -1731,7 +1732,8 @@ public final class ValidationXmlUtils {
             s = _NEW_LINES_PATTERN.matcher(s).replaceAll("\n\n\n");
 
             // remove any leading or trailing empty lines
-            s = _PATTERN_LEADING_TRAILING_EMPTY_LINES.matcher(s).replaceAll("");
+            s = _PATTERN_LEADING_EMPTY_LINES.matcher(s).replaceAll("");
+            s = _PATTERN_TRAILING_EMPTY_LINES.matcher(s).replaceAll("");
 
         }
 

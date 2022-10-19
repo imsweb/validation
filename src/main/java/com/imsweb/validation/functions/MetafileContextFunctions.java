@@ -94,7 +94,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     public static final String BINDING_KEY_DATE_COMPONENT = "__date_component";
 
     // Pre-compiled regex and formatters...
-    private static final Pattern _GEN_VAL_P1 = Pattern.compile("(-?\\d+)(.*)");
+    private static final Pattern _GEN_VAL_P1 = Pattern.compile("(-?\\d++)(.*+)");
     private static final Pattern _GEN_VALID_DATE_IOP_P1 = Pattern.compile("(\\d{8}|\\d{6}\\s{2}|\\d{4}\\s{4})");
     private static final DateTimeFormatter _GEN_DATECMP_IOP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final Pattern _GEN_TRIM_P1 = Pattern.compile("^\\s+");

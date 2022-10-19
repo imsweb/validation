@@ -5,6 +5,7 @@ package com.imsweb.validation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -324,7 +325,7 @@ public class ValidationServicesTest {
     }
 
     @Test
-    public void testFillInMessags() {
+    public void testFillInMessages() {
         Map<String, Object> map = new HashMap<>();
         map.put("vitalStatus", "1");
         map.put("nameLast", "LAST");
@@ -334,6 +335,53 @@ public class ValidationServicesTest {
         Assert.assertEquals(new ArrayList<>(), ValidationServices.getInstance().fillInMessages(new ArrayList<>(), v));
         Assert.assertEquals(Arrays.asList("Something", "Something else"), ValidationServices.getInstance().fillInMessages(Arrays.asList("Something", "Something else"), v));
         Assert.assertEquals(Arrays.asList("Value 1", "Value 'LAST'"), ValidationServices.getInstance().fillInMessages(Arrays.asList("Value ${line.vitalStatus}", "Value '${line.nameLast}'"), v));
+    }
+
+    @Test
+    public void testGetMessageValueReplacement() throws Exception {
+        Assert.assertEquals("A", ValidationServices.getInstance().getMessageValueReplacement(Collections.singletonMap("field", "A"), "field"));
+        Assert.assertEquals("A", ValidationServices.getInstance().getMessageValueReplacement(new EntityBean1("A"), "field"));
+        Assert.assertEquals("A", ValidationServices.getInstance().getMessageValueReplacement(new EntityBean2("A"), "field"));
+        try {
+            ValidationServices.getInstance().getMessageValueReplacement(new EntityBean3("A"), "field");
+            Assert.fail("Was expecting exception");
+        }
+        catch (IllegalAccessException e) {
+            // expected
+        }
+    }
+
+    private static class EntityBean1 {
+
+        public String field;
+
+        public EntityBean1(String val) {
+            field = val;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class EntityBean2 {
+
+        private final String field;
+
+        public EntityBean2(String val) {
+            field = val;
+        }
+
+        public String getField() {
+            return field;
+        }
+    }
+
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    private static class EntityBean3 {
+
+        private final String field;
+
+        public EntityBean3(String val) {
+            field = val;
+        }
     }
 
     @Test

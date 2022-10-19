@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -168,7 +169,7 @@ public class ValidationXmlUtilsTest {
 
     @Test(expected = IOException.class)
     public void testValidatorErrorWriteNullValidatorForOutputStream() throws IOException {
-        ValidationXmlUtils.writeValidatorToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeValidatorToXml(null, Files.newOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml").toPath()));
     }
 
     @Test(expected = IOException.class)
@@ -398,7 +399,7 @@ public class ValidationXmlUtilsTest {
 
     @Test(expected = IOException.class)
     public void testStandaloneSetErrorWriteNullSetForOutputStream() throws IOException {
-        ValidationXmlUtils.writeStandaloneSetToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeStandaloneSetToXml(null, Files.newOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml").toPath()));
     }
 
     @Test(expected = IOException.class)
@@ -547,7 +548,7 @@ public class ValidationXmlUtilsTest {
 
     @Test(expected = IOException.class)
     public void testTestsErrorWriteNullSetForOutputStream() throws IOException {
-        ValidationXmlUtils.writeTestsToXml(null, new FileOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml")));
+        ValidationXmlUtils.writeTestsToXml(null, Files.newOutputStream(new File(TestingUtils.TMP_DIR, "whatever.xml").toPath()));
     }
 
     @Test(expected = IOException.class)

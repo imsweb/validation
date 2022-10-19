@@ -3,7 +3,7 @@
  */
 package com.imsweb.validation;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -118,7 +118,7 @@ public class ValidationServices {
     /**
      * Cached pattern for the versions
      */
-    private static final Pattern _VERSIONS_PATTERN = Pattern.compile("\\d+(\\.\\d+)+");
+    private static final Pattern _VERSIONS_PATTERN = Pattern.compile("\\d+(\\.\\d++)++");
 
     /**
      * Initializes this class with the passed instance.
@@ -422,7 +422,6 @@ public class ValidationServices {
                     if (!(obj instanceof String))
                         throw new RuntimeException("Tables only support String values; found " + obj.getClass().getSimpleName());
 
-
             result = new ContextTable(entryId, (List<List<String>>)data);
             context.put(entryId, result);
         }
@@ -527,7 +526,6 @@ public class ValidationServices {
      * @param validatable current validatable
      * @return replaced message
      */
-    @SuppressWarnings("rawtypes")
     public String fillInMessage(String msg, Validatable validatable) {
         if (msg == null)
             return "";
@@ -546,19 +544,11 @@ public class ValidationServices {
                 String suffix = parts.length == 3 ? parts[2] : null;
                 boolean error = false;
                 Object replacement = null;
-
-                Object obj = validatable.getScope().get(prefix);
-                if (obj instanceof Map)
-                    replacement = ((Map)obj).get(propertyName);
-                else {
-                    try {
-                        Field field = obj.getClass().getDeclaredField(propertyName);
-                        field.setAccessible(true);
-                        replacement = field.get(obj);
-                    }
-                    catch (IllegalAccessException | NoSuchFieldException e) {
-                        error = true;
-                    }
+                try {
+                    replacement = getMessageValueReplacement(validatable.getScope().get(prefix), propertyName);
+                }
+                catch (IllegalAccessException | NoSuchFieldException e) {
+                    error = true;
                 }
 
                 starts.add(matcher.start());
@@ -592,6 +582,24 @@ public class ValidationServices {
             buf.replace(starts.get(i), ends.get(i), values.get(i));
 
         return buf.toString();
+    }
+
+    @SuppressWarnings("rawtypes")
+    Object getMessageValueReplacement(Object object, String propertyName) throws IllegalAccessException, NoSuchFieldException {
+        Object replacement;
+
+        if (object instanceof Map)
+            replacement = ((Map)object).get(propertyName);
+        else {
+            try {
+                replacement = object.getClass().getMethod("get" + StringUtils.capitalize(propertyName)).invoke(object);
+            }
+            catch (InvocationTargetException | NoSuchMethodException e) {
+                replacement = object.getClass().getDeclaredField(propertyName).get(object);
+            }
+        }
+
+        return replacement;
     }
 
     public int compareEngineVersions(String version1, String version2) {
