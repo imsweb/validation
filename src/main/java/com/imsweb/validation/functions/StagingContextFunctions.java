@@ -6,7 +6,6 @@ package com.imsweb.validation.functions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,69 +42,79 @@ public class StagingContextFunctions extends ValidationContextFunctions {
     public static final String CSTAGE_INPUT_PROP_DX_DATE_YEAR = "dateOfDiagnosisYear";
 
     // this maps the table number of the old DLL to the input keys used in the Staging framework
-    public static final Map<Integer, String> CSTAGE_TABLE_NUMBERS = Collections.unmodifiableMap(new HashMap<Integer, String>() {{
-        put(1, "size");
-        put(2, "extension");
-        put(3, "extension_eval");
-        put(4, "nodes");
-        put(5, "nodes_eval");
-        put(6, "nodes_pos");
-        put(7, "nodes_exam");
-        put(8, "mets");
-        put(9, "mets_eval");
-        put(10, "ssf1");
-        put(11, "ssf2");
-        put(12, "ssf3");
-        put(13, "ssf4");
-        put(14, "ssf5");
-        put(15, "ssf6");
-        put(16, "ssf7");
-        put(17, "ssf8");
-        put(18, "ssf9");
-        put(19, "ssf10");
-        put(20, "ssf11");
-        put(21, "ssf12");
-        put(22, "ssf13");
-        put(23, "ssf14");
-        put(24, "ssf15");
-        put(25, "ssf16");
-        put(26, "ssf17");
-        put(27, "ssf18");
-        put(28, "ssf19");
-        put(29, "ssf20");
-        put(30, "ssf21");
-        put(31, "ssf22");
-        put(32, "ssf23");
-        put(33, "ssf24");
-        put(34, "ssf25");
+    public static final Map<Integer, String> CSTAGE_TABLE_NUMBERS;
+
+    static {
+        Map<Integer, String> tmpMap = new HashMap<>();
+        tmpMap.put(1, "size");
+        tmpMap.put(2, "extension");
+        tmpMap.put(3, "extension_eval");
+        tmpMap.put(4, "nodes");
+        tmpMap.put(5, "nodes_eval");
+        tmpMap.put(6, "nodes_pos");
+        tmpMap.put(7, "nodes_exam");
+        tmpMap.put(8, "mets");
+        tmpMap.put(9, "mets_eval");
+        tmpMap.put(10, "ssf1");
+        tmpMap.put(11, "ssf2");
+        tmpMap.put(12, "ssf3");
+        tmpMap.put(13, "ssf4");
+        tmpMap.put(14, "ssf5");
+        tmpMap.put(15, "ssf6");
+        tmpMap.put(16, "ssf7");
+        tmpMap.put(17, "ssf8");
+        tmpMap.put(18, "ssf9");
+        tmpMap.put(19, "ssf10");
+        tmpMap.put(20, "ssf11");
+        tmpMap.put(21, "ssf12");
+        tmpMap.put(22, "ssf13");
+        tmpMap.put(23, "ssf14");
+        tmpMap.put(24, "ssf15");
+        tmpMap.put(25, "ssf16");
+        tmpMap.put(26, "ssf17");
+        tmpMap.put(27, "ssf18");
+        tmpMap.put(28, "ssf19");
+        tmpMap.put(29, "ssf20");
+        tmpMap.put(30, "ssf21");
+        tmpMap.put(31, "ssf22");
+        tmpMap.put(32, "ssf23");
+        tmpMap.put(33, "ssf24");
+        tmpMap.put(34, "ssf25");
         // there are a few more tables, but I don't think they are used in the translated edits: 35 HIST7; 36 HIST; 37 AJCC7; 38 AJCC; 39 SEERSUM
-    }});
+
+        CSTAGE_TABLE_NUMBERS = Collections.unmodifiableMap(tmpMap);
+    }
 
     // the obsolete reasons as defined in the CStage tables; edits use the key only...
-    public static final Map<String, String> CSTAGE_OBSOLETE_REASONS = Collections.unmodifiableMap(new LinkedHashMap<String, String>() {{
-        put("OBSOLETE DATA CONVERTED AND RETAINED V0200", "1");
-        put("OBSOLETE DATA CONVERTED V0102", "2");
-        put("OBSOLETE DATA CONVERTED V0104", "3");
-        put("OBSOLETE DATA CONVERTED V0200", "4");
-        put("OBSOLETE DATA RETAINED V0100", "5");
-        put("OBSOLETE DATA RETAINED V0102", "6");
-        put("OBSOLETE DATA RETAINED V0200", "7");
-        put("OBSOLETE DATA REVIEWED AND CHANGED V0102", "8");
-        put("OBSOLETE DATA REVIEWED AND CHANGED V0103", "9");
-        put("OBSOLETE DATA REVIEWED AND CHANGED V0200", "10");
-        put("OBSOLETE DATA CONVERTED V0203", "11");
-        put("OBSOLETE DATA REVIEWED AND CHANGED V0203", "12");
-        put("OBSOLETE DATA REVIEWED V0203", "13");
-        put("OBSOLETE DATA RETAINED AND REVIEWED V0203", "14");
-        put("OBSOLETE DATA RETAINED V0203", "15");
-        put("OBSOLETE DATA RETAINED V0104", "16");
-        put("OBSOLETE DATA RETAINED V0202", "17");
-        put("OBSOLETE DATA RETAINED AND REVIEWED V0200", "18");
-        put("OBSOLETE DATA CONVERTED V0204", "19");
-        put("OBSOLETE DATA REVIEWED AND CHANGED V0204", "20");
-        put("OBSOLETE DATA RETAINED AND REVIEWED V0204", "21");
-        put("OBSOLETE DATA RETAINED V0204", "22");
-    }});
+    public static final Map<String, String> CSTAGE_OBSOLETE_REASONS;
+
+    static {
+        Map<String, String> tmpMap = new HashMap<>();
+        tmpMap.put("OBSOLETE DATA CONVERTED AND RETAINED V0200", "1");
+        tmpMap.put("OBSOLETE DATA CONVERTED V0102", "2");
+        tmpMap.put("OBSOLETE DATA CONVERTED V0104", "3");
+        tmpMap.put("OBSOLETE DATA CONVERTED V0200", "4");
+        tmpMap.put("OBSOLETE DATA RETAINED V0100", "5");
+        tmpMap.put("OBSOLETE DATA RETAINED V0102", "6");
+        tmpMap.put("OBSOLETE DATA RETAINED V0200", "7");
+        tmpMap.put("OBSOLETE DATA REVIEWED AND CHANGED V0102", "8");
+        tmpMap.put("OBSOLETE DATA REVIEWED AND CHANGED V0103", "9");
+        tmpMap.put("OBSOLETE DATA REVIEWED AND CHANGED V0200", "10");
+        tmpMap.put("OBSOLETE DATA CONVERTED V0203", "11");
+        tmpMap.put("OBSOLETE DATA REVIEWED AND CHANGED V0203", "12");
+        tmpMap.put("OBSOLETE DATA REVIEWED V0203", "13");
+        tmpMap.put("OBSOLETE DATA RETAINED AND REVIEWED V0203", "14");
+        tmpMap.put("OBSOLETE DATA RETAINED V0203", "15");
+        tmpMap.put("OBSOLETE DATA RETAINED V0104", "16");
+        tmpMap.put("OBSOLETE DATA RETAINED V0202", "17");
+        tmpMap.put("OBSOLETE DATA RETAINED AND REVIEWED V0200", "18");
+        tmpMap.put("OBSOLETE DATA CONVERTED V0204", "19");
+        tmpMap.put("OBSOLETE DATA REVIEWED AND CHANGED V0204", "20");
+        tmpMap.put("OBSOLETE DATA RETAINED AND REVIEWED V0204", "21");
+        tmpMap.put("OBSOLETE DATA RETAINED V0204", "22");
+
+        CSTAGE_OBSOLETE_REASONS = Collections.unmodifiableMap(tmpMap);
+    }
 
     // some specific cstage required tags used in the edits (the "required for staging" is not a tag, it's a calculated field, so it's not here)
     public static final String CSTAGE_TAG_ALREADY_COLLECTED_SEER = "SEER_ALREADY_COLLECTED";

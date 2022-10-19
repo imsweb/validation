@@ -12,7 +12,7 @@ package com.imsweb.validation.internal.context;
  * on 9/24/15 2:08 PM from the specification file
  * <tt>config/java-context.flex</tt>
  */
-@SuppressWarnings({"ALL", "DefaultCharset", "MissingOverride", "FallThrough", "JdkObsolete", "ClassNewInstance"})
+@SuppressWarnings({"ALL", "DefaultCharset", "MissingOverride", "FallThrough", "JdkObsolete", "ClassNewInstance", "java:S1197", "java:S1854", "java:S4144", "java:S1450", "java:S1068", "java:S1119", "java:S5361", "java:S1199", "java:S108"}) // auto-generated code
 public class JavaContextLexer implements Scanner {
 
     /**

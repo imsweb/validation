@@ -324,7 +324,8 @@ public class ExecutableRule {
     public void setExpression(String expression) throws ConstructionException {
 
         try {
-            Set<String> usedProperties = new HashSet<>(), usedContextEntries = new HashSet<>();
+            Set<String> usedProperties = new HashSet<>();
+            Set<String> usedContextEntries = new HashSet<>();
             ValidationServices.getInstance().parseExpression("rule", expression, usedProperties, usedContextEntries, null);
             _script = ValidationServices.getInstance().compileExpression(expression);
             _usedProperties = usedProperties;
@@ -368,7 +369,7 @@ public class ExecutableRule {
      * @return true if the expression passes, false otherwise
      */
     public boolean validate(Validatable validatable, Binding binding) throws ValidationException {
-        ExtraPropertyHandlerDto extra = _checkForcedEntities ? new ExtraPropertyHandlerDto() : null;
+        ExtraPropertyHandlerDto extra = Boolean.TRUE.equals(_checkForcedEntities) ? new ExtraPropertyHandlerDto() : null;
 
         // this is a bit convoluted, but we still want to set the failing properties even if an exception happens...
         ValidationException exception = null;
@@ -486,7 +487,7 @@ public class ExecutableRule {
             success = true;
 
         // read back the forced/ignored entities/properties if there are any
-        if (_checkForcedEntities) {
+        if (Boolean.TRUE.equals(_checkForcedEntities)) {
             Object forcedEntities = binding.getVariable(ValidationEngine.VALIDATOR_FORCE_FAILURE_ENTITY_KEY);
             if (forcedEntities != null)
                 extra.setForcedEntities((Set<ExtraPropertyEntityHandlerDto>)forcedEntities);

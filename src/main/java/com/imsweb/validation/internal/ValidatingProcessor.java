@@ -127,8 +127,16 @@ public class ValidatingProcessor implements Processor {
             Set<String> currentRuleFailures = new HashSet<>();
             vContext.getFailedRuleIds().put(validatable.getCurrentLevel(), currentRuleFailures);
 
-            // and finally, go through each rule and execute it if it needs to be executed (ignore all rules if one is to forced, but it's not for this level)
-            for (ExecutableRule rule : toForce != null ? Collections.singleton(toForce) : vContext.getToForce() != null ? Collections.<ExecutableRule>emptySet() : _rules) {
+            // and finally, go through each rule and execute it if it needs to be executed (ignore all rules if one is forced, but it's not for this level)
+            List<ExecutableRule> toExecute;
+            if (toForce != null)
+                toExecute = Collections.singletonList(toForce);
+            else if (vContext.getToForce() != null)
+                toExecute = Collections.emptyList();
+            else
+                toExecute = _rules;
+
+            for (ExecutableRule rule : toExecute) {
                 String id = rule.getId();
 
                 // if the caller forces a rule to run, then it cannot be ignored
@@ -151,7 +159,7 @@ public class ValidatingProcessor implements Processor {
                         boolean conditionFailed = !rule.getUseAndForConditions();
                         for (String conditionId : rule.getConditions()) {
                             boolean thisConditionFailed = vContext.conditionFailed(validatablePaths, conditionId);
-                            if (rule.getUseAndForConditions()) { // if conditions are AND'ed, and this one fails, we are done
+                            if (Boolean.TRUE.equals(rule.getUseAndForConditions())) { // if conditions are AND'ed, and this one fails, we are done
                                 if (thisConditionFailed) {
                                     conditionFailed = true;
                                     break;
@@ -206,7 +214,7 @@ public class ValidatingProcessor implements Processor {
                 catch (ValidationException e) {
                     results.add(new RuleFailure(rule.getRule(), EXCEPTION_MSG, validatable, e.getCause()));
                 }
-                catch (Throwable e) {
+                catch (RuntimeException e) {
                     results.add(new RuleFailure(rule.getRule(), EXCEPTION_MSG, validatable, e));
                 }
                 finally {

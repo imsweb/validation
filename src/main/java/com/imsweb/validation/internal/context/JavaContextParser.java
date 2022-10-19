@@ -6,8 +6,10 @@ package com.imsweb.validation.internal.context;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,7 @@ public final class JavaContextParser {
      * @param currentContext current context
      * @return the parsed expression (a tree)
      */
-    @SuppressWarnings({"unchecked", "JdkObsolete"})
+    @SuppressWarnings({"unchecked", "JdkObsolete", "rawtypes"})
     public static Object parseContext(String expression, Map<String, Object> currentContext) throws ConstructionException {
         Object result;
 
@@ -97,15 +98,15 @@ public final class JavaContextParser {
                         if (!(obj instanceof List) && !(obj instanceof Set))
                             throw new ConstructionException("Unable to assign list to type " + typeHint);
                         if (obj instanceof List)
-                            ((List)obj).addAll((List)result);
+                            ((List<?>)obj).addAll((List)result);
                         else
-                            ((Set)obj).addAll((List)result);
+                            ((Set<?>)obj).addAll((List)result);
                         result = obj;
                     }
                     else if (result instanceof Map) {
                         if (!(obj instanceof Map))
                             throw new ConstructionException("Unable to assign map to type " + typeHint);
-                        ((Map)obj).putAll((Map)result);
+                        ((Map<?, ?>)obj).putAll((Map)result);
                         result = obj;
                     }
                 }
@@ -135,9 +136,9 @@ public final class JavaContextParser {
      * @param containsListBeginToken whether the queue contains a list beginning token
      * @return a parsed context
      */
-    @SuppressWarnings({"unchecked", "JdkObsolete"})
+    @SuppressWarnings({"unchecked", "JdkObsolete", "ConstantConditions"})
     private static Object buildListOrMapFromQueue(Queue<Symbol> queue, Map<String, Object> currentContext, boolean containsListBeginToken) throws ConstructionException {
-        Stack<Object> stack = new Stack<>();
+        Deque<Object> stack = new ArrayDeque<>();
         Object returnValue = null;
 
         Symbol s = queue.remove();
@@ -232,8 +233,7 @@ public final class JavaContextParser {
         }
         for (Object key : keysToDelete)
             map.remove(key);
-        for (Entry<Object, Object> entry : tempMap.entrySet())
-            map.put(entry.getKey(), entry.getValue());
+        map.putAll(tempMap);
 
         return map;
     }
@@ -256,8 +256,8 @@ public final class JavaContextParser {
         if (lowValue == null || !NumberUtils.isDigits(lowValue.toString()) || !NumberUtils.isDigits(nextValue))
             throw new ConstructionException("Invalid range syntax.");
 
-        Integer low = Integer.parseInt(lowValue.toString());
-        Integer high = Integer.parseInt(nextValue);
+        int low = Integer.parseInt(lowValue.toString());
+        int high = Integer.parseInt(nextValue);
 
         for (int i = low; i <= high; i++)
             list.add(i);
@@ -269,6 +269,7 @@ public final class JavaContextParser {
      * Created on Oct 5, 2011 by murphyr
      * @author murphyr
      */
+    @SuppressWarnings("FieldMayBeFinal")
     private static class RangeObject {
 
         private List<Integer> _rangeList;
