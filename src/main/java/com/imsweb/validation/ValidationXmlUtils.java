@@ -1598,7 +1598,7 @@ public final class ValidationXmlUtils {
         if (url == null)
             return result;
 
-        Pattern regex1 = Pattern.compile("<validator\\s+([^>]+)>", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern regex1 = Pattern.compile("<validator\\s++([^>]++)>", Pattern.MULTILINE | Pattern.DOTALL);
         Pattern regex2 = Pattern.compile("\\s*+(id|name|version|min-engine-version|translated-from)\\s*+=\\s*+['\"](.+?)['\"]", Pattern.MULTILINE | Pattern.DOTALL);
 
         boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
