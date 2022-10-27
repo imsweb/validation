@@ -10,7 +10,7 @@ import com.imsweb.staging.Staging;
 import com.imsweb.staging.entities.Schema;
 import com.imsweb.staging.entities.SchemaLookup;
 
-public class ValidationStagingUtils {
+public final class ValidationStagingUtils {
 
     public static final String SCHEMA_ID_TNM_PERITONEUM = "peritoneum";
     public static final String SCHEMA_ID_TNM_PERITONEUM_FEMALE_GEN = "peritoneum_female_gen";
