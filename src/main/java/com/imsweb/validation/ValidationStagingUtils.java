@@ -99,8 +99,8 @@ public final class ValidationStagingUtils {
     /**
      * Returns the SSF25 value based on the sex value and some conditions
      */
-    public static String getSsf25FromSex(String ssf25, String sex, String hist, String dxYear, String schemaId) {
-        boolean isPeritoneum = SCHEMA_ID_TNM_PERITONEUM.equals(schemaId) || SCHEMA_ID_TNM_PERITONEUM_FEMALE_GEN.equals(schemaId);
+    public static String getSsf25FromSex(String ssf25, String sex, String hist, String dxYear, String tnmSchemaId) {
+        boolean isPeritoneum = SCHEMA_ID_TNM_PERITONEUM.equals(tnmSchemaId) || SCHEMA_ID_TNM_PERITONEUM_FEMALE_GEN.equals(tnmSchemaId);
         boolean isMissingSsf25 = !("001".equals(ssf25) || "002".equals(ssf25) || "003".equals(ssf25) || "004".equals(ssf25) || "009".equals(ssf25) || "981".equals(ssf25));
         if (isPeritoneum && isMissingSsf25 && ("2016".equals(dxYear) || "2017".equals(dxYear))) {
             Integer histInt = hist != null ? Integer.valueOf(hist) : null;
