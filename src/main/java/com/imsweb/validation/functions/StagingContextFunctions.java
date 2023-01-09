@@ -24,6 +24,7 @@ import com.imsweb.staging.entities.SchemaLookup;
 import com.imsweb.staging.entities.Table;
 import com.imsweb.validation.ContextFunctionDocAnnotation;
 import com.imsweb.validation.ValidationContextFunctions;
+import com.imsweb.validation.ValidationStagingUtils;
 
 /**
  * Staging-related helper methods made available to the edits. If you want to execute edits that call some staging utility methods, you need to initialize
@@ -144,6 +145,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
     public static final String EOD_INPUT_PROP_DISC_1 = "schemaDiscriminator1";
     public static final String EOD_INPUT_PROP_DISC_2 = "schemaDiscriminator2";
     public static final String EOD_INPUT_PROP_BEHAV = "behaviorCodeIcdO3";
+    public static final String EOD_INPUT_PROP_DX_YEAR = "dateOfDiagnosisYear";
 
     // EOD metadata tags
     public static final String EOD_TAG_SEER_REQUIRED = "SEER_REQUIRED";
@@ -1152,12 +1154,14 @@ public class StagingContextFunctions extends ValidationContextFunctions {
         String disc2 = input.get(EOD_INPUT_PROP_DISC_2);
         String sex = input.get(EOD_INPUT_PROP_SEX);
         String behav = input.get(EOD_INPUT_PROP_BEHAV);
+        String dxYear = input.get(EOD_INPUT_PROP_DX_YEAR);
 
         SchemaLookup lkup = new SchemaLookup(site, hist);
         lkup.setInput("discriminator_1", disc1);
         lkup.setInput("discriminator_2", disc2);
         lkup.setInput("sex", sex);
         lkup.setInput("behavior", behav);
+        lkup.setInput("year_dx", dxYear);
 
         List<Schema> schemas = _eodStaging.lookupSchema(lkup);
         if (schemas.size() == 1)
@@ -1381,33 +1385,7 @@ public class StagingContextFunctions extends ValidationContextFunctions {
     /**
      * Returns the corresponding SSF25 value for the given sex value
      */
-    public String getSsf25FromSex(String ssf25, String sex, String hist, String dxYear, String schemaId) {
-        boolean isPeritoneum = "peritoneum".equals(schemaId) || "peritoneum_female_gen".equals(schemaId);
-        boolean isMissingSsf25 = !("001".equals(ssf25) || "002".equals(ssf25) || "003".equals(ssf25) || "004".equals(ssf25) || "009".equals(ssf25) || "981".equals(ssf25));
-        if (isPeritoneum && isMissingSsf25 && ("2016".equals(dxYear) || "2017".equals(dxYear))) {
-            Integer histInt = hist != null ? Integer.valueOf(hist) : null;
-            if (hist == null || !((8000 <= histInt && histInt <= 8576) || (8590 <= histInt && histInt <= 8671) || (8930 <= histInt && histInt <= 8934) || (8940 <= histInt && histInt <= 9110)))
-                return "981";
-
-            if (sex == null)
-                return "009";
-
-            switch (sex) {
-                case "2":
-                case "6":
-                    return "002";
-                case "1":
-                case "5":
-                    return "001";
-                case "3":
-                    return "003";
-                case "4":
-                    return "004";
-                default:
-                    return "009";
-            }
-        }
-
-        return ssf25;
+    public String getSsf25FromSex(String ssf25, String sex, String hist, String dxYear, String tnmSchemaId) {
+        return ValidationStagingUtils.getSsf25FromSex(ssf25, sex, hist, dxYear, tnmSchemaId);
     }
 }
