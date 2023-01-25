@@ -142,12 +142,6 @@ task generateJavaContextParser {
 
 // Nexus vulnerability scan (https://github.com/sonatype-nexus-community/scan-gradle-plugin)
 ossIndexAudit {
-    //proxyConfiguration {
-    //    protocol = 'http'
-    //    host = 'webproxy-btp.imsweb.com'
-    //    port = 8080
-    //}
-
     outputFormat = 'DEPENDENCY_GRAPH'
     printBanner = false
 
