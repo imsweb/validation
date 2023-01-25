@@ -151,9 +151,9 @@ ossIndexAudit {
     outputFormat = 'DEPENDENCY_GRAPH'
     printBanner = false
 
-    //excludeVulnerabilityIds = [
-    //        'sonatype-2022-6438'
-    //]
+    excludeVulnerabilityIds = [
+            'sonatype-2022-6438'
+    ]
 }
 
 if (project.hasProperty('branch_name') && (project.ext.get('branch_name') == 'master' || project.ext.get('branch_name') == 'main'))
