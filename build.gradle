@@ -9,7 +9,7 @@ plugins {
     id 'signing'
     id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' // publish to Maven Central
     id 'com.github.ben-manes.versions' version '0.43.0' // check for out-of-date dependencies (run manually)
-    id 'org.sonatype.gradle.plugins.scan' version '2.4.1' // scan for vulnerabilities
+    id 'org.sonatype.gradle.plugins.scan' version '2.5.5' // scan for vulnerabilities
     id "org.sonarqube" version "3.5.0.2730" // sonarQube analysis
 }
 
@@ -142,23 +142,20 @@ task generateJavaContextParser {
 
 // Nexus vulnerability scan (https://github.com/sonatype-nexus-community/scan-gradle-plugin)
 ossIndexAudit {
-    proxyConfiguration {
-        protocol = 'http'
-        host = 'webproxy-btp.imsweb.com'
-        port = 8080
-    }
+    //proxyConfiguration {
+    //    protocol = 'http'
+    //    host = 'webproxy-btp.imsweb.com'
+    //    port = 8080
+    //}
 
+    outputFormat = 'DEPENDENCY_GRAPH'
     printBanner = false
 
-    //excludeCoordinates = [
-            //'com.thoughtworks.xstream:xstream:1.4.19', // developer doesn't agree and won't fix
-    //        'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+    //excludeVulnerabilityIds = [
+    //        'sonatype-2022-6438'
     //]
-
-    excludeVulnerabilityIds = [
-            'sonatype-2022-6438'
-    ]
 }
+
 if (project.hasProperty('branch_name') && (project.ext.get('branch_name') == 'master' || project.ext.get('branch_name') == 'main'))
     check.dependsOn 'ossIndexAudit'
 
