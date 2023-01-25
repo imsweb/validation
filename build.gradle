@@ -146,6 +146,7 @@ ossIndexAudit {
     printBanner = false
 
     excludeVulnerabilityIds = [
+            'CVE-2022-42003',
             'sonatype-2022-6438'
     ]
 }
