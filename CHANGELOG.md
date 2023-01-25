@@ -4,7 +4,6 @@
 
 - Updated Groovy library from version 3.0.10 (indy) to version 4.0.8.
 - Updated XStream library from version 1.4.19 to version 1.4.20.
-- Updated staging client from version 6.3.0 to version 10.1.0.
 
 **Version 2.28**
 

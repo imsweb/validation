@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:10.1.0'
+    api 'com.imsweb:staging-client-java:6.3.0'
     api 'org.apache.groovy:groovy:4.0.8'
     api 'com.thoughtworks.xstream:xstream:1.4.20'
 
@@ -36,9 +36,9 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'commons-io:commons-io:2.11.0'
     testImplementation 'com.imsweb:layout:5.0'
-    testImplementation 'com.imsweb:staging-client-java-cs:10.1.0'
-    testImplementation 'com.imsweb:staging-client-java-tnm:10.1.0'
-    testImplementation 'com.imsweb:staging-client-java-eod-public:10.1.0'
+    testImplementation 'com.imsweb:staging-algorithm-cs:02.05.50.10'
+    testImplementation 'com.imsweb:staging-algorithm-tnm:1.9.9'
+    testImplementation 'com.imsweb:staging-algorithm-eod-public:2.1.2'
     testImplementation 'com.imsweb:validation-edits-seer:022-18'
     testImplementation 'com.imsweb:validation-edits-naaccr-translated:015-01'
 }
