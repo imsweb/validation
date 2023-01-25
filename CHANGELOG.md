@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 3.0**
+
+- Updated XStream library from version 1.4.19 to version 1.4.20.
+- Updated staging client from version 6.3.0 to version 10.1.0.
+
 **Version 2.28**
 
 - Increased the engine version to 6.7.

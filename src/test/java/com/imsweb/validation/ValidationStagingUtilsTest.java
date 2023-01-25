@@ -96,6 +96,7 @@ public class ValidationStagingUtilsTest {
         Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, null));
 
         Map<String, String> input = new HashMap<>();
+        input.put("dateOfDiagnosisYear", "2020");
         Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input));
 
         input.put("primarySite", "C481");

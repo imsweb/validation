@@ -478,6 +478,7 @@ public class StagingContextFunctionsTest {
         Assert.assertNull(_functions.getEodStagingSchema(null));
         Assert.assertNull(_functions.getEodStagingSchema(input));
 
+        input.put("dateOfDiagnosisYear", "2020");
         input.put("primarySite", "C481");
         input.put("histologicTypeIcdO3", "8000");
         Assert.assertNull(_functions.getEodStagingSchema(input));
