@@ -150,9 +150,13 @@ ossIndexAudit {
 
     printBanner = false
 
-    excludeCoordinates = [
+    //excludeCoordinates = [
             //'com.thoughtworks.xstream:xstream:1.4.19', // developer doesn't agree and won't fix
-            'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+    //        'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+    //]
+
+    excludeVulnerabilityIds = [
+            'sonatype-2022-6438'
     ]
 }
 if (project.hasProperty('branch_name') && (project.ext.get('branch_name') == 'master' || project.ext.get('branch_name') == 'main'))
