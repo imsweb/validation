@@ -150,6 +150,11 @@ public class Rule {
     protected Byte _importEditFlag;
 
     /**
+     * A (logical) data level for this edit (related to the Java Path, but not exactly the same thing); this field is not used in this library and was added for other projects using the library.
+     */
+    protected Byte _dataLevel;
+
+    /**
      * Constructor.
      * <p/>
      * Created on Nov 9, 2007 by depryf
@@ -687,6 +692,26 @@ public class Rule {
      */
     public void setImportEditFlag(Byte importEditFlag) {
         _importEditFlag = importEditFlag;
+    }
+
+    /**
+     * Getter
+     * <p/>
+     * Created on Jan 30, 2023 by depryf
+     * @return the "logical" data level for this rule
+     */
+    public Byte getDataLevel() {
+        return _dataLevel;
+    }
+
+    /**
+     * Setter
+     * <p/>
+     * Created on Jan 30, 2023 by depryf
+     * @param dataLevel the "logical" data level for this rule
+     */
+    public void setDataLevel(Byte dataLevel) {
+        _dataLevel = dataLevel;
     }
 
     @Override

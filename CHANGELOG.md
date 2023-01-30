@@ -2,6 +2,8 @@
 
 **Version 3.0**
 
+- Increased the engine version to 6.8.
+- Added a new dataLevel field on the Rule class (not used by this library, it was added to support projects using the library).
 - Updated Groovy library from version 3.0.10 (indy) to version 4.0.8.
 - Updated XStream library from version 1.4.19 to version 1.4.20.
 
