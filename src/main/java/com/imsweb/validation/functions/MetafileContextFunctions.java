@@ -242,6 +242,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         try {
             int day = val.trim().length() == 8 ? Integer.parseInt(val.substring(6, 8)) : 1;
+            if (day <= 0 || day > 31) {
+                binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to day");
+                return false;
+            }
             LocalDate toCheck = LocalDate.of(year, month, day);
             int actualMaxDay = YearMonth.of(year, month).lengthOfMonth();
             if (day <= 0 || day > actualMaxDay) {
@@ -257,6 +261,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             }
         }
         catch (DateTimeException e) {
+            binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to day");
             return false; // Invalid date.  Like Feb 29th 2010.
         }
 
