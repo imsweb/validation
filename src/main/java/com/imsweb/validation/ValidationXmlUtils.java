@@ -130,17 +130,6 @@ public final class ValidationXmlUtils {
     private static final Pattern _CONTROL_CHARACTERS_PATTERN = Pattern.compile("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]");
 
     /**
-     * Compiled  <code>Pattern</code> for many new lines combined together (at least 3)
-     */
-    private static final Pattern _NEW_LINES_PATTERN = Pattern.compile("(\r?\n){3,}+");
-
-    /**
-     * Compiled <code>Pattern</code> for leading and trailing empty lines
-     */
-    private static final Pattern _PATTERN_LEADING_EMPTY_LINES = Pattern.compile("^(\\s*+\r?\n)*+");
-    private static final Pattern _PATTERN_TRAILING_EMPTY_LINES = Pattern.compile("(\r?\n\\s*+)*+$");
-
-    /**
      * Compiled <code>Pattern</code> for sorting the rule by ID
      */
     private static final Pattern _PATTERN_RULE_ID = Pattern.compile("^(\\D*+)(\\d++)(.*+)$");
@@ -1728,12 +1717,20 @@ public final class ValidationXmlUtils {
             // remove any control characters
             s = _CONTROL_CHARACTERS_PATTERN.matcher(s).replaceAll("");
 
-            // the next regex does't like many new lines in the middle of the text; so let's use at most 3 of them!
-            s = _NEW_LINES_PATTERN.matcher(s).replaceAll("\n\n\n");
+            // keep track of leading spaces so we can re-apply them after trimming (if we have to trim, none of this is relevant)
+            if (!trim) {
+                StringBuilder spacesBuffer = new StringBuilder();
+                for (int i = 0; i < s.length(); i++) {
+                    if (s.charAt(i) == ' ')
+                        spacesBuffer.append(" ");
+                    else
+                        break;
+                }
 
-            // remove any leading or trailing empty lines
-            s = _PATTERN_LEADING_EMPTY_LINES.matcher(s).replaceAll("");
-            s = _PATTERN_TRAILING_EMPTY_LINES.matcher(s).replaceAll("");
+                s = s.trim();
+                if (spacesBuffer.length() > 0)
+                    s = spacesBuffer + s;
+            }
 
         }
 

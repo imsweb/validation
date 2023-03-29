@@ -688,10 +688,7 @@ public class ValidationXmlUtilsTest {
             Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
             s = "Some text with\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nmany new lines";
-            exp = "Some text with\n\n\nmany new lines";
-            Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
-
-            s = "Some text with\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nmany new lines";
+            exp = "Some text with\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nmany new lines";
             Assert.assertEquals(exp, ValidationXmlUtils.trimEmptyLines(s, true));
 
             ValidationXmlUtils.disableRealignment();
