@@ -4,20 +4,18 @@ plugins {
     id 'java-library'
     id 'checkstyle'
     id 'jacoco'
-    id 'com.github.spotbugs' version '5.0.12'
+    id 'com.github.spotbugs' version '5.0.14'
     id 'maven-publish'
     id 'signing'
     id 'io.github.gradle-nexus.publish-plugin' version '1.1.0' // publish to Maven Central
-    id 'com.github.ben-manes.versions' version '0.43.0' // check for out-of-date dependencies (run manually)
-    id 'org.sonatype.gradle.plugins.scan' version '2.5.5' // scan for vulnerabilities
-    id "org.sonarqube" version "3.5.0.2730" // sonarQube analysis
+    id 'com.github.ben-manes.versions' version '0.47.0' // check for out-of-date dependencies (run manually)
+    id 'org.sonatype.gradle.plugins.scan' version '2.6.0' // scan for vulnerabilities
+    id "org.sonarqube" version "4.2.1.3168" // sonarQube analysis
 }
 
 group = 'com.imsweb'
 version = file('VERSION').text.trim()
 description = 'This framework allows edits to be defined in Groovy and to be executed on various data types.'
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
 
 println "Starting build using JDK ${Runtime.version().feature()}"
 
@@ -26,19 +24,19 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:10.1.0'
-    api 'org.apache.groovy:groovy:4.0.8'
+    api 'com.imsweb:staging-client-java:10.2.0'
+    api 'org.apache.groovy:groovy:4.0.13'
     api 'com.thoughtworks.xstream:xstream:1.4.20'
 
-    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'commons-codec:commons-codec:1.16.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'commons-io:commons-io:2.11.0'
-    testImplementation 'com.imsweb:layout:5.1'
-    testImplementation 'com.imsweb:staging-client-java-cs:10.1.0'
-    testImplementation 'com.imsweb:staging-client-java-tnm:10.1.0'
-    testImplementation 'com.imsweb:staging-client-java-eod-public:10.1.0'
+    testImplementation 'commons-io:commons-io:2.13.0'
+    testImplementation 'com.imsweb:layout:5.2'
+    testImplementation 'com.imsweb:staging-client-java-cs:10.2.0'
+    testImplementation 'com.imsweb:staging-client-java-eod-public:10.2.0'
+    testImplementation 'com.imsweb:staging-client-java-tnm:10.2.0'
     testImplementation 'com.imsweb:validation-edits-seer:022-18'
     testImplementation 'com.imsweb:validation-edits-naaccr-translated:015-01'
 }
@@ -56,6 +54,9 @@ tasks.withType(Javadoc) {
 
 // generate javadoc and sources (required by Nexus)
 java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
     withJavadocJar()
     withSourcesJar()
 }
@@ -114,17 +115,13 @@ spotbugsTest {
 
 sonarqube {
     properties {
-        property 'sonar.projectName', 'Library-Validation'
-        property 'sonar.projectKey', 'Library---Validation'
-        property 'sonar.organization', 'imsweb'
-        property 'sonar.host.url', project.ext.get('sonar.host.url')
+        property "sonar.projectKey", "imsweb_validation"
+        property "sonar.organization", "imsweb"
+        property "sonar.host.url", "https://sonarcloud.io"
         property 'sonar.exclusions', '**/lab/*'
         property 'sonar.coverage.exclusions', '**/lab/*'
     }
 }
-
-if (!project.hasProperty('branch_name') || (project.ext.get('branch_name') != 'master' && project.ext.get('branch_name') != 'main'))
-    gradle.startParameter.excludedTaskNames += 'sonarqube'
 
 // use this task to generate the regex parser
 task generateJavaContextParser {
@@ -242,5 +239,3 @@ wrapper {
     gradleVersion = '7.5.1'
     distributionType = Wrapper.DistributionType.ALL
 }
-
-
