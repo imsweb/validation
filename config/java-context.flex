@@ -25,14 +25,14 @@ VariableLiteral = [A-Za-z0-9_\-]+
 
 <YYINITIAL> {
 
-  "["                          { return new Symbol(Symbol.SymbolType.LEFT_BRACKET, yyline, yycolumn); }
-  "]"                          { return new Symbol(Symbol.SymbolType.RIGHT_BRACKET, yyline, yycolumn); }
-  ","                          { return new Symbol(Symbol.SymbolType.COMMA, yyline, yycolumn); }
-  ":"                          { return new Symbol(Symbol.SymbolType.COLON, yyline, yycolumn); }
-  ".."                         { return new Symbol(Symbol.SymbolType.RANGE, yyline, yycolumn); }
-  {StringLiteral}              { return new Symbol(Symbol.SymbolType.STRING, yyline, yycolumn, yytext().substring(1, yytext().length() - 1).replaceAll("\\\\'", "'")); }
-  {NumberLiteral}              { return new Symbol(Symbol.SymbolType.NUMBER, yyline, yycolumn, Integer.valueOf(yytext())); }
-  {VariableLiteral}            { return new Symbol(Symbol.SymbolType.VARIABLE, yyline, yycolumn, yytext()); }
+  "["                          { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.LEFT_BRACKET, yyline, yycolumn); }
+  "]"                          { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.RIGHT_BRACKET, yyline, yycolumn); }
+  ","                          { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.COMMA, yyline, yycolumn); }
+  ":"                          { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.COLON, yyline, yycolumn); }
+  ".."                         { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.RANGE, yyline, yycolumn); }
+  {StringLiteral}              { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.STRING_VAL, yyline, yycolumn, yytext().substring(1, yytext().length() - 1).replaceAll("\\\\'", "'")); }
+  {NumberLiteral}              { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.NUMBER, yyline, yycolumn, Integer.valueOf(yytext())); }
+  {VariableLiteral}            { return new JavaContextSymbol(JavaContextSymbol.JavaContextSymbolType.VARIABLE, yyline, yycolumn, yytext()); }
 
 }
 

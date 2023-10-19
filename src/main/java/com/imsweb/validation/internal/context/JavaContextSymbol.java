@@ -3,24 +3,15 @@
  */
 package com.imsweb.validation.internal.context;
 
-/** 
- * Created on Oct 4, 2011 by murphyr
- * @author murphyr
- * @author depryf
- */
-public class Symbol {
+public class JavaContextSymbol {
 
-    /** 
-     * Created on Oct 4, 2011 by murphyr
-     * @author murphyr
-     */
-    public enum SymbolType {
+    public enum JavaContextSymbolType {
         /** LEFT_BRACKET */
         LEFT_BRACKET,
         /** RIGHT_BRACKET */
         RIGHT_BRACKET,
-        /** STRING */
-        STRING,
+        /** STRING (renamed to STRING_VAL to avoid confusing with STRING JDK constant) */
+        STRING_VAL,
         /** NUMBER */
         NUMBER,
         /** COMMA */
@@ -34,16 +25,16 @@ public class Symbol {
     }
 
     /** Symbol type */
-    private SymbolType _type;
+    private final JavaContextSymbolType _type;
 
     /** Line number */
-    private int _line;
+    private final int _line;
 
     /** Column number */
-    private int _column;
+    private final int _column;
 
     /** Value (will be null for some symbol types) */
-    private Object _value;
+    private final Object _value;
 
     /** 
      * Constructor.
@@ -53,7 +44,7 @@ public class Symbol {
      * @param line line number
      * @param column column number
      */
-    public Symbol(SymbolType type, int line, int column) {
+    public JavaContextSymbol(JavaContextSymbolType type, int line, int column) {
         this(type, line, column, null);
     }
 
@@ -66,7 +57,7 @@ public class Symbol {
      * @param column column number
      * @param value value of the symbol
      */
-    public Symbol(SymbolType type, int line, int column, Object value) {
+    public JavaContextSymbol(JavaContextSymbolType type, int line, int column, Object value) {
         _type = type;
         _line = line;
         _column = column;
@@ -76,7 +67,7 @@ public class Symbol {
     /**
      * @return Returns the _type.
      */
-    public SymbolType getType() {
+    public JavaContextSymbolType getType() {
         return _type;
     }
 
@@ -90,6 +81,7 @@ public class Symbol {
     /**
      * @return Returns the _column.
      */
+    @SuppressWarnings("unused")
     public int getColumn() {
         return _column;
     }

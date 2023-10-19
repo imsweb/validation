@@ -21,8 +21,16 @@
         <Class name="com.imsweb.validation.ValidationXmlUtils"/>
         <Bug code="RCN,NP"/>
     </Match>
-    <!-- Services/Engine allow to register a different instance; I don't know how to allow that without triggering this check -->
     <Match>
+        <!-- Services/Engine allow to register a different instance; I don't know how to allow that without triggering this check -->
         <Bug code="MS"/>
+    </Match>
+    <Match>
+         <!-- Do not reuse public identifiers from JSL as class name, fixing this is too disruptive -->
+        <Bug pattern="PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES"/>
+    </Match>
+    <Match>
+        <!-- Be wary of letting constructors throw exceptions, not easy to fix, and I don't think that can create a problem -->
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
     </Match>
 </FindBugsFilter>

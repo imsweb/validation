@@ -10,11 +10,13 @@ package com.imsweb.validation.internal.context;
  * @author depryf
  */
 @SuppressWarnings("java:S100")
-public interface Scanner {
+public interface JavaContextScanner {
 
     /**
      * Created on Oct 4, 2011 by murphyr
      * @return the next <code>Symbol</code>
      */
-    Symbol next_token() throws Exception;
+    @SuppressWarnings("java:S112")
+    // don't throw Exception (this is a very old class, I don't want to mess with that)
+    JavaContextSymbol next_token() throws Exception;
 }

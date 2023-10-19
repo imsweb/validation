@@ -16,14 +16,12 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.ValidationEngine;
-import com.imsweb.validation.internal.context.Symbol.SymbolType;
+import com.imsweb.validation.internal.context.JavaContextSymbol.JavaContextSymbolType;
 
 /**
  * Created on Oct 4, 2011 by murphyr
@@ -31,8 +29,6 @@ import com.imsweb.validation.internal.context.Symbol.SymbolType;
  */
 @SuppressWarnings({"java:S1149", "rawtypes"})
 public final class JavaContextParser {
-
-    private static final Pattern _TYPE_HINT_PATTERN = Pattern.compile("(.+])\\sas\\s(.+)$");
 
     /**
      * Created on Oct 4, 2011 by murphyr
@@ -48,35 +44,36 @@ public final class JavaContextParser {
      * @param currentContext current context
      * @return the parsed expression (a tree)
      */
-    @SuppressWarnings({"unchecked", "JdkObsolete"})
+    @SuppressWarnings({"unchecked", "JdkObsolete", "java:S1141"})
     public static Object parseContext(String expression, Map<String, Object> currentContext) throws ConstructionException {
         Object result;
 
         // this is a bit hackish, but I am parsing out the type hint at the end of the expression instead of using the lexer...
         String typeHint = null;
-        if (expression.contains(" as ")) {
-            Matcher m = _TYPE_HINT_PATTERN.matcher(expression);
-            if (m.matches()) {
-                expression = m.group(1);
-                typeHint = m.group(2);
+        int typeHintIdx = expression.lastIndexOf(" as ");
+        if (typeHintIdx > 0) {
+            String content = expression.substring(0, typeHintIdx);
+            if (content.endsWith("]")) {
+                typeHint = expression.substring(typeHintIdx + 4);
+                expression = content;
             }
         }
 
         JavaContextLexer lexer = new JavaContextLexer(new StringReader(expression));
         try {
-            Symbol token = lexer.next_token();
-            Queue<Symbol> queue = new LinkedList<>();
+            JavaContextSymbol token = lexer.next_token();
+            Queue<JavaContextSymbol> queue = new LinkedList<>();
             queue.add(token);
 
-            if (token.getType() == SymbolType.NUMBER || token.getType() == SymbolType.STRING) {
-                Symbol nextToken = lexer.next_token();
+            if (token.getType() == JavaContextSymbolType.NUMBER || token.getType() == JavaContextSymbolType.STRING_VAL) {
+                JavaContextSymbol nextToken = lexer.next_token();
 
                 //just a string or a integer
                 if (nextToken == null)
                     return token.getValue();
 
                 //at this point we only expect a string, an integer, or a range so anything else is invalid syntax
-                if (nextToken.getType() != SymbolType.RANGE)
+                if (nextToken.getType() != JavaContextSymbolType.RANGE)
                     throw new ConstructionException("Invalid syntax.");
                 else
                     //its a range so add it to the queue
@@ -139,33 +136,33 @@ public final class JavaContextParser {
      * @return a parsed context
      */
     @SuppressWarnings({"unchecked", "JdkObsolete", "ConstantConditions"})
-    private static Object buildListOrMapFromQueue(Queue<Symbol> queue, Map<String, Object> currentContext, boolean containsListBeginToken) throws ConstructionException {
+    private static Object buildListOrMapFromQueue(Queue<JavaContextSymbol> queue, Map<String, Object> currentContext, boolean containsListBeginToken) throws ConstructionException {
         Stack<Object> stack = new Stack<>();
         Object returnValue = null;
 
-        Symbol s = queue.remove();
+        JavaContextSymbol s = queue.remove();
 
         while (!queue.isEmpty() && s != null) {
-            if (s.getType() == SymbolType.NUMBER || s.getType() == SymbolType.STRING)
+            if (s.getType() == JavaContextSymbolType.NUMBER || s.getType() == JavaContextSymbolType.STRING_VAL)
                 stack.add(s.getValue());
-            else if (s.getType() == SymbolType.LEFT_BRACKET)
+            else if (s.getType() == JavaContextSymbolType.LEFT_BRACKET)
                 stack.add(buildListOrMapFromQueue(queue, currentContext, true));
-            else if (s.getType() == SymbolType.COLON)
+            else if (s.getType() == JavaContextSymbolType.COLON)
                 returnValue = new HashMap<>();
-            else if (s.getType() == SymbolType.COMMA)
+            else if (s.getType() == JavaContextSymbolType.COMMA)
                 returnValue = new ArrayList<>();
-            else if (s.getType() == SymbolType.VARIABLE) {
+            else if (s.getType() == JavaContextSymbolType.VARIABLE) {
                 if (s.getValue() != null && currentContext.containsKey(s.getValue().toString()))
                     stack.add(currentContext.get(s.getValue().toString()));
                 else if (!ValidationEngine.VALIDATOR_CONTEXT_KEY.equals(s.getValue()))
                     throw new ConstructionException("Could not find key '" + s.getValue() + "' in current contexts.");
             }
-            else if (s.getType() == SymbolType.RANGE) {
+            else if (s.getType() == JavaContextSymbolType.RANGE) {
                 if (stack.isEmpty() || queue.isEmpty())
                     throw new ConstructionException("Invalid range syntax.");
                 stack.add(createRange(stack.pop(), queue));
             }
-            else if (s.getType() == SymbolType.RIGHT_BRACKET)
+            else if (s.getType() == JavaContextSymbolType.RIGHT_BRACKET)
                 break;
 
             s = queue.remove();
@@ -253,7 +250,7 @@ public final class JavaContextParser {
     private static RangeObject createRange(Object lowValue, Queue queue) throws ConstructionException {
         List<Integer> list = new ArrayList<>();
 
-        String nextValue = ((Symbol)queue.remove()).getValue().toString();
+        String nextValue = ((JavaContextSymbol)queue.remove()).getValue().toString();
 
         if (lowValue == null || !NumberUtils.isDigits(lowValue.toString()) || !NumberUtils.isDigits(nextValue))
             throw new ConstructionException("Invalid range syntax.");
