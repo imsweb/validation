@@ -785,7 +785,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 result = _GEN_TRIM_P3.matcher(val).replaceAll("");
                 break;
             default:
-                throw new RuntimeException("Unsupported type: " + type);
+                throw new IllegalStateException("Unsupported type: " + type);
         }
 
         return result;
@@ -912,10 +912,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                     if (elem instanceof List) {
                         List<Object> indexAndRecNum = (List<Object>)elem;
                         if (indexAndRecNum.size() != 2)
-                            throw new RuntimeException("List elements of indexes must be of size 2 (index value and row number)");
+                            throw new IllegalStateException("List elements of indexes must be of size 2 (index value and row number)");
                         Object indexStr = indexAndRecNum.get(0);
                         if (!(indexStr instanceof String))
-                            throw new RuntimeException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
+                            throw new IllegalStateException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
                         int comp = trimmedVal.compareTo((String)indexStr);
                         if (comp == 0) {
                             found = true;
@@ -936,7 +936,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                             break; // values in the index are sorted, so we can stop the iteration sooner...
                     }
                     else
-                        throw new RuntimeException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
+                        throw new IllegalStateException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
                 }
             }
             else if (indexObj instanceof Map) {
@@ -946,13 +946,13 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                     if (rowNumObject instanceof Integer)
                         valIndex = (Integer)rowNumObject;
                     else
-                        throw new RuntimeException("Row numbers in indexes have to be Integers, got " + rowNumObject.getClass().getSimpleName());
+                        throw new IllegalStateException("Row numbers in indexes have to be Integers, got " + rowNumObject.getClass().getSimpleName());
                 }
             }
             else if (indexObj instanceof Set)
                 found = ((Set<Object>)indexObj).contains(trimmedVal);
             else
-                throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
+                throw new IllegalStateException("Unsupported index type: " + indexObj.getClass().getSimpleName());
         }
         else if (table != null) { // otherwise go over the entire table (ignore header)
             for (int i = 1; i < table.size(); i++) {
@@ -1074,7 +1074,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             }
         }
         else
-            throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
+            throw new IllegalStateException("Unsupported index type: " + indexObj.getClass().getSimpleName());
 
         boolean found = valIndex != null && valIndex.intValue() >= 0;
 
@@ -1133,10 +1133,10 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                 if (elem instanceof List) {
                     List<Object> indexAndRecNum = (List<Object>)elem;
                     if (indexAndRecNum.size() != 2)
-                        throw new RuntimeException("List elements of indexes must be of size 2 (index value and row number)");
+                        throw new IllegalStateException("List elements of indexes must be of size 2 (index value and row number)");
                     Object indexStr = indexAndRecNum.get(0);
                     if (!(indexStr instanceof String))
-                        throw new RuntimeException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
+                        throw new IllegalStateException("Index values must be Strings; got " + indexStr.getClass().getSimpleName());
                     int comp = trimmedVal.compareTo((String)indexStr);
                     if (comp == 0) {
                         found = true;
@@ -1156,7 +1156,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
                         break; // values in the index are sorted, so we can stop the iteration sooner...
                 }
                 else
-                    throw new RuntimeException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
+                    throw new IllegalStateException("Index elements must be Strings or Lists; got " + elem.getClass().getSimpleName());
             }
         }
         else if (indexObj instanceof Map)
@@ -1164,7 +1164,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         else if (indexObj instanceof Set)
             found = ((Set<Object>)indexObj).contains(trimmedVal);
         else
-            throw new RuntimeException("Unsupported index type: " + indexObj.getClass().getSimpleName());
+            throw new IllegalStateException("Unsupported index type: " + indexObj.getClass().getSimpleName());
 
         return found;
     }
@@ -1491,14 +1491,14 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         // handle text by block of size "width"
         int loopCounter = 1;
         int i;
-        for (i = width; i < txt.length(); i += width) {
-            if (txt.substring(i - width, i).indexOf(val) > -1)
+        for (i = w; i < txt.length(); i += w) {
+            if (txt.substring(i - w, i).indexOf(val) > -1)
                 return loopCounter;
             loopCounter++;
         }
 
         // handle last block if we have to
-        if (i - width < txt.length() && txt.substring(i - width, Math.min(i, txt.length())).indexOf(val) > -1)
+        if (i - w < txt.length() && txt.substring(i - w, Math.min(i, txt.length())).indexOf(val) > -1)
             return loopCounter;
 
         return 0;
@@ -1522,7 +1522,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         else if (justified == JUSTIFIED_RIGHT)
             return val != null && val.length() > 0 && value.toString().charAt(val.length() - 1) != ' ';
         else
-            throw new RuntimeException("Bad parameter to GEN_JUSTIFIED: " + justified);
+            throw new IllegalStateException("Bad parameter to GEN_JUSTIFIED: " + justified);
     }
 
     /**
@@ -1825,7 +1825,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_GETFIELD(Object... params) {
-        throw new RuntimeException("GEN_GETFIELD method is currently not supported!"); // coudn't find a single edit using this method
+        throw new IllegalStateException("GEN_GETFIELD method is currently not supported!"); // coudn't find a single edit using this method
     }
 
     /**
@@ -1836,7 +1836,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_PUTFIELD(Object... params) {
-        throw new RuntimeException("GEN_PUTFIELD method is currently not supported!"); // coudn't find a single edit using this method
+        throw new IllegalStateException("GEN_PUTFIELD method is currently not supported!"); // coudn't find a single edit using this method
     }
 
     /**
@@ -1847,7 +1847,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_GETVAR(Object... params) {
-        throw new RuntimeException("GEN_GETVAR method is currently not supported!"); // coudn't find a single edit using this method
+        throw new IllegalStateException("GEN_GETVAR method is currently not supported!"); // coudn't find a single edit using this method
     }
 
     /**
@@ -1858,7 +1858,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_SETVAR(Object... params) {
-        throw new RuntimeException("GEN_PUTFIELD method is currently not supported!"); // coudn't find a single edit using this method
+        throw new IllegalStateException("GEN_PUTFIELD method is currently not supported!"); // coudn't find a single edit using this method
     }
 
     /**
@@ -1869,7 +1869,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @return - internal use only -
      */
     public boolean GEN_NAMEEXPR(Object... params) {
-        throw new RuntimeException("GEN_NAMEEXPR method is currently not supported!"); // coudn't find a single edit using this method
+        throw new IllegalStateException("GEN_NAMEEXPR method is currently not supported!"); // coudn't find a single edit using this method
     }
 
     public int GEN_EXTERNALDLL(String dll, String method) {
@@ -1894,7 +1894,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
     public int GEN_EXTERNALDLL(String dll, String method, Object param1, Object param2, Object param3, Object param4, Object param5) {
         if (!"Cstage.dll".equalsIgnoreCase(dll) && !"Cstage0205.dll".equalsIgnoreCase(dll))
-            throw new RuntimeException("Only cstage.dll and cstage0205.dll are currently supported!");
+            throw new IllegalStateException("Only cstage.dll and cstage0205.dll are currently supported!");
 
         if ("CStage_get_version".equalsIgnoreCase(method)) {
             GEN_STRCPY((char[])param1, getCsVersion());
@@ -1922,7 +1922,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             return isAcceptableCsCode(schemaNumber, tableNumber, valueToCheck) ? 1 : 0;
         }
         else
-            throw new RuntimeException("Unsupported method: " + method);
+            throw new IllegalStateException("Unsupported method: " + method);
 
         return 0;
     }
