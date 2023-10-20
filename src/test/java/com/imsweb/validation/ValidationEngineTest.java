@@ -283,6 +283,28 @@ public class ValidationEngineTest {
         Assert.assertNotNull(rf.getGroovyException());
         TestingUtils.unloadValidator("fake-validator-exception-groovy");
 
+        RuleFailure rf1 = new RuleFailure();
+        RuleFailure rf2 = new RuleFailure();
+        Assert.assertEquals(rf1, rf2);
+        rf1.setRule(tmpRule);
+        Assert.assertNotEquals(rf1, rf2);
+        rf2.setRule(tmpRule);
+        Assert.assertEquals(rf1, rf2);
+        try {
+            new RuleFailure(null, "message", validatable, null);
+            Assert.fail("Should have been an exception");
+        }
+        catch (IllegalStateException e) {
+            // expected
+        }
+        try {
+            new RuleFailure(tmpRule, "message", null, null);
+            Assert.fail("Should have been an exception");
+        }
+        catch (IllegalStateException e) {
+            // expected
+        }
+
         // test a rule based on a condition defined on a higher level (rule on 'level1.level2' depends on a condition defined on 'level1')
         TestingUtils.loadValidator("fake-validator-parent-condition");
         entity.clear();
