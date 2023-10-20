@@ -15,7 +15,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * <p/>
  * Created on Apr 5, 2011 by depryf
  */
-@SuppressWarnings("unused")
 public class RuleFailure {
 
     /**
@@ -247,7 +246,7 @@ public class RuleFailure {
     }
 
     /**
-     * Getter for the original reslut
+     * Getter for the original result
      * @return the original result, can be null if the edit threw an exception and didn't return anything
      */
     public Boolean getOriginalResult() {

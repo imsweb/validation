@@ -5,6 +5,7 @@ package com.imsweb.validation;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -269,6 +270,17 @@ public class ValidationEngineTest {
         Assert.assertEquals(ValidationEngine.EXCEPTION_MSG, rf.getMessage());
         Assert.assertNotNull(rf.getGroovyException());
         Assert.assertEquals("TEST", rf.getGroovyException().getMessage());
+        // the following are mainly here to improve the coverage...
+        rf.setTumorIdentifier(1L);
+        Assert.assertNotNull(rf.getTumorIdentifier());
+        rf.setExtraErrorMessages(Arrays.asList("MSG1", "MSG2"));
+        Assert.assertNotNull(rf.getExtraErrorMessages());
+        rf.setInformationMessages(Arrays.asList("MSG1", "MSG2"));
+        Assert.assertNotNull(rf.getInformationMessages());
+        rf.setOriginalResult(Boolean.TRUE);
+        Assert.assertNotNull(rf.getOriginalResult());
+        rf.setGroovyException(new Exception("TEST"));
+        Assert.assertNotNull(rf.getGroovyException());
         TestingUtils.unloadValidator("fake-validator-exception-groovy");
 
         // test a rule based on a condition defined on a higher level (rule on 'level1.level2' depends on a condition defined on 'level1')

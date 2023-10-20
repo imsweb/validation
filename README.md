@@ -2,7 +2,7 @@
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=imsweb_validation&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=imsweb_validation)
 [![integration](https://github.com/imsweb/validation/workflows/integration/badge.svg)](https://github.com/imsweb/validation/actions)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation/badge.svg?gav=true)](https://maven-badges.herokuapp.com/maven-central/com.imsweb/validation)
 
 This framework allows edits to be defined in [Groovy](http://www.groovy-lang.org/) and to be executed on various data types.
 
