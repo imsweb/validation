@@ -1,6 +1,6 @@
 ## Validation Framework Version History
 
-**Version 3.1**
+**Version 3.2**
 
 - Updated Groovy library from version 4.0.8 to version 4.0.15.
 - Updated staging client from version 10.1.0 to version 11.0.0.
