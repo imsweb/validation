@@ -33,6 +33,7 @@ import static com.imsweb.validation.functions.MetafileContextFunctions.TRIM_BOTH
 import static com.imsweb.validation.functions.MetafileContextFunctions.TRIM_LEFT;
 import static com.imsweb.validation.functions.MetafileContextFunctions.TRIM_RIGHT;
 
+@SuppressWarnings("java:S5961") // methods too complex
 public class MetafileContextFunctionsTest {
 
     private MetafileContextFunctions _functions;
@@ -1218,6 +1219,7 @@ public class MetafileContextFunctionsTest {
     }
 
     @Test
+    @SuppressWarnings("java:S5778")
     public void testGEN_SQLLOOKUP() {
 
         // define the table we are going to use

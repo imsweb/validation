@@ -2,6 +2,12 @@
 
 **Version 3.1**
 
+- Updated Groovy library from version 4.0.8 to version 4.0.15.
+- Updated staging client from version 10.1.0 to version 11.0.0.
+
+**Version 3.1**
+
+- Updated Groovy library from version 4.0.8 to version 4.0.13.
 - Updated staging client from version 6.3.0 to version 10.1.0.
 
 **Version 3.0**

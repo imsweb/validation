@@ -186,6 +186,8 @@ public class ValidationXmlUtilsTest {
     public void testValidatorEmptyData() throws IOException, ConstructionException {
         Validator v = ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource("fake-validator-empty.xml"));
 
+        Assert.assertTrue(v.getRules().isEmpty());
+
         ValidationEngine.getInstance().addValidator(new EditableValidator(v));
         ValidationEngine.getInstance().deleteValidator(new EditableValidator(v));
 

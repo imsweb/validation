@@ -563,7 +563,7 @@ public class StagingContextFunctionsTest {
         input.clear();
         input.put("primarySite", "C530");
         input.put("histologicTypeIcdO3", "8000");
-        Assert.assertNull(_functions.getEodSchemaId(input));
+        Assert.assertEquals("cervix_9th_2021", _functions.getEodSchemaId(input));
         input.put("dateOfDiagnosisYear", "2018");
         Assert.assertEquals("cervix", _functions.getEodSchemaId(input));
     }
