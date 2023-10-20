@@ -51,7 +51,7 @@ public final class RuntimeUtils {
 
     public static String createMethodName(String ruleId) {
         if (ruleId == null || ruleId.isEmpty())
-            throw new RuntimeException("Rule ID cannot be blank!");
+            throw new IllegalStateException("Rule ID cannot be blank!");
 
         ruleId = _P1.matcher(ruleId).replaceAll(" ");
         ruleId = _P2.matcher(ruleId).replaceAll("_");
@@ -72,7 +72,7 @@ public final class RuntimeUtils {
         StringBuilder result = new StringBuilder();
         for (String s : StringUtils.split(validatorId, "-"))
             result.append(StringUtils.capitalize(s));
-        return result.toString() + "CompiledRules";
+        return result + "CompiledRules";
     }
 
     public static CompiledRules findCompileRules(Validator validator, InitializationStats stats) {
@@ -96,7 +96,7 @@ public final class RuntimeUtils {
             return null;
 
         if (parameters == null)
-            throw new RuntimeException("Got null parameters for rule ID '" + ruleId + "'");
+            throw new IllegalStateException("Got null parameters for rule ID '" + ruleId + "'");
 
         try {
             return compiledRules.getClass().getMethod(RuntimeUtils.createMethodName(ruleId), parameters.toArray(new Class[0]));
@@ -110,7 +110,7 @@ public final class RuntimeUtils {
         StringBuilder result = new StringBuilder();
         for (String s : StringUtils.split(validatorId, "-"))
             result.append(StringUtils.capitalize(s));
-        return result.toString() + "ParsedProperties";
+        return result + "ParsedProperties";
 
     }
 
@@ -130,7 +130,7 @@ public final class RuntimeUtils {
         StringBuilder result = new StringBuilder();
         for (String s : StringUtils.split(validatorId, "-"))
             result.append(StringUtils.capitalize(s));
-        return result.toString() + "ParsedContexts";
+        return result + "ParsedContexts";
     }
 
     @SuppressWarnings("unchecked")
@@ -149,7 +149,7 @@ public final class RuntimeUtils {
         StringBuilder result = new StringBuilder();
         for (String s : StringUtils.split(validatorId, "-"))
             result.append(StringUtils.capitalize(s));
-        return result.toString() + "ParsedLookups";
+        return result + "ParsedLookups";
     }
 
     @SuppressWarnings("unchecked")

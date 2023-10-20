@@ -356,14 +356,8 @@ public class ValidationServices {
                 throw new ConstructionException("Context expression '" + entryId + "' evaluated to 'null'");
 
             // make sure that closures use 'def' keyword for any new variable (#66487)
-            if (result instanceof Closure) {
-                try {
-                    parseExpression(entryId, expression, null, null, null);
-                }
-                catch (Exception e) {
-                    throw new ConstructionException("Error in context '" + entryId + "': " + e.getMessage());
-                }
-            }
+            if (result instanceof Closure)
+                validateExpression(entryId, expression);
             context.put(entryId, result);
         }
         catch (RuntimeException e) {
@@ -371,6 +365,15 @@ public class ValidationServices {
         }
 
         return result;
+    }
+
+    private void validateExpression(String entryId, String expression) throws ConstructionException {
+        try {
+            parseExpression(entryId, expression, null, null, null);
+        }
+        catch (Exception e) {
+            throw new ConstructionException("Error in context '" + entryId + "': " + e.getMessage());
+        }
     }
 
     /**
@@ -420,7 +423,7 @@ public class ValidationServices {
             for (List<?> row : (List<List<?>>)data)
                 for (Object obj : row)
                     if (!(obj instanceof String))
-                        throw new RuntimeException("Tables only support String values; found " + obj.getClass().getSimpleName());
+                        throw new IllegalStateException("Tables only support String values; found " + obj.getClass().getSimpleName());
 
             result = new ContextTable(entryId, (List<List<String>>)data);
             context.put(entryId, result);

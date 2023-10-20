@@ -756,7 +756,7 @@ public class ValidationEngine {
         try {
             Rule rule = getRule(ruleId);
             if (rule == null)
-                throw new RuntimeException("Unknown rule ID: " + ruleId);
+                throw new IllegalStateException("Unknown rule ID: " + ruleId);
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToForce(rule);
             vContext.setComputeEditsStats(_computeEditsStats);
@@ -788,9 +788,9 @@ public class ValidationEngine {
         _lock.readLock().lock();
         try {
             if (rule == null)
-                throw new RuntimeException("This method requires a non-null rule!");
+                throw new IllegalStateException("This method requires a non-null rule!");
             if (rule.getJavaPath() == null)
-                throw new RuntimeException("The provided rule must have a java-path!");
+                throw new IllegalStateException("The provided rule must have a java-path!");
 
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToForce(rule);
@@ -1686,7 +1686,7 @@ public class ValidationEngine {
                 updateProcessorsRules(getRulesSortedByDependencies(_executableRules, _executableConditions));
             }
             catch (ConstructionException e) {
-                throw new RuntimeException("Internal state has not changed, this exception should not happen!", e);
+                throw new IllegalStateException("Internal state has not changed, this exception should not happen!", e);
             }
 
             // update the raw data

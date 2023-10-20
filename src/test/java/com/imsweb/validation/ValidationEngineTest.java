@@ -75,7 +75,7 @@ public class ValidationEngineTest {
         ValidationEngine.getInstance().initialize(options, v);
         Assert.assertTrue(ValidationEngine.getInstance().isInitialized());
         Assert.assertFalse(ValidationEngine.getInstance().getValidators().isEmpty());
-        Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots().size() > 0); // the roots come from the services...
+        Assert.assertFalse(ValidationEngine.getInstance().getSupportedJavaPathRoots().isEmpty()); // the roots come from the services...
         // level is defined as a root but doesn't have any edit under it
         Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots().contains("level"));
         Assert.assertFalse(ValidationEngine.getInstance().getSupportedJavaPathRoots(true).contains("level"));
@@ -122,7 +122,7 @@ public class ValidationEngineTest {
         TestingUtils.loadValidator("fake-validator");
 
         Assert.assertFalse(ValidationEngine.getInstance().getValidators().isEmpty());
-        Assert.assertTrue(ValidationEngine.getInstance().getSupportedJavaPathRoots().size() > 0); // roots come from services...
+        Assert.assertFalse(ValidationEngine.getInstance().getSupportedJavaPathRoots().isEmpty()); // roots come from services...
 
         Assert.assertNotNull(ValidationEngine.getInstance().getValidator("fake-validator"));
         Assert.assertNotNull(ValidationEngine.getInstance().getValidators().get("fake-validator"));

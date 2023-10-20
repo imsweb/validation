@@ -33,7 +33,7 @@ public class InitializationOptions {
 
     public void setNumCompilationThreads(int n) {
         if (n < 1 || n > 32)
-            throw new RuntimeException("Number of threads must be between 1 and 32");
+            throw new IllegalStateException("Number of threads must be between 1 and 32");
         _numCompilationThreads = n;
     }
 

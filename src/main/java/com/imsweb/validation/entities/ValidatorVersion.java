@@ -55,7 +55,7 @@ public class ValidatorVersion implements Comparable<ValidatorVersion> {
      */
     public ValidatorVersion(String rawString) {
         if (!validateVersionFormat(rawString))
-            throw new RuntimeException("provided raw version does not have a valid format: " + rawString);
+            throw new IllegalStateException("provided raw version does not have a valid format: " + rawString);
 
         String[] parts = StringUtils.split(rawString, '-');
 

@@ -123,7 +123,7 @@ public class SimpleMapValidatable implements Validatable {
      */
     public SimpleMapValidatable(String displayId, String rootPrefix, Map<String, Object> map, Map<String, Object> context) {
         if (map == null)
-            throw new RuntimeException("map cannot be null");
+            throw new IllegalStateException("map cannot be null");
 
         _displayId = displayId;
         _prefix = rootPrefix;

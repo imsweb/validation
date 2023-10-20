@@ -28,7 +28,7 @@ public final class TestingUtils {
     public static void init() {
 
         if (!TMP_DIR.exists() && !TMP_DIR.mkdirs())
-            throw new RuntimeException("Unable to create tmp folder '" + TMP_DIR.getPath() + "'");
+            throw new IllegalStateException("Unable to create tmp folder '" + TMP_DIR.getPath() + "'");
 
         // initialize engine
         if (!ValidationEngine.getInstance().isInitialized()) {
@@ -54,7 +54,7 @@ public final class TestingUtils {
                         new EditableValidator(ValidationXmlUtils.loadValidatorFromXml(Thread.currentThread().getContextClassLoader().getResource(id + ".xml"))));
             }
             catch (Exception e) {
-                throw new RuntimeException("Unable to load '" + id + "'", e);
+                throw new IllegalStateException("Unable to load '" + id + "'", e);
             }
         }
 
@@ -66,7 +66,7 @@ public final class TestingUtils {
             ValidationEngine.getInstance().deleteValidator(id);
         }
         catch (Exception e) {
-            throw new RuntimeException("Unable to unload '" + id + "'", e);
+            throw new IllegalStateException("Unable to unload '" + id + "'", e);
         }
     }
 
@@ -77,13 +77,13 @@ public final class TestingUtils {
             return os.toString();
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
     public static void assertEditFailure(Collection<RuleFailure> results, String... ruleIds) {
         if (ruleIds.length == 0)
-            throw new RuntimeException("This method requires at least one rule ID!");
+            throw new IllegalStateException("This method requires at least one rule ID!");
 
         for (String ruleId : ruleIds) {
             boolean found = false;
@@ -108,7 +108,7 @@ public final class TestingUtils {
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public static void assertNoEditFailure(Collection<RuleFailure> results, String... ruleIds) {
         if (ruleIds.length == 0)
-            throw new RuntimeException("This method requires at least one rule ID!");
+            throw new IllegalStateException("This method requires at least one rule ID!");
 
         for (String ruleId : ruleIds) {
             boolean found = false;
@@ -165,7 +165,7 @@ public final class TestingUtils {
          */
         private static final Map<String, String> _EXTRA_ALIASES = new HashMap<>();
 
-        private List<String> _logMessages = new ArrayList<>();
+        private final List<String> _logMessages = new ArrayList<>();
 
         static {
             _EXTRA_ALIASES.put("level1", "level1");

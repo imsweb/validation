@@ -79,7 +79,7 @@ public class ValidationContextFunctions {
      */
     public static List<ContextFunctionDocDto> getMethodsDocumentation() {
         if (_INSTANCE == null)
-            throw new RuntimeException("Validation Context Functions have not been initialized!");
+            throw new IllegalStateException("Validation Context Functions have not been initialized!");
 
         List<ContextFunctionDocDto> dtos = new ArrayList<>();
 
@@ -459,7 +459,7 @@ public class ValidationContextFunctions {
      */
     public void enableRegexCaching(int cacheSize) {
         if (cacheSize < 0)
-            throw new RuntimeException("Cache size must be greater than 0!");
+            throw new IllegalStateException("Cache size must be greater than 0!");
         _regexCache = new ConcurrentHashMap<>();
         _regexCacheSize = cacheSize;
         _numRegexCacheHit = new AtomicLong();

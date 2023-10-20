@@ -15,6 +15,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * <p/>
  * Created on Apr 5, 2011 by depryf
  */
+@SuppressWarnings("unused")
 public class RuleFailure {
 
     /**
@@ -102,9 +103,9 @@ public class RuleFailure {
     public RuleFailure(Rule rule, String message, Validatable validatable, Throwable groovyException) {
 
         if (rule == null)
-            throw new RuntimeException("Can't build a RuleFailure from a null rule!");
+            throw new IllegalStateException("Can't build a RuleFailure from a null rule!");
         if (validatable == null)
-            throw new RuntimeException("Can't build a RuleFailure from a null validatable!");
+            throw new IllegalStateException("Can't build a RuleFailure from a null validatable!");
 
         _rule = rule;
         _message = message == null ? "" : message; // avoid NPE on message...
@@ -117,7 +118,7 @@ public class RuleFailure {
      * Getter for the rule.
      * <p/>
      * Created on Apr 5, 2011 by depryf
-     * @return the accociated <code>Rule</code>
+     * @return the associated <code>Rule</code>
      */
     public Rule getRule() {
         return _rule;

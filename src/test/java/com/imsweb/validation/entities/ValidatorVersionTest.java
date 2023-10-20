@@ -61,6 +61,14 @@ public class ValidatorVersionTest {
         Assert.assertEquals(-1, ValidatorVersion.compareVersions("invalid", "SE12-001-01"));
         Assert.assertEquals(-1, ValidatorVersion.compareVersions("invalid", "invalid"));
         Assert.assertEquals(1, ValidatorVersion.compareVersions("SE12-001-01", "invalid"));
+    }
 
+    @Test
+    public void testFormat() {
+        ValidatorVersion version = new ValidatorVersion("SE12-001-01-1");
+        Assert.assertEquals("SE12", version.getPrefix());
+        Assert.assertEquals(1, version.getMajor().intValue());
+        Assert.assertEquals(1, version.getMinor().intValue());
+        Assert.assertEquals(1, version.getSuffix().intValue());
     }
 }

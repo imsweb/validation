@@ -40,9 +40,9 @@ public class IterativeProcessor implements Processor {
      */
     public IterativeProcessor(Processor processor, String collectionName) {
         if (processor == null)
-            throw new RuntimeException("Cannot create an iterative processor from a null processor!");
+            throw new IllegalStateException("Cannot create an iterative processor from a null processor!");
         if (collectionName == null)
-            throw new RuntimeException("Cannot create an iterative processor from a null collection name!");
+            throw new IllegalStateException("Cannot create an iterative processor from a null collection name!");
 
         _processor = processor;
         _collectionName = collectionName;

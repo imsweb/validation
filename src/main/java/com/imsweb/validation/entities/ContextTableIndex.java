@@ -49,7 +49,7 @@ public class ContextTableIndex {
         for (String column : indexedColumns) {
             int idx = table.getHeaders().indexOf(column.trim());
             if (idx == -1)
-                throw new RuntimeException("Unable to find column \"" + column + "\" to index on table \"" + table.getName() + "\"");
+                throw new IllegalStateException("Unable to find column \"" + column + "\" to index on table \"" + table.getName() + "\"");
             colIdx.add(idx);
         }
 

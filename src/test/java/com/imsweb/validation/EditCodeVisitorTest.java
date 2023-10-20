@@ -368,7 +368,7 @@ public class EditCodeVisitorTest {
             }
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         // ignored
 

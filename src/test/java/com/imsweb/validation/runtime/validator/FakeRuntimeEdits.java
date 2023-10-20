@@ -18,7 +18,7 @@ public class FakeRuntimeEdits implements RuntimeEdits {
             return ValidationXmlUtils.loadValidatorFromXml(getXmlUrl(), new FakeRuntimeEdits());
         }
         catch (IOException e) {
-            throw new RuntimeException("Unable to load validator", e);
+            throw new IllegalStateException("Unable to load validator", e);
         }
     }
 

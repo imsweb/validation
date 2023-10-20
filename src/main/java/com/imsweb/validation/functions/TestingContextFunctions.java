@@ -44,6 +44,7 @@ import com.imsweb.validation.entities.Validatable;
  * Created on Aug 8, 2011 by depryf
  * @author depryf
  */
+@SuppressWarnings("unused")
 public class TestingContextFunctions {
 
     /**
@@ -133,7 +134,7 @@ public class TestingContextFunctions {
 
         // redirect the output
         OutputStream output = new OutputStream() {
-            private StringBuilder _buf = new StringBuilder();
+            private final StringBuilder _buf = new StringBuilder();
 
             @Override
             public void write(int b) {
@@ -195,7 +196,7 @@ public class TestingContextFunctions {
 
         // redirect the output
         OutputStream output = new OutputStream() {
-            private StringBuilder _buf = new StringBuilder();
+            private final StringBuilder _buf = new StringBuilder();
 
             @Override
             public void write(int b) {
@@ -330,7 +331,7 @@ public class TestingContextFunctions {
         Validatable result;
 
         if (data == null)
-            throw new RuntimeException("Invalid testing data structure: cannot run edit on null object");
+            throw new IllegalStateException("Invalid testing data structure: cannot run edit on null object");
 
         Rule r = _rule;
         if (r == null)
@@ -345,25 +346,25 @@ public class TestingContextFunctions {
                         if (data instanceof List)
                             result = new SimpleNaaccrLinesValidatable((List<Map<String, String>>)data, context, useUntrimmedNotation);
                         else
-                            throw new RuntimeException("Invalid testing data structure: expected List, got " + data.getClass().getSimpleName());
+                            throw new IllegalStateException("Invalid testing data structure: expected List, got " + data.getClass().getSimpleName());
                     }
                     else {
                         if (data instanceof Map)
                             result = new SimpleNaaccrLinesValidatable(Collections.singletonList((Map<String, String>)data), context, useUntrimmedNotation);
                         else
-                            throw new RuntimeException("Invalid testing data structure: expected Map, got " + data.getClass().getSimpleName());
+                            throw new IllegalStateException("Invalid testing data structure: expected Map, got " + data.getClass().getSimpleName());
                     }
                 }
                 else if (data instanceof Map)
                     result = new SimpleMapValidatable("?", javaPath, (Map<String, Object>)data, context);
                 else
-                    throw new RuntimeException("Invalid testing data structure: expected Map, got " + data.getClass().getSimpleName());
+                    throw new IllegalStateException("Invalid testing data structure: expected Map, got " + data.getClass().getSimpleName());
             }
             else
-                throw new RuntimeException("Rule '" + r.getId() + "' doesn't define a java-path");
+                throw new IllegalStateException("Rule '" + r.getId() + "' doesn't define a java-path");
         }
         else
-            throw new RuntimeException("Unable to find rule '" + _ruleId + "'");
+            throw new IllegalStateException("Unable to find rule '" + _ruleId + "'");
 
         return result;
     }
@@ -398,7 +399,7 @@ public class TestingContextFunctions {
             }
         }
         catch (IOException e) {
-            throw new RuntimeException("Unable to redirect output", e);
+            throw new IllegalStateException("Unable to redirect output", e);
         }
 
         // add a new result to that list
@@ -426,7 +427,7 @@ public class TestingContextFunctions {
         else if (isSimpleType(data.getClass()))
             result = data;
         else
-            throw new RuntimeException("Unsupported data type: " + data.getClass().getName());
+            throw new IllegalStateException("Unsupported data type: " + data.getClass().getName());
 
         return result;
     }
@@ -470,7 +471,7 @@ public class TestingContextFunctions {
                     result.put(entry.getKey(), obj);
             }
             else
-                throw new RuntimeException("Unsupported data type: " + obj.getClass().getName());
+                throw new IllegalStateException("Unsupported data type: " + obj.getClass().getName());
         }
 
         return result;
@@ -498,7 +499,7 @@ public class TestingContextFunctions {
                 result.add(obj);
             }
             else
-                throw new RuntimeException("Unsupported data type: " + obj.getClass().getName());
+                throw new IllegalStateException("Unsupported data type: " + obj.getClass().getName());
         }
 
         return result;
@@ -553,6 +554,7 @@ public class TestingContextFunctions {
      * @param day day to set
      * @return corresponding date
      */
+    @SuppressWarnings("MagicConstant")
     public static Date createDate(int year, int month, int day) {
         return new GregorianCalendar(year, month - 1, day).getTime();
     }

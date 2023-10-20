@@ -667,7 +667,7 @@ public final class ValidationXmlUtils {
                 catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException)
                         throw (IOException)e.getCause();
-                    throw new RuntimeException(e);
+                    throw new IllegalStateException(e);
                 }
             }
 
@@ -931,7 +931,7 @@ public final class ValidationXmlUtils {
             if (rule.getConditions() != null && !rule.getConditions().isEmpty()) {
                 StringBuilder condBuf = new StringBuilder();
                 for (String c : rule.getConditions()) {
-                    if (c.length() > 0)
+                    if (!c.isEmpty())
                         condBuf.append(Boolean.TRUE.equals(rule.getUseAndForConditions()) ? "&" : "|");
                     condBuf.append(c);
                 }
@@ -1588,7 +1588,7 @@ public final class ValidationXmlUtils {
             return result;
 
         Pattern regex1 = Pattern.compile("<validator\\s++([^>]++)>", Pattern.MULTILINE | Pattern.DOTALL);
-        Pattern regex2 = Pattern.compile("\\s*+(id|name|version|min-engine-version|translated-from)\\s*+=\\s*+['\"]([^'\"]+?)['\"]", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern regex2 = Pattern.compile("(id|name|version|min-engine-version|translated-from)\\s*+=\\s*+['\"]([^'\"]+?)['\"]", Pattern.MULTILINE | Pattern.DOTALL);
 
         boolean gzipped = url.getPath().toLowerCase().endsWith(".gz") || url.getPath().toLowerCase().endsWith(".gzip");
         try (InputStream is = gzipped ? new GZIPInputStream(url.openStream()) : url.openStream()) {
@@ -1600,7 +1600,7 @@ public final class ValidationXmlUtils {
 
                     Matcher m1 = regex1.matcher(line);
                     if (m1.find()) {
-                        Matcher m2 = regex2.matcher(m1.group(1).replaceAll("\r?\n", ""));
+                        Matcher m2 = regex2.matcher(m1.group(1).trim().replaceAll("\r?\n", ""));
                         while (m2.find())
                             result.put(m2.group(1), m2.group(2));
                     }
@@ -1609,7 +1609,7 @@ public final class ValidationXmlUtils {
                         n = is.read(bytes);
                         m1 = regex1.matcher(line + new String(bytes, 0, n, StandardCharsets.UTF_8));
                         if (m1.find()) {
-                            Matcher m2 = regex2.matcher(m1.group(1).replaceAll("\r?\n", ""));
+                            Matcher m2 = regex2.matcher(m1.group(1).trim().replaceAll("\r?\n", ""));
                             while (m2.find())
                                 result.put(m2.group(1), m2.group(2));
                         }
@@ -1640,6 +1640,7 @@ public final class ValidationXmlUtils {
      * @param url <code>URL</code>, possibly null
      * @return corresponding hash code
      */
+    @SuppressWarnings("java:S4790") // week hash algorithm, but hashing is just used to know if an validator changed, it's OK in this case
     public static String getXmlValidatorHash(URL url) {
         if (url == null)
             return null;

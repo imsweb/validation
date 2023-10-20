@@ -143,7 +143,7 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
      */
     public SimpleNaaccrLinesValidatable(List<Map<String, String>> list, Map<String, Object> context, boolean useUntrimmedNotation) {
         if (list == null)
-            throw new RuntimeException("wrapped entity cannot be null");
+            throw new IllegalStateException("wrapped entity cannot be null");
 
         String rootPrefix = useUntrimmedNotation ? ROOT_PREFIX_UNTRIMMED : ROOT_PREFIX;
 

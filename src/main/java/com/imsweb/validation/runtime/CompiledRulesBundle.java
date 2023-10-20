@@ -22,7 +22,7 @@ public class CompiledRulesBundle implements CompiledRules {
     public CompiledRulesBundle(CompiledRules... splitCompiledRules) {
         _splitCompiledRules = Arrays.asList(splitCompiledRules);
         if (_splitCompiledRules.isEmpty())
-            throw new RuntimeException("At least one compiled-rules object must be provided!");
+            throw new IllegalStateException("At least one compiled-rules object must be provided!");
     }
 
     @Override
