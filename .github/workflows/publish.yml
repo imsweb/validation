@@ -3,7 +3,7 @@
 name: publish
 
 on:
-  repository_dispatch:
+  repository_dispatch: {}
   release:
     types: [ created ]
 
