@@ -4,13 +4,13 @@ plugins {
     id 'java-library'
     id 'checkstyle'
     id 'jacoco'
-    id 'com.github.spotbugs' version '5.2.1'
+    id 'com.github.spotbugs' version '6.0.20'
     id 'maven-publish'
     id 'signing'
-    id 'io.github.gradle-nexus.publish-plugin' version '1.3.0' // publish to Maven Central
-    id 'com.github.ben-manes.versions' version '0.49.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
-    id 'org.sonatype.gradle.plugins.scan' version '2.6.1' // scan for vulnerabilities
-    id 'org.sonarqube' version '4.4.1.3373' // sonarQube analysis
+    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0' // publish to Maven Central
+    id 'com.github.ben-manes.versions' version '0.51.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
+    id 'org.sonatype.gradle.plugins.scan' version '2.8.3' // scan for vulnerabilities
+    id 'org.sonarqube' version '5.1.0.4882' // sonarQube analysis
 }
 
 group = 'com.imsweb'
@@ -24,21 +24,21 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:11.0.0'
-    api 'org.apache.groovy:groovy:4.0.15'
+    api 'com.imsweb:staging-client-java:11.3.0'
+    api 'org.apache.groovy:groovy:4.0.22'
     api 'com.thoughtworks.xstream:xstream:1.4.20'
 
-    implementation 'commons-codec:commons-codec:1.16.0'
-    implementation 'org.apache.commons:commons-lang3:3.13.0'
+    implementation 'commons-codec:commons-codec:1.17.1'
+    implementation 'org.apache.commons:commons-lang3:3.16.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'commons-io:commons-io:2.14.0'
-    testImplementation 'com.imsweb:layout:5.3'
-    testImplementation 'com.imsweb:staging-client-java-cs:11.0.0'
-    testImplementation 'com.imsweb:staging-client-java-eod-public:11.0.0'
-    testImplementation 'com.imsweb:staging-client-java-tnm:11.0.0'
-    testImplementation('com.imsweb:validation-edits-seer:023-08') { exclude module: 'validation' }
-    testImplementation('com.imsweb:validation-edits-naaccr-translated:018-01') { exclude module: 'validation' }
+    testImplementation 'commons-io:commons-io:2.16.0'
+    testImplementation 'com.imsweb:layout:5.6'
+    testImplementation 'com.imsweb:staging-client-java-cs:11.3.0'
+    testImplementation 'com.imsweb:staging-client-java-eod-public:11.3.0'
+    testImplementation 'com.imsweb:staging-client-java-tnm:11.3.0'
+    testImplementation('com.imsweb:validation-edits-seer:024-09') { exclude module: 'validation' }
+    testImplementation('com.imsweb:validation-edits-naaccr-translated:019-01') { exclude module: 'validation' }
 }
 
 // enforce UTF-8, display the compilation warnings
@@ -229,6 +229,6 @@ nexusPublishing {
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '8.4'
+    gradleVersion = '8.9'
     distributionType = Wrapper.DistributionType.ALL
 }
