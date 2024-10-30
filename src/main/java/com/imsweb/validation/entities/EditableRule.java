@@ -42,6 +42,18 @@ public class EditableRule {
 
     protected Set<RuleHistory> _histories;
 
+    protected String _tag;
+
+    protected String _agency;
+
+    protected Byte _allowOverride;
+
+    protected Boolean _needsReview;
+
+    protected Byte _importEditFlag;
+
+    protected Byte _dataLevel;
+
     /**
      * Created on Jun 29, 2011 by depryf
      */
@@ -73,6 +85,12 @@ public class EditableRule {
         _ignored = rule.getIgnored();
         _dependencies.addAll(rule.getDependencies());
         _histories.addAll(rule.getHistories());
+        _tag = rule.getTag();
+        _agency = rule.getAgency();
+        _allowOverride = rule.getAllowOverride();
+        _needsReview = rule.getNeedsReview();
+        _importEditFlag = rule.getImportEditFlag();
+        _dataLevel = rule.getDataLevel();
     }
 
     /**
@@ -300,4 +318,51 @@ public class EditableRule {
             this._histories = histories;
     }
 
+    public String getTag() {
+        return _tag;
+    }
+
+    public void setTag(String tag) {
+        _tag = tag;
+    }
+
+    public String getAgency() {
+        return _agency;
+    }
+
+    public void setAgency(String agency) {
+        _agency = agency;
+    }
+
+    public Byte getAllowOverride() {
+        return _allowOverride;
+    }
+
+    public void setAllowOverride(Byte allowOverride) {
+        _allowOverride = allowOverride;
+    }
+
+    public Boolean getNeedsReview() {
+        return _needsReview;
+    }
+
+    public void setNeedsReview(Boolean needsReview) {
+        _needsReview = needsReview;
+    }
+
+    public Byte getImportEditFlag() {
+        return _importEditFlag;
+    }
+
+    public void setImportEditFlag(Byte importEditFlag) {
+        _importEditFlag = importEditFlag;
+    }
+
+    public Byte getDataLevel() {
+        return _dataLevel;
+    }
+
+    public void setDataLevel(Byte dataLevel) {
+        _dataLevel = dataLevel;
+    }
 }

@@ -901,6 +901,12 @@ public class ValidationEngine {
             rule.setConditions(editableRule.getConditions());
             rule.setUseAndForConditions(editableRule.getUseAndForConditions());
             rule.setCategory(editableRule.getCategory());
+            rule.setTag(editableRule.getTag());
+            rule.setAgency(editableRule.getAgency());
+            rule.setAllowOverride(editableRule.getAllowOverride());
+            rule.setNeedsReview(editableRule.getNeedsReview());
+            rule.setImportEditFlag(editableRule.getImportEditFlag());
+            rule.setDataLevel(editableRule.getDataLevel());
             rule.setDescription(editableRule.getDescription());
             rule.setDependencies(editableRule.getDependencies());
             rule.setHistories(editableRule.getHistories());
@@ -1050,6 +1056,12 @@ public class ValidationEngine {
             rule.setConditions(editableRule.getConditions());
             rule.setUseAndForConditions(editableRule.getUseAndForConditions());
             rule.setCategory(editableRule.getCategory());
+            rule.setTag(editableRule.getTag());
+            rule.setAgency(editableRule.getAgency());
+            rule.setAllowOverride(editableRule.getAllowOverride());
+            rule.setNeedsReview(editableRule.getNeedsReview());
+            rule.setImportEditFlag(editableRule.getImportEditFlag());
+            rule.setDataLevel(editableRule.getDataLevel());
             if (editableRule.getSeverity() != null)
                 rule.setSeverity(editableRule.getSeverity());
             if (dependenciesUpdated) {
