@@ -10,6 +10,7 @@ import java.util.Set;
  * An <code>EditableRule</code> is a wrapper for a <code>Rule<code> that needs to be added/updated/deleted.
  * Created on Jun 29, 2011 by depryf
  */
+@SuppressWarnings("unused")
 public class EditableRule {
 
     protected Long _ruleId;

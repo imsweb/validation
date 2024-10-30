@@ -3,8 +3,8 @@
 **Version 3.3**
 
 - Fixed a few fields recently added to the Rule class that were not handled by the EditableRule class.
-- Updated Groovy library from version 4.0.15 to version 4.0.22.
-- Updated staging client from version 11.0.0 to version 11.3.0.
+- Updated Groovy library from version 4.0.15 to version 4.0.23.
+- Updated staging client from version 11.0.0 to version 11.3.1.
 
 **Version 3.2**
 
