@@ -1,5 +1,11 @@
 ## Validation Framework Version History
 
+**Version 4.0**
+
+- Updated the minimum Java language from Java 8 to Java 11.
+- Updated Groovy library from version 4.0.23 to version 4.0.24.
+- Updated XStream library from version 1.4.20 to version 1.4.21.
+
 **Version 3.3**
 
 - Fixed a few fields recently added to the Rule class that were not handled by the EditableRule class.

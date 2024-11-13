@@ -4,7 +4,7 @@ plugins {
     id 'java-library'
     id 'checkstyle'
     id 'jacoco'
-    id 'com.github.spotbugs' version '6.0.25'
+    id 'com.github.spotbugs' version '6.0.26'
     id 'maven-publish'
     id 'signing'
     id 'io.github.gradle-nexus.publish-plugin' version '2.0.0' // publish to Maven Central
@@ -25,15 +25,15 @@ repositories {
 
 dependencies {
     api 'com.imsweb:staging-client-java:11.3.1'
-    api 'org.apache.groovy:groovy:4.0.23'
-    api 'com.thoughtworks.xstream:xstream:1.4.20'
+    api 'org.apache.groovy:groovy:4.0.24'
+    api 'com.thoughtworks.xstream:xstream:1.4.21'
 
     implementation 'commons-codec:commons-codec:1.17.1'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'commons-io:commons-io:2.17.0'
-    testImplementation 'com.imsweb:layout:5.7'
+    testImplementation 'com.imsweb:layout:6.0'
     testImplementation 'com.imsweb:staging-client-java-cs:11.3.1'
     testImplementation 'com.imsweb:staging-client-java-eod-public:11.3.1'
     testImplementation 'com.imsweb:staging-client-java-tnm:11.3.1'
@@ -54,8 +54,8 @@ tasks.withType(Javadoc).configureEach {
 
 // generate javadoc and sources (required by Nexus)
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 
     withJavadocJar()
     withSourcesJar()
@@ -229,6 +229,6 @@ nexusPublishing {
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '8.10.2'
+    gradleVersion = '8.11'
     distributionType = Wrapper.DistributionType.ALL
 }
