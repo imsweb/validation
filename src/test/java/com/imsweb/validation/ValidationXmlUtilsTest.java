@@ -228,6 +228,7 @@ public class ValidationXmlUtilsTest {
         Assert.assertEquals(0, c.get(Calendar.MONTH));
         Assert.assertEquals(15, c.get(Calendar.DAY_OF_MONTH));
         Assert.assertEquals("666", drh1.getReference());
+        Assert.assertEquals("XYZ", drh1.getReplacedBy());
         Assert.assertEquals("Edit was deleted.", drh1.getMessage());
 
         Assert.assertEquals(1, v.getCategories().size());

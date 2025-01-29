@@ -27,7 +27,7 @@ public class DeletedRuleHistory {
     protected String _deletedRuleName;
 
     /**
-     * Message (comment) for this rule histroy
+     * Message (comment) for this rule history
      */
     protected String _message;
 
@@ -52,6 +52,11 @@ public class DeletedRuleHistory {
     protected String _reference;
 
     /**
+     * The rule ID that replaced this deleted rule (useful when the ID of an edit changes)
+     */
+    protected String _replacedBy;
+
+    /**
      * <code>Validator</code> for which this deleted history is for
      */
     protected Validator _validator;
@@ -62,6 +67,7 @@ public class DeletedRuleHistory {
      * Created on Feb 23, 2011 by depryf
      * @return change database ID
      */
+    @SuppressWarnings("unused")
     public Long getRuleHistoryId() {
         return _ruleHistoryId;
     }
@@ -236,6 +242,27 @@ public class DeletedRuleHistory {
         _reference = reference;
     }
 
+    /**
+     * Getter.
+     * <p/>
+     * Created on Jan 29, 2025 by depryf
+     * @return replaced by
+     */
+    public String getReplacedBy() {
+        return _replacedBy;
+    }
+
+
+    /**
+     * Setter.
+     * <p/>
+     * Created on Jan 29, 2025 by depryf
+     * @param replacedBy replaced by
+     */
+    public void setReplacedBy(String replacedBy) {
+        _replacedBy = replacedBy;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -250,6 +277,7 @@ public class DeletedRuleHistory {
                 Objects.equals(_username, that._username) &&
                 Objects.equals(_date, that._date) &&
                 Objects.equals(_reference, that._reference) &&
+               Objects.equals(_replacedBy, that._replacedBy) &&
                 Objects.equals(_validator, that._validator);
     }
 
@@ -257,6 +285,6 @@ public class DeletedRuleHistory {
     public int hashCode() {
         if (_ruleHistoryId != null)
             return Objects.hash(_ruleHistoryId);
-        return Objects.hash(_deletedRuleId, _deletedRuleName, _message, _version, _username, _date, _reference, _validator);
+        return Objects.hash(_deletedRuleId, _deletedRuleName, _message, _version, _username, _date, _reference, _replacedBy, _validator);
     }
 }

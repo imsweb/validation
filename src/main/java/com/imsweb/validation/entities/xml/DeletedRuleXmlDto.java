@@ -30,6 +30,10 @@ public class DeletedRuleXmlDto {
     @XStreamAsAttribute
     private String ref;
 
+    @XStreamAsAttribute
+    @XStreamAlias("replaced-by")
+    private String replacedBy;
+
     private String value;
 
     public String getId() {
@@ -86,5 +90,13 @@ public class DeletedRuleXmlDto {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getReplacedBy() {
+        return replacedBy;
+    }
+
+    public void setReplacedBy(String replacedBy) {
+        this.replacedBy = replacedBy;
     }
 }

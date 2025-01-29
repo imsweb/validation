@@ -7,7 +7,7 @@
     </releases>
 
     <deleted-rules>
-        <deleted-rule id="OLD-ID" name="OLD-NAME" version="TEST-001-02" user="test" date="2000-01-15" ref="666">Edit was deleted.</deleted-rule>
+        <deleted-rule id="OLD-ID" name="OLD-NAME" version="TEST-001-02" user="test" date="2000-01-15" ref="666" replaced-by="XYZ">Edit was deleted.</deleted-rule>
     </deleted-rules>
 
     <context>

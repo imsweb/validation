@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 4.1**
+
+- Added support for an optional replaced-by attribute in deleted rule section of the XML validator files.
+
 **Version 4.0**
 
 - Updated the minimum Java language from Java 8 to Java 11.

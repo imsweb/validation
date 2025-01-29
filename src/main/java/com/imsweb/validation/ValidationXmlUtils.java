@@ -507,6 +507,7 @@ public final class ValidationXmlUtils {
                     throw new IOException("Deleted rule date is required");
                 rh.setDate(event.getDate());
                 rh.setReference(event.getRef());
+                rh.setReplacedBy(event.getReplacedBy());
                 rh.setMessage(ValidationXmlUtils.trimEmptyLines(event.getValue(), true));
                 histories.add(rh);
             }
@@ -642,42 +643,43 @@ public final class ValidationXmlUtils {
             }
 
             // go through each rule (we multi-thread this part since it can be a bit slow
-            ExecutorService service = Executors.newFixedThreadPool(2);
-            List<Future<Void>> results = new ArrayList<>(rulesType.size());
-            for (RuleXmlDto type : rulesType) {
+            try (ExecutorService service = Executors.newFixedThreadPool(2)) {
+                List<Future<Void>> results = new ArrayList<>(rulesType.size());
+                for (RuleXmlDto type : rulesType) {
 
-                // make sure rule ID has not been used yet
-                if (rules.containsKey(type.getId()))
-                    throw new IOException("Edit '" + type.getId() + "' defined more than once in group " + validator.getId());
+                    // make sure rule ID has not been used yet
+                    if (rules.containsKey(type.getId()))
+                        throw new IOException("Edit '" + type.getId() + "' defined more than once in group " + validator.getId());
 
-                results.add(service.submit(new RuleParsingCallable(type, ValidationServices.getInstance().getNextRuleSequence(), validator, versions, rules, props, contexts, lookups)));
-            }
+                    results.add(service.submit(new RuleParsingCallable(type, ValidationServices.getInstance().getNextRuleSequence(), validator, versions, rules, props, contexts, lookups)));
+                }
 
-            // we won't be submitting new work anymore
-            service.shutdown();
+                // we won't be submitting new work anymore
+                service.shutdown();
 
-            // this is important to detect any exception in the background threads
-            for (Future<Void> result : results) {
+                // this is important to detect any exception in the background threads
+                for (Future<Void> result : results) {
+                    try {
+                        result.get();
+                    }
+                    catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    catch (ExecutionException e) {
+                        if (e.getCause() instanceof IOException)
+                            throw (IOException)e.getCause();
+                        throw new IllegalStateException(e);
+                    }
+                }
+
+                // the work should be done by now because we call get(), which is a blocking call; but better safe than sorry...
                 try {
-                    result.get();
+                    if (!service.awaitTermination(5, TimeUnit.MINUTES))
+                        throw new IllegalStateException("Edits compilation took too long to complete");
                 }
                 catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                catch (ExecutionException e) {
-                    if (e.getCause() instanceof IOException)
-                        throw (IOException)e.getCause();
-                    throw new IllegalStateException(e);
-                }
-            }
-
-            // the work should be done by now because we call get(), which is a blocking call; but better safe than sorry...
-            try {
-                if (!service.awaitTermination(5, TimeUnit.MINUTES))
-                    throw new IllegalStateException("Edits compilation took too long to complete");
-            }
-            catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
         }
 
@@ -778,6 +780,7 @@ public final class ValidationXmlUtils {
             eventType.setValue(history.getMessage());
             eventType.setDate(history.getDate());
             eventType.setRef(history.getReference());
+            eventType.setReplacedBy(history.getReplacedBy());
             deletedRules.add(eventType);
         }
 
