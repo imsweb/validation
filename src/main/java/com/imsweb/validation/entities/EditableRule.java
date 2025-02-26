@@ -3,7 +3,9 @@
  */
 package com.imsweb.validation.entities;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -53,6 +55,8 @@ public class EditableRule {
 
     protected Byte _importEditFlag;
 
+    protected List<Long> _dataEntryTypes;
+
     protected Byte _dataLevel;
 
     /**
@@ -62,6 +66,7 @@ public class EditableRule {
         _dependencies = new HashSet<>();
         _histories = new HashSet<>();
         _conditions = new HashSet<>();
+        _dataEntryTypes = new ArrayList<>();
         _useAndForConditions = Boolean.TRUE;
     }
 
@@ -91,6 +96,7 @@ public class EditableRule {
         _allowOverride = rule.getAllowOverride();
         _needsReview = rule.getNeedsReview();
         _importEditFlag = rule.getImportEditFlag();
+        _dataEntryTypes = rule.getDataEntryTypes();
         _dataLevel = rule.getDataLevel();
     }
 
@@ -357,6 +363,14 @@ public class EditableRule {
 
     public void setImportEditFlag(Byte importEditFlag) {
         _importEditFlag = importEditFlag;
+    }
+
+    public List<Long> getDataEntryTypes() {
+        return _dataEntryTypes;
+    }
+
+    public void setDataEntryTypes(List<Long> dataEntryTypes) {
+        _dataEntryTypes = dataEntryTypes;
     }
 
     public Byte getDataLevel() {

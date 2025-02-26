@@ -4,6 +4,7 @@
 package com.imsweb.validation.entities;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -148,6 +149,11 @@ public class Rule {
      * Import edit flag; this field is not used in this library and was added for other projects using the library.
      */
     protected Byte _importEditFlag;
+
+    /**
+     * Data entry applicable record types; this field is not used in this library and was added for other projects using the library.
+     */
+    protected List<Long> _dataEntryTypes;
 
     /**
      * A (logical) data level for this edit (related to the Java Path, but not exactly the same thing); this field is not used in this library and was added for other projects using the library.
@@ -692,6 +698,27 @@ public class Rule {
      */
     public void setImportEditFlag(Byte importEditFlag) {
         _importEditFlag = importEditFlag;
+    }
+
+
+    /**
+     * Getter
+     * <p/>
+     * Created on Feb 26, 2025 by depryf
+     * @return list of applicable record types in data entry
+     */
+    public List<Long> getDataEntryTypes() {
+        return _dataEntryTypes;
+    }
+
+    /**
+     * Setter
+     * <p/>
+     * Created on Feb 26, 2025 by depryf
+     * @param dataEntryTypes list of applicable record types in data entry
+     */
+    public void setDataEntryTypes(List<Long> dataEntryTypes) {
+        _dataEntryTypes = dataEntryTypes;
     }
 
     /**

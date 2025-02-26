@@ -906,6 +906,7 @@ public class ValidationEngine {
             rule.setAllowOverride(editableRule.getAllowOverride());
             rule.setNeedsReview(editableRule.getNeedsReview());
             rule.setImportEditFlag(editableRule.getImportEditFlag());
+            rule.setDataEntryTypes(editableRule.getDataEntryTypes());
             rule.setDataLevel(editableRule.getDataLevel());
             rule.setDescription(editableRule.getDescription());
             rule.setDependencies(editableRule.getDependencies());
@@ -1061,6 +1062,7 @@ public class ValidationEngine {
             rule.setAllowOverride(editableRule.getAllowOverride());
             rule.setNeedsReview(editableRule.getNeedsReview());
             rule.setImportEditFlag(editableRule.getImportEditFlag());
+            rule.setDataEntryTypes(editableRule.getDataEntryTypes());
             rule.setDataLevel(editableRule.getDataLevel());
             if (editableRule.getSeverity() != null)
                 rule.setSeverity(editableRule.getSeverity());

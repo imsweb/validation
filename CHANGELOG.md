@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 4.2**
+
+- Added a new dataEntryTypes field on the Rule class (not used by this library, it was added to support projects using the library).
+
 **Version 4.1**
 
 - Added support for an optional replaced-by attribute in deleted rule section of the XML validator files.
