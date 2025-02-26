@@ -229,6 +229,6 @@ nexusPublishing {
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '8.11'
+    gradleVersion = '8.13'
     distributionType = Wrapper.DistributionType.ALL
 }
