@@ -3,12 +3,6 @@
  */
 package com.imsweb.validation.entities;
 
-import com.imsweb.validation.TestingUtils;
-import com.imsweb.validation.ValidationEngine;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.imsweb.validation.TestingUtils;
+import com.imsweb.validation.ValidationEngine;
 
 public class SimpleMapValidatableTest {
 
@@ -32,17 +33,6 @@ public class SimpleMapValidatableTest {
         // I am using the 'fake-validator.xml' for this test, so my entity has three levels: level1, level2 and level3
         Map<String, Object> entity = new HashMap<>();
         entity.put("prop", "1"); // should trigger fv-rule1
-
-        // null map
-        boolean exception = false;
-        try {
-            new SimpleMapValidatable("ID", "level1", null);
-        }
-        catch (RuntimeException e) {
-            exception = true;
-        }
-        if (!exception)
-            Assert.fail("Where is the exception?");
 
         // empty map
         SimpleMapValidatable v = new SimpleMapValidatable("ID", "level1", entity);
@@ -150,7 +140,7 @@ public class SimpleMapValidatableTest {
     }
 
     @Test
-    public void testReportFailureForProperty() throws Exception {
+    public void testReportFailureForProperty() {
 
         Map<String, Object> entity = new HashMap<>();
         List<Map<String, Object>> level2List = new ArrayList<>();

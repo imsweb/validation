@@ -13,6 +13,7 @@ import groovy.lang.Binding;
 import com.imsweb.validation.ValidationContextFunctions;
 import com.imsweb.validation.runtime.CompiledRules;
 
+@SuppressWarnings("unused")
 public class FakeRuntimeEditsCompiledRules implements CompiledRules {
 
     @Override

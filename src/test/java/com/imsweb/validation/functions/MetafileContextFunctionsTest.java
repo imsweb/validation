@@ -639,11 +639,11 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals(0, _functions.GEN_STRCMP("ABC", "AB", 1));
 
         // this example is taken from the Genedits documentation...
-        char[] t_state = new char[3], t_state_zip = new char[8];
-        _functions.GEN_STRCPY(t_state, "GA");
+        char[] tState = new char[3], t_state_zip = new char[8];
+        _functions.GEN_STRCPY(tState, "GA");
         _functions.GEN_STRCPY(t_state_zip, "GA");
         _functions.GEN_STRCAT(t_state_zip, "30341");
-        Assert.assertEquals(0, _functions.GEN_STRCMP(t_state, "GA"));
+        Assert.assertEquals(0, _functions.GEN_STRCMP(tState, "GA"));
         Assert.assertEquals(0, _functions.GEN_STRCMP(t_state_zip, "GA", 2));
 
     }
@@ -961,24 +961,24 @@ public class MetafileContextFunctionsTest {
     @Test
     public void testGEN_EXTERNALDLL() {
         //Test schema name
-        char[] t_schema_name = new char[31];
-        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 1, t_schema_name);
-        Assert.assertEquals("LipUpper", new String(t_schema_name).trim());
-        t_schema_name = new char[31];
-        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 150, t_schema_name);
-        Assert.assertEquals("Lymphoma", new String(t_schema_name).trim());
-        t_schema_name = new char[31];
-        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 100, t_schema_name);
-        Assert.assertEquals("MycosisFungoides", new String(t_schema_name).trim());
-        t_schema_name = new char[31];
-        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 160, t_schema_name);
-        Assert.assertEquals("", new String(t_schema_name).trim());
-        t_schema_name = new char[31];
-        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 0, t_schema_name);
-        Assert.assertEquals("", new String(t_schema_name).trim());
-        t_schema_name = new char[31];
-        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", -1, t_schema_name);
-        Assert.assertEquals("", new String(t_schema_name).trim());
+        char[] tSchemaName = new char[31];
+        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 1, tSchemaName);
+        Assert.assertEquals("LipUpper", new String(tSchemaName).trim());
+        tSchemaName = new char[31];
+        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 150, tSchemaName);
+        Assert.assertEquals("Lymphoma", new String(tSchemaName).trim());
+        tSchemaName = new char[31];
+        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 100, tSchemaName);
+        Assert.assertEquals("MycosisFungoides", new String(tSchemaName).trim());
+        tSchemaName = new char[31];
+        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 160, tSchemaName);
+        Assert.assertEquals("", new String(tSchemaName).trim());
+        tSchemaName = new char[31];
+        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", 0, tSchemaName);
+        Assert.assertEquals("", new String(tSchemaName).trim());
+        tSchemaName = new char[31];
+        _functions.GEN_EXTERNALDLL("cstage.dll", "CStage_get_schema_name", -1, tSchemaName);
+        Assert.assertEquals("", new String(tSchemaName).trim());
     }
 
     @Test

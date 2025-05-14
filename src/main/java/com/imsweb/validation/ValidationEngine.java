@@ -90,7 +90,7 @@ public class ValidationEngine {
      * Engine version (used to check compatibility with the edits)
      */
     private static final String _ENGINE_VERSION = "6.8";
-    
+
     /**
      * The different context types supported by the engine
      */
@@ -1895,94 +1895,95 @@ public class ValidationEngine {
             stats.setReasonNotPreCompiled(validator.getId(), InitializationStats.REASON_DISABLED);
 
         // internalize the rules
-        ExecutorService service = Executors.newFixedThreadPool(_options.getNumCompilationThreads());
-        List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
-        if (validator.getRules() != null) {
-            for (Rule r : validator.getRules()) {
-                if (r.getRuleId() == null)
-                    r.setRuleId(ValidationServices.getInstance().getNextRuleSequence());
-                if (r.getRuleId() == null)
-                    throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
-                results.add(service.submit(new RuleCompilingCallable(r, rules, compiledRules, stats)));
+        try (ExecutorService service = Executors.newFixedThreadPool(_options.getNumCompilationThreads())) {
+            List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
+            if (validator.getRules() != null) {
+                for (Rule r : validator.getRules()) {
+                    if (r.getRuleId() == null)
+                        r.setRuleId(ValidationServices.getInstance().getNextRuleSequence());
+                    if (r.getRuleId() == null)
+                        throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
+                    results.add(service.submit(new RuleCompilingCallable(r, rules, compiledRules, stats)));
+                }
+                validator.setRules(new HashSet<>(validator.getRules())); // since internal IDs might have changed
             }
-            validator.setRules(new HashSet<>(validator.getRules())); // since internal IDs might have changed
-        }
 
-        // internalize the conditions
-        if (validator.getConditions() != null) {
-            for (Condition c : validator.getConditions()) {
-                if (c.getConditionId() == null)
-                    c.setConditionId(ValidationServices.getInstance().getNextConditionSequence());
-                if (c.getConditionId() == null)
-                    throw new ConstructionException("Conditions must have a non-null internal ID to be registered in the engine");
-                conditions.put(c.getConditionId(), new ExecutableCondition(c));
+            // internalize the conditions
+            if (validator.getConditions() != null) {
+                for (Condition c : validator.getConditions()) {
+                    if (c.getConditionId() == null)
+                        c.setConditionId(ValidationServices.getInstance().getNextConditionSequence());
+                    if (c.getConditionId() == null)
+                        throw new ConstructionException("Conditions must have a non-null internal ID to be registered in the engine");
+                    conditions.put(c.getConditionId(), new ExecutableCondition(c));
+                }
+                validator.setConditions(new HashSet<>(validator.getConditions())); // since internal IDs might have changed
             }
-            validator.setConditions(new HashSet<>(validator.getConditions())); // since internal IDs might have changed
-        }
 
-        // we don't internalize the categories because they are not used at runtime, but let's still assign a unique ID to them...
-        if (validator.getCategories() != null) {
-            for (Category c : validator.getCategories())
-                if (c.getCategoryId() == null)
-                    c.setCategoryId(ValidationServices.getInstance().getNextCategorySequence());
-            validator.setCategories(new HashSet<>(validator.getCategories())); // since internal IDs might have changed
-        }
+            // we don't internalize the categories because they are not used at runtime, but let's still assign a unique ID to them...
+            if (validator.getCategories() != null) {
+                for (Category c : validator.getCategories())
+                    if (c.getCategoryId() == null)
+                        c.setCategoryId(ValidationServices.getInstance().getNextCategorySequence());
+                validator.setCategories(new HashSet<>(validator.getCategories())); // since internal IDs might have changed
+            }
 
-        // for any context entry that threw an exception, re-try it a second time, hopefully the dependency exception will be resolved...
-        if (validator.getRawContext() != null) {
-            Set<ContextEntry> reRun = new HashSet<>();
-            for (ContextEntry entry : validator.getRawContext()) {
-                if (entry.getContextEntryId() == null)
-                    entry.setContextEntryId(ValidationServices.getInstance().getNextContextEntrySequence());
-                try {
-                    // this is really not great, a better way would be to fully parse the context expressions, but that will do for now...
-                    if (entry.getExpression().contains(VALIDATOR_CONTEXT_KEY + "."))
+            // for any context entry that threw an exception, re-try it a second time, hopefully the dependency exception will be resolved...
+            if (validator.getRawContext() != null) {
+                Set<ContextEntry> reRun = new HashSet<>();
+                for (ContextEntry entry : validator.getRawContext()) {
+                    if (entry.getContextEntryId() == null)
+                        entry.setContextEntryId(ValidationServices.getInstance().getNextContextEntrySequence());
+                    try {
+                        // this is really not great, a better way would be to fully parse the context expressions, but that will do for now...
+                        if (entry.getExpression().contains(VALIDATOR_CONTEXT_KEY + "."))
+                            reRun.add(entry);
+                        else
+                            ValidationServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+                    }
+                    catch (ConstructionException e) {
                         reRun.add(entry);
-                    else
-                        ValidationServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+                    }
                 }
-                catch (ConstructionException e) {
-                    reRun.add(entry);
+                for (ContextEntry entry : reRun)
+                    ValidationServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
+                validator.setRawContext(new HashSet<>(validator.getRawContext())); // since internal IDs might have changed
+            }
+
+            // we don't internalize the sets because they are not used at runtime, but let's still assign a unique ID to them...
+            if (validator.getSets() != null) {
+                for (EmbeddedSet s : validator.getSets())
+                    if (s.getSetId() == null)
+                        s.setSetId(ValidationServices.getInstance().getNextSetSequence());
+                validator.setSets(new HashSet<>(validator.getSets())); // since internal IDs might have changed
+            }
+
+            // we won't be submitting new work anymore
+            service.shutdown();
+
+            // this is important to detect any exception in the background threads
+            for (Future<Void> result : results) {
+                try {
+                    result.get();
+                }
+                catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                catch (ExecutionException e) {
+                    if (e.getCause() instanceof ConstructionException)
+                        throw (ConstructionException)e.getCause();
+                    throw new IllegalStateException(e);
                 }
             }
-            for (ContextEntry entry : reRun)
-                ValidationServices.getInstance().addContextExpression(entry.getExpression(), contexts, entry.getKey(), entry.getType());
-            validator.setRawContext(new HashSet<>(validator.getRawContext())); // since internal IDs might have changed
-        }
 
-        // we don't internalize the sets because they are not used at runtime, but let's still assign a unique ID to them...
-        if (validator.getSets() != null) {
-            for (EmbeddedSet s : validator.getSets())
-                if (s.getSetId() == null)
-                    s.setSetId(ValidationServices.getInstance().getNextSetSequence());
-            validator.setSets(new HashSet<>(validator.getSets())); // since internal IDs might have changed
-        }
-
-        // we won't be submitting new work anymore
-        service.shutdown();
-
-        // this is important to detect any exception in the background threads
-        for (Future<Void> result : results) {
+            // the work should be done by now because we call get(), which is a blocking call; but better safe than sorry...
             try {
-                result.get();
+                if (!service.awaitTermination(30, TimeUnit.SECONDS))
+                    throw new IllegalStateException("Background compilation took too long to complete");
             }
             catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            catch (ExecutionException e) {
-                if (e.getCause() instanceof ConstructionException)
-                    throw (ConstructionException)e.getCause();
-                throw new IllegalStateException(e);
-            }
-        }
-
-        // the work should be done by now because we call get(), which is a blocking call; but better safe than sorry...
-        try {
-            if (!service.awaitTermination(30, TimeUnit.SECONDS))
-                throw new IllegalStateException("Background compilation took too long to complete");
-        }
-        catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 

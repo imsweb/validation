@@ -105,8 +105,8 @@ public class SimpleNaaccrLinesValidatableTest {
         ValidationContextFunctions.initialize(new StagingContextFunctions(csStaging, tnmStaging, eodStaging));
 
         try {
-            Map<String, String> record = new HashMap<>();
-            SimpleNaaccrLinesValidatable v = new SimpleNaaccrLinesValidatable(record);
+            Map<String, String> rec = new HashMap<>();
+            SimpleNaaccrLinesValidatable v = new SimpleNaaccrLinesValidatable(rec);
             List<Validatable> validatables = v.followCollection("line");
             Map<String, String> line = (Map<String, String>)validatables.get(0).getScope().get("line");
             Assert.assertNull(line.get("csSiteSpecificFactor25"));
@@ -114,10 +114,10 @@ public class SimpleNaaccrLinesValidatableTest {
             Assert.assertNull(line.get("_csSchemaId"));
             Assert.assertNull(line.get("_eodSchemaId"));
 
-            record.put("dateOfDiagnosisYear", "2018");
-            record.put("primarySite", "C111");
-            record.put("histologicTypeIcdO3", "8000");
-            v = new SimpleNaaccrLinesValidatable(record);
+            rec.put("dateOfDiagnosisYear", "2018");
+            rec.put("primarySite", "C111");
+            rec.put("histologicTypeIcdO3", "8000");
+            v = new SimpleNaaccrLinesValidatable(rec);
             validatables = v.followCollection("line");
             line = (Map<String, String>)validatables.get(0).getScope().get("line");
             Assert.assertNull(line.get("csSiteSpecificFactor25"));
@@ -125,9 +125,9 @@ public class SimpleNaaccrLinesValidatableTest {
             Assert.assertNull(line.get("_csSchemaId"));
             Assert.assertNull(line.get("_eodSchemaId"));
 
-            record.put("csSiteSpecificFactor25", "010");
-            record.put("schemaDiscriminator1", "1");
-            v = new SimpleNaaccrLinesValidatable(record);
+            rec.put("csSiteSpecificFactor25", "010");
+            rec.put("schemaDiscriminator1", "1");
+            v = new SimpleNaaccrLinesValidatable(rec);
             validatables = v.followCollection("line");
             line = (Map<String, String>)validatables.get(0).getScope().get("line");
             Assert.assertEquals("010", line.get("csSiteSpecificFactor25"));
@@ -135,11 +135,11 @@ public class SimpleNaaccrLinesValidatableTest {
             Assert.assertEquals("nasopharynx", line.get("_csSchemaId"));
             Assert.assertEquals("nasopharynx", line.get("_eodSchemaId"));
 
-            record.put("primarySite", "C481");
-            record.put("csSiteSpecificFactor25", null);
-            record.put("schemaDiscriminator1", null);
-            record.put("sex", "1");
-            v = new SimpleNaaccrLinesValidatable(record);
+            rec.put("primarySite", "C481");
+            rec.put("csSiteSpecificFactor25", null);
+            rec.put("schemaDiscriminator1", null);
+            rec.put("sex", "1");
+            v = new SimpleNaaccrLinesValidatable(rec);
             validatables = v.followCollection("line");
             line = (Map<String, String>)validatables.get(0).getScope().get("line");
             Assert.assertNull(line.get("csSiteSpecificFactor25")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
@@ -147,7 +147,7 @@ public class SimpleNaaccrLinesValidatableTest {
             Assert.assertNull(line.get("_csSchemaId")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
             Assert.assertEquals("retroperitoneum", line.get("_eodSchemaId"));
 
-            v = new SimpleNaaccrLinesValidatable(Collections.singletonList(record), null, true);
+            v = new SimpleNaaccrLinesValidatable(Collections.singletonList(rec), null, true);
             validatables = v.followCollection("untrimmedline");
             line = (Map<String, String>)validatables.get(0).getScope().get("untrimmedline");
             Assert.assertNull(line.get("csSiteSpecificFactor25")); // the code used to assign the SSF25 based on the TNM schema and sex value; this was removed (#36)
