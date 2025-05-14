@@ -4,7 +4,7 @@ plugins {
     id 'java-library'
     id 'checkstyle'
     id 'jacoco'
-    id 'com.vanniktech.maven.publish' version '0.31.0' // publish to Maven Central
+    id 'com.vanniktech.maven.publish' version '0.32.0' // publish to Maven Central
     id 'com.github.ben-manes.versions' version '0.52.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
     id 'com.github.spotbugs' version '6.1.11' // spotbugs code analysis
     id 'org.sonatype.gradle.plugins.scan' version '3.1.1' // scan for vulnerabilities
@@ -38,7 +38,6 @@ dependencies {
     testImplementation('com.imsweb:validation-edits-seer:025-06') { exclude module: 'validation' }
     testImplementation('com.imsweb:validation-edits-naaccr-translated:022-01') { exclude module: 'validation' }
 }
-
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
