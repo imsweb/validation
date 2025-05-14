@@ -36,10 +36,26 @@ public class FakeRuntimeEditsCompiledRules implements CompiledRules {
         return Collections.singletonMap("runtime", parameters);
     }
 
+    /**
+     * Fake rule #1
+     * @param binding binding
+     * @param context context
+     * @param functions functions
+     * @param runtime runtime
+     * @return pass/fail
+     */
     public boolean fvrtRule1(Binding binding, Map<String, Object> context, ValidationContextFunctions functions, Map<String, Object> runtime) {
         return "value".equals(runtime.get("key"));
     }
 
+    /**
+     * Fake rule #2
+     * @param binding binding
+     * @param context context
+     * @param functions functions
+     * @param runtime runtime
+     * @return pass/fail
+     */
     public boolean fvrtRule2(Binding binding, Map<String, Object> context, ValidationContextFunctions functions, Map<String, Object> runtime) {
         return "other".equals(runtime.get("key"));
     }

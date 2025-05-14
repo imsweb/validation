@@ -639,12 +639,13 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals(0, _functions.GEN_STRCMP("ABC", "AB", 1));
 
         // this example is taken from the Genedits documentation...
-        char[] tState = new char[3], t_state_zip = new char[8];
+        char[] tState = new char[3];
+        char[] tStateZip = new char[8];
         _functions.GEN_STRCPY(tState, "GA");
-        _functions.GEN_STRCPY(t_state_zip, "GA");
-        _functions.GEN_STRCAT(t_state_zip, "30341");
+        _functions.GEN_STRCPY(tStateZip, "GA");
+        _functions.GEN_STRCAT(tStateZip, "30341");
         Assert.assertEquals(0, _functions.GEN_STRCMP(tState, "GA"));
-        Assert.assertEquals(0, _functions.GEN_STRCMP(t_state_zip, "GA", 2));
+        Assert.assertEquals(0, _functions.GEN_STRCMP(tStateZip, "GA", 2));
 
     }
 
