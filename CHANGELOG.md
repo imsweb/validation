@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 4.3**
+
+- Updated Groovy library from version 4.0.23 to version 4.0.26.
+- Updated staging client from version 11.3.1 to version 11.4.0.
+
 **Version 4.2**
 
 - Added a new dataEntryTypes field on the Rule class (not used by this library, it was added to support projects using the library).
