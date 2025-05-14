@@ -103,18 +103,12 @@ sonarqube {
 }
 
 // use this task to generate the regex parser
-tasks.register('generateJavaContextParser') {
-    doLast {
-        javaexec {
-            main = '-jar'
-            args = ['config/jflex-1.4.2/lib/JFlex.jar',
-                    '--nobak',
-                    '-d',
-                    'src/main/java/com/imsweb/validation/internal/context/',
-                    'config/java-context.flex']
-        }
-    }
+tasks.register('generateJavaContextParser', JavaExec) {
+    group = 'context'
+    classpath = files('config/jflex-1.4.2/lib/JFlex.jar')
+    args = ['--nobak', '-d', 'src/main/java/com/imsweb/validation/internal/context/', 'config/java-context.flex']
 }
+
 
 // Nexus vulnerability scan (https://github.com/sonatype-nexus-community/scan-gradle-plugin)
 ossIndexAudit {
