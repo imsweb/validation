@@ -42,42 +42,42 @@ public class SimpleMapValidatable implements Validatable {
     /**
      * Display ID for this validatable.
      */
-    private String _displayId;
+    protected String _displayId;
 
     /**
      * Used to keep track of the property paths (prefix) when an error is reported; this is the full path with the indexes.
      */
-    private final String _prefix;
+    protected final String _prefix;
 
     /**
      * The current alias.
      */
-    private final String _alias;
+    protected final String _alias;
 
     /**
      * Current map being validated.
      */
-    private final Map<String, Object> _current;
+    protected final Map<String, Object> _current;
 
     /**
      * Link to the parent validatable.
      */
-    private final SimpleMapValidatable _parent;
+    protected final SimpleMapValidatable _parent;
 
     /**
      * Map of prefixes, contains the prefixes of this validatable plus any prefixes from the parents.
      */
-    private final Map<String, String> _prefixes;
+    protected final Map<String, String> _prefixes;
 
     /**
      * Map of scopes, contains the scope of this validatable plus any scopes from the parents.
      */
-    private final Map<String, Object> _scopes;
+    protected final Map<String, Object> _scopes;
 
     /**
      * Set of failing properties.
      */
-    private final Set<String> _propertiesWithError;
+    protected final Set<String> _propertiesWithError;
 
     /**
      * Constructor.

@@ -40,6 +40,7 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
  * <br/><br/>
  * Created on Apr 17, 2010 by Fabian
  */
+@SuppressWarnings("unused")
 public class SimpleNaaccrLinesValidatable implements Validatable {
 
     /**
@@ -55,52 +56,52 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     /**
      * Used to keep track of the property paths (prefix) when an error is reported; this is the full path with the indexes
      */
-    private final String _prefix;
+    protected final String _prefix;
 
     /**
      * The current alias
      */
-    private final String _alias;
+    protected final String _alias;
 
     /**
      * Current collections of lines (applied only to the root validatable)
      */
-    private final List<Map<String, String>> _lines;
+    protected final List<Map<String, String>> _lines;
 
     /**
      * Context entries
      */
-    private final Map<String, Object> _context;
+    protected final Map<String, Object> _context;
 
     /**
      * Current map being validated
      */
-    private final Map<String, String> _currentLine;
+    protected final Map<String, String> _currentLine;
 
     /**
      * Link to the parent validatable
      */
-    private final SimpleNaaccrLinesValidatable _parent;
+    protected final SimpleNaaccrLinesValidatable _parent;
 
     /**
      * Map of prefixes, contains the prefixes of this validatable plus any prefixes from the parents
      */
-    private final Map<String, String> _prefixes;
+    protected final Map<String, String> _prefixes;
 
     /**
      * Map of scopes, contains the scope of this validatable plus any scopes from the parents
      */
-    private final Map<String, Object> _scopes;
+    protected final Map<String, Object> _scopes;
 
     /**
      * Set of failing properties
      */
-    private final Set<String> _propertiesWithError;
+    protected final Set<String> _propertiesWithError;
 
     /**
      * If true, the untrimmed notation will be used ('untrimmedline' instead of 'line')
      */
-    private final boolean _useUntrimmedNotation;
+    protected final boolean _useUntrimmedNotation;
 
     /**
      * Constructor.
@@ -115,11 +116,33 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
     /**
      * Constructor.
      * <p/>
+     * Created on Jun 18, 2025 by depryf
+     * @param map entity (a map representing one  NAACCR record)
+     * @param useUntrimmedNotation if true, the untrimmed notation will be used ('untrimmedline' instead of 'line')
+     */
+    public SimpleNaaccrLinesValidatable(Map<String, String> map, boolean useUntrimmedNotation) {
+        this(Collections.singletonList(map), null, useUntrimmedNotation);
+    }
+
+    /**
+     * Constructor.
+     * <p/>
      * Created on Aug 7, 2011 by depryf
      * @param list wrapped entity (a list of map representing one or several NAACCR records for one patient set)
      */
     public SimpleNaaccrLinesValidatable(List<Map<String, String>> list) {
         this(list, null);
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * Created on Aug 7, 2011 by depryf
+     * @param list wrapped entity (a list of map representing one or several NAACCR records for one patient set)
+     * @param useUntrimmedNotation if true, the untrimmed notation will be used ('untrimmedline' instead of 'line')
+     */
+    public SimpleNaaccrLinesValidatable(List<Map<String, String>> list, boolean useUntrimmedNotation) {
+        this(list, null, useUntrimmedNotation);
     }
 
     /**
