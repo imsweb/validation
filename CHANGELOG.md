@@ -1,5 +1,11 @@
 ## Validation Framework Version History
 
+**Version 4.4**
+
+- Made some fields protected instead of private in default validatable classes.
+- Updated Groovy library from version 4.0.26 to version 4.0.27.
+- Updated staging client from version 11.4.0 to version 11.4.1.
+
 **Version 4.3**
 
 - Updated Groovy library from version 4.0.23 to version 4.0.26.

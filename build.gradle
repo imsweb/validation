@@ -6,9 +6,9 @@ plugins {
     id 'jacoco'
     id 'com.vanniktech.maven.publish' version '0.32.0' // publish to Maven Central
     id 'com.github.ben-manes.versions' version '0.52.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
-    id 'com.github.spotbugs' version '6.1.11' // spotbugs code analysis
+    id 'com.github.spotbugs' version '6.2.0' // spotbugs code analysis
     id 'org.sonatype.gradle.plugins.scan' version '3.1.1' // scan for vulnerabilities
-    id 'org.sonarqube' version '6.1.0.5360' // sonarQube analysis
+    id 'org.sonarqube' version '6.2.0.5505' // sonarQube analysis
 }
 
 group = 'com.imsweb'
@@ -22,8 +22,8 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:11.4.0'
-    api 'org.apache.groovy:groovy:4.0.26'
+    api 'com.imsweb:staging-client-java:11.4.1'
+    api 'org.apache.groovy:groovy:4.0.27'
     api 'com.thoughtworks.xstream:xstream:1.4.21'
 
     implementation 'commons-codec:commons-codec:1.18.0'
@@ -31,10 +31,10 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'commons-io:commons-io:2.19.0'
-    testImplementation 'com.imsweb:layout:6.2'
-    testImplementation 'com.imsweb:staging-client-java-cs:11.4.0'
-    testImplementation 'com.imsweb:staging-client-java-eod-public:11.4.0'
-    testImplementation 'com.imsweb:staging-client-java-tnm:11.4.0'
+    testImplementation 'com.imsweb:layout:6.3'
+    testImplementation 'com.imsweb:staging-client-java-cs:11.4.1'
+    testImplementation 'com.imsweb:staging-client-java-eod-public:11.4.1'
+    testImplementation 'com.imsweb:staging-client-java-tnm:11.4.1'
     testImplementation('com.imsweb:validation-edits-seer:025-06') { exclude module: 'validation' }
     testImplementation('com.imsweb:validation-edits-naaccr-translated:022-01') { exclude module: 'validation' }
 }
