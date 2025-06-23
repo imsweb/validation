@@ -1690,13 +1690,11 @@ public class MetafileContextFunctions extends StagingContextFunctions {
          * Errors reported by SAVE_ERROR_TEXT are in addition to any reported by ERROR_MSG or other returns from the edit.
          */
 
-        // the description says this method generates tyep "M" messages, so I am adding them to the "information" list of messages instead of the error ones
-
         @SuppressWarnings("unchecked")
-        List<String> extraErrorMsgs = (List<String>)binding.getVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES);
+        List<String> extraErrorMsgs = (List<String>)binding.getVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES);
         if (extraErrorMsgs == null) {
             extraErrorMsgs = new ArrayList<>();
-            binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, extraErrorMsgs);
+            binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, extraErrorMsgs);
         }
         for (Object text : texts)
             if (text != null)

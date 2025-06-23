@@ -194,14 +194,27 @@ public class ValidatingProcessor implements Processor {
                     if (vContext.computeEditsStats() && id != null && !id.isEmpty())
                         vContext.reportEditDuration(_currentJavaPath, id, endTime - startTime);
 
-                    // if failure, need to keep track of it since other depending rules might not have to run
                     if (!success) {
                         String message = ValidationServices.getInstance().fillInMessage(rule.getMessage(), validatable);
 
-                        // translated edits can override the default error message
-                        String overriddenError = (String)binding.getVariable(VALIDATOR_ERROR_MESSAGE);
-                        if (overriddenError != null)
-                            message = ValidationServices.getInstance().fillInMessage(overriddenError, validatable);
+                        // edits returned "passed", but the failing flag was set; we can't use the "default" error message
+                        if (Boolean.TRUE.equals(binding.getVariable(VALIDATOR_ORIGINAL_RESULT))) {
+                            List<String> errorMessages = (List<String>)binding.getVariable(VALIDATOR_EXTRA_ERROR_MESSAGES);
+                            if (errorMessages != null && !errorMessages.isEmpty())
+                                message = ValidationServices.getInstance().fillInMessage(errorMessages.removeFirst(), validatable);
+                            else {
+                                // there should be an "extra" error message, but if there isn't, see if the overridden default error was set and if not, just use the default message
+                                String overriddenError = (String)binding.getVariable(VALIDATOR_ERROR_MESSAGE);
+                                if (overriddenError != null)
+                                    message = ValidationServices.getInstance().fillInMessage(overriddenError, validatable);
+                            }
+                        }
+                        else {
+                            // translated edits can override the default error message
+                            String overriddenError = (String)binding.getVariable(VALIDATOR_ERROR_MESSAGE);
+                            if (overriddenError != null)
+                                message = ValidationServices.getInstance().fillInMessage(overriddenError, validatable);
+                        }
 
                         RuleFailure failure = new RuleFailure(rule.getRule(), message, validatable);
                         failure.setExtraErrorMessages(ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(VALIDATOR_EXTRA_ERROR_MESSAGES), validatable));

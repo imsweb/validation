@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 4.5**
+
+- Fixed behavior of translated edits that add extra error messages.
+
 **Version 4.4**
 
 - Made some fields protected instead of private in default validatable classes.
