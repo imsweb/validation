@@ -270,10 +270,22 @@ public class SimpleNaaccrLinesValidatable implements Validatable {
         if (_currentLine == null)
             return null;
 
-        String tumorId = _currentLine.get("tumorRecordNumber");
-        if (!NumberUtils.isDigits(tumorId))
-            tumorId = _currentLine.get("sequenceNumberCentral");
-        return NumberUtils.isDigits(tumorId) ? Long.valueOf(tumorId) : null;
+        // if the line number is available, it's the best way to uniquely identify a tumor...
+        String lineNumber = _currentLine.get(Validatable.KEY_LINE_NUMBER);
+        if (lineNumber != null)
+            return Long.valueOf(lineNumber);
+
+        // otherwise, try to use the tumor record number
+        String tumorRecordNumber = _currentLine.get("tumorRecordNumber");
+        if (NumberUtils.isDigits(tumorRecordNumber))
+            return Long.valueOf(tumorRecordNumber);
+
+        // otherwise, try to use the sequence number central
+        String sequenceNumberCentral = _currentLine.get("sequenceNumberCentral");
+        if (NumberUtils.isDigits(sequenceNumberCentral))
+            return Long.valueOf(sequenceNumberCentral);
+
+        return null;
 
     }
 

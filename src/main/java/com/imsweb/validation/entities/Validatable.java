@@ -18,6 +18,11 @@ import java.util.Set;
 public interface Validatable {
 
     /**
+     * Key for the line number corresponding to the entity being validated; some validatable implementations might put this on their "line" data.
+     */
+    String KEY_LINE_NUMBER = "_lineNumber";
+
+    /**
      * Key for the calculated CS staging schema ID that some validatable implementations put in the context of the executed edits.
      */
     String KEY_CS_SCHEMA_ID = "_csSchemaId";

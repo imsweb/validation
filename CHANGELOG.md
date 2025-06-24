@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 4.6**
+
+- Added a way to provide a line number as a tumor identifier in the simple NAACCR validatable.
+
 **Version 4.5**
 
 - Fixed behavior of translated edits that add extra error messages.
