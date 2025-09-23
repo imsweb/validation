@@ -2,13 +2,11 @@ import com.vanniktech.maven.publish.*
 
 plugins {
     id 'java-library'
-    id 'checkstyle'
     id 'jacoco'
-    id 'com.vanniktech.maven.publish' version '0.32.0' // publish to Maven Central
+    id 'com.vanniktech.maven.publish' version '0.34.0' // publish to Maven Central
     id 'com.github.ben-manes.versions' version '0.52.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
-    id 'com.github.spotbugs' version '6.1.11' // spotbugs code analysis
-    id 'org.sonatype.gradle.plugins.scan' version '3.1.1' // scan for vulnerabilities
-    id 'org.sonarqube' version '6.1.0.5360' // sonarQube analysis
+    id 'com.github.spotbugs' version '6.4.2' // spotbugs code analysis
+    id 'org.sonarqube' version '6.3.1.5724' // sonarQube analysis
 }
 
 group = 'com.imsweb'
@@ -22,20 +20,20 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:11.4.1'
+    api 'com.imsweb:staging-client-java:11.6.0'
     api 'org.apache.groovy:groovy:4.0.27'
     api 'com.thoughtworks.xstream:xstream:1.4.21'
 
-    implementation 'commons-codec:commons-codec:1.18.0'
-    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'commons-codec:commons-codec:1.19.0'
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'commons-io:commons-io:2.19.0'
-    testImplementation 'com.imsweb:layout:6.3'
-    testImplementation 'com.imsweb:staging-client-java-cs:11.4.1'
-    testImplementation 'com.imsweb:staging-client-java-eod-public:11.4.1'
-    testImplementation 'com.imsweb:staging-client-java-tnm:11.4.1'
-    testImplementation('com.imsweb:validation-edits-seer:025-06') { exclude module: 'validation' }
+    testImplementation 'commons-io:commons-io:2.20.0'
+    testImplementation 'com.imsweb:layout:6.4'
+    testImplementation 'com.imsweb:staging-client-java-cs:11.6.0'
+    testImplementation 'com.imsweb:staging-client-java-eod-public:11.6.0'
+    testImplementation 'com.imsweb:staging-client-java-tnm:11.6.0'
+    testImplementation('com.imsweb:validation-edits-seer:025-08') { exclude module: 'validation' }
     testImplementation('com.imsweb:validation-edits-naaccr-translated:022-01') { exclude module: 'validation' }
 }
 
@@ -70,13 +68,6 @@ jar {
     }
 }
 
-// checkstyle plugin settings
-checkstyle {
-    ignoreFailures = false
-    configFile = file('config/checkstyle/checkstyle.xml')
-    configProperties = ['suppressionFile': file('config/checkstyle/checkstyle-exclude.xml')]
-}
-
 // jacoco plugin settings
 jacocoTestReport {
     reports {
@@ -108,22 +99,6 @@ tasks.register('generateJavaContextParser', JavaExec) {
     args = ['--nobak', '-d', 'src/main/java/com/imsweb/validation/internal/context/', 'config/java-context.flex']
 }
 
-
-// Nexus vulnerability scan (https://github.com/sonatype-nexus-community/scan-gradle-plugin)
-ossIndexAudit {
-    outputFormat = 'DEPENDENCY_GRAPH'
-    printBanner = false
-
-    excludeVulnerabilityIds = [
-            'CVE-2022-42003',
-            'CVE-2022-42004',
-            'sonatype-2022-6438'
-    ]
-}
-
-if (project.hasProperty('branch_name') && (project.ext.get('branch_name') == 'master' || project.ext.get('branch_name') == 'main'))
-    check.dependsOn 'ossIndexAudit'
-
 def isNonStable = { String version ->
     def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
     def regex = /^[0-9,.v-]+(-r)?$/
@@ -141,7 +116,7 @@ tasks.named("dependencyUpdates").configure {
 mavenPublishing {
     configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
 
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, true)
+    publishToMavenCentral(true)
     signAllPublications()
 
     pom {
