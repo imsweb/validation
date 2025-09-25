@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class InitializationStats {
@@ -16,7 +17,7 @@ public class InitializationStats {
     public static final String REASON_DIFFERENT_VERSION = "pre-compiled validator has version {0} but application expected {1}";
     public static final String REASON_DISABLED = "pre-compiled edits are disabled";
 
-    private long _initializationDuration;
+    private final AtomicLong _initializationDuration;
 
     private final AtomicInteger _numEditsLoaded;
 
@@ -27,7 +28,7 @@ public class InitializationStats {
     private final Map<String, InitializationStatsPerValidator> _validatorStats;
 
     public InitializationStats() {
-        _initializationDuration = 0L;
+        _initializationDuration = new AtomicLong();
         _numEditsLoaded = new AtomicInteger();
         _numEditsCompiled = new AtomicInteger();
         _numEditsPreCompiled = new AtomicInteger();
@@ -35,11 +36,11 @@ public class InitializationStats {
     }
 
     public long getInitializationDuration() {
-        return _initializationDuration;
+        return _initializationDuration.get();
     }
 
     public void setInitializationDuration(long initializationDuration) {
-        _initializationDuration = initializationDuration;
+        _initializationDuration.addAndGet(initializationDuration);
     }
 
     public int getNumEditsLoaded() {

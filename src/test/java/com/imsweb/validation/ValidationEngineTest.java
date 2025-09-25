@@ -248,13 +248,13 @@ public class ValidationEngineTest {
         ValidationEngine.getInstance().setEditsStatsEnabled(false);
 
         // let's make the second level fail, that rule overrides the returned properties
-        ((List<Map<String, Object>>)entity.get("level2")).get(0).put("prop", "1");
+        ((List<Map<String, Object>>)entity.get("level2")).getFirst().put("prop", "1");
         validatable = new SimpleMapValidatable("ID", "level1", entity);
         TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(validatable), "fv-rule2");
         TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(validatable, "fv-rule2"), "fv-rule2");
         Assert.assertEquals(1, ValidationEngine.getInstance().validate(validatable).iterator().next().getProperties().size());
         Assert.assertTrue(ValidationEngine.getInstance().validate(validatable).iterator().next().getProperties().contains("level1.level2[0].otherProp"));
-        ((List<Map<String, Object>>)entity.get("level2")).get(0).put("prop", "0");
+        ((List<Map<String, Object>>)entity.get("level2")).getFirst().put("prop", "0");
 
         Assert.assertTrue(ValidationEngine.getInstance().getStats().isEmpty());
         ValidationEngine.getInstance().setEditsStatsEnabled(true);
@@ -354,11 +354,12 @@ public class ValidationEngineTest {
         Assert.assertFalse(normalValidator.getRule("fvrt-rule1").getUsedLookupIds().contains("fake-lookup"));
         ValidationEngine normalEngine = new ValidationEngine();
         InitializationStats stats = normalEngine.initialize(normalValidator);
+        Assert.assertTrue(stats.getInitializationDuration() > 0);
         Assert.assertEquals(2, stats.getNumEditsLoaded());
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
         Assert.assertEquals(2, stats.getNumEditsCompiled());
         Assert.assertEquals(1, stats.getValidatorStats().size());
-        InitializationStatsPerValidator valStats = stats.getValidatorStats().get(0);
+        InitializationStatsPerValidator valStats = stats.getValidatorStats().getFirst();
         Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
         Assert.assertEquals(2, valStats.getNumEditsLoaded());
         Assert.assertEquals(0, valStats.getNumEditsPreCompiled());
@@ -373,7 +374,7 @@ public class ValidationEngineTest {
         Assert.assertEquals(2, stats.getNumEditsLoaded());
         Assert.assertEquals(2, stats.getNumEditsPreCompiled());
         Assert.assertEquals(0, stats.getNumEditsCompiled());
-        valStats = stats.getValidatorStats().get(0);
+        valStats = stats.getValidatorStats().getFirst();
         Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
         Assert.assertEquals(2, valStats.getNumEditsLoaded());
         Assert.assertEquals(2, valStats.getNumEditsPreCompiled());
@@ -388,7 +389,7 @@ public class ValidationEngineTest {
         Assert.assertEquals(2, stats.getNumEditsLoaded());
         Assert.assertEquals(2, stats.getNumEditsPreCompiled());
         Assert.assertEquals(0, stats.getNumEditsCompiled());
-        valStats = stats.getValidatorStats().get(0);
+        valStats = stats.getValidatorStats().getFirst();
         Assert.assertEquals("fake-validator-runtime", valStats.getValidatorId());
         Assert.assertEquals(2, valStats.getNumEditsLoaded());
         Assert.assertEquals(2, valStats.getNumEditsPreCompiled());
@@ -402,7 +403,7 @@ public class ValidationEngineTest {
         Assert.assertEquals(2, stats.getNumEditsLoaded());
         Assert.assertEquals(0, stats.getNumEditsPreCompiled());
         Assert.assertEquals(2, stats.getNumEditsCompiled());
-        Assert.assertEquals(InitializationStats.REASON_DISABLED, stats.getValidatorStats().get(0).getReasonNotPreCompiled());
+        Assert.assertEquals(InitializationStats.REASON_DISABLED, stats.getValidatorStats().getFirst().getReasonNotPreCompiled());
 
         // the global cached engine should not now about these validators
         Assert.assertNull(ValidationEngine.getInstance().getValidator("fake-validator-runtime"));

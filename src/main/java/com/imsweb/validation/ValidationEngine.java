@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -249,7 +250,7 @@ public class ValidationEngine {
     /**
      * Whether or not the edits statistics should be computed (initial value is based on the initialization options, but can be changed later)
      */
-    protected boolean _computeEditsStats = false;
+    protected AtomicBoolean _computeEditsStats = new AtomicBoolean(false);
 
     /**
      * Private lock controlling access to the stats; those are "written" every time new stats are reported (which is constantly), and so using a global engine lock is not good enough.
@@ -359,7 +360,7 @@ public class ValidationEngine {
 
             _options = options == null ? new InitializationOptions() : options;
 
-            _computeEditsStats = _options.isEngineStatsEnabled();
+            _computeEditsStats.set(_options.isEngineStatsEnabled());
 
             if (validators != null) {
                 checkValidatorConstraints(validators);
@@ -667,7 +668,7 @@ public class ValidationEngine {
         _lock.readLock().lock();
         try {
             ValidatingContext vContext = new ValidatingContext();
-            vContext.setComputeEditsStats(_computeEditsStats);
+            vContext.setComputeEditsStats(_computeEditsStats.get());
             return internalValidate(validatable, vContext);
         }
         finally {
@@ -696,7 +697,7 @@ public class ValidationEngine {
         try {
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToIgnore(ruleIdsToIgnore);
-            vContext.setComputeEditsStats(_computeEditsStats);
+            vContext.setComputeEditsStats(_computeEditsStats.get());
             return internalValidate(validatable, vContext);
         }
         finally {
@@ -727,7 +728,7 @@ public class ValidationEngine {
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToIgnore(ruleIdsToIgnore);
             vContext.setToExecute(ruleIdsToExecute);
-            vContext.setComputeEditsStats(_computeEditsStats);
+            vContext.setComputeEditsStats(_computeEditsStats.get());
             return internalValidate(validatable, vContext);
         }
         finally {
@@ -759,7 +760,7 @@ public class ValidationEngine {
                 throw new IllegalStateException("Unknown rule ID: " + ruleId);
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToForce(rule);
-            vContext.setComputeEditsStats(_computeEditsStats);
+            vContext.setComputeEditsStats(_computeEditsStats.get());
             return internalValidate(validatable, vContext);
         }
         finally {
@@ -794,7 +795,7 @@ public class ValidationEngine {
 
             ValidatingContext vContext = new ValidatingContext();
             vContext.setToForce(rule);
-            vContext.setComputeEditsStats(_computeEditsStats);
+            vContext.setComputeEditsStats(_computeEditsStats.get());
             return internalValidate(validatable, vContext);
         }
         finally {
@@ -818,7 +819,7 @@ public class ValidationEngine {
     public Collection<RuleFailure> validate(Validatable validatable, ValidatingContext vContext) throws ValidationException {
         _lock.readLock().lock();
         try {
-            vContext.setComputeEditsStats(_computeEditsStats);
+            vContext.setComputeEditsStats(_computeEditsStats.get());
             return internalValidate(validatable, vContext);
         }
         finally {
@@ -1843,14 +1844,14 @@ public class ValidationEngine {
      * Dynamically enables/disabled computing the edits statistics on this engine.
      */
     public void setEditsStatsEnabled(boolean enabled) {
-        _computeEditsStats = enabled;
+        _computeEditsStats.set(enabled);
     }
 
     /**
      * Returns true if the edits statistics are on (that can be done via the initialization or dynamically via the engine itself).
      */
     public boolean isEditsStatsEnabled() {
-        return _computeEditsStats;
+        return _computeEditsStats.get();
     }
 
     /**
@@ -2042,7 +2043,7 @@ public class ValidationEngine {
         Collection<RuleFailure> failures = processor.process(validatable, vContext);
 
         // report the stats if we have to
-        if (_computeEditsStats) {
+        if (_computeEditsStats.get()) {
             _statsLock.writeLock().lock();
             try {
                 for (Entry<String, Long> entry : vContext.getEditDurations().entrySet())

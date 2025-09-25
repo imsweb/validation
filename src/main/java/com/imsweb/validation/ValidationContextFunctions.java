@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
@@ -141,7 +142,7 @@ public class ValidationContextFunctions {
     private Map<String, Pattern> _regexCache;
 
     // maximum size of the regex cache (-1 for no limit)
-    private int _regexCacheSize;
+    private AtomicInteger _regexCacheSize;
 
     // stats for the cached regular expressions
     private AtomicLong _numRegexCacheHit;
@@ -255,25 +256,28 @@ public class ValidationContextFunctions {
      * @return a <code>ValidationLookup</code>, never null
      * @throws ValidationException if provided lookup ID is null or invalid
      */
-    @ContextFunctionDocAnnotation(paramName1 = "id", param1 = "Lookup ID", desc = "Returns the lookup corresponding to the requested ID.\n\n" +
-            "The returned object is a ValidationLookup on which the following methods are available:\n" +
-            "    String getId()\n" +
-            "    String getByKey(String key)\n" +
-            "    String getByKeyWithCase(String key)\n" +
-            "    Set<String> getAllByKey(String key)\n" +
-            "    Set<String> getAllByKeyWithCase(String key)\n" +
-            "    Set<String> getAllKeys()\n" +
-            "    String getByValue(String value)\n" +
-            "    String getByValueWithCase(String value)\n" +
-            "    Set<String> getAllByValue(String value)\n" +
-            "    Set<String> getAllByValueWithCase(String value)\n" +
-            "    Set<String> getAllValues()\n" +
-            "    boolean containsKey(Object key)\n" +
-            "    boolean containsKeyWithCase(Object key)\n" +
-            "    boolean containsValue(Object value)\n" +
-            "    boolean containsValueWithCase(Object value)\n" +
-            "    boolean containsPair(String key, String value)\n" +
-            "    boolean containsPairWithCase(String key, String value)\n",
+    @ContextFunctionDocAnnotation(paramName1 = "id", param1 = "Lookup ID", desc = """
+            Returns the lookup corresponding to the requested ID.
+            
+            The returned object is a ValidationLookup on which the following methods are available:
+                String getId()
+                String getByKey(String key)
+                String getByKeyWithCase(String key)
+                Set<String> getAllByKey(String key)
+                Set<String> getAllByKeyWithCase(String key)
+                Set<String> getAllKeys()
+                String getByValue(String value)
+                String getByValueWithCase(String value)
+                Set<String> getAllByValue(String value)
+                Set<String> getAllByValueWithCase(String value)
+                Set<String> getAllValues()
+                boolean containsKey(Object key)
+                boolean containsKeyWithCase(Object key)
+                boolean containsValue(Object value)
+                boolean containsValueWithCase(Object value)
+                boolean containsPair(String key, String value)
+                boolean containsPairWithCase(String key, String value)
+            """,
             example = "Functions.fetchLookup('lookup_id').containsKey(value)")
     public ValidationLookup fetchLookup(String id) throws ValidationException {
         if (id == null)
@@ -382,8 +386,7 @@ public class ValidationContextFunctions {
         if (value == null || low == null || high == null)
             return false;
 
-        if (value instanceof String) {
-            String val = (String)value;
+        if (value instanceof String val) {
             String l = low.toString();
             String h = high.toString();
 
@@ -461,7 +464,7 @@ public class ValidationContextFunctions {
         if (cacheSize < 0)
             throw new IllegalStateException("Cache size must be greater than 0!");
         _regexCache = new ConcurrentHashMap<>();
-        _regexCacheSize = cacheSize;
+        _regexCacheSize = new AtomicInteger(cacheSize);
         _numRegexCacheHit = new AtomicLong();
         _numRegexCacheMiss = new AtomicLong();
     }
@@ -473,7 +476,7 @@ public class ValidationContextFunctions {
      */
     public void disableRegexCaching() {
         _regexCache = null;
-        _regexCacheSize = Integer.MAX_VALUE;
+        _regexCacheSize = new AtomicInteger(Integer.MAX_VALUE);
         _numRegexCacheHit = null;
         _numRegexCacheMiss = null;
     }
@@ -501,7 +504,7 @@ public class ValidationContextFunctions {
                 _numRegexCacheMiss.incrementAndGet();
                 pattern = Pattern.compile(reg);
                 // in a multi-threaded environment, it's possible that the cache will add a few more values than the max cache size, and that's OK
-                if (_regexCache.size() < _regexCacheSize)
+                if (_regexCache.size() < _regexCacheSize.get())
                     _regexCache.put(reg, pattern);
             }
             else
