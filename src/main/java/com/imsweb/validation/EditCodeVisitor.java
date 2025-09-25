@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.codehaus.groovy.ast.CodeVisitorSupport;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
 import org.codehaus.groovy.ast.expr.BinaryExpression;
@@ -92,7 +93,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
 
         if (expression.getProperty() instanceof ConstantExpression) {
             String prop = expression.getProperty().getText();
-            String[] parts = StringUtils.split(StringUtils.replace(uncast(expression.getObjectExpression()).getText(), "?", ""), '.');
+            String[] parts = StringUtils.split(Strings.CS.replace(uncast(expression.getObjectExpression()).getText(), "?", ""), '.');
             if (parts.length > 0) {
                 if (ValidationEngine.VALIDATOR_CONTEXT_KEY.equals(parts[0]))
                     _contextEntries.add(prop);
@@ -146,6 +147,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
     }
 
     @Override
+    @SuppressWarnings("IfCanBeSwitch")
     public void visitDeclarationExpression(DeclarationExpression expression) {
         // def site1 = line1.primarySite
         // def reg = facilityAdmission.registryData
@@ -156,8 +158,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
 
         Expression rightExpression = uncast(expression.getRightExpression());
 
-        if (rightExpression instanceof MethodCallExpression) {
-            MethodCallExpression call = (MethodCallExpression)rightExpression;
+        if (rightExpression instanceof MethodCallExpression call) {
             for (Method m : ValidationContextFunctions.getInstance().getClass().getMethods()) {
                 if (m.getName().equals(call.getMethodAsString()) && m.getAnnotation(ContextFunctionAliasAnnotation.class) != null) {
                     _variableAliases.put(expression.getLeftExpression().getText(), m.getAnnotation(ContextFunctionAliasAnnotation.class).value());
@@ -202,10 +203,8 @@ public class EditCodeVisitor extends CodeVisitorSupport {
         String method = call.getMethodAsString();
         String alias = getAliasForPartialPath(uncast(call.getObjectExpression()));
         if (alias != null) {
-            if (call.getArguments() instanceof ArgumentListExpression) {
-                ArgumentListExpression list = (ArgumentListExpression)call.getArguments();
-                if (list.getExpressions().size() == 1 && list.getExpression(0) instanceof ClosureExpression) {
-                    ClosureExpression closure = (ClosureExpression)list.getExpression(0);
+            if (call.getArguments() instanceof ArgumentListExpression list) {
+                if (list.getExpressions().size() == 1 && list.getExpression(0) instanceof ClosureExpression closure) {
                     String groovyAlias = closure.getParameters().length > 0 ? closure.getParameters()[0].getName() : "it";
                     _variableAliases.put(groovyAlias, alias);
                     call.getArguments().visit(this);
@@ -214,7 +213,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
                 }
                 else if ("get".equals(method)) {
                     if (!_defVariables.isEmpty())
-                        _variableAliases.put(_defVariables.get(_defVariables.size() - 1), alias);
+                        _variableAliases.put(_defVariables.getLast(), alias);
                 }
             }
         }
@@ -250,7 +249,7 @@ public class EditCodeVisitor extends CodeVisitorSupport {
             String alias = getAliasForPartialPath(uncast(expression.getLeftExpression()));
             if (alias != null)
                 if (!_defVariables.isEmpty())
-                    _variableAliases.put(_defVariables.get(_defVariables.size() - 1), alias);
+                    _variableAliases.put(_defVariables.getLast(), alias);
         }
 
         super.visitBinaryExpression(expression);

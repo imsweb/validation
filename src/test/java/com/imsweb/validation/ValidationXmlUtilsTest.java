@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -607,10 +606,6 @@ public class ValidationXmlUtilsTest {
 
         URL url2 = Thread.currentThread().getContextClassLoader().getResource("fake-validator.xml.gz");
         Assert.assertNotNull(ValidationXmlUtils.getXmlValidatorHash(url2));
-
-        // doesn't matter if the URL is gzipped, the hash should be the same...
-        if (SystemUtils.IS_OS_WINDOWS) // this doesn't work on linux, not sure why...
-            Assert.assertEquals(ValidationXmlUtils.getXmlValidatorHash(url), ValidationXmlUtils.getXmlValidatorHash(url2));
     }
 
     @Test

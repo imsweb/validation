@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 4.7 (not released yet)**
+
+- Changed the minimum Java language for this library from Java 11 to Java 21.
+- Updated dependencies.
+
 **Version 4.6**
 
 - Added a way to provide a line number as a tumor identifier in the simple NAACCR validatable.

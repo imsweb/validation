@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import groovy.lang.Binding;
 
@@ -865,7 +866,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
             val = val.substring(start, end);
         }
 
-        for (String term : StringUtils.split(StringUtils.replace(l, " ", ""), ',')) {
+        for (String term : StringUtils.split(Strings.CS.replace(l, " ", ""), ',')) {
             String[] parts = StringUtils.split(term, '-');
 
             if ((parts.length == 1 && val.equals(term)) || (parts.length == 2 && val.compareTo(parts[0]) >= 0 && val.compareTo(parts[1]) <= 0))

@@ -44,6 +44,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.MessageDigestAlgorithms;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -1599,7 +1600,7 @@ public final class ValidationXmlUtils {
             int n = is.read(bytes);
             while (n > 0) {
                 String line = new String(bytes, 0, n, StandardCharsets.UTF_8);
-                if (StringUtils.contains(line, "<validator")) { // hopefully this check is cheaper that using the regex
+                if (Strings.CS.contains(line, "<validator")) { // hopefully this check is cheaper that using the regex
 
                     Matcher m1 = regex1.matcher(line);
                     if (m1.find()) {
@@ -1732,7 +1733,7 @@ public final class ValidationXmlUtils {
                 }
 
                 s = s.trim();
-                if (spacesBuffer.length() > 0)
+                if (!spacesBuffer.isEmpty())
                     s = spacesBuffer + s;
             }
 
