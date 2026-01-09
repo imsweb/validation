@@ -3,10 +3,10 @@ import com.vanniktech.maven.publish.*
 plugins {
     id 'java-library'
     id 'jacoco'
-    id 'com.vanniktech.maven.publish' version '0.34.0' // publish to Maven Central
-    id 'com.github.ben-manes.versions' version '0.52.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
-    id 'com.github.spotbugs' version '6.4.2' // spotbugs code analysis
-    id 'org.sonarqube' version '6.3.1.5724' // sonarQube analysis
+    id 'com.vanniktech.maven.publish' version '0.35.0' // publish to Maven Central
+    id 'com.github.ben-manes.versions' version '0.53.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
+    id 'com.github.spotbugs' version '6.4.8' // spotbugs code analysis
+    id 'org.sonarqube' version '7.2.2.6593' // sonarQube analysis
 }
 
 group = 'com.imsweb'
@@ -20,21 +20,19 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:11.5.1'
-    api 'org.apache.groovy:groovy:4.0.27'
+    api 'com.imsweb:staging-client-java:11.8.1'
+    api 'org.apache.groovy:groovy:4.0.29'
     api 'com.thoughtworks.xstream:xstream:1.4.21'
 
-    implementation 'commons-codec:commons-codec:1.19.0'
-    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    implementation 'commons-codec:commons-codec:1.20.0'
+    implementation 'org.apache.commons:commons-lang3:3.20.0'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'commons-io:commons-io:2.20.0'
-    testImplementation 'com.imsweb:layout:6.4'
-    testImplementation 'com.imsweb:staging-client-java-cs:11.5.1'
-    testImplementation 'com.imsweb:staging-client-java-eod-public:11.5.1'
-    testImplementation 'com.imsweb:staging-client-java-tnm:11.5.1'
-    testImplementation('com.imsweb:validation-edits-seer:025-08') { exclude module: 'validation' }
-    testImplementation('com.imsweb:validation-edits-naaccr-translated:022-01') { exclude module: 'validation' }
+    testImplementation 'commons-io:commons-io:2.21.0'
+    testImplementation 'com.imsweb:layout:7.0'
+    testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.3'
+    testImplementation('com.imsweb:validation-edits-seer:025-10') { exclude module: 'validation' }
+    testImplementation('com.imsweb:validation-edits-naaccr-translated:023-01') { exclude module: 'validation' }
 }
 
 java {
@@ -151,6 +149,6 @@ mavenPublishing {
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '8.14'
+    gradleVersion = '9.2.1'
     distributionType = Wrapper.DistributionType.ALL
 }

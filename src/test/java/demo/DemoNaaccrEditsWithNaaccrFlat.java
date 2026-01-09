@@ -15,9 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.imsweb.layout.LayoutFactory;
 import com.imsweb.layout.record.fixed.naaccr.NaaccrLayout;
-import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.cs.CsDataProvider.CsVersion;
 import com.imsweb.validation.InitializationStats;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.ValidationContextFunctions;
@@ -47,8 +44,7 @@ public class DemoNaaccrEditsWithNaaccrFlat {
         File dataFile = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/data/synthetic-data_naaccr-18-incidence_5-records.txt");
 
         // we have to initialize the CS staging framework since the NAACCR edits use it...
-        Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsVersion.LATEST));
-        ValidationContextFunctions.initialize(new MetafileContextFunctions(csStaging, null, null));
+        ValidationContextFunctions.initialize(new MetafileContextFunctions(TestingUtils.getCsStaging(), null, null));
 
         // load the NAACCR edits and initialize the validation engine
         Validator naaccrValidator = NaaccrTranslatedRuntimeEdits.loadValidator();

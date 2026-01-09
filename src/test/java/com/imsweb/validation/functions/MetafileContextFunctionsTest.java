@@ -21,8 +21,6 @@ import org.junit.Test;
 
 import groovy.lang.Binding;
 
-import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.entities.ContextTable;
@@ -42,7 +40,7 @@ public class MetafileContextFunctionsTest {
     public void setUp() {
         TestingUtils.init();
 
-        _functions = new MetafileContextFunctions(Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST)));
+        _functions = new MetafileContextFunctions(TestingUtils.getCsStaging());
     }
 
     @Test

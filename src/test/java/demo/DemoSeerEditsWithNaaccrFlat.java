@@ -15,13 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.imsweb.layout.LayoutFactory;
 import com.imsweb.layout.record.fixed.naaccr.NaaccrLayout;
-import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.cs.CsDataProvider.CsVersion;
-import com.imsweb.staging.eod.EodDataProvider;
-import com.imsweb.staging.eod.EodDataProvider.EodVersion;
-import com.imsweb.staging.tnm.TnmDataProvider;
-import com.imsweb.staging.tnm.TnmDataProvider.TnmVersion;
 import com.imsweb.validation.InitializationStats;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.ValidationContextFunctions;
@@ -49,10 +42,7 @@ public class DemoSeerEditsWithNaaccrFlat {
         File dataFile = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/data/synthetic-data_naaccr-18-incidence_5-records.txt");
 
         // we have to initialize the staging framework since the SEER edits use it...
-        Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsVersion.LATEST));
-        Staging tnmStaging = Staging.getInstance(TnmDataProvider.getInstance(TnmVersion.LATEST));
-        Staging eodStaging = Staging.getInstance(EodDataProvider.getInstance(EodVersion.LATEST));
-        ValidationContextFunctions.initialize(new StagingContextFunctions(csStaging, tnmStaging, eodStaging));
+        ValidationContextFunctions.initialize(new StagingContextFunctions(TestingUtils.getCsStaging(), TestingUtils.getTnmStaging(), TestingUtils.getEodStaging()));
 
         // load the SEER edits and initialize the validation engine
         InitializationStats stats = ValidationEngine.getInstance().initialize(SeerRuntimeEdits.loadValidator());

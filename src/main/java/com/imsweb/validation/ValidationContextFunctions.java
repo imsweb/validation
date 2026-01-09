@@ -7,6 +7,8 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -532,6 +534,58 @@ public class ValidationContextFunctions {
      */
     public long getNumRegexCacheMiss() {
         return _numRegexCacheMiss == null ? 0L : _numRegexCacheMiss.get();
+    }
+
+        /**
+     * Returns the difference in days between the two day/month/year. Returns -1 if it cannot be calculated.
+     * <p/>
+     * Created on Dec 27, 2007 by depryf
+     * @param day1 first day
+     * @param month1 first month
+     * @param year1 first year
+     * @param day2 second day
+     * @param month2 second month
+     * @param year2 second year
+     * @return difference in days between the two dates
+     */
+    @SuppressWarnings("MagicConstant")
+    @ContextFunctionDocAnnotation(paramName1 = "day1", param1 = "day of first date", paramName2 = "month1", param2 = "month of first date", paramName3 = "year1", param3 = "year of first date",
+            paramName4 = "day2", param4 = "day of second date", paramName5 = "month2", param5 = "month of second day", paramName6 = "year2", param6 = "year of second date",
+            desc = "Returns the difference in days between the first provided day/month/year and the second provided day/month/year, returns -1 if that cannot be determined.",
+            example = "def days = differenceInDays(day1, month1, year1, day2, month2, year2)")
+    public int differenceInDays(Object day1, Object month1, Object year1, Object day2, Object month2, Object year2) {
+
+        Integer y1 = asInt(year1);
+        if (y1 != null)
+            y1 = y1 == 9999 ? null : y1;
+        Integer m1 = asInt(month1);
+        if (m1 != null)
+            m1 = m1 == 99 ? null : m1;
+        Integer d1 = asInt(day1);
+        if (d1 != null)
+            d1 = d1 == 99 ? null : d1;
+        Integer y2 = asInt(year2);
+        if (y2 != null)
+            y2 = y2 == 9999 ? null : y2;
+        Integer m2 = asInt(month2);
+        if (m2 != null)
+            m2 = m2 == 99 ? null : m2;
+        Integer d2 = asInt(day2);
+        if (d2 != null)
+            d2 = d2 == 99 ? null : d2;
+
+        if (y1 == null || m1 == null || y2 == null || m2 == null)
+            return -1;
+
+        Calendar cal1 = new GregorianCalendar(y1, m1 - 1, d1 == null ? 1 : d1);
+        Calendar cal2 = new GregorianCalendar(y2, m2 - 1, d2 == null ? 1 : d2);
+
+        // fix possible daylight saving time problem
+        long fromL = cal1.getTimeInMillis() + cal1.getTimeZone().getOffset(cal1.getTimeInMillis());
+        long toL = cal2.getTimeInMillis() + cal2.getTimeZone().getOffset(cal2.getTimeInMillis());
+        long difference = toL - fromL;
+
+        return (int)(difference / (1000 * 60 * 60 * 24));
     }
 }
 

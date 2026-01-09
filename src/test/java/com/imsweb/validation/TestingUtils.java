@@ -17,6 +17,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 
+import com.imsweb.staging.Staging;
 import com.imsweb.validation.entities.EditableValidator;
 import com.imsweb.validation.entities.RuleFailure;
 import com.imsweb.validation.entities.Validator;
@@ -24,6 +25,10 @@ import com.imsweb.validation.entities.Validator;
 public final class TestingUtils {
 
     public static File TMP_DIR = new File(getWorkingDirectory() + "/build/test-tmp");
+
+    private static Staging _CS_STAGING;
+    private static Staging _TNM_STAGING;
+    private static Staging _EOD_STAGING;
 
     public static void init() {
 
@@ -39,6 +44,34 @@ public final class TestingUtils {
             options.enableEngineStats();
             ValidationEngine.getInstance().initialize(options);
         }
+
+        if (_CS_STAGING == null)
+            _CS_STAGING = loadStagingInstance("cs-02.05.50.zip");
+        if (_TNM_STAGING == null)
+            _TNM_STAGING = loadStagingInstance("tnm-2.0.zip");
+        if (_EOD_STAGING == null)
+            _EOD_STAGING = loadStagingInstance("eod_public-3.3.zip");
+    }
+
+    private static Staging loadStagingInstance(String data) {
+        try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("staging/" + data)) {
+            return Staging.getInstance(is);
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Unable to initialize staging from " + data, e);
+        }
+    }
+
+    public static Staging getCsStaging() {
+        return _CS_STAGING;
+    }
+
+    public static Staging getTnmStaging() {
+        return _TNM_STAGING;
+    }
+
+    public static Staging getEodStaging() {
+        return _EOD_STAGING;
     }
 
     public static String getWorkingDirectory() {
@@ -98,7 +131,7 @@ public final class TestingUtils {
                 StringBuilder buf = new StringBuilder();
                 for (RuleFailure rf : results)
                     buf.append("  ").append(rf.getRule().getId()).append(": ").append(rf.getMessage()).append("\n");
-                if (buf.length() == 0)
+                if (buf.isEmpty())
                     buf.append("none");
                 Assert.fail("\nWas expecting a failure for '" + ruleId + "' but didn't get it; failures:\n" + buf);
             }
@@ -127,7 +160,7 @@ public final class TestingUtils {
                     else
                         buf.append("  ").append(rf.getRule().getId()).append(": ").append(rf.getMessage()).append("\n");
                 }
-                if (buf.length() == 0)
+                if (buf.isEmpty())
                     buf.append("none");
                 Assert.fail("\nWas expecting no failure for '" + ruleId + "' but got it; failures:\n" + buf);
             }

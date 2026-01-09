@@ -10,120 +10,107 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.eod.EodDataProvider;
-import com.imsweb.staging.tnm.TnmDataProvider;
-
 import static com.imsweb.validation.ValidationStagingUtils.SCHEMA_ID_TNM_PERITONEUM;
 import static com.imsweb.validation.ValidationStagingUtils.getSsf25FromSex;
 
 public class ValidationStagingUtilsTest {
 
-    private Staging _csStaging;
-    private Staging _tnmStaging;
-    private Staging _eodStaging;
-
     @Before
     public void setUp() {
         TestingUtils.init();
-
-        _csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST));
-        _tnmStaging = Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST));
-        _eodStaging = Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST));
     }
 
     @Test
     public void testComputeCsShemaId() {
-        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, null));
+        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), null));
 
         Map<String, String> input = new HashMap<>();
-        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input));
 
         input.put("primarySite", "C481");
         input.put("histologicTypeIcdO3", "8000");
-        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input));
 
         input.put("sex", "1");
-        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input)); // peritoneum
+        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input)); // peritoneum
 
         input.put("dateOfDiagnosisYear", "2016");
         input.put("csSiteSpecificFactor25", getSsf25FromSex(null, "1", "8000", "2016", SCHEMA_ID_TNM_PERITONEUM));
-        Assert.assertNotNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input)); // peritoneum
+        Assert.assertNotNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input)); // peritoneum
 
         input.put("csSiteSpecificFactor25", "010");
-        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input));
 
         input.put("primarySite", "C111");
-        Assert.assertNotNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input)); // nasopharynx
+        Assert.assertNotNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input)); // nasopharynx
 
         input.put("csSiteSpecificFactor25", "000");
-        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input));
 
         input.put("csSiteSpecificFactor25", "020");
-        Assert.assertNotNull(ValidationStagingUtils.computeCsSchemaId(_csStaging, input)); // pharyngeal_tonsil
+        Assert.assertNotNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input)); // pharyngeal_tonsil
     }
 
     @Test
     public void testComputeTnmShemaId() {
-        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, null));
+        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), null));
 
         Map<String, String> input = new HashMap<>();
-        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input));
 
         input.put("primarySite", "C481");
         input.put("histologicTypeIcdO3", "8000");
-        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input));
 
         input.put("sex", "1");
-        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, input)); // peritoneum
+        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input)); // peritoneum
 
         input.put("csSiteSpecificFactor25", "010");
-        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, input));
+        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input));
 
         input.put("primarySite", "C111");
-        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, input)); // nasopharynx
+        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input)); // nasopharynx
 
         input.put("csSiteSpecificFactor25", "000");
-        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input));
 
         input.put("csSiteSpecificFactor25", "020");
-        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(_tnmStaging, input)); // pharyngeal_tonsil
+        Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input)); // pharyngeal_tonsil
     }
     
     @Test
     public void testComputeEodShemaId() {
-        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, null));
+        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), null));
 
         Map<String, String> input = new HashMap<>();
         input.put("dateOfDiagnosisYear", "2020");
-        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input));
 
         input.put("primarySite", "C481");
         input.put("histologicTypeIcdO3", "8000");
-        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input));
 
         input.put("sex", "1");
-        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input)); // retroperitoneum
+        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input)); // retroperitoneum
 
         input.put("schemaDiscriminator1", "1");
-        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input));
+        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input));
 
         input.put("primarySite", "C111");
-        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input)); // nasopharynx
+        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input)); // nasopharynx
 
         input.put("schemaDiscriminator1", "2");
-        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input));
+        Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input));
 
         input.put("schemaDiscriminator2", "2");
-        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input)); // oropharynx_hpv_mediated_p16_pos
+        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input)); // oropharynx_hpv_mediated_p16_pos
 
         input.put("primarySite", "C700");
         input.put("histologicTypeIcdO3", "8710");
         input.put("behaviorCodeIcdO3", "0");
         input.put("schemaDiscriminator1", null);
         input.put("schemaDiscriminator2", null);
-        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(_eodStaging, input)); // brain
+        Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input)); // brain
     }
 
     @Test

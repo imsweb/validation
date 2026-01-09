@@ -113,12 +113,6 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * relied on the CS DLL, but not on any TNM or EOD DLL.
      * <br/><br/>
      * You may provide null for the CS staging object, but any CS-related context methods won't work correctly.
-     * <br/><br/>
-     * Here is an example of how to create the required CS staging object:
-     * <code>
-     * Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.v020550));
-     * </code>
-     * You will also need to add a dependency to the CS algorithm in your project, see https://github.com/imsweb/staging-algorithm-cs
      */
     public MetafileContextFunctions(Staging csStaging) {
         super(csStaging, null, null);

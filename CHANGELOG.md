@@ -1,7 +1,8 @@
 ## Validation Framework Version History
 
-**Version 4.7 (not released yet)**
+**Version 4.7**
 
+- Added new differenceInDays methods to the edits context.
 - Changed the minimum Java language for this library from Java 11 to Java 21.
 - Updated dependencies.
 

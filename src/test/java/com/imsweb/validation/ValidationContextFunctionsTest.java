@@ -18,7 +18,7 @@ import com.imsweb.validation.internal.ExtraPropertyEntityHandlerDto;
 
 public class ValidationContextFunctionsTest {
 
-    private ValidationContextFunctions _functions = new ValidationContextFunctions();
+    private final ValidationContextFunctions _functions = new ValidationContextFunctions();
 
     @Before
     public void setUp() {
@@ -326,5 +326,33 @@ public class ValidationContextFunctionsTest {
         finally {
             _functions.disableRegexCaching();
         }
+    }
+
+    @Test
+    public void testDifferenceInDays() {
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, null, 1, 1, 2000));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, null, 2000, 1, 1, 2000));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, 2000, 1, 1, null));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, 2000, 1, null, 2000));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, 2000, 1, 1, 9999));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, 2000, 1, 99, 2000));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, "A", 1, 1, 2000));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, "A", 2000, 1, 1, 2000));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, 2000, 1, 1, "A"));
+        Assert.assertEquals(-1, _functions.differenceInDays(1, 1, 2000, 1, "A", 2000));
+
+        Assert.assertEquals(0, _functions.differenceInDays(1, 1, 2000, 1, 1, 2000));
+        Assert.assertEquals(0, _functions.differenceInDays(null, 1, 2000, null, 1, 2000));
+        Assert.assertEquals(1, _functions.differenceInDays("A", 1, 2000, 2, 1, 2000));
+        Assert.assertEquals(31, _functions.differenceInDays(1, 1, 2000, 1, 2, 2000));
+        Assert.assertEquals(366, _functions.differenceInDays(1, 1, 2000, 1, 1, 2001));
+        Assert.assertEquals(2, _functions.differenceInDays(31, 12, 2000, 2, 1, 2001));
+        Assert.assertEquals(87, _functions.differenceInDays(null, 1, 2000, 88, 1, 2000));
+        Assert.assertEquals(0, _functions.differenceInDays(99, 1, 2000, 1, 1, 2000));
+
+        Assert.assertEquals(-1, _functions.differenceInDays(2, 1, 2000, 1, 1, 2000));
+        Assert.assertEquals(-31, _functions.differenceInDays(1, 2, 2000, 1, 1, 2000));
+        Assert.assertEquals(-366, _functions.differenceInDays(1, 1, 2001, 1, 1, 2000));
+
     }
 }

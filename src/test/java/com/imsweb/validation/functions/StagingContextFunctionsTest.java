@@ -11,12 +11,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
 import com.imsweb.staging.entities.impl.StagingMetadata;
 import com.imsweb.staging.entities.impl.StagingSchemaInput;
-import com.imsweb.staging.eod.EodDataProvider;
-import com.imsweb.staging.tnm.TnmDataProvider;
 import com.imsweb.validation.TestingUtils;
 
 public class StagingContextFunctionsTest {
@@ -27,11 +23,7 @@ public class StagingContextFunctionsTest {
     public void setUp() {
         TestingUtils.init();
 
-        Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsDataProvider.CsVersion.LATEST));
-        Staging tnmStaging = Staging.getInstance(TnmDataProvider.getInstance(TnmDataProvider.TnmVersion.LATEST));
-        Staging eodStaging = Staging.getInstance(EodDataProvider.getInstance(EodDataProvider.EodVersion.LATEST));
-
-        _functions = new StagingContextFunctions(csStaging, tnmStaging, eodStaging);
+        _functions = new StagingContextFunctions(TestingUtils.getCsStaging(), TestingUtils.getTnmStaging(), TestingUtils.getEodStaging());
     }
 
     @Test

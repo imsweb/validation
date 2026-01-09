@@ -21,9 +21,6 @@ import com.imsweb.naaccrxml.PatientXmlReader;
 import com.imsweb.naaccrxml.entity.Item;
 import com.imsweb.naaccrxml.entity.Patient;
 import com.imsweb.naaccrxml.entity.Tumor;
-import com.imsweb.staging.Staging;
-import com.imsweb.staging.cs.CsDataProvider;
-import com.imsweb.staging.cs.CsDataProvider.CsVersion;
 import com.imsweb.validation.InitializationStats;
 import com.imsweb.validation.TestingUtils;
 import com.imsweb.validation.ValidationContextFunctions;
@@ -52,8 +49,7 @@ public class DemoNaaccrEditsWithNaaccrXml {
         File dataFile = new File(TestingUtils.getWorkingDirectory() + "/src/test/resources/data/synthetic-data_naaccr-xml-22-abstract_5-tumors.xml");
 
         // we have to initialize the CS staging framework since the NAACCR edits use it...
-        Staging csStaging = Staging.getInstance(CsDataProvider.getInstance(CsVersion.LATEST));
-        ValidationContextFunctions.initialize(new MetafileContextFunctions(csStaging, null, null));
+        ValidationContextFunctions.initialize(new MetafileContextFunctions(TestingUtils.getCsStaging(), null, null));
 
         // load the NAACCR edits and initialize the validation engine
         Validator naaccrValidator = NaaccrTranslatedRuntimeEdits.loadValidator();
