@@ -3,6 +3,7 @@
 **Version 4.7**
 
 - Added new differenceInDays methods to the edits context.
+- Fixed VALID_DATE_IO metafile functions to allow trailing 0's for day and month.
 - Changed the minimum Java language for this library from Java 11 to Java 21.
 - Updated dependencies.
 

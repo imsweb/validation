@@ -230,6 +230,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
         }
 
         int month = val.trim().length() >= 6 ? Integer.parseInt(val.substring(4, 6)) : 1;
+        if (month == 0) // non-documented feature: 0 is allowed (treated as blank)
+            month = 1;
         if (month <= 0 || month > 12) {
             binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to month");
             return false;
@@ -237,13 +239,15 @@ public class MetafileContextFunctions extends StagingContextFunctions {
 
         try {
             int day = val.trim().length() == 8 ? Integer.parseInt(val.substring(6, 8)) : 1;
+            if (day == 0) // non-documented feature: 0 is allowed (treated as blank)
+                day = 1;
             if (day <= 0 || day > 31) {
                 binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to day");
                 return false;
             }
             LocalDate toCheck = LocalDate.of(year, month, day);
             int actualMaxDay = YearMonth.of(year, month).lengthOfMonth();
-            if (day <= 0 || day > actualMaxDay) {
+            if (day > actualMaxDay) {
                 binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid as to day");
                 return false;
             }

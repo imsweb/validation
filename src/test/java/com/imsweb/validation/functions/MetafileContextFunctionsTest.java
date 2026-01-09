@@ -679,6 +679,14 @@ public class MetafileContextFunctionsTest {
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20100230"));
         Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20100229"));
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20120229"));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "201102"));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "2011"));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20110299"));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "20119999"));
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "99999999"));
+        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20110200")); // trailing 0's for day is allowed (hidden feature, not in the documentation)
+        Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, "20110000")); // trailing 0's for month/day is allowed (hidden feature, not in the documentation)
+        Assert.assertFalse(_functions.GEN_VALID_DATE_IOP(binding, "00000000"));
 
         //today
         Assert.assertTrue(_functions.GEN_VALID_DATE_IOP(binding, today.format(yearMonthDayFormatter)));
