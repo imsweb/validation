@@ -19,7 +19,7 @@ public final class ValidationStagingUtils {
     public static final String INPUT_PROP_SITE = "primarySite";
     public static final String INPUT_PROP_HIST = "histologicTypeIcdO3";
     public static final String INPUT_PROP_SSF25 = "csSiteSpecificFactor25";
-    public static final String INPUT_PROP_SEX = "sex";
+    public static final String INPUT_PROP_SEX_ASSIGNED_AT_BIRTH = "sexAssignedAtBirth";
     public static final String INPUT_PROP_DISC_1 = "schemaDiscriminator1";
     public static final String INPUT_PROP_DISC_2 = "schemaDiscriminator2";
     public static final String INPUT_PROP_BEHAV = "behaviorCodeIcdO3";
@@ -43,7 +43,7 @@ public final class ValidationStagingUtils {
         lkup.setInput("ssf25", ssf25);
         List<Schema> info = stagingInstance.lookupSchema(lkup);
         if (info.size() == 1) {
-            Schema schema = stagingInstance.getSchema(info.get(0).getId());
+            Schema schema = stagingInstance.getSchema(info.getFirst().getId());
             return schema.getId();
         }
         return null;
@@ -56,15 +56,15 @@ public final class ValidationStagingUtils {
         String site = input.get(INPUT_PROP_SITE);
         String hist = input.get(INPUT_PROP_HIST);
         String ssf25 = input.get(INPUT_PROP_SSF25);
-        String sex = input.get(INPUT_PROP_SEX);
+        String sex = input.get(INPUT_PROP_SEX_ASSIGNED_AT_BIRTH);
         
         // get the TNM schema ID
         SchemaLookup lkup = new SchemaLookup(site, hist);
         lkup.setInput("ssf25", ssf25);
-        lkup.setInput("sex", sex);
+        lkup.setInput("sex_at_birth", sex);
         List<Schema> info = stagingInstance.lookupSchema(lkup);
         if (info.size() == 1) {
-            Schema schema = stagingInstance.getSchema(info.get(0).getId());
+            Schema schema = stagingInstance.getSchema(info.getFirst().getId());
             return schema.getId();
         }
         return null;
@@ -78,19 +78,19 @@ public final class ValidationStagingUtils {
         String hist = input.get(INPUT_PROP_HIST);
         String disc1 = input.get(INPUT_PROP_DISC_1);
         String disc2 = input.get(INPUT_PROP_DISC_2);
-        String sex = input.get(INPUT_PROP_SEX);
+        String sex = input.get(INPUT_PROP_SEX_ASSIGNED_AT_BIRTH);
         String behav = input.get(INPUT_PROP_BEHAV);
         String dxYear = input.get(INPUT_PROP_DX_YEAR);
 
         SchemaLookup lkup = new SchemaLookup(site, hist);
         lkup.setInput("discriminator_1", disc1);
         lkup.setInput("discriminator_2", disc2);
-        lkup.setInput("sex", sex);
+        lkup.setInput("sex_at_birth", sex);
         lkup.setInput("behavior", behav);
         lkup.setInput("year_dx", dxYear);
         List<Schema> info = stagingInstance.lookupSchema(lkup);
         if (info.size() == 1) {
-            Schema schema = stagingInstance.getSchema(info.get(0).getId());
+            Schema schema = stagingInstance.getSchema(info.getFirst().getId());
             return schema.getId();
         }
         return null;
@@ -110,20 +110,13 @@ public final class ValidationStagingUtils {
             if (sex == null)
                 return "009";
 
-            switch (sex) {
-                case "2":
-                case "6":
-                    return "002";
-                case "1":
-                case "5":
-                    return "001";
-                case "3":
-                    return "003";
-                case "4":
-                    return "004";
-                default:
-                    return "009";
-            }
+            return switch (sex) {
+                case "2", "6" -> "002";
+                case "1", "5" -> "001";
+                case "3" -> "003";
+                case "4" -> "004";
+                default -> "009";
+            };
         }
 
         return ssf25;

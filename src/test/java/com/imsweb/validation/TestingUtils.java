@@ -48,9 +48,9 @@ public final class TestingUtils {
         if (_CS_STAGING == null)
             _CS_STAGING = loadStagingInstance("cs-02.05.50.zip");
         if (_TNM_STAGING == null)
-            _TNM_STAGING = loadStagingInstance("tnm-2.0.zip");
+            _TNM_STAGING = loadStagingInstance("tnm-2.1.zip");
         if (_EOD_STAGING == null)
-            _EOD_STAGING = loadStagingInstance("eod_public-3.2.zip");
+            _EOD_STAGING = loadStagingInstance("eod_public-3.3.zip");
     }
 
     private static Staging loadStagingInstance(String data) {

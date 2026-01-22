@@ -31,7 +31,7 @@ public class ValidationStagingUtilsTest {
         input.put("histologicTypeIcdO3", "8000");
         Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input));
 
-        input.put("sex", "1");
+        input.put("sexAssignedAtBirth", "1");
         Assert.assertNull(ValidationStagingUtils.computeCsSchemaId(TestingUtils.getCsStaging(), input)); // peritoneum
 
         input.put("dateOfDiagnosisYear", "2016");
@@ -62,7 +62,7 @@ public class ValidationStagingUtilsTest {
         input.put("histologicTypeIcdO3", "8000");
         Assert.assertNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input));
 
-        input.put("sex", "1");
+        input.put("sexAssignedAtBirth", "1");
         Assert.assertNotNull(ValidationStagingUtils.computeTnmSchemaId(TestingUtils.getTnmStaging(), input)); // peritoneum
 
         input.put("csSiteSpecificFactor25", "010");
@@ -90,7 +90,7 @@ public class ValidationStagingUtilsTest {
         input.put("histologicTypeIcdO3", "8000");
         Assert.assertNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input));
 
-        input.put("sex", "1");
+        input.put("sexAssignedAtBirth", "1");
         Assert.assertNotNull(ValidationStagingUtils.computeEodSchemaId(TestingUtils.getEodStaging(), input)); // retroperitoneum
 
         input.put("schemaDiscriminator1", "1");

@@ -131,7 +131,7 @@ public class SimpleNaaccrLinesValidatableTest {
             rec.put("primarySite", "C481");
             rec.put("csSiteSpecificFactor25", null);
             rec.put("schemaDiscriminator1", null);
-            rec.put("sex", "1");
+            rec.put("sexAssignedAtBirth", "1");
             v = new SimpleNaaccrLinesValidatable(rec);
             validatables = v.followCollection("line");
             line = (Map<String, String>)validatables.getFirst().getScope().get("line");

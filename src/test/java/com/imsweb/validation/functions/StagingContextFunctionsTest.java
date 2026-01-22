@@ -312,7 +312,7 @@ public class StagingContextFunctionsTest {
         input.put("csSiteSpecificFactor25", null);
         Assert.assertNull(_functions.getTnmStagingSchema(input));
 
-        input.put("sex", "1");
+        input.put("sexAssignedAtBirth", "1");
         Assert.assertNotNull(_functions.getTnmStagingSchema(input));
 
         input.put("csSiteSpecificFactor25", "010");
@@ -374,9 +374,9 @@ public class StagingContextFunctionsTest {
         input.put("primarySite", "C481");
         input.put("histologicTypeIcdO3", "8000");
         input.put("csSiteSpecificFactor25", null);
-        input.put("sex", "2");
+        input.put("sexAssignedAtBirth", "2");
         Assert.assertEquals("peritoneum_female_gen", _functions.getTnmSchemaId(input));
-        input.put("sex", null);
+        input.put("sexAssignedAtBirth", null);
         Assert.assertNull(_functions.getTnmSchemaId(input));
     }
 
@@ -475,7 +475,7 @@ public class StagingContextFunctionsTest {
         input.put("histologicTypeIcdO3", "8000");
         Assert.assertNull(_functions.getEodStagingSchema(input));
 
-        input.put("sex", "1");
+        input.put("sexAssignedAtBirth", "1");
         Assert.assertNotNull(_functions.getEodStagingSchema(input)); // retroperitoneum
 
         input.put("schemaDiscriminator1", "1");
@@ -547,9 +547,9 @@ public class StagingContextFunctionsTest {
         input.put("primarySite", "C481");
         input.put("histologicTypeIcdO3", "8000");
         input.put("schemaDiscriminator1", null);
-        input.put("sex", "2");
+        input.put("sexAssignedAtBirth", "2");
         Assert.assertEquals("primary_peritoneal_carcinoma", _functions.getEodSchemaId(input));
-        input.put("sex", null);
+        input.put("sexAssignedAtBirth", null);
         Assert.assertNull(_functions.getEodSchemaId(input));
 
         input.clear();
@@ -619,7 +619,7 @@ public class StagingContextFunctionsTest {
         input.put("histologicTypeIcdO3", "8000");
         input.put("schemaDiscriminator1", null);
 
-        Assert.assertTrue(_functions.isNeededForStagingEodField(input, "psaLabValue"));
+        Assert.assertFalse(_functions.isNeededForStagingEodField(input, "psaLabValue"));
         Assert.assertFalse(_functions.isNeededForStagingEodField(input, "gleasonPatternsClinical"));
         Assert.assertTrue(_functions.isNeededForStagingEodField(input, "prostatePathologicalExtension"));
         Assert.assertFalse(_functions.isNeededForStagingEodField(input, "regionalNodesPositive"));

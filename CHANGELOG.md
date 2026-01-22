@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 4.8**
+
+- Updated staging client.
+- Fixed staging context methods to use 'sexAssignedAtBirth' instead of deprecated 'sex' NAACCR variable.
+
 **Version 4.7**
 
 - Added new differenceInDays methods to the edits context.
