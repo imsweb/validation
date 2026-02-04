@@ -3,7 +3,7 @@ import com.vanniktech.maven.publish.*
 plugins {
     id 'java-library'
     id 'jacoco'
-    id 'com.vanniktech.maven.publish' version '0.35.0' // publish to Maven Central
+    id 'com.vanniktech.maven.publish' version '0.36.0' // publish to Maven Central
     id 'com.github.ben-manes.versions' version '0.53.0' // check for out-of-date dependencies (run 'dependencyUpdates' manually)
     id 'com.github.spotbugs' version '6.4.8' // spotbugs code analysis
     id 'org.sonarqube' version '7.2.2.6593' // sonarQube analysis
@@ -112,7 +112,7 @@ tasks.named("dependencyUpdates").configure {
 
 // needed to deploy to Maven Central Portal
 mavenPublishing {
-    configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
+    configure(new JavaLibrary(new JavadocJar.Javadoc(), new SourcesJar.Sources()))
 
     publishToMavenCentral(true)
     signAllPublications()
