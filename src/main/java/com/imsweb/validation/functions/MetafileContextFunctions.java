@@ -205,13 +205,8 @@ public class MetafileContextFunctions extends StagingContextFunctions {
     public boolean GEN_VALID_DATE_IOP(Binding binding, Object value) {
         String val = GEN_TO_STRING(value);
 
-        if (val == null || val.isEmpty()) {
-            binding.setVariable(BINDING_KEY_DATE_COMPONENT, "date is an empty string");
-            return false;
-        }
-
-        if (!_GEN_VALID_DATE_IOP_P1.matcher(val).matches()) {
-            binding.setVariable(BINDING_KEY_DATE_COMPONENT, "date format must be CCYYMMDD");
+        if (val == null || val.isEmpty() || !_GEN_VALID_DATE_IOP_P1.matcher(val).matches()) {
+            binding.setVariable(BINDING_KEY_DATE_COMPONENT, "invalid");
             return false;
         }
 
