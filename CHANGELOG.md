@@ -1,5 +1,10 @@
 ## Validation Framework Version History
 
+**Version 4.9**
+
+- Fixed some metafile functions that would not accept arrays of characters as input.
+- Updated Groovy dependency from 4.x to 5.x.
+
 **Version 4.8**
 
 - Updated staging client.

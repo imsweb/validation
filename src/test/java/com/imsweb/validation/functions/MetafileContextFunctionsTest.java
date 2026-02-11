@@ -1094,6 +1094,12 @@ public class MetafileContextFunctionsTest {
         Assert.assertEquals(-19, _functions.GEN_MONTHDIFF_IOP(binding, "2010    ", "20080606", MetafileContextFunctions.DT_MAX));
         Assert.assertEquals(-18, _functions.GEN_MONTHDIFF_IOP(binding, "2010    ", "200806  ", MetafileContextFunctions.DT_MAX));
         Assert.assertEquals(0, _functions.GEN_MONTHDIFF_IOP(binding, "2009    ", "2008    ", MetafileContextFunctions.DT_MAX));
+
+        char[] str1 = new char[8];
+        _functions.GEN_STRCPY(str1, "20000101");
+        char[] str2 = new char[8];
+        _functions.GEN_STRCPY(str2, "20100101");
+        Assert.assertEquals(121, _functions.GEN_MONTHDIFF_IOP(binding, str1, str2, MetafileContextFunctions.DT_EXACT));
     }
 
     @Test
