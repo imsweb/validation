@@ -185,9 +185,9 @@ public class EditCodeVisitor extends CodeVisitorSupport {
 
         String alias = getAliasForPartialPath(uncast(forLoop.getCollectionExpression()));
         if (alias != null) {
-            _variableAliases.put(forLoop.getVariable().getName(), alias);
+            _variableAliases.put(forLoop.getValueVariable().getName(), alias);
             forLoop.getLoopBlock().visit(this);
-            _variableAliases.remove(forLoop.getVariable().getName());
+            _variableAliases.remove(forLoop.getValueVariable().getName());
         }
         else
             forLoop.getLoopBlock().visit(this);

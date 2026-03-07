@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 4.10**
+
+- Updated dependencies.
+
 **Version 4.9**
 
 - Fixed some metafile functions that would not accept arrays of characters as input.
