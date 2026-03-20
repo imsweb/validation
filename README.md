@@ -6,6 +6,8 @@
 
 This framework allows edits to be defined in [Groovy](http://www.groovy-lang.org/) and to be executed on various data types.
 
+The library requires a Java 21 environment.
+
 ## Features
 
 * Edits are written in Groovy, a rich java-based scripting language.
