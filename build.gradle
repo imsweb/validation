@@ -20,8 +20,8 @@ repositories {
 }
 
 dependencies {
-    api 'com.imsweb:staging-client-java:11.9.1'
-    api 'org.apache.groovy:groovy:5.0.4'
+    api 'com.imsweb:staging-client-java:11.9.2'
+    api 'org.apache.groovy:groovy:5.0.5'
     api 'com.thoughtworks.xstream:xstream:1.4.21'
 
     implementation 'commons-codec:commons-codec:1.21.0'
@@ -29,9 +29,9 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'commons-io:commons-io:2.21.0'
-    testImplementation 'com.imsweb:layout:7.0'
-    testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.3'
-    testImplementation('com.imsweb:validation-edits-seer:026-02') { exclude module: 'validation' }
+    testImplementation 'com.imsweb:layout:7.1'
+    testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.25.4'
+    testImplementation('com.imsweb:validation-edits-seer:026-04') { exclude module: 'validation' }
     testImplementation('com.imsweb:validation-edits-naaccr-translated:023-01') { exclude module: 'validation' }
 }
 
@@ -149,6 +149,6 @@ mavenPublishing {
 
 // Gradle wrapper, this allows to build the project without having to install Gradle!
 wrapper {
-    gradleVersion = '9.4.0'
+    gradleVersion = '9.4.1'
     distributionType = Wrapper.DistributionType.ALL
 }

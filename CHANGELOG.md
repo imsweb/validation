@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 4.11**
+
+- Updated dependencies.
+
 **Version 4.10**
 
 - Updated dependencies.
