@@ -2,6 +2,7 @@
 
 **Version 4.11**
 
+- Updated validation engine version from 6.8 to 6.9 (should have been done when the metafile functions changed) 
 - Updated dependencies.
 
 **Version 4.10**
