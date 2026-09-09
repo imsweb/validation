@@ -90,7 +90,7 @@ public class ValidationEngine {
     /**
      * Engine version (used to check compatibility with the edits)
      */
-    private static final String _ENGINE_VERSION = "6.9";
+    private static final String _ENGINE_VERSION = "6.10";
 
     /**
      * The different context types supported by the engine
@@ -149,6 +149,11 @@ public class ValidationEngine {
      * Context key to set a flag indicating an edit failed (used internally for the Genedits translated edits only).
      */
     public static final String VALIDATOR_FAILING_FLAG = "__failing_flag";
+
+    /**
+     * Context key to set a flag indicating an edit had a warning (used internally for the Genedits translated edits only).
+     */
+    public static final String VALIDATOR_WARNING_FLAG = "__warning_flag";
 
     /**
      * The true result returned by the translated edits (it's possible for an edit to fail because of a set flag but still return true...)

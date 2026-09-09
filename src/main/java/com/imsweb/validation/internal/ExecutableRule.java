@@ -125,7 +125,7 @@ public class ExecutableRule {
             _aliases = new ArrayList<>();
             StringBuilder buf = new StringBuilder();
             for (String javaPathPart : StringUtils.split(_javaPath, '.')) {
-                if (buf.length() > 0)
+                if (!buf.isEmpty())
                     buf.append(".");
                 buf.append(javaPathPart);
                 _aliases.add(ValidationServices.getInstance().getAliasForJavaPath(buf.toString()));
@@ -435,6 +435,7 @@ public class ExecutableRule {
         binding.setVariable(ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSAGES, null);
         binding.setVariable(ValidationEngine.VALIDATOR_INFORMATION_MESSAGES, null);
         binding.setVariable(ValidationEngine.VALIDATOR_FAILING_FLAG, null);
+        binding.setVariable(ValidationEngine.VALIDATOR_WARNING_FLAG, null);
         binding.setVariable(ValidationEngine.VALIDATOR_ORIGINAL_RESULT, null);
 
         // if a method is available, invoke it, otherwise execute the script

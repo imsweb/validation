@@ -34,6 +34,7 @@ import static com.imsweb.validation.ValidationEngine.VALIDATOR_EXTRA_ERROR_MESSA
 import static com.imsweb.validation.ValidationEngine.VALIDATOR_FUNCTIONS_KEY;
 import static com.imsweb.validation.ValidationEngine.VALIDATOR_INFORMATION_MESSAGES;
 import static com.imsweb.validation.ValidationEngine.VALIDATOR_ORIGINAL_RESULT;
+import static com.imsweb.validation.ValidationEngine.VALIDATOR_WARNING_FLAG;
 
 /**
  * A <code>ValidatingProcessor</code> is a <code>Processor</code> that runs edits on a particular level of a <code>Validatable</code>.
@@ -117,7 +118,7 @@ public class ValidatingProcessor implements Processor {
             List<String> validatablePaths = new ArrayList<>();
             StringBuilder buf = new StringBuilder();
             for (String validatablePath : StringUtils.split(validatable.getCurrentLevel(), '.')) {
-                if (buf.length() > 0)
+                if (!buf.isEmpty())
                     buf.append(".");
                 buf.append(validatablePath);
                 validatablePaths.add(buf.toString());
@@ -220,6 +221,7 @@ public class ValidatingProcessor implements Processor {
                         failure.setExtraErrorMessages(ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(VALIDATOR_EXTRA_ERROR_MESSAGES), validatable));
                         failure.setInformationMessages(ValidationServices.getInstance().fillInMessages((List<String>)binding.getVariable(VALIDATOR_INFORMATION_MESSAGES), validatable));
                         failure.setOriginalResult((Boolean)binding.getVariable(VALIDATOR_ORIGINAL_RESULT));
+                        failure.setWarningFlag((Boolean)binding.getVariable(VALIDATOR_WARNING_FLAG));
                         results.add(failure);
                         currentRuleFailures.add(id);
                     }

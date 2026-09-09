@@ -1707,6 +1707,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param texts
      */
     public boolean GEN_SAVE_WARNING_TEXT(Binding binding, Object... texts) {
+        binding.setVariable(ValidationEngine.VALIDATOR_WARNING_FLAG, Boolean.TRUE);
 
         /**
          * Generates warning messages but does not set flags. This function causes WARN to be returned from the edit.
@@ -1728,6 +1729,7 @@ public class MetafileContextFunctions extends StagingContextFunctions {
      * @param texts
      */
     public boolean GEN_SET_WARNING(Binding binding, Object... texts) {
+        binding.setVariable(ValidationEngine.VALIDATOR_WARNING_FLAG, Boolean.TRUE);
 
         /**
          * Sets one or more flags in the flag_array and generates corresponding error messages.  This function causes WARN to be returned from the edit.

@@ -60,7 +60,13 @@ public class RuleFailure {
     protected Boolean _originalResult;
 
     /**
-     * Default constructor. This constructor is inteded for testing only; it by-passes any nullity checking!
+     * Translated edits can set warnings on edits.  By default, warnings do not fail edits, meaning there would be no failure for those.
+     * There is an initialization option to fails edits that have warnings; that option has to be set to return failures for those, and they might have this flag set to true.
+     */
+    protected Boolean _warningFlag;
+
+    /**
+     * Default constructor. This constructor is intended for testing only; it by-passes any nullity checking!
      * <p/>
      * Created on Mar 2, 2010 by depryf
      */
@@ -261,12 +267,27 @@ public class RuleFailure {
         _originalResult = originalResult;
     }
 
+    /**
+     * Getter for the warning flag
+     * @return the warning flag, can be null
+     */
+    public Boolean getWarningFlag() {
+        return _warningFlag;
+    }
+
+    /**
+     * Setter for the warning flag
+     * @param warningFlag warning flag to set
+     */
+    public void setWarningFlag(Boolean warningFlag) {
+        _warningFlag = warningFlag;
+    }
+
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof RuleFailure))
+        if (!(other instanceof RuleFailure otherResult))
             return false;
 
-        RuleFailure otherResult = (RuleFailure)other;
         return new EqualsBuilder().append(_rule, otherResult.getRule()).append(_properties, otherResult.getProperties()).isEquals();
     }
 

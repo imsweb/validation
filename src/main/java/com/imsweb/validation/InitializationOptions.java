@@ -5,13 +5,13 @@ package com.imsweb.validation;
  */
 public class InitializationOptions {
 
-    // whether or not the engine needs to keep track of edits statistics (defaults to false)
+    // whether the engine needs to keep track of edits statistics (defaults to false)
     private boolean _engineStatsEnabled;
 
     // the number of threads the engine can use to compile the edits (defaults to 2)
     private int _numCompilationThreads;
 
-    // whether or not the engine should use pre-compiled edits if available (defaults to true)
+    // whether the engine should use pre-compiled edits if available (defaults to true)
     private boolean _preCompiledEditsEnabled;
 
     /**
