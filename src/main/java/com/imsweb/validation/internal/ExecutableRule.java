@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 
 import com.imsweb.validation.ConstructionException;
@@ -100,6 +101,19 @@ public class ExecutableRule {
      * @param stats initialization stats (can be null)
      */
     public ExecutableRule(Rule rule, CompiledRules compiledRules, InitializationStats stats) throws ConstructionException {
+        this(rule, compiledRules, stats, null);
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * @param rule parent rule
+     * @param compiledRules pre-compiled rules (can be null in which case a Groovy Script will be compiled)
+     * @param stats initialization stats (can be null)
+     * @param shell the Groovy shell to compile the expression with; if null, a new one is created for this rule alone. Only provide
+     * a shared shell for rules that are discarded together, since a shell retains every script it compiles (see ValidationServices).
+     */
+    public ExecutableRule(Rule rule, CompiledRules compiledRules, InitializationStats stats, GroovyShell shell) throws ConstructionException {
         _rule = rule;
         _id = rule.getId();
         _internalId = rule.getRuleId();
@@ -143,7 +157,7 @@ public class ExecutableRule {
         // only compile Groovy script if no re-compiled Groovy method was available...
         if (_compiledRule == null) {
             try {
-                _script = ValidationServices.getInstance().compileExpression(rule.getExpression());
+                _script = ValidationServices.getInstance().compileExpression(rule.getExpression(), shell);
             }
             catch (CompilationFailedException e) {
                 throw new ConstructionException("Unable to compile rule " + _rule.getId(), e);

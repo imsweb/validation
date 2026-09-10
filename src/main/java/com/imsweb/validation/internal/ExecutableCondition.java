@@ -6,6 +6,7 @@ package com.imsweb.validation.internal;
 import org.codehaus.groovy.control.CompilationFailedException;
 
 import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 
 import com.imsweb.validation.ConstructionException;
@@ -45,13 +46,24 @@ public class ExecutableCondition {
      * @param condition the <code>Condition</code> on which this executable ruleset is based one
      */
     public ExecutableCondition(Condition condition) throws ConstructionException {
+        this(condition, null);
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * @param condition the <code>Condition</code> on which this executable ruleset is based one
+     * @param shell the Groovy shell to compile the expression with; if null, a new one is created for this condition alone. Only provide
+     * a shared shell for conditions that are discarded together, since a shell retains every script it compiles (see ValidationServices).
+     */
+    public ExecutableCondition(Condition condition, GroovyShell shell) throws ConstructionException {
         _condition = condition;
         _id = condition.getId();
         _internalId = condition.getConditionId();
         _javaPath = condition.getJavaPath();
 
         try {
-            _script = ValidationServices.getInstance().compileExpression(condition.getExpression());
+            _script = ValidationServices.getInstance().compileExpression(condition.getExpression(), shell);
         }
         catch (CompilationFailedException e) {
             _script = null;

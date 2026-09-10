@@ -14,6 +14,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
+
 import com.imsweb.validation.entities.ContextTable;
 import com.imsweb.validation.entities.ContextTableIndex;
 import com.imsweb.validation.entities.SimpleMapValidatable;
@@ -382,6 +385,40 @@ public class ValidationServicesTest {
         public EntityBean3(String val) {
             _field = val;
         }
+    }
+
+    @Test
+    public void testCompileExpression() {
+        ValidationServices services = ValidationServices.getInstance();
+
+        // a null or blank expression compiles into a script that always passes
+        Assert.assertNotNull(services.compileExpression(null));
+        Assert.assertNotNull(services.compileExpression(""));
+        Assert.assertNotNull(services.compileExpression(null, null));
+        Assert.assertNotNull(services.compileExpression("", new GroovyShell()));
+
+        // every Groovy shell creates a class loader, so without a shared shell each script ends up with its own
+        Script script1 = services.compileExpression("return 1 > 0");
+        Script script2 = services.compileExpression("return 2 > 0");
+        Assert.assertNotSame(parentLoader(script1), parentLoader(script2));
+
+        // when a shell is shared, the scripts share its class loader (each script still gets its own inner loader)
+        GroovyShell shell = new GroovyShell();
+        Script shared1 = services.compileExpression("return 1 > 0", shell);
+        Script shared2 = services.compileExpression("return 2 > 0", shell);
+        Assert.assertSame(shell.getClassLoader(), parentLoader(shared1));
+        Assert.assertSame(shell.getClassLoader(), parentLoader(shared2));
+
+        // passing no shell must behave exactly like the single-argument version
+        Assert.assertNotSame(parentLoader(services.compileExpression("return 1 > 0", null)), parentLoader(services.compileExpression("return 2 > 0", null)));
+
+        // and the scripts must of course still run
+        Assert.assertEquals(Boolean.TRUE, shared1.run());
+        Assert.assertEquals(Boolean.TRUE, shared2.run());
+    }
+
+    private static ClassLoader parentLoader(Script script) {
+        return script.getClass().getClassLoader().getParent();
     }
 
     @Test

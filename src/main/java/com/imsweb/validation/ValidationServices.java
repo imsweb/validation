@@ -510,6 +510,30 @@ public class ValidationServices {
         return new GroovyShell().parse(expression);
     }
 
+    /**
+     * Compile the provided expression into a Groovy script, using the provided shell.
+     * <p/>
+     * Every Groovy shell creates its own class loader, and that class loader is retained in memory for as long as the compiled script
+     * is used. Compiling many expressions with their own shell is therefore expensive; providing a single shell for a set of expressions
+     * that share the same life-cycle (the edits of a given group, for example) divides that overhead by the size of the set.
+     * <p/>
+     * Note that the shell also keeps a strong reference to every script it compiles; a shell must not be shared by expressions that
+     * can be discarded individually, since their scripts would never be released. When in doubt, don't provide a shell.
+     * @param expression expression to compile
+     * @param shell the shell to compile with; if null, this method behaves exactly like the single-argument version
+     * @return Groovy Script
+     * @throws CompilationFailedException if anything goes wrong
+     */
+    public Script compileExpression(String expression, GroovyShell shell) throws CompilationFailedException {
+        if (shell == null)
+            return compileExpression(expression);
+
+        if (expression == null || expression.trim().isEmpty())
+            expression = "return true";
+
+        return shell.parse(expression);
+    }
+
     public List<String> fillInMessages(List<String> originalMessages, Validatable validatable) {
         if (originalMessages == null)
             return null;

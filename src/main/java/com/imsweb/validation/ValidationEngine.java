@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import groovy.lang.GroovyShell;
+
 import com.imsweb.validation.entities.Category;
 import com.imsweb.validation.entities.Condition;
 import com.imsweb.validation.entities.ContextEntry;
@@ -2060,6 +2062,13 @@ public class ValidationEngine {
         else if (stats != null)
             stats.setReasonNotPreCompiled(validator.getId(), InitializationStats.REASON_DISABLED);
 
+        // every Groovy shell creates a class loader that is retained for as long as the scripts it compiled are used; using a single
+        // shell for the entire group divides that overhead by the number of edits. The shell is not referenced anywhere: the compiled
+        // scripts keep it alive, so it is released when the group is deleted (or when the engine is un-initialized), all at once.
+        // Note that edits added to the engine after this point are deliberately not compiled with this shell, since they can be
+        // deleted individually and a shell never releases the scripts it compiled...
+        GroovyShell shell = new GroovyShell();
+
         // internalize the rules
         try (ExecutorService service = Executors.newFixedThreadPool(_options.getNumCompilationThreads())) {
             List<Future<Void>> results = new ArrayList<>(validator.getRules().size());
@@ -2069,7 +2078,7 @@ public class ValidationEngine {
                         r.setRuleId(ValidationServices.getInstance().getNextRuleSequence());
                     if (r.getRuleId() == null)
                         throw new ConstructionException("Edits must have a non-null internal ID to be registered in the engine");
-                    results.add(service.submit(new RuleCompilingCallable(r, rules, compiledRules, stats)));
+                    results.add(service.submit(new RuleCompilingCallable(r, rules, compiledRules, stats, shell)));
                 }
                 validator.setRules(new HashSet<>(validator.getRules())); // since internal IDs might have changed
             }
@@ -2081,7 +2090,7 @@ public class ValidationEngine {
                         c.setConditionId(ValidationServices.getInstance().getNextConditionSequence());
                     if (c.getConditionId() == null)
                         throw new ConstructionException("Conditions must have a non-null internal ID to be registered in the engine");
-                    conditions.put(c.getConditionId(), new ExecutableCondition(c));
+                    conditions.put(c.getConditionId(), new ExecutableCondition(c, shell));
                 }
                 validator.setConditions(new HashSet<>(validator.getConditions())); // since internal IDs might have changed
             }
