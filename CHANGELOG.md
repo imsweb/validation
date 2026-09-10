@@ -4,6 +4,7 @@
 
 - Added better support for warnings in translated edits.
 - Updated validation engine version from 6.9 to 6.10.
+- Fixed speed and memory issues when using the Validation::addRule method in a loop for adding a large number of edits.
 - Updated dependencies.
 
 **Version 4.11**
