@@ -63,14 +63,19 @@ public class ValidatingProcessor implements Processor {
     // cached compiled forced rules (#294)
     private final ValidationLRUCache<String, ExecutableRule> _cachedForcedRules = new ValidationLRUCache<>(10);
 
+    // whether the pre-compiled version of the forced edits can be used (mirrors the corresponding initialization option)
+    private final boolean _preCompiledEditsEnabled;
+
     /**
      * Constructor.
      * <p/>
      * Created on Aug 15, 2011 by depryf
      * @param javaPath current java path for this validating processor
+     * @param preCompiledEditsEnabled whether pre-compiled edits can be used
      */
-    public ValidatingProcessor(String javaPath) {
+    public ValidatingProcessor(String javaPath, boolean preCompiledEditsEnabled) {
         _currentJavaPath = javaPath;
+        _preCompiledEditsEnabled = preCompiledEditsEnabled;
     }
 
     @Override
@@ -86,7 +91,7 @@ public class ValidatingProcessor implements Processor {
                 String key = vContext.getToForce().getId() + "|" + vContext.getToForce().getExpression().hashCode();
                 toForce = _cachedForcedRules.get(key);
                 if (toForce == null) {
-                    toForce = new ExecutableRule(vContext.getToForce(), RuntimeUtils.findCompileRules(vContext.getToForce().getValidator(), null), null);
+                    toForce = new ExecutableRule(vContext.getToForce(), _preCompiledEditsEnabled ? RuntimeUtils.findCompileRules(vContext.getToForce().getValidator(), null) : null, null);
                     _cachedForcedRules.put(key, toForce);
                 }
             }

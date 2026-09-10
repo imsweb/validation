@@ -29,7 +29,9 @@ import com.imsweb.validation.entities.RuleHistory;
 import com.imsweb.validation.entities.SimpleMapValidatable;
 import com.imsweb.validation.entities.Validatable;
 import com.imsweb.validation.entities.Validator;
+import com.imsweb.validation.runtime.CompiledRulesBundle;
 import com.imsweb.validation.runtime.validator.FakeRuntimeEdits;
+import com.imsweb.validation.runtime.validator.FakeRuntimeEditsCompiledRules;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
 public class ValidationEngineTest {
@@ -891,6 +893,97 @@ public class ValidationEngineTest {
         ValidationEngine.getInstance().deleteRules(Collections.emptyList());
 
         TestingUtils.unloadValidator("fake-validator");
+    }
+
+    @Test
+    public void testAddRuleUsesPreCompiledEdits() throws Exception {
+
+        ValidationEngine engine = new ValidationEngine();
+        engine.initialize(FakeRuntimeEdits.getValidator());
+
+        Map<String, Object> data = new HashMap<>();
+        Validatable validatable = new SimpleMapValidatable("runtime", data);
+
+        // delete an edit that has a pre-compiled version, then add it back
+        EditableRule editableRule = new EditableRule(engine.getRule("fvrt-rule2"));
+        engine.deleteRule(editableRule);
+        Assert.assertNull(engine.getRule("fvrt-rule2"));
+
+        // the expression is deliberately different from the pre-compiled logic; that's the only way for this test to tell which
+        // one the engine executed (in real life the expression of a pre-compiled edit is expected to be the compiled one).
+        // The pre-compiled version passes when 'key' is 'other'; this expression would always fail...
+        editableRule.setExpression("return false");
+        engine.addRule(editableRule);
+        data.put("key", "other");
+        TestingUtils.assertNoEditFailure(engine.validate(validatable), "fvrt-rule2"); // so the pre-compiled version was used
+        data.put("key", "value");
+        TestingUtils.assertEditFailure(engine.validate(validatable), "fvrt-rule2");
+
+        // an edit the pre-compiled class doesn't know about must fall back to compiling its Groovy expression
+        EditableRule unknownRule = new EditableRule();
+        unknownRule.setId("fvrt-rule-unknown");
+        unknownRule.setMessage("msg");
+        unknownRule.setValidatorId("fake-validator-runtime");
+        unknownRule.setJavaPath("runtime");
+        unknownRule.setExpression("return runtime.key != 'value'");
+        engine.addRule(unknownRule);
+        data.put("key", "value");
+        TestingUtils.assertEditFailure(engine.validate(validatable), "fvrt-rule-unknown");
+        data.put("key", "other");
+        TestingUtils.assertNoEditFailure(engine.validate(validatable), "fvrt-rule-unknown");
+
+        // same thing for an edit on a java-path that the pre-compiled class doesn't support
+        EditableRule otherPathRule = new EditableRule();
+        otherPathRule.setId("fvrt-rule-other-path");
+        otherPathRule.setMessage("msg");
+        otherPathRule.setValidatorId("fake-validator-runtime");
+        otherPathRule.setJavaPath("level1");
+        otherPathRule.setExpression("return false");
+        Assert.assertNotNull(engine.addRule(otherPathRule));
+
+        // when the pre-compiled edits are disabled, the Groovy expression must be used even if a pre-compiled version exists
+        InitializationOptions options = new InitializationOptions();
+        options.disablePreCompiledEdits();
+        ValidationEngine disabledEngine = new ValidationEngine();
+        disabledEngine.initialize(options, FakeRuntimeEdits.getValidator());
+        EditableRule disabledRule = new EditableRule(disabledEngine.getRule("fvrt-rule2"));
+        disabledEngine.deleteRule(disabledRule);
+        disabledRule.setExpression("return false");
+        disabledEngine.addRule(disabledRule);
+        data.put("key", "other");
+        TestingUtils.assertEditFailure(disabledEngine.validate(validatable), "fvrt-rule2"); // the expression was used, not the pre-compiled version
+    }
+
+    @Test
+    public void testAddRuleUsesPreCompiledEditsBundle() throws Exception {
+
+        // a bundle only claims the edits its splits know about; adding any other edit used to throw a null-pointer exception
+        Validator validator = FakeRuntimeEdits.getValidator();
+        validator.setCompiledRules(new CompiledRulesBundle(new FakeRuntimeEditsCompiledRules() {
+            @Override
+            public boolean containsRuleId(String id) {
+                return "fvrt-rule1".equals(id) || "fvrt-rule2".equals(id);
+            }
+        }));
+
+        ValidationEngine engine = new ValidationEngine();
+        InitializationStats stats = engine.initialize(validator);
+        Assert.assertEquals(2, stats.getNumEditsPreCompiled());
+
+        EditableRule unknownRule = new EditableRule();
+        unknownRule.setId("fvrt-rule-not-in-bundle");
+        unknownRule.setMessage("msg");
+        unknownRule.setValidatorId("fake-validator-runtime");
+        unknownRule.setJavaPath("runtime");
+        unknownRule.setExpression("return runtime.key != 'value'");
+        Assert.assertNotNull(engine.addRule(unknownRule));
+
+        Map<String, Object> data = new HashMap<>();
+        Validatable validatable = new SimpleMapValidatable("runtime", data);
+        data.put("key", "value");
+        TestingUtils.assertEditFailure(engine.validate(validatable), "fvrt-rule-not-in-bundle");
+        data.put("key", "other");
+        TestingUtils.assertNoEditFailure(engine.validate(validatable), "fvrt-rule-not-in-bundle");
     }
 
     @Test

@@ -117,18 +117,26 @@ public class ExecutableRule {
 
             // if the compiledRules is a bundle, extract that correct compiledRules to use based on the rule ID
             if (_compiledRules instanceof CompiledRulesBundle)
-                _compiledRules = ((CompiledRulesBundle)compiledRules).getCompiledRulesForRuleId(_id);
+                _compiledRules = ((CompiledRulesBundle)compiledRules).getCompiledRulesForRuleId(_id); // null if no split handles that rule ID
 
-            _compiledRule = RuntimeUtils.findCompiledMethod(_compiledRules, rule.getId(), _compiledRules.getMethodParameters().get(rule.getJavaPath()));
+            // the pre-compiled class doesn't necessarily know about the rule nor its java-path (that happens for rules that are added to the
+            // engine after it has been initialized); when it doesn't, the Groovy expression is compiled instead...
+            List<Class<?>> methodParameters = _compiledRules == null ? null : _compiledRules.getMethodParameters().get(rule.getJavaPath());
+            if (methodParameters != null)
+                _compiledRule = RuntimeUtils.findCompiledMethod(_compiledRules, rule.getId(), methodParameters);
 
-            // optimization - pre-compute the different aliases for the rule's java path
-            _aliases = new ArrayList<>();
-            StringBuilder buf = new StringBuilder();
-            for (String javaPathPart : StringUtils.split(_javaPath, '.')) {
-                if (!buf.isEmpty())
-                    buf.append(".");
-                buf.append(javaPathPart);
-                _aliases.add(ValidationServices.getInstance().getAliasForJavaPath(buf.toString()));
+            if (_compiledRule == null)
+                _compiledRules = null; // no need to keep a reference to pre-compiled rules that won't be used
+            else {
+                // optimization - pre-compute the different aliases for the rule's java path
+                _aliases = new ArrayList<>();
+                StringBuilder buf = new StringBuilder();
+                for (String javaPathPart : StringUtils.split(_javaPath, '.')) {
+                    if (!buf.isEmpty())
+                        buf.append(".");
+                    buf.append(javaPathPart);
+                    _aliases.add(ValidationServices.getInstance().getAliasForJavaPath(buf.toString()));
+                }
             }
         }
 

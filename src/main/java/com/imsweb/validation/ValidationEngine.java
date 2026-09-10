@@ -894,6 +894,7 @@ public class ValidationEngine {
 
             List<Rule> rulesToAdd = new ArrayList<>();
             Map<Long, ExecutableRule> execRulesToAdd = new HashMap<>();
+            Map<String, CompiledRules> compiledRulesByValidator = new HashMap<>();
             boolean newJavaPath = false;
 
             for (EditableRule editableRule : editableRules) {
@@ -935,8 +936,10 @@ public class ValidationEngine {
                 rulesToAdd.add(rule);
                 allRuleIds.add(rule.getId());
 
-                // create an executable rule from it (this is the only expensive operation that cannot be shared by the entire batch)
-                ExecutableRule execRule = new ExecutableRule(rule);
+                // create an executable rule from it (this is the only expensive operation that cannot be shared by the entire batch);
+                // if the group provides a pre-compiled version of the edit, it is used and the Groovy expression is not compiled
+                CompiledRules compiledRules = compiledRulesByValidator.computeIfAbsent(editableRule.getValidatorId(), this::findCompiledRules);
+                ExecutableRule execRule = new ExecutableRule(rule, compiledRules, null);
                 execRulesToAdd.put(execRule.getInternalId(), execRule);
 
                 newJavaPath = newJavaPath || !_processors.containsKey(editableRule.getJavaPath());
@@ -997,6 +1000,15 @@ public class ValidationEngine {
         rule.setHistories(editableRule.getHistories());
         rule.setValidator(_validators.get(editableRule.getValidatorId()));
         return rule;
+    }
+
+    /**
+     * Returns the pre-compiled edits provided by the requested group, null if there are none or if they are disabled.
+     */
+    private CompiledRules findCompiledRules(String validatorId) {
+        if (!_options.isPreCompiledEditsEnabled())
+            return null;
+        return RuntimeUtils.findCompileRules(_validators.get(validatorId), null);
     }
 
     private Set<String> gatherAllConditionIds() {
@@ -2226,13 +2238,13 @@ public class ValidationEngine {
             StringBuilder partialPath = new StringBuilder(parts[0]);
 
             // first part correspond to a validating processor, the rest of the parts correspond to iterative processors...
-            ValidatingProcessor current = _processors.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString()));
+            ValidatingProcessor current = _processors.computeIfAbsent(partialPath.toString(), k -> new ValidatingProcessor(partialPath.toString(), _options.isPreCompiledEditsEnabled()));
             for (int i = 1; i < parts.length; i++) {
                 partialPath.append(".").append(parts[i]);
 
                 ValidatingProcessor vProcessor = _processors.get(partialPath.toString());
                 if (vProcessor == null) {
-                    vProcessor = new ValidatingProcessor(partialPath.toString());
+                    vProcessor = new ValidatingProcessor(partialPath.toString(), _options.isPreCompiledEditsEnabled());
                     IterativeProcessor iProcessor = new IterativeProcessor(vProcessor, parts[i]);
                     _processors.put(partialPath.toString(), vProcessor);
                     current.addNested(iProcessor);
