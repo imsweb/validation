@@ -805,6 +805,95 @@ public class ValidationEngineTest {
     }
 
     @Test
+    public void testAddAndDeleteRules() throws Exception {
+        TestingUtils.loadValidator("fake-validator");
+
+        EditableRule parent = new EditableRule();
+        parent.setId("batch-parent");
+        parent.setMessage("msg");
+        parent.setValidatorId("fake-validator");
+        parent.setJavaPath("level1");
+
+        // the rules of a batch are allowed to depend on each other, whatever the order they are provided in
+        EditableRule child = new EditableRule();
+        child.setId("batch-child");
+        child.setMessage("msg");
+        child.setValidatorId("fake-validator");
+        child.setJavaPath("level1");
+        child.setDependencies(Collections.singleton("batch-parent"));
+
+        List<Rule> added = ValidationEngine.getInstance().addRules(Arrays.asList(child, parent));
+        Assert.assertEquals(2, added.size());
+        Assert.assertEquals("batch-child", added.get(0).getId()); // the returned rules are in the same order as the provided ones
+        Assert.assertEquals("batch-parent", added.get(1).getId());
+        Assert.assertNotNull(ValidationEngine.getInstance().getRule("batch-parent"));
+        Assert.assertNotNull(ValidationEngine.getInstance().getRule("batch-child"));
+        Assert.assertTrue(ValidationEngine.getInstance().getRule("batch-parent").getInvertedDependencies().contains("batch-child"));
+
+        // an empty batch is a no-op
+        Assert.assertTrue(ValidationEngine.getInstance().addRules(Collections.emptyList()).isEmpty());
+
+        // the rules of a batch must be unique among themselves
+        EditableRule duplicate = new EditableRule();
+        duplicate.setId("batch-other");
+        duplicate.setMessage("msg");
+        duplicate.setValidatorId("fake-validator");
+        duplicate.setJavaPath("level1");
+        boolean exception = false;
+        try {
+            ValidationEngine.getInstance().addRules(Arrays.asList(duplicate, duplicate));
+        }
+        catch (ConstructionException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception but didn't get it");
+        Assert.assertNull(ValidationEngine.getInstance().getRule("batch-other")); // nothing should have been added
+
+        // if one rule of the batch is bad, none of them should be added
+        EditableRule bad = new EditableRule();
+        bad.setId("batch-bad");
+        bad.setMessage("msg");
+        bad.setValidatorId("fake-validator");
+        bad.setJavaPath("?");
+        exception = false;
+        try {
+            ValidationEngine.getInstance().addRules(Arrays.asList(duplicate, bad));
+        }
+        catch (ConstructionException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception but didn't get it");
+        Assert.assertNull(ValidationEngine.getInstance().getRule("batch-other"));
+        Assert.assertNull(ValidationEngine.getInstance().getRule("batch-bad"));
+
+        // deleting the parent alone is not allowed since the child depends on it
+        exception = false;
+        try {
+            ValidationEngine.getInstance().deleteRules(Collections.singletonList(new EditableRule(ValidationEngine.getInstance().getRule("batch-parent"))));
+        }
+        catch (ConstructionException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception but didn't get it");
+        Assert.assertNotNull(ValidationEngine.getInstance().getRule("batch-parent"));
+
+        // but deleting both together is, whatever the order they are provided in
+        ValidationEngine.getInstance().deleteRules(Arrays.asList(
+                new EditableRule(ValidationEngine.getInstance().getRule("batch-parent")),
+                new EditableRule(ValidationEngine.getInstance().getRule("batch-child"))));
+        Assert.assertNull(ValidationEngine.getInstance().getRule("batch-parent"));
+        Assert.assertNull(ValidationEngine.getInstance().getRule("batch-child"));
+
+        // an empty batch is a no-op
+        ValidationEngine.getInstance().deleteRules(Collections.emptyList());
+
+        TestingUtils.unloadValidator("fake-validator");
+    }
+
+    @Test
     public void testSeerdmsUsage() throws Exception {
         Validator v = TestingUtils.loadValidator("fake-validator");
         // add new rule parent
