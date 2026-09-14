@@ -37,6 +37,13 @@ public class EditableRule {
 
     protected String _expression;
 
+    // the following three collections are optional; if they are all provided, the expression won't be parsed when the rule is created/updated
+    protected Set<String> _usedProperties;
+
+    protected Set<String> _usedContextKeys;
+
+    protected Set<String> _usedLookupIds;
+
     protected String _description;
 
     protected Boolean _ignored;
@@ -261,6 +268,48 @@ public class EditableRule {
      */
     public void setExpression(String expression) {
         this._expression = expression;
+    }
+
+    /**
+     * @return Returns the properties used in the expression (null if they are not known and need to be computed).
+     */
+    public Set<String> getUsedProperties() {
+        return _usedProperties;
+    }
+
+    /**
+     * @param usedProperties The properties used in the expression to set.
+     */
+    public void setUsedProperties(Set<String> usedProperties) {
+        this._usedProperties = usedProperties;
+    }
+
+    /**
+     * @return Returns the context entries used in the expression (null if they are not known and need to be computed).
+     */
+    public Set<String> getUsedContextKeys() {
+        return _usedContextKeys;
+    }
+
+    /**
+     * @param usedContextKeys The context entries used in the expression to set.
+     */
+    public void setUsedContextKeys(Set<String> usedContextKeys) {
+        this._usedContextKeys = usedContextKeys;
+    }
+
+    /**
+     * @return Returns the lookup IDs used in the expression (null if they are not known and need to be computed).
+     */
+    public Set<String> getUsedLookupIds() {
+        return _usedLookupIds;
+    }
+
+    /**
+     * @param usedLookupIds The lookup IDs used in the expression to set.
+     */
+    public void setUsedLookupIds(Set<String> usedLookupIds) {
+        this._usedLookupIds = usedLookupIds;
     }
 
     /**

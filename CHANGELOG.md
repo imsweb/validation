@@ -2,9 +2,11 @@
 
 **Version 4.12**
 
+- Added support for providing the used properties, context entries and lookup IDs when adding/updating edits, allowing the engine to skip parsing the expressions.
+- Fixed the used properties, context entries and lookup IDs of a condition not being reset when its expression was re-assigned.
+- Fixed speed and memory issues when using the Validation::addRule method in a loop for adding a large number of edits.
 - Added better support for warnings in translated edits.
 - Updated validation engine version from 6.9 to 6.10.
-- Fixed speed and memory issues when using the Validation::addRule method in a loop for adding a large number of edits.
 - Updated dependencies.
 
 **Version 4.11**

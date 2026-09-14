@@ -194,6 +194,9 @@ public class Condition {
         if (expression != null && !expression.trim().isEmpty()) {
             synchronized (this) {
                 try {
+                    _usedProperties.clear();
+                    _usedContextKeys.clear();
+                    _usedLookupIds.clear();
                     ValidationServices.getInstance().parseExpression("condition", _expression, _usedProperties, _usedContextKeys, _usedLookupIds);
                 }
                 catch (CompilationFailedException e) {
@@ -201,6 +204,25 @@ public class Condition {
                 }
             }
         }
+    }
+
+    /**
+     * Setter for the expression taking the used properties, context entries and lookup IDs.
+     * <p/>
+     * Unlike the other setter, this method doesn't parse the expression, it simply assigns the provided values.
+     * <p/>
+     * @param expression the condition expression
+     * @param usedProperties the properties used in the expression
+     * @param usedContextKeys the context entries used in the expression
+     * @param usedLookupIds the lookup IDs used in the expression
+     */
+    public void setExpression(String expression, Set<String> usedProperties, Set<String> usedContextKeys, Set<String> usedLookupIds) {
+        _expression = expression;
+
+        // the collections are copied so they stay modifiable (they are cleared and re-populated if the expression is set again through the parsing setter)
+        _usedProperties = usedProperties == null ? new HashSet<>() : new HashSet<>(usedProperties);
+        _usedContextKeys = usedContextKeys == null ? new HashSet<>() : new HashSet<>(usedContextKeys);
+        _usedLookupIds = usedLookupIds == null ? new HashSet<>() : new HashSet<>(usedLookupIds);
     }
 
     /**
@@ -310,9 +332,10 @@ public class Condition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Condition)) return false;
-        Condition condition = (Condition)o;
+        if (this == o)
+            return true;
+        if (!(o instanceof Condition condition))
+            return false;
         if (_conditionId != null && condition._conditionId != null)
             return Objects.equals(_conditionId, condition._conditionId);
         return Objects.equals(_id, condition._id);

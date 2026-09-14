@@ -1393,6 +1393,134 @@ public class ValidationEngineTest {
     }
 
     @Test
+    public void testAddAndUpdateRuleWithProvidedUsedCollections() throws Exception {
+        TestingUtils.loadValidator("fake-validator");
+
+        Map<String, Object> entity = new HashMap<>();
+        entity.put("prop", "1");
+        Validatable validatable = new SimpleMapValidatable("ID", "level1", entity);
+
+        // the collections are deliberately not the ones that parsing the expression would return; that's how we know they were used as-is
+        Set<String> properties = new HashSet<>(Collections.singleton("level1.madeUpProp"));
+        Set<String> contextKeys = new HashSet<>(Collections.singleton("MADE_UP_CONTEXT"));
+        Set<String> lookupIds = new HashSet<>(Collections.singleton("made-up-lookup"));
+
+        EditableRule editableRule = new EditableRule();
+        editableRule.setId("fv-rule-used");
+        editableRule.setMessage("msg");
+        editableRule.setValidatorId("fake-validator");
+        editableRule.setJavaPath("level1");
+        editableRule.setExpression("return level1.prop != '1'");
+        editableRule.setUsedProperties(properties);
+        editableRule.setUsedContextKeys(contextKeys);
+        editableRule.setUsedLookupIds(lookupIds);
+
+        try {
+            Rule rule = ValidationEngine.getInstance().addRule(editableRule);
+            Assert.assertEquals(properties, rule.getUsedProperties());
+            Assert.assertEquals(contextKeys, rule.getUsedContextKeys());
+            Assert.assertEquals(lookupIds, rule.getUsedLookupIds());
+            editableRule.setRuleId(rule.getRuleId()); // required to update the rule
+
+            // the expression is still compiled, so the rule must run normally
+            TestingUtils.assertEditFailure(ValidationEngine.getInstance().validate(validatable), "fv-rule-used");
+
+            // same thing when updating the rule
+            Set<String> otherProperties = new HashSet<>(Collections.singleton("level1.otherMadeUpProp"));
+            editableRule.setExpression("return level1.prop == '1'");
+            editableRule.setUsedProperties(otherProperties);
+            ValidationEngine.getInstance().updateRule(editableRule);
+            Assert.assertEquals(otherProperties, ValidationEngine.getInstance().getRule("fv-rule-used").getUsedProperties());
+            Assert.assertEquals(contextKeys, ValidationEngine.getInstance().getRule("fv-rule-used").getUsedContextKeys());
+            Assert.assertEquals(lookupIds, ValidationEngine.getInstance().getRule("fv-rule-used").getUsedLookupIds());
+            TestingUtils.assertNoEditFailure(ValidationEngine.getInstance().validate(validatable), "fv-rule-used");
+
+            // if any of the three collections is missing, the expression must be parsed and the computed values used instead
+            editableRule.setExpression("return level1.prop != Context.FV_CONTEXT1");
+            editableRule.setUsedContextKeys(null);
+            ValidationEngine.getInstance().updateRule(editableRule);
+            Assert.assertEquals(Collections.singleton("level1.prop"), ValidationEngine.getInstance().getRule("fv-rule-used").getUsedProperties());
+            Assert.assertEquals(Collections.singleton("FV_CONTEXT1"), ValidationEngine.getInstance().getRule("fv-rule-used").getUsedContextKeys());
+
+            // the expression is still compiled, so an invalid one must still be rejected
+            editableRule.setExpression("!@$%^");
+            editableRule.setUsedContextKeys(contextKeys);
+            boolean exception = false;
+            try {
+                ValidationEngine.getInstance().updateRule(editableRule);
+            }
+            catch (ConstructionException e) {
+                exception = true;
+            }
+            if (!exception)
+                Assert.fail("Was expecting an exception but didn't get it");
+        }
+        finally {
+            TestingUtils.unloadValidator("fake-validator");
+        }
+    }
+
+    @Test
+    public void testAddAndUpdateConditionWithProvidedUsedCollections() throws Exception {
+        TestingUtils.loadValidator("fake-validator");
+
+        // the collections are deliberately not the ones that parsing the expression would return; that's how we know they were used as-is
+        Set<String> properties = new HashSet<>(Collections.singleton("level1.madeUpProp"));
+        Set<String> contextKeys = new HashSet<>(Collections.singleton("MADE_UP_CONTEXT"));
+        Set<String> lookupIds = new HashSet<>(Collections.singleton("made-up-lookup"));
+
+        EditableCondition editableCondition = new EditableCondition();
+        editableCondition.setId("fv-condition-used");
+        editableCondition.setName("Condition");
+        editableCondition.setValidatorId("fake-validator");
+        editableCondition.setJavaPath("level1");
+        editableCondition.setExpression("return level1.prop != '1'");
+        editableCondition.setUsedProperties(properties);
+        editableCondition.setUsedContextKeys(contextKeys);
+        editableCondition.setUsedLookupIds(lookupIds);
+
+        try {
+            Condition condition = ValidationEngine.getInstance().addCondition(editableCondition);
+            Assert.assertEquals(properties, condition.getUsedProperties());
+            Assert.assertEquals(contextKeys, condition.getUsedContextKeys());
+            Assert.assertEquals(lookupIds, condition.getUsedLookupIds());
+            editableCondition.setConditionId(condition.getConditionId()); // required to update the condition
+
+            // same thing when updating the condition
+            Set<String> otherProperties = new HashSet<>(Collections.singleton("level1.otherMadeUpProp"));
+            editableCondition.setExpression("return level1.prop == '1'");
+            editableCondition.setUsedProperties(otherProperties);
+            ValidationEngine.getInstance().updateCondition(editableCondition);
+            Assert.assertEquals(otherProperties, ValidationEngine.getInstance().getCondition("fv-condition-used").getUsedProperties());
+            Assert.assertEquals(contextKeys, ValidationEngine.getInstance().getCondition("fv-condition-used").getUsedContextKeys());
+            Assert.assertEquals(lookupIds, ValidationEngine.getInstance().getCondition("fv-condition-used").getUsedLookupIds());
+
+            // if any of the three collections is missing, the expression must be parsed and the computed values used instead
+            editableCondition.setExpression("return level1.prop != Context.FV_CONTEXT1");
+            editableCondition.setUsedLookupIds(null);
+            ValidationEngine.getInstance().updateCondition(editableCondition);
+            Assert.assertEquals(Collections.singleton("level1.prop"), ValidationEngine.getInstance().getCondition("fv-condition-used").getUsedProperties());
+            Assert.assertEquals(Collections.singleton("FV_CONTEXT1"), ValidationEngine.getInstance().getCondition("fv-condition-used").getUsedContextKeys());
+
+            // the expression is still compiled, so an invalid one must still be rejected
+            editableCondition.setExpression("!@$%^");
+            editableCondition.setUsedLookupIds(lookupIds);
+            boolean exception = false;
+            try {
+                ValidationEngine.getInstance().updateCondition(editableCondition);
+            }
+            catch (ConstructionException e) {
+                exception = true;
+            }
+            if (!exception)
+                Assert.fail("Was expecting an exception but didn't get it");
+        }
+        finally {
+            TestingUtils.unloadValidator("fake-validator");
+        }
+    }
+
+    @Test
     public void testMassUpdateIgnoreFlags() throws Exception {
         TestingUtils.loadValidator("fake-validator");
 

@@ -365,6 +365,25 @@ public class Rule {
     }
 
     /**
+     * Setter for the expression taking the used properties, context entries and lookup IDs.
+     * <p/>
+     * Unlike the other setters, this method doesn't parse the expression, it simply assigns the provided values.
+     * <p/>
+     * @param expression the rule expression
+     * @param usedProperties the properties used in the expression
+     * @param usedContextKeys the context entries used in the expression
+     * @param usedLookupIds the lookup IDs used in the expression
+     */
+    public void setExpression(String expression, Set<String> usedProperties, Set<String> usedContextKeys, Set<String> usedLookupIds) {
+        _expression = expression;
+
+        // the collections are copied so they stay modifiable (they are cleared and re-populated if the expression is set again through the parsing setter)
+        _usedProperties = usedProperties == null ? new HashSet<>() : new HashSet<>(usedProperties);
+        _usedContextKeys = usedContextKeys == null ? new HashSet<>() : new HashSet<>(usedContextKeys);
+        _usedLookupIds = usedLookupIds == null ? new HashSet<>() : new HashSet<>(usedLookupIds);
+    }
+
+    /**
      * Setter for the expression taking pre-parsed objects for optimization.
      */
     public void setExpression(String expression, ParsedProperties parsedProperties, ParsedContexts parsedContexts, ParsedLookups parsedLookups) throws ConstructionException {
@@ -700,7 +719,6 @@ public class Rule {
         _importEditFlag = importEditFlag;
     }
 
-
     /**
      * Getter
      * <p/>
@@ -748,9 +766,10 @@ public class Rule {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Rule)) return false;
-        Rule rule = (Rule)o;
+        if (this == o)
+            return true;
+        if (!(o instanceof Rule rule))
+            return false;
         if (_ruleId != null && rule._ruleId != null)
             return Objects.equals(_ruleId, rule._ruleId);
         return Objects.equals(_id, rule._id);

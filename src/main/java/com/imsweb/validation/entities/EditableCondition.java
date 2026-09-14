@@ -3,6 +3,8 @@
  */
 package com.imsweb.validation.entities;
 
+import java.util.Set;
+
 
 /**
  * An <code>EditableCondition</code> is a wrapper for a <code>Condition<code> that needs to be added/updated/deleted.
@@ -25,6 +27,15 @@ public class EditableCondition {
 
     /** Groovy expression */
     protected String _expression;
+
+    /** Properties used in the expression; optional, if all three "used" collections are provided, the expression won't be parsed */
+    protected Set<String> _usedProperties;
+
+    /** Context entries used in the expression; optional, if all three "used" collections are provided, the expression won't be parsed */
+    protected Set<String> _usedContextKeys;
+
+    /** Lookup IDs used in the expression; optional, if all three "used" collections are provided, the expression won't be parsed */
+    protected Set<String> _usedLookupIds;
 
     /** Description */
     protected String _description;
@@ -164,6 +175,60 @@ public class EditableCondition {
      */
     public void setExpression(String expression) {
         _expression = expression;
+    }
+
+    /**
+     * Getter for the properties used in the expression.
+     * <p/>
+     * @return the used properties, null if they are not known and need to be computed
+     */
+    public Set<String> getUsedProperties() {
+        return _usedProperties;
+    }
+
+    /**
+     * Setter for the properties used in the expression.
+     * <p/>
+     * @param usedProperties the used properties
+     */
+    public void setUsedProperties(Set<String> usedProperties) {
+        _usedProperties = usedProperties;
+    }
+
+    /**
+     * Getter for the context entries used in the expression.
+     * <p/>
+     * @return the used context entries, null if they are not known and need to be computed
+     */
+    public Set<String> getUsedContextKeys() {
+        return _usedContextKeys;
+    }
+
+    /**
+     * Setter for the context entries used in the expression.
+     * <p/>
+     * @param usedContextKeys the used context entries
+     */
+    public void setUsedContextKeys(Set<String> usedContextKeys) {
+        _usedContextKeys = usedContextKeys;
+    }
+
+    /**
+     * Getter for the lookup IDs used in the expression.
+     * <p/>
+     * @return the used lookup IDs, null if they are not known and need to be computed
+     */
+    public Set<String> getUsedLookupIds() {
+        return _usedLookupIds;
+    }
+
+    /**
+     * Setter for the lookup IDs used in the expression.
+     * <p/>
+     * @param usedLookupIds the used lookup IDs
+     */
+    public void setUsedLookupIds(Set<String> usedLookupIds) {
+        _usedLookupIds = usedLookupIds;
     }
 
     /**

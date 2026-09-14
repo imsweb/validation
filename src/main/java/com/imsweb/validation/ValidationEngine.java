@@ -973,6 +973,40 @@ public class ValidationEngine {
         }
     }
 
+    /**
+     * Assigns the expression of the provided rule; if the editable rule knows the used properties, context entries and lookup IDs,
+     * they are assigned as-is, otherwise the expression is parsed to compute them.
+     */
+    private void applyExpression(Rule rule, EditableRule editableRule) throws ConstructionException {
+        if (editableRule.getUsedProperties() != null && editableRule.getUsedContextKeys() != null && editableRule.getUsedLookupIds() != null)
+            rule.setExpression(editableRule.getExpression(), editableRule.getUsedProperties(), editableRule.getUsedContextKeys(), editableRule.getUsedLookupIds());
+        else
+            rule.setExpression(editableRule.getExpression());
+    }
+
+    /**
+     * Assigns the expression of the provided executable rule; if the editable rule knows the used properties, they are assigned as-is,
+     * otherwise the expression is parsed to compute them (the expression always needs to be compiled).
+     */
+    private void applyExpression(ExecutableRule execRule, EditableRule editableRule) throws ConstructionException {
+        if (editableRule.getUsedProperties() != null && editableRule.getUsedContextKeys() != null && editableRule.getUsedLookupIds() != null)
+            execRule.setExpression(editableRule.getExpression(), editableRule.getUsedProperties());
+        else
+            execRule.setExpression(editableRule.getExpression());
+    }
+
+    /**
+     * Assigns the expression of the provided condition; if the editable condition knows the used properties, context entries and lookup IDs,
+     * they are assigned as-is, otherwise the expression is parsed to compute them.
+     */
+    private void applyExpression(Condition condition, EditableCondition editableCondition) throws ConstructionException {
+        if (editableCondition.getUsedProperties() != null && editableCondition.getUsedContextKeys() != null && editableCondition.getUsedLookupIds() != null)
+            condition.setExpression(editableCondition.getExpression(), editableCondition.getUsedProperties(), editableCondition.getUsedContextKeys(),
+                    editableCondition.getUsedLookupIds());
+        else
+            condition.setExpression(editableCondition.getExpression());
+    }
+
     private Rule createRule(EditableRule editableRule) throws ConstructionException {
         Rule rule = new Rule();
         rule.setId(editableRule.getId());
@@ -981,7 +1015,7 @@ public class ValidationEngine {
             rule.setRuleId(ValidationServices.getInstance().getNextRuleSequence());
         rule.setName(editableRule.getName());
         rule.setJavaPath(editableRule.getJavaPath());
-        rule.setExpression(editableRule.getExpression());
+        applyExpression(rule, editableRule);
         rule.setMessage(editableRule.getMessage());
         if (editableRule.getIgnored() != null)
             rule.setIgnored(editableRule.getIgnored());
@@ -1147,7 +1181,7 @@ public class ValidationEngine {
             if (idUpdated)
                 execRule.setId(editableRule.getId());
             if (expressionUpdated)
-                execRule.setExpression(editableRule.getExpression());
+                applyExpression(execRule, editableRule);
             execRule.setMessage(editableRule.getMessage());
             execRule.setIgnored(editableRule.getIgnored() == null ? Boolean.FALSE : editableRule.getIgnored());
             if (dependenciesUpdated)
@@ -1171,7 +1205,7 @@ public class ValidationEngine {
             // update the raw data
             rule.setId(editableRule.getId());
             rule.setName(editableRule.getName());
-            rule.setExpression(editableRule.getExpression());
+            applyExpression(rule, editableRule);
             rule.setMessage(editableRule.getMessage());
             rule.setIgnored(editableRule.getIgnored() == null ? Boolean.FALSE : editableRule.getIgnored());
             rule.setDescription(editableRule.getDescription());
@@ -1388,7 +1422,7 @@ public class ValidationEngine {
             condition.setName(editableCondition.getName());
             condition.setDescription(editableCondition.getDescription());
             condition.setJavaPath(editableCondition.getJavaPath());
-            condition.setExpression(editableCondition.getExpression());
+            applyExpression(condition, editableCondition);
             condition.setValidator(_validators.get(editableCondition.getValidatorId()));
 
             // create the executable condition
@@ -1490,7 +1524,7 @@ public class ValidationEngine {
             condition.setName(editableCondition.getName());
             condition.setDescription(editableCondition.getDescription());
             condition.setJavaPath(editableCondition.getJavaPath());
-            condition.setExpression(editableCondition.getExpression());
+            applyExpression(condition, editableCondition);
         }
         finally {
             _lock.writeLock().unlock();

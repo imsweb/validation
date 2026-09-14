@@ -81,17 +81,6 @@ public class ExecutableRule {
 
     // cached aliases for the java-path, only used with pre-compiled edits
     private List<String> _aliases;
-
-    /**
-     * Constructor.
-     * <p/>
-     * Created on Jun 28, 2011 by depryf
-     * @param rule parent rule
-     */
-    public ExecutableRule(Rule rule) throws ConstructionException {
-        this(rule, null, null);
-    }
-
     /**
      * Constructor.
      * <p/>
@@ -349,6 +338,29 @@ public class ExecutableRule {
             Set<String> usedProperties = new HashSet<>();
             Set<String> usedContextEntries = new HashSet<>();
             ValidationServices.getInstance().parseExpression("rule", expression, usedProperties, usedContextEntries, null);
+            _script = ValidationServices.getInstance().compileExpression(expression);
+            _usedProperties = usedProperties;
+            _checkForcedEntities = computeCheckForcedEntities(expression);
+
+            // can't use pre-compiled methods when dynamically changing the expression! Let's make sure of that...
+            _compiledRules = null;
+            _compiledRule = null;
+            _aliases = null;
+        }
+        catch (CompilationFailedException e) {
+            throw new ConstructionException("Unable to compile rule " + _id, e);
+        }
+    }
+
+    /**
+     * Sets the rule expression using the provided used properties instead of parsing the expression to compute them.
+     * <p/>
+     * The expression still needs to be compiled since the resulting script is what is executed.
+     * @param expression expression
+     * @param usedProperties the properties used in the expression
+     */
+    public void setExpression(String expression, Set<String> usedProperties) throws ConstructionException {
+        try {
             _script = ValidationServices.getInstance().compileExpression(expression);
             _usedProperties = usedProperties;
             _checkForcedEntities = computeCheckForcedEntities(expression);
