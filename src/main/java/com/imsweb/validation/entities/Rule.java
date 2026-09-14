@@ -391,12 +391,8 @@ public class Rule {
         Set<String> properties = RuntimeUtils.getParsedProperties(parsedProperties, _id);
         Set<String> contexts = RuntimeUtils.getParsedContexts(parsedContexts, _id);
         Set<String> lookups = RuntimeUtils.getParsedLookups(parsedLookups, _id);
-        if (properties != null && contexts != null && lookups != null) {
-            _expression = expression;
-            _usedProperties = properties;
-            _usedContextKeys = contexts;
-            _usedLookupIds = lookups;
-        }
+        if (properties != null && contexts != null && lookups != null)
+            setExpression(expression, properties, contexts, lookups);
         else
             setExpression(expression);
     }

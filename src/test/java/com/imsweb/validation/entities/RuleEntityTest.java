@@ -13,6 +13,9 @@ import org.junit.Test;
 
 import com.imsweb.validation.ConstructionException;
 import com.imsweb.validation.TestingUtils;
+import com.imsweb.validation.runtime.validator.FakeRuntimeEditsParsedContexts;
+import com.imsweb.validation.runtime.validator.FakeRuntimeEditsParsedLookups;
+import com.imsweb.validation.runtime.validator.FakeRuntimeEditsParsedProperties;
 
 public class RuleEntityTest {
 
@@ -100,6 +103,23 @@ public class RuleEntityTest {
         Assert.assertEquals(Collections.singleton("line.otherProp"), rule.getUsedProperties());
 
         // the immutable collections shouldn't make the parsing setter fail when it clears them
+        rule.setExpression("return line.prop != null");
+        Assert.assertEquals(Collections.singleton("line.prop"), rule.getUsedProperties());
+        Assert.assertTrue(rule.getUsedLookupIds().isEmpty());
+    }
+
+    @Test
+    public void testSetExpressionFromPreParsedObjectsCopiesTheCollections() throws ConstructionException {
+        // the pre-parsed runtime objects return immutable collections
+        Rule rule = new Rule();
+        rule.setId("fvrt-rule1");
+        rule.setExpression("return true", new FakeRuntimeEditsParsedProperties(), new FakeRuntimeEditsParsedContexts(), new FakeRuntimeEditsParsedLookups());
+
+        Assert.assertEquals(Collections.singleton("key"), rule.getUsedProperties());
+        Assert.assertTrue(rule.getUsedContextKeys().isEmpty());
+        Assert.assertEquals(Collections.singleton("fake-lookup"), rule.getUsedLookupIds());
+
+        // those immutable collections shouldn't make the parsing setter fail when it clears them
         rule.setExpression("return line.prop != null");
         Assert.assertEquals(Collections.singleton("line.prop"), rule.getUsedProperties());
         Assert.assertTrue(rule.getUsedLookupIds().isEmpty());
