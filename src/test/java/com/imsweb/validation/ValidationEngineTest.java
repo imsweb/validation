@@ -896,6 +896,109 @@ public class ValidationEngineTest {
     }
 
     @Test
+    public void testUpdateRules() throws Exception {
+        TestingUtils.loadValidator("fake-validator");
+
+        // the child depends on the parent, the two other ones are independent
+        ValidationEngine.getInstance().addRules(Arrays.asList(
+                createBatchRule("batch-parent", null),
+                createBatchRule("batch-child", Collections.singleton("batch-parent")),
+                createBatchRule("batch-a", null),
+                createBatchRule("batch-b", null)));
+        Assert.assertTrue(ValidationEngine.getInstance().getRule("batch-parent").getInvertedDependencies().contains("batch-child"));
+
+        // an empty batch is a no-op
+        ValidationEngine.getInstance().updateRules(Collections.emptyList());
+
+        // update several rules at once
+        EditableRule editableParent = new EditableRule(ValidationEngine.getInstance().getRule("batch-parent"));
+        EditableRule editableChild = new EditableRule(ValidationEngine.getInstance().getRule("batch-child"));
+        editableParent.setMessage("new parent message");
+        editableChild.setMessage("new child message");
+        ValidationEngine.getInstance().updateRules(Arrays.asList(editableParent, editableChild));
+        Assert.assertEquals("new parent message", ValidationEngine.getInstance().getRule("batch-parent").getMessage());
+        Assert.assertEquals("new child message", ValidationEngine.getInstance().getRule("batch-child").getMessage());
+
+        // the rules of a batch can exchange their IDs, which is not possible when updating them one by one
+        EditableRule editableA = new EditableRule(ValidationEngine.getInstance().getRule("batch-a"));
+        EditableRule editableB = new EditableRule(ValidationEngine.getInstance().getRule("batch-b"));
+        Long internalIdA = editableA.getRuleId();
+        Long internalIdB = editableB.getRuleId();
+        editableA.setId("batch-b");
+        editableB.setId("batch-a");
+        ValidationEngine.getInstance().updateRules(Arrays.asList(editableA, editableB));
+        Assert.assertEquals(internalIdB, ValidationEngine.getInstance().getRule("batch-a").getRuleId());
+        Assert.assertEquals(internalIdA, ValidationEngine.getInstance().getRule("batch-b").getRuleId());
+
+        // but an ID still cannot collide with a rule that is not part of the batch
+        editableA = new EditableRule(ValidationEngine.getInstance().getRule("batch-a"));
+        editableA.setId("batch-parent");
+        boolean exception = false;
+        try {
+            ValidationEngine.getInstance().updateRules(Collections.singletonList(editableA));
+        }
+        catch (ConstructionException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception but didn't get it");
+        Assert.assertNotNull(ValidationEngine.getInstance().getRule("batch-a"));
+
+        // a given rule can appear only once in a batch
+        editableA = new EditableRule(ValidationEngine.getInstance().getRule("batch-a"));
+        exception = false;
+        try {
+            ValidationEngine.getInstance().updateRules(Arrays.asList(editableA, editableA));
+        }
+        catch (ConstructionException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception but didn't get it");
+
+        // if one rule of the batch is bad, none of them should be updated
+        editableA = new EditableRule(ValidationEngine.getInstance().getRule("batch-a"));
+        editableA.setMessage("should not be applied");
+        EditableRule badRule = new EditableRule(ValidationEngine.getInstance().getRule("batch-b"));
+        badRule.setCategory("?");
+        exception = false;
+        try {
+            ValidationEngine.getInstance().updateRules(Arrays.asList(editableA, badRule));
+        }
+        catch (ConstructionException e) {
+            exception = true;
+        }
+        if (!exception)
+            Assert.fail("Was expecting an exception but didn't get it");
+        Assert.assertNotEquals("should not be applied", ValidationEngine.getInstance().getRule("batch-a").getMessage());
+
+        // the inverted dependencies must be refreshed for the rules whose dependencies changed
+        editableChild = new EditableRule(ValidationEngine.getInstance().getRule("batch-child"));
+        editableChild.setDependencies(null);
+        ValidationEngine.getInstance().updateRules(Collections.singletonList(editableChild));
+        Assert.assertTrue(ValidationEngine.getInstance().getRule("batch-child").getDependencies().isEmpty());
+        Assert.assertFalse(ValidationEngine.getInstance().getRule("batch-parent").getInvertedDependencies().contains("batch-child"));
+        editableChild = new EditableRule(ValidationEngine.getInstance().getRule("batch-child"));
+        editableChild.setDependencies(Collections.singleton("batch-parent"));
+        ValidationEngine.getInstance().updateRules(Collections.singletonList(editableChild));
+        Assert.assertTrue(ValidationEngine.getInstance().getRule("batch-parent").getInvertedDependencies().contains("batch-child"));
+
+        TestingUtils.unloadValidator("fake-validator");
+    }
+
+    private static EditableRule createBatchRule(String id, Set<String> dependencies) {
+        EditableRule rule = new EditableRule();
+        rule.setId(id);
+        rule.setMessage("msg");
+        rule.setValidatorId("fake-validator");
+        rule.setJavaPath("level1");
+        rule.setExpression("return true");
+        if (dependencies != null)
+            rule.setDependencies(dependencies);
+        return rule;
+    }
+
+    @Test
     public void testAddRuleUsesPreCompiledEdits() throws Exception {
 
         ValidationEngine engine = new ValidationEngine();

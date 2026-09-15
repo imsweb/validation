@@ -1118,139 +1118,240 @@ public class ValidationEngine {
      * Note that the ruleId property should not be modified under any circumstances since it is how the engine knows
      * which edit needs to be updated. It is an internal identifier.
      * <p/>
+     * If many rules need to be updated, use the updateRules() method instead; updating the rules one by one is very inefficient.
+     * <p/>
      * Created on Jun 29, 2011 by depryf
      * @param editableRule <code>EditableRule</code>, cannot be null
      * @throws ConstructionException if the rule contains an error
      */
     public void updateRule(EditableRule editableRule) throws ConstructionException {
+        updateRules(Collections.singletonList(editableRule));
+    }
+
+    /**
+     * Updates several existing rules in the engine, in a single operation.
+     * <p/>
+     * This method should be used instead of calling updateRule() in a loop when many rules need to be updated; the expensive operations
+     * (re-sorting all the rules by dependencies and re-assigning the rules to the processors) are executed once for the entire batch
+     * instead of once per updated rule.
+     * <p/>
+     * The rules are validated as a whole; since the IDs are checked against the ones the engine will end up with, the rules of a batch
+     * can exchange or re-use each other's IDs (unlike calling updateRule() in a loop, which would fail or not depending on the order of
+     * the rules). A given rule can appear only once in a batch. As in the single-rule version, this operation is all-or-nothing; if any
+     * of the rules contains an error, none of them is updated and the internal state of the engine is left untouched.
+     * <p/>
+     * @param editableRules the <code>EditableRule</code> objects to update, cannot be null (nor contain null), can be empty
+     * @throws ConstructionException if any of the rules contains an error
+     */
+    public void updateRules(Collection<EditableRule> editableRules) throws ConstructionException {
         _lock.writeLock().lock();
         try {
-            if (editableRule == null)
-                throw new ConstructionException("An editable rule is required for modifying an edit");
-            if (editableRule.getRuleId() == null)
-                throw new ConstructionException("An internal ID is required when modifying an edit");
-            if (editableRule.getId() == null)
-                throw new ConstructionException("An edit ID is required when modifying an edit");
-            if (editableRule.getValidatorId() == null)
-                throw new ConstructionException("A group is required when modifying an edit");
-            if (editableRule.getMessage() == null)
-                throw new ConstructionException("A message is required when modifying an edit");
-            if (!_validators.containsKey(editableRule.getValidatorId()))
-                throw new ConstructionException("Unknown group: " + editableRule.getValidatorId());
-            if (!ValidationServices.getInstance().getAllJavaPaths().containsKey(editableRule.getJavaPath()))
-                throw new ConstructionException("Unknown java-path: " + editableRule.getJavaPath());
+            if (editableRules == null)
+                throw new ConstructionException("A collection of editable rules is required for modifying edits");
+            if (editableRules.isEmpty())
+                return;
 
-            // get original executable rule
-            ExecutableRule originalExecRule = _executableRules.get(editableRule.getRuleId());
-            if (originalExecRule == null)
-                throw new ConstructionException("Validation Engine does not contain requested edit");
+            // gather once the information that would otherwise have to be re-gathered for every single rule...
+            Map<String, String> allJavaPaths = ValidationServices.getInstance().getAllJavaPaths();
+            Map<String, Rule> allRules = new HashMap<>();
+            for (Validator v : _validators.values())
+                if (v.getRules() != null)
+                    for (Rule r : v.getRules())
+                        allRules.put(r.getId(), r);
+            Set<String> allConditionIds = null; // those two are lazily gathered since many rules don't reference any condition/category
+            Set<String> allCategoryIds = null;
 
-            // get the rule to update
-            Rule rule = getRule(originalExecRule.getId());
-            if (rule == null)
-                throw new ConstructionException("Validation Engine does not contain requested edit");
+            // validate the requested updates; nothing is modified until every single one of them has been verified
+            List<RuleUpdate> updates = new ArrayList<>();
+            Set<Long> internalIds = new HashSet<>();
+            boolean newJavaPath = false;
+            for (EditableRule editableRule : editableRules) {
+                if (editableRule == null)
+                    throw new ConstructionException("An editable rule is required for modifying an edit");
+                if (editableRule.getRuleId() == null)
+                    throw new ConstructionException("An internal ID is required when modifying an edit");
+                if (editableRule.getId() == null)
+                    throw new ConstructionException("An edit ID is required when modifying an edit");
+                if (editableRule.getValidatorId() == null)
+                    throw new ConstructionException("A group is required when modifying an edit");
+                if (editableRule.getMessage() == null)
+                    throw new ConstructionException("A message is required when modifying an edit");
+                if (!_validators.containsKey(editableRule.getValidatorId()))
+                    throw new ConstructionException("Unknown group: " + editableRule.getValidatorId());
+                if (!allJavaPaths.containsKey(editableRule.getJavaPath()))
+                    throw new ConstructionException("Unknown java-path: " + editableRule.getJavaPath());
+                if (!internalIds.add(editableRule.getRuleId()))
+                    throw new ConstructionException("An edit can be modified only once within a batch, got '" + editableRule.getId() + "' twice");
 
-            // verify the condition exists if provided
-            if (editableRule.getConditions() != null) {
-                for (String conditionId : editableRule.getConditions()) {
-                    Condition condition = getCondition(conditionId, null); // passing null for the validator ID to allow cross-validator conditions (used in SEER*DMS)
-                    if (condition == null)
-                        throw new ConstructionException("Unknown condition: " + conditionId);
+                // get original executable rule
+                ExecutableRule originalExecRule = _executableRules.get(editableRule.getRuleId());
+                if (originalExecRule == null)
+                    throw new ConstructionException("Validation Engine does not contain requested edit");
+
+                // get the rule to update
+                Rule rule = allRules.get(originalExecRule.getId());
+                if (rule == null)
+                    throw new ConstructionException("Validation Engine does not contain requested edit");
+
+                // verify the condition exists if provided
+                if (editableRule.getConditions() != null && !editableRule.getConditions().isEmpty()) {
+                    if (allConditionIds == null)
+                        allConditionIds = gatherAllConditionIds(); // conditions are gathered from all the groups to allow cross-validator conditions (used in SEER*DMS)
+                    for (String conditionId : editableRule.getConditions())
+                        if (!allConditionIds.contains(conditionId))
+                            throw new ConstructionException("Unknown condition: " + conditionId);
                 }
+
+                // verify the category exists if provided
+                if (editableRule.getCategory() != null) {
+                    if (allCategoryIds == null)
+                        allCategoryIds = gatherAllCategoryIds(); // categories are gathered from all the groups to allow cross-validator categories (used in SEER*DMS)
+                    if (!allCategoryIds.contains(editableRule.getCategory()))
+                        throw new ConstructionException("Unknown category: " + editableRule.getCategory());
+                }
+
+                // the flags have to be computed against the original state of the rule, which is not modified until the entire batch is valid
+                updates.add(new RuleUpdate(editableRule, rule, originalExecRule,
+                        !editableRule.getId().equals(rule.getId()),
+                        editableRule.getExpression() == null || !editableRule.getExpression().equals(rule.getExpression()),
+                        editableRule.getDependencies() == null || !editableRule.getDependencies().equals(rule.getDependencies()),
+                        editableRule.getHistories() == null || !editableRule.getHistories().equals(rule.getHistories())));
+
+                newJavaPath = newJavaPath || !_processors.containsKey(editableRule.getJavaPath());
             }
 
-            // verify the category exists if provided
-            if (editableRule.getCategory() != null) {
-                Category category = getCategory(editableRule.getCategory(), null); // passing null for the validator ID to allow cross-validator conditions (used in SEER*DMS)
-                if (category == null)
-                    throw new ConstructionException("Unknown category: " + editableRule.getCategory());
+            // check ID unicity against the IDs the engine will end up with, so the rules of a batch can exchange or re-use each other's IDs
+            Set<String> allRuleIds = new HashSet<>(allRules.keySet());
+            for (RuleUpdate update : updates)
+                allRuleIds.remove(update.rule().getId());
+            for (RuleUpdate update : updates)
+                if (!allRuleIds.add(update.editableRule().getId()))
+                    throw new ConstructionException("Edit IDs must be unique within the edits engine, cannot add '" + update.editableRule().getId() + "'");
+
+            // create the executable rules and update the requested properties (the cheap one are always updated, other ones have a pre-condition);
+            // this is the only expensive operation that cannot be shared by the entire batch since it re-compiles the modified expressions
+            Map<Long, ExecutableRule> execRulesToUpdate = new HashMap<>();
+            for (RuleUpdate update : updates) {
+                EditableRule editableRule = update.editableRule();
+                ExecutableRule execRule = new ExecutableRule(update.originalExecRule());
+                if (update.idUpdated())
+                    execRule.setId(editableRule.getId());
+                if (update.expressionUpdated())
+                    applyExpression(execRule, editableRule);
+                execRule.setMessage(editableRule.getMessage());
+                execRule.setIgnored(editableRule.getIgnored() == null ? Boolean.FALSE : editableRule.getIgnored());
+                if (update.dependenciesUpdated())
+                    execRule.setDependencies(editableRule.getDependencies() == null ? Collections.emptySet() : editableRule.getDependencies());
+                execRule.setConditions(editableRule.getConditions());
+                execRule.setUseAndForConditions(editableRule.getUseAndForConditions());
+                execRule.setJavaPath(editableRule.getJavaPath());
+                execRulesToUpdate.put(execRule.getInternalId(), execRule);
             }
-
-            // check ID unicity
-            if (!editableRule.getId().equals(rule.getId()))
-                if (getRule(editableRule.getId()) != null)
-                    throw new ConstructionException("Edit IDs must be unique within the edits engine, cannot add '" + editableRule.getId() + "'");
-
-            boolean idUpdated = !editableRule.getId().equals(rule.getId());
-            boolean expressionUpdated = editableRule.getExpression() == null || !editableRule.getExpression().equals(rule.getExpression());
-            boolean dependenciesUpdated = editableRule.getDependencies() == null || !editableRule.getDependencies().equals(rule.getDependencies());
-            boolean historiesUpdated = editableRule.getHistories() == null || !editableRule.getHistories().equals(rule.getHistories());
-
-            // create an executable rule and update the requested properties (the cheap one are always updated, other ones have a pre-condition)
-            ExecutableRule execRule = new ExecutableRule(originalExecRule);
-            if (idUpdated)
-                execRule.setId(editableRule.getId());
-            if (expressionUpdated)
-                applyExpression(execRule, editableRule);
-            execRule.setMessage(editableRule.getMessage());
-            execRule.setIgnored(editableRule.getIgnored() == null ? Boolean.FALSE : editableRule.getIgnored());
-            if (dependenciesUpdated)
-                execRule.setDependencies(editableRule.getDependencies() == null ? Collections.emptySet() : editableRule.getDependencies());
-            execRule.setConditions(editableRule.getConditions());
-            execRule.setUseAndForConditions(editableRule.getUseAndForConditions());
-            execRule.setJavaPath(editableRule.getJavaPath());
 
             // update the dependencies; make sure we don't leave the internal structures in a bad state if something goes wrong...
             Map<Long, ExecutableRule> rules = new HashMap<>(_executableRules);
-            rules.put(execRule.getInternalId(), execRule);
+            rules.putAll(execRulesToUpdate);
             List<ExecutableRule> sortedRules = getRulesSortedByDependencies(rules, _executableConditions); // this will validate the rule dependencies...
-            _executableRules.put(execRule.getInternalId(), execRule);
+            _executableRules.putAll(execRulesToUpdate);
 
-            // update the processors after re-evaluating the rules order (if the new java path doesn't exist, re-populate all the processors)
-            if (!_processors.containsKey(editableRule.getJavaPath()))
+            // update the processors after re-evaluating the rules order (if one of the new java paths doesn't exist, re-populate all the processors)
+            if (newJavaPath)
                 populateProcessors(sortedRules);
             else
                 updateProcessorsRules(sortedRules); // this is way less expensive than re-populating the processors...
 
             // update the raw data
-            rule.setId(editableRule.getId());
-            rule.setName(editableRule.getName());
-            applyExpression(rule, editableRule);
-            rule.setMessage(editableRule.getMessage());
-            rule.setIgnored(editableRule.getIgnored() == null ? Boolean.FALSE : editableRule.getIgnored());
-            rule.setDescription(editableRule.getDescription());
-            rule.setJavaPath(editableRule.getJavaPath());
-            rule.setConditions(editableRule.getConditions());
-            rule.setUseAndForConditions(editableRule.getUseAndForConditions());
-            rule.setCategory(editableRule.getCategory());
-            rule.setTag(editableRule.getTag());
-            rule.setAgency(editableRule.getAgency());
-            rule.setAllowOverride(editableRule.getAllowOverride());
-            rule.setNeedsReview(editableRule.getNeedsReview());
-            rule.setImportEditFlag(editableRule.getImportEditFlag());
-            rule.setDataEntryTypes(editableRule.getDataEntryTypes());
-            rule.setDataLevel(editableRule.getDataLevel());
-            if (editableRule.getSeverity() != null)
-                rule.setSeverity(editableRule.getSeverity());
-            if (dependenciesUpdated) {
-                Set<String> dependencies = new HashSet<>();
-                if (editableRule.getDependencies() != null)
-                    dependencies.addAll(editableRule.getDependencies());
-                rule.setDependencies(new HashSet<>(dependencies));
-            }
-            if (historiesUpdated) {
-                Set<RuleHistory> histories = new HashSet<>();
-                if (editableRule.getHistories() != null) {
-                    for (RuleHistory hist : editableRule.getHistories()) {
-                        hist.setRule(rule);
-                        histories.add(hist);
-                    }
+            List<Rule> updatedRules = new ArrayList<>();
+            for (RuleUpdate update : updates) {
+                EditableRule editableRule = update.editableRule();
+                Rule rule = update.rule();
+                rule.setId(editableRule.getId());
+                rule.setName(editableRule.getName());
+                applyExpression(rule, editableRule);
+                rule.setMessage(editableRule.getMessage());
+                rule.setIgnored(editableRule.getIgnored() == null ? Boolean.FALSE : editableRule.getIgnored());
+                rule.setDescription(editableRule.getDescription());
+                rule.setJavaPath(editableRule.getJavaPath());
+                rule.setConditions(editableRule.getConditions());
+                rule.setUseAndForConditions(editableRule.getUseAndForConditions());
+                rule.setCategory(editableRule.getCategory());
+                rule.setTag(editableRule.getTag());
+                rule.setAgency(editableRule.getAgency());
+                rule.setAllowOverride(editableRule.getAllowOverride());
+                rule.setNeedsReview(editableRule.getNeedsReview());
+                rule.setImportEditFlag(editableRule.getImportEditFlag());
+                rule.setDataEntryTypes(editableRule.getDataEntryTypes());
+                rule.setDataLevel(editableRule.getDataLevel());
+                if (editableRule.getSeverity() != null)
+                    rule.setSeverity(editableRule.getSeverity());
+                if (update.dependenciesUpdated()) {
+                    Set<String> dependencies = new HashSet<>();
+                    if (editableRule.getDependencies() != null)
+                        dependencies.addAll(editableRule.getDependencies());
+                    rule.setDependencies(new HashSet<>(dependencies));
+                    updatedRules.add(rule);
                 }
-                rule.setHistories(histories);
+                if (update.historiesUpdated()) {
+                    Set<RuleHistory> histories = new HashSet<>();
+                    if (editableRule.getHistories() != null) {
+                        for (RuleHistory hist : editableRule.getHistories()) {
+                            hist.setRule(rule);
+                            histories.add(hist);
+                        }
+                    }
+                    rule.setHistories(histories);
+                }
             }
 
-            // update the inverted dependencies in the raw data
-            if (dependenciesUpdated) {
-                for (Rule r : rule.getValidator().getRules()) {
-                    if (rule.getDependencies().contains(r.getId()))
-                        r.getInvertedDependencies().add(rule.getId());
-                    else
-                        r.getInvertedDependencies().remove(rule.getId());
-                }
-            }
+            // update the inverted dependencies in the raw data (only the rules whose dependencies changed need to be taken into account)
+            refreshInvertedDependencies(updatedRules);
         }
         finally {
             _lock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * The state of a single rule being updated, gathered while the batch is validated and applied once all of it has been.
+     */
+    private record RuleUpdate(EditableRule editableRule, Rule rule, ExecutableRule originalExecRule, boolean idUpdated, boolean expressionUpdated,
+                              boolean dependenciesUpdated, boolean historiesUpdated) {}
+
+    /**
+     * Re-computes the inverted dependencies of the rules the provided ones depend on; the ID of a provided rule is added to the rules it
+     * depends on, and removed from all the other ones.
+     * <p/>
+     * The rules are indexed by the ID of the rules they depend on, so a single pass over the rules of each affected group is enough to
+     * handle the entire batch.
+     */
+    private void refreshInvertedDependencies(Collection<Rule> rules) {
+
+        // group-id -> group
+        Map<String, Validator> validators = new HashMap<>();
+        // group-id -> (ID of a depended-on rule -> IDs of the provided rules depending on it)
+        Map<String, Map<String, Set<String>>> dependingRules = new HashMap<>();
+        // group-id -> IDs of all the provided rules of that group
+        Map<String, Set<String>> ruleIds = new HashMap<>();
+
+        for (Rule rule : rules) {
+            Validator v = rule.getValidator();
+            validators.put(v.getId(), v);
+            ruleIds.computeIfAbsent(v.getId(), k -> new HashSet<>()).add(rule.getId());
+            if (rule.getDependencies() != null)
+                for (String dependencyId : rule.getDependencies())
+                    dependingRules.computeIfAbsent(v.getId(), k -> new HashMap<>()).computeIfAbsent(dependencyId, k -> new HashSet<>()).add(rule.getId());
+        }
+
+        for (Entry<String, Validator> entry : validators.entrySet()) {
+            Map<String, Set<String>> dependencies = dependingRules.getOrDefault(entry.getKey(), Collections.emptyMap());
+            Set<String> ids = ruleIds.get(entry.getKey());
+            for (Rule r : entry.getValue().getRules()) {
+                Set<String> toAdd = dependencies.getOrDefault(r.getId(), Collections.emptySet());
+                r.getInvertedDependencies().addAll(toAdd);
+                for (String id : ids)
+                    if (!toAdd.contains(id))
+                        r.getInvertedDependencies().remove(id);
+            }
         }
     }
 
