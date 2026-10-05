@@ -1,5 +1,9 @@
 ## Validation Framework Version History
 
+**Version 4.13**
+
+- Updated dependencies.
+
 **Version 4.12**
 
 - Added support for providing the used properties, context entries and lookup IDs when adding/updating edits, allowing the engine to skip parsing the expressions.
